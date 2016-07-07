@@ -1,6 +1,6 @@
 {
   "name": "modepress-admin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The modepress admin tool is a small angular app for managing a modepress server",
   "main": "gulpfile.js",
   "author": "Mathew Henson",
