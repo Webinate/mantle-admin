@@ -24,7 +24,7 @@ var cleanCss = require('gulp-clean-css');
 // CONFIG
 // ==============================
 var outDir = "./dist";
-var outDirDefinitions = "../server/dist/definitions";
+var outDirDefinitions = "./lib/definitions/generated";
 var tsConfig = JSON.parse(fs.readFileSync('tsconfig.json'));
 var tsFiles = tsConfig.files;
 var thirdPartyFiles =  [
