@@ -1,0 +1,42 @@
+$folder: -96px -64px 32px 64px;
+$media: -32px -64px 32px 64px;
+$posts: -0px -64px 32px 64px;
+$search: -131px -64px 30px 60px;
+$seo: -64px -64px 32px 64px;
+$standard-file: -0px -0px 64px 64px;
+$users: -131px -0px 32px 64px;
+$file-info-clock: -64px -35px 20px 20px;
+$file-info-downloads: -84px -35px 20px 20px;
+$file-info-id: -104px -35px 20px 20px;
+$file-info-mime: -0px -128px 20px 20px;
+$file-info-size: -20px -128px 20px 20px;
+$logo-home-small: -64px -0px 67px 35px;
+@mixin sprite-width($sprite) {
+  width: nth($sprite, 3);
+}
+@mixin sprite-height($sprite) {
+  height: nth($sprite, 4);
+}
+@function sprite-width($sprite) {
+   @return nth($sprite, 3);
+}
+@function sprite-height($sprite) {
+   @return nth($sprite, 4);
+}
+@mixin sprite-position($sprite) {
+  $sprite-offset-x: nth($sprite, 1);
+  $sprite-offset-y: nth($sprite, 2);
+  background-position: $sprite-offset-x $sprite-offset-y;
+}
+@mixin sprite($sprite, $display: block) {
+   @include sprite-position($sprite);
+  background-repeat: no-repeat;
+  overflow: hidden;
+  display: $display;
+  @include sprite-width($sprite);
+  @include sprite-height($sprite);
+}
+
+.sprite {
+  background-image: url('/media/sprites/sprites.png');
+}
