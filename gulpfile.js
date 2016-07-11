@@ -198,6 +198,8 @@ gulp.task('install-definitions', function () {
  * @param {string} folder The folder we are moving the contents to
  */
 function downloadTarball(url, folder){
+    rimraf.sync(folder);
+
     return new Promise(function(resolve, reject){
         gutil.log('Downloading file "'+ url +'" into folder "' + folder + '"');
         return request(url)
