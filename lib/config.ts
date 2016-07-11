@@ -104,12 +104,8 @@
                         tinymce.remove("textarea");
                     },
                     resolve: {
-                        categories: ["$http", "apiURL", function ($http: ng.IHttpService, apiURL: string)
-                        {
-                            return $http.get<Modepress.IGetCategories>(`${apiURL}/categories`).then(function (categories)
-                            {
-                                return categories.data.data;
-                            });
+                         curCategories: ["categories", function (categories: ModepressClientPlugin.CategoryService) {
+                            return categories.all();
                         }]
                     }
                 })

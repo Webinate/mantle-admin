@@ -9,7 +9,8 @@ module clientAdmin
 {
     'use strict';
 
-    var appModule = angular.module("admin", ["ui.router", "ngAnimate", "ngSanitize", 'angular-loading-bar', 'ngFileUpload', 'admin-templates'])
+    var appModule = angular.module("admin", ["ui.router", "ngAnimate", "ngSanitize", 'angular-loading-bar', 'ngFileUpload', 'admin-templates', 'modepress-client'])
+        .value('apiUrl', '.')
         .constant("usersURL", _users )
         .constant("apiURL", "./api")
         .constant("cacheURL", _cache)

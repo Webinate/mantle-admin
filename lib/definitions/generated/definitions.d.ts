@@ -224,13 +224,14 @@ declare module clientAdmin {
         targetImgReciever: string;
         private _scope;
         private _q;
-        private http;
+        private _ps;
+        private _cs;
         private error;
         private loading;
         private errorMsg;
         private pager;
         static $inject: string[];
-        constructor(scope: any, http: ng.IHttpService, apiURL: string, categories: Array<Modepress.ICategory>, $q: ng.IQService);
+        constructor(scope: any, apiURL: string, curCategories: Modepress.IGetCategories, $q: ng.IQService, ps: ModepressClientPlugin.PostService, cs: ModepressClientPlugin.CategoryService);
         initializeTiny(): void;
         /**
         * Opens the media browser
@@ -254,10 +255,6 @@ declare module clientAdmin {
         updateDefaultSlug(form: any): void;
         swapOrder(): void;
         swapSortType(): void;
-        /**
-        * Gets a list of categories
-        */
-        getCategories(): void;
         /**
         * Sets the page into post mode
         */

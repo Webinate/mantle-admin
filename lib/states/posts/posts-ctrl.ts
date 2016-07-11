@@ -28,15 +28,17 @@
 
         private _scope: any;
         private _q: ng.IQService;
-        private http: ng.IHttpService;
+        private _ps: ModepressClientPlugin.PostService;
+        private _cs: ModepressClientPlugin.CategoryService;
         private error: boolean;
         private loading: boolean;
         private errorMsg: string;
         private pager: IPagerRemote;
 
 		// $inject annotation.
-        public static $inject = ["$scope", "$http", "apiURL", "categories", "$q"];
-        constructor(scope, http: ng.IHttpService, apiURL: string, categories: Array<Modepress.ICategory>, $q: ng.IQService)
+        public static $inject = ["$scope", "apiURL", "curCategories", "$q", "posts", "categories"];
+        constructor(scope, apiURL: string, curCategories: Modepress.IGetCategories, $q: ng.IQService,
+            ps : ModepressClientPlugin.PostService, cs : ModepressClientPlugin.CategoryService)
         {
             this.newCategoryMode = false;
             this.scope = scope;
@@ -50,15 +52,15 @@
             this.showFilters = false;
             this.searchKeyword = "";
             this.searchCategory = "";
-            this.sortOrder = "desc";
+            this.sortOrder = ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.desc];
             this.sortType = "created";
             this.defaultSlug = "";
             this.showMediaBrowser = false;
             this.targetImgReciever = "";
             this._scope = scope;
+            this._ps = ps;
+            this._cs = cs;
 
-
-            this.http = http;
             this.loading = false;
             this.error = false;
             this.errorMsg = "";
@@ -68,13 +70,11 @@
             this.postToken = { title: "", content: "", slug: "", tags: [], categories: [], public: true, brief: "" };
             var that = this;
 
-
-
             // The category token
             this.categoryToken = { title: "", description: "", slug: "" };
 
             // Fetches the categories
-            this.categories = categories;
+            this.categories = curCategories.data;
 
             scope.removePost = this.removePost.bind(this);
         }
@@ -158,7 +158,10 @@
 
         swapOrder()
         {
-            this.sortOrder = (this.sortOrder == 'asc' ? 'desc' : 'asc');
+            this.sortOrder = (this.sortOrder == ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.asc] ?
+                ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.desc] :
+                ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.asc]);
+
             this.pager.invalidate();
         }
 
@@ -166,18 +169,6 @@
         {
             this.sortType = (this.sortType == 'created' ? 'updated' : 'created');
             this.pager.invalidate();
-        }
-
-        /**
-        * Gets a list of categories
-        */
-        getCategories()
-        {
-            var that = this;
-            that.http.get<Modepress.IGetCategories>(`${that.apiURL}/categories`).then(function (categories)
-            {
-                that.categories = categories.data.data;
-            });
         }
 
         /**
@@ -205,11 +196,14 @@
             this.showNewPostForm = true;
 
             var that = this;
-            that.http.get<Modepress.IGetPost>(`${that.apiURL}/posts/slug/${post.slug}?verbose=true`).then(function (post)
-            {
-                that.postToken = post.data.data;
+            this._ps.bySlug(post.slug, true).then(function(postToken) {
+                that.postToken = postToken;
                 that.loading = false;
-                tinymce.editors[0].setContent(that.postToken.content);
+                tinymce.editors[0].setContent(postToken.content);
+
+            }).catch(function(err : Error) {
+                that.error = true;
+                that.errorMsg = err.message;
             });
         }
 
@@ -227,26 +221,32 @@
                     var order = that.sortOrder;
                     var sortType = that.sortType;
 
-                    return new that._q<number>(function(resolve, reject)
-                    {
-                        that.http.get<Modepress.IGetPosts>(`${that.apiURL}/posts?visibility=all&verbose=true&sort=${sortType}&sortOrder=${order}&categories=${searchCategory}&index=${index}&limit=${limit}&keyword=${keyword}`).then(function (token)
-                        {
-                            if (token.data.error) {
-                                that.error = true;
-                                that.errorMsg = token.data.message;
-                                that.posts = [];
-                                resolve(1);
-                            }
-                            else {
-                                that.posts = token.data.data;
-                                resolve(token.data.count);
-                            }
+                    return new that._q<number>(function(resolve, reject) {
+                        that._ps.all({
+                            sortOrder: ModepressClientPlugin.SortOrder[order],
+                            sortByUpdate: (that.sortType == 'created' ? false : true ),
+                            categories: [searchCategory],
+                            index: index,
+                            limit: limit,
+                            keyword: keyword,
+                            visibility: ModepressClientPlugin.Visibility.all
 
+                        }).then(function (token) {
+                            that.posts = token.data;
+                            resolve(token.count);
+
+                        }).catch(function(err : Error) {
+                            that.error = true;
+                            that.errorMsg = err.message;
+                            that.posts = [];
+                            resolve(1);
+
+                        }).finally(function() {
                             that.loading = false;
                         });
                     });
                 }
-            };
+            }
 
             return remote;
         }
@@ -290,17 +290,17 @@
             this.errorMsg = "";
             this.loading = true;
 
-            that.http.delete<Modepress.IResponse>(`${that.apiURL}/posts/${post._id}`).then(function (token)
-            {
-                if (token.data.error) {
-                    that.error = true;
-                    that.errorMsg = token.data.message;
-                }
-                else
-                    that.posts.splice(that.posts.indexOf(post), 1);
-
-                that.loading = false;
+            this._ps.delete(post._id).then(function(postId) {
+                that.posts.splice(that.posts.indexOf(post), 1);
                 (<any>post).confirmDelete = false;
+
+            }).catch(function(err : Error) {
+                that.error = true;
+                that.errorMsg = err.message;
+
+            }).finally(function() {
+                 that.loading = false;
+                 (<any>post).confirmDelete = false;
             });
         }
 
@@ -315,23 +315,18 @@
             this.errorMsg = "";
             this.loading = true;
 
-            that.http.delete<Modepress.IResponse>(`${that.apiURL}/categories/${category._id}`).then(function (token)
-            {
-                if (token.data.error)
-                {
-                    that.error = true;
-                    that.errorMsg = token.data.message;
-                }
-                else
-                {
-                    if (that.postToken.categories.indexOf(category.slug) != -1)
-                        that.postToken.categories.splice(that.postToken.categories.indexOf(category.slug), 1);
+            this._cs.delete(category._id).then(function(){
+                if (that.postToken.categories.indexOf(category.slug) != -1)
+                    that.postToken.categories.splice(that.postToken.categories.indexOf(category.slug), 1);
 
-                    that.categories.splice(that.categories.indexOf(category), 1);
-                }
+                that.categories.splice(that.categories.indexOf(category), 1);
 
+            }).catch(function(err: Error) {
+                that.error = true;
+                that.errorMsg = err.message;
+            }).finally(function(){
                 that.loading = false;
-            });
+            })
         }
 
         /**
@@ -353,44 +348,34 @@
 
             if (this.editMode)
             {
-                that.http.put<Modepress.IGetPost>(`${that.apiURL}/posts/${postToken._id}`, postToken).then(function (token)
-                {
-                    if (token.data.error)
-                    {
-                        that.error = true;
-                        that.errorMsg = token.data.message;
-                    }
-                    else
-                    {
-                        that.successMessage = token.data.message;
-                        for (var i = 0, l = that.posts.length; i < l; i++)
-                            if (that.posts[i]._id == that.postToken._id)
-                            {
-                                that.posts.splice(i, 1, that.postToken);
-                                break;
-                            }
-                    }
+                that._ps.edit(postToken._id, postToken).then(function(token) {
 
+                    that.successMessage = "Post updated";
+                    for (var i = 0, l = that.posts.length; i < l; i++)
+                        if (that.posts[i]._id == that.postToken._id) {
+                            that.posts.splice(i, 1, that.postToken);
+                            break;
+                        }
+
+                }).catch(function(err: Error) {
+                    that.error = true;
+                    that.errorMsg = err.message;
+                }).finally(function(){
                     that.loading = false;
                 });
             }
             else
             {
-                that.http.post<Modepress.IGetPost>(`${that.apiURL}/posts`, postToken).then(function (token)
-                {
-                    if (token.data.error)
-                    {
-                        that.error = true;
-                        that.errorMsg = token.data.message;
-                    }
-                    else
-                    {
-                        that.posts.push(token.data.data);
-                        that.showNewPostForm = false;
-                    }
+                that._ps.create(postToken).then(function (token) {
+                    that.posts.push(token);
+                    that.showNewPostForm = false;
 
+                }).catch(function(err: Error) {
+                    that.error = true;
+                    that.errorMsg = err.message;
+                }).finally(function(){
                     that.loading = false;
-                });
+                });;
             }
         }
 
@@ -409,25 +394,20 @@
             this.errorMsg = "";
             this.loading = true;
             var categoryToken = this.categoryToken;
-            that.http.post<Modepress.IGetCategory>(`${that.apiURL}/categories`, categoryToken).then(function (token)
+            that._cs.create(categoryToken).then(function (token)
             {
-                if (token.data.error)
-                {
-                    that.error = true;
-                    that.errorMsg = token.data.message;
-                }
-                else
-                {
-                    that.categories.push(token.data.data);
-                    that.categoryToken.description = "";
-                    that.categoryToken.title = "";
-                    that.categoryToken.slug = "";
-                }
-
-                that.loading = false;
-
+                that.categories.push(token);
+                that.categoryToken.description = "";
+                that.categoryToken.title = "";
+                that.categoryToken.slug = "";
                 that.scope.newCategoryForm.$setUntouched();
                 that.scope.newCategoryForm.$setPristine();
+
+            }).catch(function(err: Error) {
+                that.error = true;
+                that.errorMsg = err.message;
+            }).finally(function() {
+                that.loading = false;
             });
         }
 
