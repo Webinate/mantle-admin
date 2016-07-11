@@ -8,14 +8,14 @@ declare module clientAdmin {
         protected showRenders: boolean;
         protected renders: Array<Modepress.IRender>;
         private _q;
-        private http;
         private error;
         private loading;
         private errorMsg;
         private pager;
         private searchTerm;
+        private _rs;
         static $inject: string[];
-        constructor(scope: any, http: ng.IHttpService, apiURL: string, cacheURL: string, $q: ng.IQService);
+        constructor(scope: any, apiURL: string, cacheURL: string, $q: ng.IQService, renders: ModepressClientPlugin.RenderService);
         /**
          * Fetches the users from the database
          * @returns {IPagerRemote}

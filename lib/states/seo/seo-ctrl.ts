@@ -11,16 +11,16 @@
         protected renders: Array<Modepress.IRender>;
 
         private _q: ng.IQService;
-        private http: ng.IHttpService;
         private error: boolean;
         private loading: boolean;
         private errorMsg: string;
         private pager: IPagerRemote;
         private searchTerm: string;
+        private _rs: ModepressClientPlugin.RenderService;
 
 		// $inject annotation.
-        public static $inject = ["$scope", "$http", "apiURL", "cacheURL", "$q"];
-        constructor(scope: any, http: ng.IHttpService, apiURL: string, cacheURL: string, $q : ng.IQService)
+        public static $inject = ["$scope", "apiURL", "cacheURL", "$q", "renders"];
+        constructor(scope: any, apiURL: string, cacheURL: string, $q : ng.IQService, renders : ModepressClientPlugin.RenderService)
         {
             this.showRenders = true;
             this.apiURL = apiURL;
@@ -28,11 +28,11 @@
             this.renders = [];
 
             this._q = $q;
-            this.http = http;
             this.loading = false;
             this.error = false;
             this.errorMsg = "";
             this.searchTerm = "";
+            this._rs = renders;
             this.pager = this.createPagerRemote();
         }
 
@@ -52,21 +52,23 @@
 
                     return new that._q<number>(function(resolve, reject)
                     {
-                        that.http.get<Modepress.IGetPosts>(`${that.apiURL}/renders/get-renders?index=${index}&verbose=true&limit=${limit}&search=${that.searchTerm}`).then(function (token)
-                        {
-                            if (token.data.error) {
-                                that.error = true;
-                                that.errorMsg = token.data.message;
-                                that.renders = [];
-                                resolve(1);
-                            }
-                            else {
-                                that.renders = token.data.data;
-                                resolve(token.data.count);
-                            }
+                        that._rs.all({
+                            index: index,
+                            limit: limit,
+                            keyword: that.searchTerm
+                        }).then(function (token) {
+                            that.renders = token.data;
+                            resolve(token.count);
 
+                        }).catch( function(err : Error ) {
+                            that.error = true;
+                            that.errorMsg = err.message;
+                            that.renders = [];
+                            resolve(1);
+
+                        }).finally(function(){
                             that.loading = false;
-                        });
+                        })
                     });
                 }
             };
@@ -84,16 +86,14 @@
             this.errorMsg = "";
             this.loading = true;
 
-            that.http.delete<Modepress.IResponse>(`${that.apiURL}/renders/clear-renders`).then(function (token)
-            {
-                if (token.data.error)
-                {
-                    that.error = true;
-                    that.errorMsg = token.data.message;
-                }
-                else
-                    that.renders = [];
+            that._rs.clear().then(function(){
+                that.renders = [];
 
+            }).catch( function(err : Error ) {
+                that.error = true;
+                that.errorMsg = err.message;
+
+            }).finally(function(){
                 that.loading = false;
             });
         }
@@ -108,16 +108,15 @@
             this.errorMsg = "";
             this.loading = true;
 
-            that.http.delete<Modepress.IResponse>(`${that.apiURL}/renders/remove-render/${render._id}`).then(function (token)
+            that._rs.delete(render._id).then(function (token)
             {
-                if (token.data.error)
-                {
-                    that.error = true;
-                    that.errorMsg = token.data.message;
-                }
-                else
-                    that.renders.splice(that.renders.indexOf(render), 1);
+                that.renders.splice(that.renders.indexOf(render), 1);
 
+            }).catch( function(err : Error ) {
+                that.error = true;
+                that.errorMsg = err.message;
+
+            }).finally(function(){
                 that.loading = false;
                 (<any>render).confirmDelete = false;
             });

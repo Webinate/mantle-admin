@@ -14,7 +14,7 @@
             <div pager interface="controller.pager" limit="10">
                 <div class="div-list" ng-repeat="render in controller.renders">
                     <div class="name left">
-                        <a target="_blank" ng-href="{{controller.apiURL}}/renders/preview-render/{{render._id}}">{{render.url}}</a>
+                        <a target="_blank" ng-href="{{render.url}}">{{render.url}}</a>
                     </div>
                     <div class="right">
                         <div class="nav-button red-highlight" ng-click="controller.removeRender(render)">

@@ -229,4 +229,53 @@ declare module ModepressClientPlugin {
     }
 }
 declare module ModepressClientPlugin {
+    /**
+     * Describes how to filter the renders returned from a GET call.
+     */
+    interface IRenderOptions {
+        /** Set the number of renders returned by the call */
+        limit?: number;
+        /** Set the starting index for fetching renders */
+        index?: number;
+        /** Filter by a render by a keyword in its url */
+        keyword?: string;
+        /** If true, do not fetch the render's content */
+        minimal?: boolean;
+        /** Specify the sort order */
+        sortOrder?: SortOrder;
+    }
+    /**
+     * A service for interacting with page renders and the relevant modepress endpoints
+     */
+    class RenderService {
+        private _http;
+        private _url;
+        private _q;
+        static $inject: string[];
+        constructor($http: ng.IHttpService, apiUrl: string, $q: ng.IQService);
+        /**
+         * Gets a render by its id
+         * @param {string} id The id of the render to fetch
+         * @returns {ng.IPromise<string>} Returns the preview in HTML
+         */
+        preview(id: string): ng.IPromise<string>;
+        /**
+         * Removes a render by its ID
+         * @param {string} id The id of the render
+         * @returns {ng.IPromise<string>} Returns the ID of the removed render
+         */
+        delete(id: string): ng.IPromise<string>;
+        /**
+         * Removes all renders
+         */
+        clear(): ng.IPromise<void>;
+        /**
+         * Gets all renders
+         * @param {IRenderOptions} options
+         * @returns {ng.IPromise<Modepress.IGetRenders>}
+         */
+        all(options: IRenderOptions): ng.IPromise<Modepress.IGetRenders>;
+    }
+}
+declare module ModepressClientPlugin {
 }
