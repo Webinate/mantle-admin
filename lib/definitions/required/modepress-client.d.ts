@@ -64,15 +64,17 @@ declare module ModepressClientPlugin {
         /**
          * Gets a post by its unique slug
          * @param {string} slug The slug of the post
+         * @param {boolean} verbose [Optional] If true, returns all post data - incluing any sensitive fields - based on user privileges
          * @returns {ng.IPromise<Modepress.IPost>}
          */
-        bySlug(slug: string): ng.IPromise<Modepress.IPost>;
+        bySlug(slug: string, verbose?: boolean): ng.IPromise<Modepress.IPost>;
         /**
          * Gets a post by its id
          * @param {string} slug The slug of the post
+         * @param {boolean} verbose [Optional] If true, returns all post data - incluing any sensitive fields - based on user privileges
          * @returns {ng.IPromise<Modepress.IPost>}
          */
-        byId(id: string): ng.IPromise<Modepress.IPost>;
+        byId(id: string, verbose?: boolean): ng.IPromise<Modepress.IPost>;
         /**
          * Removes a post by its ID
          * @param {string} id The id of the post
@@ -89,9 +91,9 @@ declare module ModepressClientPlugin {
         /**
          * Creates a new post
          * @param {Modepress.IPost} postData The post data to create
-         * @returns {ng.IPromise<string>}
+         * @returns {ng.IPromise<Modepress.IPost>}
          */
-        create(postData: Modepress.IPost): ng.IPromise<string>;
+        create(postData: Modepress.IPost): ng.IPromise<Modepress.IPost>;
         /**
          * Gets all posts that match each of the parameter conditions
          * @param {Modepress.IPostOptions} options The filter options
@@ -118,9 +120,9 @@ declare module ModepressClientPlugin {
         /**
          * Creates a new category
          * @param {Modepress.ICategory} category The category data to create
-         * @returns {ng.IPromise<string>}
+         * @returns {ng.IPromise<Modepress.ICategory>}
          */
-        create(category: Modepress.ICategory): ng.IPromise<string>;
+        create(category: Modepress.ICategory): ng.IPromise<Modepress.ICategory>;
         /**
          * Gets all categories
          * @param {number} index The start index to fetch categories from
