@@ -35,7 +35,8 @@ var thirdPartyFiles =  [
     './third-party/angular-animate/angular-animate.js',
     './third-party/angular-loading-bar/build/loading-bar.js',
     './third-party/angular-loading-bar/build/loading-bar.css',
-    './third-party/angular-file-upload/dist/ng-file-upload.js'
+    './third-party/angular-file-upload/dist/ng-file-upload.js',
+    './third-party/modepress-client/dist/plugin.js'
 ];
 
 /**
@@ -161,26 +162,6 @@ gulp.task('copy-index-release', function() {
     ]);
 });
 
-
-
-/**
- * Deletes a folder and all its children recursively
- * @param {string} path The folder path to remove
- */
-function deleteFolderRecursive(path) {
-    if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file,index){
-            var curPath = path + "/" + file;
-            if(fs.lstatSync(curPath).isDirectory()) { // recurse
-                deleteFolderRecursive(curPath);
-            }
-            else
-                fs.unlinkSync(curPath);
-        });
-        fs.rmdirSync(path);
-    }
-};
-
 /**
  * This function downloads a definition file from github and writes it to a destination
  * @param {string} url The url of the file to download
@@ -232,7 +213,7 @@ function downloadTarball(url, folder){
             gulp.src( folder + '/' + folders[0] + "/**/*.*" )
                 .pipe(gulp.dest(folder))
                 .on('end', function() {
-                    deleteFolderRecursive(folder + '/' + folders[0]);
+                    rimraf.sync(folder + '/' + folders[0]);
                     gutil.log(gutil.colors.green('Finished download of "'+ url +'"'));
                     resolve(true);
                 });
@@ -252,7 +233,8 @@ gulp.task('install-third-parties', function () {
         downloadTarball("https://github.com/jquery/jquery/tarball/2.2.2", './third-party/jquery'),
         downloadTarball("https://github.com/chieffancypants/angular-loading-bar/tarball/0.9.0", './third-party/angular-loading-bar'),
         downloadTarball("https://github.com/tinymce/tinymce-dist/tarball/4.3.8", './third-party/tinymce'),
-        downloadTarball("https://github.com/danialfarid/ng-file-upload/tarball/12.0.4", './third-party/angular-file-upload')
+        downloadTarball("https://github.com/danialfarid/ng-file-upload/tarball/12.0.4", './third-party/angular-file-upload'),
+        downloadTarball("https://github.com/MKHenson/modepress-client-angular/tarball/master", './third-party/modepress-client')
     ]);
 });
 
