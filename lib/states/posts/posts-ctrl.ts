@@ -9,7 +9,6 @@
         public posts: Array<Modepress.IPost>;
         public showNewPostForm: boolean;
         public editMode: boolean;
-        public apiURL: string;
         public scope: any;
         public successMessage: string;
         public tagString: string;
@@ -26,7 +25,6 @@
         public defaultSlug: string;
         public targetImgReciever: string;
 
-        private _scope: any;
         private _q: ng.IQService;
         private _ps: ModepressClientPlugin.PostService;
         private _cs: ModepressClientPlugin.CategoryService;
@@ -36,13 +34,12 @@
         private pager: IPagerRemote;
 
 		// $inject annotation.
-        public static $inject = ["$scope", "apiURL", "curCategories", "$q", "posts", "categories"];
-        constructor(scope, apiURL: string, curCategories: Modepress.IGetCategories, $q: ng.IQService,
+        public static $inject = ["$scope", "curCategories", "$q", "posts", "categories"];
+        constructor(scope, curCategories: Modepress.IGetCategories, $q: ng.IQService,
             ps : ModepressClientPlugin.PostService, cs : ModepressClientPlugin.CategoryService)
         {
             this.newCategoryMode = false;
             this.scope = scope;
-            this.apiURL = apiURL;
             this.posts = [];
             this.successMessage = "";
             this.tagString = "";
@@ -57,7 +54,6 @@
             this.defaultSlug = "";
             this.showMediaBrowser = false;
             this.targetImgReciever = "";
-            this._scope = scope;
             this._ps = ps;
             this._cs = cs;
 
@@ -92,7 +88,7 @@
                         onclick: function ()
                         {
                             that.openMediaBrowser();
-                            that._scope.$apply();
+                            that.scope.$apply();
                         }
                     });
                 },
@@ -158,10 +154,7 @@
 
         swapOrder()
         {
-            this.sortOrder = (this.sortOrder == ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.asc] ?
-                ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.desc] :
-                ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.asc]);
-
+            this.sortOrder = (this.sortOrder == "asc" ? "desc" : "asc" );
             this.pager.invalidate();
         }
 
@@ -198,12 +191,13 @@
             var that = this;
             this._ps.bySlug(post.slug, true).then(function(postToken) {
                 that.postToken = postToken;
-                that.loading = false;
                 tinymce.editors[0].setContent(postToken.content);
 
             }).catch(function(err : Error) {
                 that.error = true;
                 that.errorMsg = err.message;
+            }).finally(function(){
+                that.loading = false;
             });
         }
 
@@ -223,7 +217,7 @@
 
                     return new that._q<number>(function(resolve, reject) {
                         that._ps.all({
-                            sortOrder: ModepressClientPlugin.SortOrder[order],
+                            sortOrder: ( order == "asc" ? ModepressClientPlugin.SortOrder.asc : ModepressClientPlugin.SortOrder.desc ),
                             sortByUpdate: (that.sortType == 'created' ? false : true ),
                             categories: [searchCategory],
                             index: index,

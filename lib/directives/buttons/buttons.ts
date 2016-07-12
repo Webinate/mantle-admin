@@ -14,7 +14,7 @@ module clientAdmin
 
         constructor(color : string = `blue`, template? : string )
         {
-            this.template = template || `<div class="button ${color}"><div class="cross" ng-show="!noIcon"></div>{{text}}</div>`;
+            this.template = template || `<button class="button ${color}"><div class="cross" ng-show="!noIcon"></div>{{text}}</button>`;
         }
 
         link (scope, elem: JQuery, attributes: angular.IAttributes, ngModel: angular.INgModelController)
@@ -98,7 +98,7 @@ module clientAdmin
     export class ToggleButton implements ng.IDirective
 	{
         restrict = 'E';
-        template = '<div class="button blue" ng-click="expanded=!expanded"><div class="cross" ng-show="!expanded"></div><div class="minus" ng-show="expanded"></div>{{text}}</div>';
+        template = '<button class="button blue" ng-click="expanded=!expanded"><div class="cross" ng-show="!expanded"></div><div class="minus" ng-show="expanded"></div>{{text}}</button>';
         scope = {
             text: '=',
             expanded: '=?'

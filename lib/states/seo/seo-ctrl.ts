@@ -5,7 +5,6 @@
 	*/
     export class SEOCtrl
 	{
-        protected apiURL: string;
         protected cacheURL: string;
         protected showRenders: boolean;
         protected renders: Array<Modepress.IRender>;
@@ -19,11 +18,10 @@
         private _rs: ModepressClientPlugin.RenderService;
 
 		// $inject annotation.
-        public static $inject = ["$scope", "apiURL", "cacheURL", "$q", "renders"];
+        public static $inject = ["$scope", "cacheURL", "$q", "renders"];
         constructor(scope: any, apiURL: string, cacheURL: string, $q : ng.IQService, renders : ModepressClientPlugin.RenderService)
         {
             this.showRenders = true;
-            this.apiURL = apiURL;
             this.cacheURL = cacheURL;
             this.renders = [];
 

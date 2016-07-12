@@ -3,7 +3,6 @@ declare module clientAdmin {
     * Controller for the dashboard users section
     */
     class SEOCtrl {
-        protected apiURL: string;
         protected cacheURL: string;
         protected showRenders: boolean;
         protected renders: Array<Modepress.IRender>;
@@ -206,7 +205,6 @@ declare module clientAdmin {
         posts: Array<Modepress.IPost>;
         showNewPostForm: boolean;
         editMode: boolean;
-        apiURL: string;
         scope: any;
         successMessage: string;
         tagString: string;
@@ -222,7 +220,6 @@ declare module clientAdmin {
         showMediaBrowser: boolean;
         defaultSlug: string;
         targetImgReciever: string;
-        private _scope;
         private _q;
         private _ps;
         private _cs;
@@ -231,7 +228,7 @@ declare module clientAdmin {
         private errorMsg;
         private pager;
         static $inject: string[];
-        constructor(scope: any, apiURL: string, curCategories: Modepress.IGetCategories, $q: ng.IQService, ps: ModepressClientPlugin.PostService, cs: ModepressClientPlugin.CategoryService);
+        constructor(scope: any, curCategories: Modepress.IGetCategories, $q: ng.IQService, ps: ModepressClientPlugin.PostService, cs: ModepressClientPlugin.CategoryService);
         initializeTiny(): void;
         /**
         * Opens the media browser
@@ -294,6 +291,50 @@ declare module clientAdmin {
         * Adds this category to the post's selected categories
         */
         selectCategory(category: Modepress.ICategory): void;
+    }
+}
+declare module clientAdmin {
+    /**
+    * Controller for the dashboard comments section
+    */
+    class CommentsCtrl {
+        commentToken: Modepress.IComment;
+        comments: Array<Modepress.IComment>;
+        scope: any;
+        successMessage: string;
+        searchKeyword: string;
+        sortOrder: string;
+        sortType: string;
+        showFilters: boolean;
+        editMode: boolean;
+        private _q;
+        private _ps;
+        private _cs;
+        private error;
+        private loading;
+        private errorMsg;
+        private pager;
+        static $inject: string[];
+        constructor(scope: any, $q: ng.IQService, ps: ModepressClientPlugin.PostService, cs: ModepressClientPlugin.CommentService);
+        initializeTiny(): void;
+        swapOrder(): void;
+        swapSortType(): void;
+        /**
+        * Set the edit mode
+        */
+        enterEditMode(comment: Modepress.IComment): void;
+        createPagerRemote(): IPagerRemote;
+        /**
+         * Edits a comment on the fly
+         * @param {Modepress.IComment} comment The comment we are editing
+         * @param {Modepress.IComment} editBody The comment variables we are updating
+         */
+        quickEdit(comment: Modepress.IComment, editBody: Modepress.IComment): void;
+        /**
+        * Removes a comment from the database
+        * @param {Modepress.IComment} comment The comment to remove
+        */
+        removeComment(comment: Modepress.IComment): void;
     }
 }
 declare module clientAdmin {

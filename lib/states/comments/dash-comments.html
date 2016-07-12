@@ -1,0 +1,86 @@
+<div class="comments state">
+    <error-modal message="controller.errorMsg" visible="controller.error"></error-modal>
+
+    <state-header text="'Comments'" loading="controller.loading">
+        <div>
+            <toggle-button ng-click="controller.showFilters = !controller.showFilters" text="'Filters'"></toggle-button>
+            <search-bar value="controller.searchKeyword" on-click="controller.pager.invalidate"></search-bar>
+            <div class="fix"></div>
+        </div>
+    </state-header>
+
+    <div class="content-view">
+        <div class="filter-options animated-panel animated-panel-med ng-hide" ng-show="controller.showFilters">
+            <div class="filter-group">
+                <div class="label">Sort Order</div>
+                <tick-box on-ticked="controller.swapOrder(checked)" checked="controller.sortOrder != 'asc'" text="'Newest'"></tick-box>
+                <tick-box on-ticked="controller.swapOrder(checked)" checked="controller.sortOrder == 'asc'" text="'Oldest'"></tick-box>
+            </div>
+
+            <div class="filter-group">
+                <div class="label">Sort By</div>
+                <tick-box on-ticked="controller.swapSortType(checked)" checked="controller.sortType != 'created'" text="'Last Modified'"></tick-box>
+                <tick-box on-ticked="controller.swapSortType(checked)" checked="controller.sortType == 'created'" text="'Created'"></tick-box>
+            </div>
+
+            <div class="filter-group">
+                <div class="label">Category</div>
+                <div class="dropdown">
+                    <select ng-model="controller.searchCategory" ng-change="controller.pager.invalidate()">
+                        <option value=""></option>
+                        <option ng-repeat="category in controller.categories" ng-value="category.slug">{{category.title}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fix"></div>
+        </div>
+
+        <div class="content-view-item edit-form" ng-show="controller.editMode">
+            <form name="editForm" ng-submit="editForm.$valid && controller.createPost()" novalidate>
+                <detail text="'Content'" info="'The main content of the post'" on-render="controller.initializeTiny()">
+                    <textarea class="newPostText" name="nContent"></textarea>
+                </detail>
+            </form>
+        </div>
+
+        <div class="content-view-item-list" ng-show="!controller.editMode">
+            <div pager interface="controller.pager" limit="10">
+                <item-panel ng-repeat="comment in controller.comments" model="comment" on-delete="removeComment">
+                    <panel-preview>
+                        <div class="view-item-label date">Created: {{comment.createdOn | date:"MM/dd/yyyy 'at' h:mma"}}</div>
+                        <div class="view-item-label date nav-button red-highlight"><a href="" ng-click="controller.enterEditMode(comment)">Edit</a></div>
+                        <div class="view-item-label"><b>{{comment.author}}</b> : <span class="author">{{ comment.content | limitTo: 20 }}{{ (comment.content.length > 20 ? "..." : "" ) }}</span></div>
+                    </panel-preview>
+                    <panel-content>
+                        <detail text="'ID'">
+                            <div class="textbox">{{comment._id}}</div>
+                        </detail>
+                        <detail text="'Author'">
+                            <div class="textbox">{{comment.author}}</div>
+                        </detail>
+                        <detail text="'Created on'">
+                            <div class="textbox">{{comment.createdOn | date:"MM/dd/yyyy 'at' h:mma"}}</div>
+                        </detail>
+                        <detail text="'Last Updated'">
+                            <div class="textbox">{{comment.lastUpdated | date:"MM/dd/yyyy 'at' h:mma"}}</div>
+                        </detail>
+                        <detail text="'Visibility'">
+                            <tick-box on-ticked="controller.quickEdit(comment, {public : !ticked})" checked="comment.public" text="'Public'"></tick-box>
+                        </detail>
+                        <detail text="'Content'">
+                            <div class="fix"></div>
+                            <div class="preview" ng-bind-html="comment.content"></div>
+                        </detail>
+                        <div class="content-view-detail">
+                            <div class="buttons">
+                                <div class="nav-button red-highlight" ng-hide="$parent.confirmDelete" ng-click="$parent.confirmDelete=true"><a href="">Remove Comment</a></div>
+                                <add-button ng-click="controller.enterEditMode(comment)" no-icon="true" text="'Edit Post'"></add-button>
+                            </div>
+                        </div>
+                    </panel-content>
+                </item-panel>
+            </div>
+        </div>
+    </div>
+</div>

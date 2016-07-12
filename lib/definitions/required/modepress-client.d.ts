@@ -185,19 +185,17 @@ declare module ModepressClientPlugin {
         byId(id: string): ng.IPromise<Modepress.IComment>;
         /**
          * Removes a comment by its ID
-         * @param {string} user The parent user of the comment
          * @param {string} id The id of the comment
          * @returns {ng.IPromise<string>}
          */
-        delete(user: string, id: string): ng.IPromise<string>;
+        delete(id: string): ng.IPromise<string>;
         /**
          * Edits a comment by its ID
-         * @param {string} user The parent user of the comment
          * @param {string} id The id of the comment
          * @param {Modepress.IComment} commentData The comment data to edit
          * @returns {ng.IPromise<string>}
          */
-        edit(user: string, id: string, commentData: Modepress.IComment): ng.IPromise<string>;
+        edit(id: string, commentData: Modepress.IComment): ng.IPromise<string>;
         /**
          * Creates a new comment
          * @param {string} postId The post we are commenting on
@@ -214,18 +212,24 @@ declare module ModepressClientPlugin {
          */
         allByParent(parentId: string, options?: ICommentOptions): ng.IPromise<Modepress.IGetComments>;
         /**
-        * Gets all comments of a user
+        * Gets all comments of a particular user
         * @param {string} user The username  of the user
         * @param {Modepress.ICommentOptions} options The filter options
         * @returns {ng.IPromise<Modepress.IGetComments>}
         */
         allByUser(user: string, options?: ICommentOptions): ng.IPromise<Modepress.IGetComments>;
         /**
+         * Gets all comments. Requires admin priviledges.
+         * @param {Modepress.ICommentOptions} options The filter options
+         * @returns {ng.IPromise<Modepress.IGetComments>}
+         */
+        all(options?: ICommentOptions): ng.IPromise<Modepress.IGetComments>;
+        /**
          * Gets all comments that match each of the parameter conditions
          * @param {Modepress.ICommentOptions} options The filter options
          * @returns {ng.IPromise<Modepress.IGetComments>}
          */
-        all(url?: string, options?: ICommentOptions): ng.IPromise<Modepress.IGetComments>;
+        private _all(url?, options?);
     }
 }
 declare module ModepressClientPlugin {

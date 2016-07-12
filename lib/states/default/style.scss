@@ -61,6 +61,9 @@
     }
 
     .sprite {
+        &.comments{
+            @include sprite($comments-norm, inline-block);
+        }
         &.sprite-posts{
             @include sprite-position($posts);
         }
@@ -76,6 +79,9 @@
     }
 
     &.active .icon {
+        &.comments{
+            @include sprite($comments-active, inline-block);
+        }
         &.sprite-posts {
             background-position-y: (nth($posts, 2) - (sprite-height($posts) / 2));
         }

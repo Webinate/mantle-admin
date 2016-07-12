@@ -109,6 +109,17 @@
                         }]
                     }
                 })
+                .state('default.comments', <CustomState>{
+                    templateUrl: 'states/comments/dash-comments.html',
+                    url: 'comments',
+                    authenticate: true,
+                    controller: "commentsCtrl",
+                    controllerAs: "controller",
+                    onExit: function()
+                    {
+                        tinymce.remove("textarea");
+                    }
+                })
                 .state("login", <CustomState>{
 					views: {
 						"main-view": {

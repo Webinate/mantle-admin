@@ -38,6 +38,7 @@ module clientAdmin
         .controller("passwordCtrl", PasswordCtrl)
         .controller("usersCtrl", UsersCtrl)
         .controller("postsCtrl", PostsCtrl)
+        .controller("commentsCtrl", CommentsCtrl)
         .controller("seoCtrl", SEOCtrl)
         .controller("mediaCtrl", MediaCtrl)
         .service("Authenticator", Authenticator)
