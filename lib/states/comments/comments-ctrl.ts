@@ -1,19 +1,21 @@
 ﻿module clientAdmin
 {
+    export interface CustomComment extends Modepress.IComment {
+        $editing?: boolean;
+        $content? : string;
+    };
+
 	/**
 	* Controller for the dashboard comments section
 	*/
     export class CommentsCtrl
     {
-        public commentToken: Modepress.IComment;
         public comments: Array<Modepress.IComment>;
         public scope: any;
-        public successMessage: string;
         public searchKeyword: string;
         public sortOrder: string;
         public sortType: string;
         public showFilters: boolean;
-        public editMode: boolean;
 
         private _q: ng.IQService;
         private _ps: ModepressClientPlugin.PostService;
@@ -30,34 +32,18 @@
         {
             this.scope = scope;
             this.comments = [];
-            this.successMessage = "";
             this.showFilters = false;
             this.searchKeyword = "";
             this.sortOrder = ModepressClientPlugin.SortOrder[ModepressClientPlugin.SortOrder.desc];
             this.sortType = "created";
             this._ps = ps;
             this._cs = cs;
-            this.editMode = false;
-
             this.loading = false;
             this.error = false;
             this.errorMsg = "";
             this._q = $q;
             this.pager = this.createPagerRemote();
-            this.commentToken = { content: "", public: true };
             scope.removeComment = this.removeComment.bind(this);
-        }
-
-        initializeTiny()
-        {
-            var that = this;
-            tinymce.init({
-                height: 350,
-                content_css: '/css/mce-style.css',
-                selector: "textarea", plugins: ["link", "code", "textcolor", "colorpicker", "table", "wordcount", "lists", "contextmenu", "charmap", "fullpage", "pagebreak", "print", "spellchecker", "fullscreen", "searchreplace"],
-                toolbar1: "insertfile undo redo | styleselect | bold italic charmap | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link drive | print preview media | forecolor backcolor emoticons",
-                toolbar2: "pagebreak | spellchecker searchreplace | fullpage fullscreen"
-            });
         }
 
         swapOrder()
@@ -73,26 +59,19 @@
         }
 
         /**
-        * Set the edit mode
-        */
-        enterEditMode(comment: Modepress.IComment )
-        {
-            this.editMode = true;
-            this.loading = true;
-            var that = this;
-            this._cs.byId(comment._id).then(function(commentToken) {
-                that.commentToken = commentToken;
-                tinymce.editors[0].setContent(commentToken.content);
-
-            }).catch(function(err : Error) {
-                that.error = true;
-                that.errorMsg = err.message;
-
-            }).finally(function(){
-                that.loading = false;
-            });
+         * Given comment goes into an edit mode
+         * @param {CustomComment} comment The comment to edit
+         * @param {number} index The index of the comment
+         */
+        edit(comment: CustomComment, index: number ) {
+            jQuery(`.edit-box-${index}`).focus();
+            comment.$content = comment.content;
+            comment.$editing = true
         }
 
+        /**
+         * Creates a pager remote control
+         */
         createPagerRemote(): IPagerRemote
         {
             var that = this;
@@ -140,7 +119,7 @@
          * @param {Modepress.IComment} comment The comment we are editing
          * @param {Modepress.IComment} editBody The comment variables we are updating
          */
-        quickEdit( comment : Modepress.IComment, editBody : Modepress.IComment ) {
+        quickEdit( comment : CustomComment, editBody : CustomComment ) {
             this.error = false;
             this.errorMsg = "";
             this.loading = true;
@@ -150,6 +129,8 @@
                 for ( var i in editBody )
                     if ( comment.hasOwnProperty(i) )
                         comment[i] = editBody[i];
+
+                comment.$editing = false;
 
             }).catch(function(err : Error) {
                 that.error = true;
@@ -164,7 +145,7 @@
         * Removes a comment from the database
         * @param {Modepress.IComment} comment The comment to remove
         */
-        removeComment(comment: Modepress.IComment)
+        removeComment(comment: CustomComment)
         {
             var that = this;
             this.error = false;

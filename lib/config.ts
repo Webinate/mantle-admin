@@ -114,11 +114,7 @@
                     url: 'comments',
                     authenticate: true,
                     controller: "commentsCtrl",
-                    controllerAs: "controller",
-                    onExit: function()
-                    {
-                        tinymce.remove("textarea");
-                    }
+                    controllerAs: "controller"
                 })
                 .state("login", <CustomState>{
 					views: {

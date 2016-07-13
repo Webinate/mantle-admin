@@ -14,7 +14,7 @@ declare module clientAdmin {
         private searchTerm;
         private _rs;
         static $inject: string[];
-        constructor(scope: any, apiURL: string, cacheURL: string, $q: ng.IQService, renders: ModepressClientPlugin.RenderService);
+        constructor(scope: any, cacheURL: string, $q: ng.IQService, renders: ModepressClientPlugin.RenderService);
         /**
          * Fetches the users from the database
          * @returns {IPagerRemote}
@@ -294,19 +294,20 @@ declare module clientAdmin {
     }
 }
 declare module clientAdmin {
+    interface CustomComment extends Modepress.IComment {
+        $editing?: boolean;
+        $content?: string;
+    }
     /**
     * Controller for the dashboard comments section
     */
     class CommentsCtrl {
-        commentToken: Modepress.IComment;
         comments: Array<Modepress.IComment>;
         scope: any;
-        successMessage: string;
         searchKeyword: string;
         sortOrder: string;
         sortType: string;
         showFilters: boolean;
-        editMode: boolean;
         private _q;
         private _ps;
         private _cs;
@@ -316,25 +317,29 @@ declare module clientAdmin {
         private pager;
         static $inject: string[];
         constructor(scope: any, $q: ng.IQService, ps: ModepressClientPlugin.PostService, cs: ModepressClientPlugin.CommentService);
-        initializeTiny(): void;
         swapOrder(): void;
         swapSortType(): void;
         /**
-        * Set the edit mode
-        */
-        enterEditMode(comment: Modepress.IComment): void;
+         * Given comment goes into an edit mode
+         * @param {CustomComment} comment The comment to edit
+         * @param {number} index The index of the comment
+         */
+        edit(comment: CustomComment, index: number): void;
+        /**
+         * Creates a pager remote control
+         */
         createPagerRemote(): IPagerRemote;
         /**
          * Edits a comment on the fly
          * @param {Modepress.IComment} comment The comment we are editing
          * @param {Modepress.IComment} editBody The comment variables we are updating
          */
-        quickEdit(comment: Modepress.IComment, editBody: Modepress.IComment): void;
+        quickEdit(comment: CustomComment, editBody: CustomComment): void;
         /**
         * Removes a comment from the database
         * @param {Modepress.IComment} comment The comment to remove
         */
-        removeComment(comment: Modepress.IComment): void;
+        removeComment(comment: CustomComment): void;
     }
 }
 declare module clientAdmin {
@@ -364,6 +369,23 @@ declare module clientAdmin {
         link: (scope: any, elem: JQuery, attributes: ng.IAttributes, ngModel: ng.INgModelController) => void;
         /**
          * Creates an intance of the pager directive
+         */
+        static factory(): ng.IDirectiveFactory;
+    }
+}
+declare module clientAdmin {
+    /**
+    * Sets the focus of an element when the hide and show attributes change
+    */
+    class FocusOnShow implements ng.IDirective {
+        link: any;
+        restrict: 'A';
+        private _timeout;
+        static $inject: any[];
+        constructor(timeout?: ng.ITimeoutService);
+        _link(scope: any, elem: JQuery, attributes: any, ngModel: any): void;
+        /**
+         * Creates an intance of the directive
          */
         static factory(): ng.IDirectiveFactory;
     }
