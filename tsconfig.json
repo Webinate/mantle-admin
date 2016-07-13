@@ -23,6 +23,7 @@
         "lib/states/posts/posts-ctrl.ts",
         "lib/states/comments/comments-ctrl.ts",
         "lib/directives/pager/pager.ts",
+        "lib/directives/focus-on-show/focus-on-show.ts",
         "lib/directives/search-bar/search-bar.ts",
         "lib/directives/buttons/buttons.ts",
         "lib/directives/detail/detail.ts",

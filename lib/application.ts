@@ -44,6 +44,7 @@ module clientAdmin
         .service("Authenticator", Authenticator)
         .directive('pager', Pager.factory())
         .directive('errorModal', ErrorModal.factory())
+        .directive('focusOnShow', FocusOnShow.factory())
         .directive('addButton', AddButton.factory())
         .directive('approveButton', ApproveButton.factory())
         .directive('removeButton', RemoveButton.factory())
