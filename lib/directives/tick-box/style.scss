@@ -1,5 +1,7 @@
 .checkbox{
     cursor:pointer;
+    display: inline-block;
+
     &:hover .cross {
         &:before, &:after {
             background: red;
@@ -21,6 +23,7 @@
     width:20px;
     height:20px;
     display:inline-block;
+    vertical-align: middle;
 
     .tick {
         top: -25%;
