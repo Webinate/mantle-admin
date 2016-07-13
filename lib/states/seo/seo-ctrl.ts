@@ -19,7 +19,7 @@
 
 		// $inject annotation.
         public static $inject = ["$scope", "cacheURL", "$q", "renders"];
-        constructor(scope: any, apiURL: string, cacheURL: string, $q : ng.IQService, renders : ModepressClientPlugin.RenderService)
+        constructor(scope: any, cacheURL: string, $q : ng.IQService, renders : ModepressClientPlugin.RenderService)
         {
             this.showRenders = true;
             this.cacheURL = cacheURL;
