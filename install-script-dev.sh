@@ -11,11 +11,11 @@ wget https://github.com/MKHenson/modepress-admin/archive/dev.zip
 unzip -o "dev.zip" "modepress-admin-dev/*"
 
 # Moves the server folder to the current directory
-cp -r modepress-dev/* .
+cp -r modepress-admin-dev/* .
 
 # Remove modepress-admin folder
 if [ -d "modepress-admin-dev" ]; then
-	rm modepress-dev -R
+	rm modepress-admin-dev -R
 fi
 
 # Remove the zip file
