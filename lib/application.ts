@@ -1,6 +1,6 @@
 ﻿declare var _users: string;
 declare var _cache: string;
-declare var _plugins: Array<ModepressAdmin.IAdminPlugin>;
+declare var _plugins: Array<clientAdmin.IAdminPlugin>;
 
 /**
 * The admin code for the website
