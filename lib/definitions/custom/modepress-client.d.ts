@@ -1,4 +1,4 @@
-declare module ModepressAdmin
+declare module clientAdmin
 {
     /*
     * Describes a dashboard link
