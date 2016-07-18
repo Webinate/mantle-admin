@@ -7,7 +7,7 @@ module clientAdmin
     export class ItemPanel implements ng.IDirective
 	{
         restrict = 'E';
-        transclude = {
+        transclude : {[slot:string]: string} = {
             'preview': 'panelPreview',
             'content': 'panelContent'
         };

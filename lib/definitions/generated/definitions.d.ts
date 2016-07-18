@@ -520,8 +520,7 @@ declare module clientAdmin {
     class ItemPanel implements ng.IDirective {
         restrict: string;
         transclude: {
-            'preview': string;
-            'content': string;
+            [slot: string]: string;
         };
         templateUrl: string;
         scope: {
