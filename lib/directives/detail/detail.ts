@@ -8,7 +8,7 @@ module clientAdmin
         restrict = 'E';
         template = `
            <div class="content-view-detail">
-            <div class="label">{{text}}: <span ng-if="info && info != ''" class="info">{{info}}</span></div>
+            <div class="label"><span ng-if="info && info != ''" class="info">{{info}}</span>{{text}}:</div>
             <ng-transclude class="detail-transclude"></ng-transclude>
             <div class="fix"></div>
            </div>`;
