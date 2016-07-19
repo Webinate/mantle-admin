@@ -38,5 +38,9 @@
         -ms-transform: rotate(45deg);
         -webkit-transform: rotate(45deg);
         transform: rotate(45deg);
+
+        -ms-transform-origin: 13px 10px;
+        -webkit-transform-origin: 13px 10px;
+        transform-origin: 13px 10px;
     }
 }
