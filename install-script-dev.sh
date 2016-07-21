@@ -7,7 +7,7 @@ set -e
 echo "Downloading dev version from github"
 
 #download latest
-wget https://github.com/MKHenson/modepress-admin/archive/dev.zip
+wget https://github.com/Webinate/modepress-admin/archive/dev.zip
 unzip -o "dev.zip" "modepress-admin-dev/*"
 
 # Moves the server folder to the current directory

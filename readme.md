@@ -28,13 +28,13 @@ sudo su
 If you want the latest stable version:
 
 ```
-curl -o- https://raw.githubusercontent.com/MKHenson/modepress-admin/master/install-script.sh | bash
+curl -o- https://raw.githubusercontent.com/Webinate/modepress-admin/master/install-script.sh | bash
 ```
 
 OR if you want the dev build
 
 ```
-curl -o- https://raw.githubusercontent.com/MKHenson/modepress-admin/dev/install-script-dev.sh | bash
+curl -o- https://raw.githubusercontent.com/Webinate/modepress-admin/dev/install-script-dev.sh | bash
 ```
 
 This downloads the latest modepress-admin project into the current folder.

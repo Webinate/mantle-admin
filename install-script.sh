@@ -12,7 +12,7 @@ version() {
 echo "Downloading latest version from github $(version)"
 
 #download latest
-wget https://github.com/MKHenson/modepress-admin/archive/v$(version).zip
+wget https://github.com/Webinate/modepress-admin/archive/v$(version).zip
 unzip -o "v$(version).zip" "modepress-admin-$(version)/*"
 
 # Moves the server folder to the current directory

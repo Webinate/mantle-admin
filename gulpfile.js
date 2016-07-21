@@ -186,9 +186,9 @@ function getDefinition(url, dest, name) {
  */
 gulp.task('install-definitions', function () {
      return Promise.all([
-            getDefinition("https://raw.githubusercontent.com/MKHenson/users/dev/src/definitions/custom/definitions.d.ts", "lib/definitions/required/", "users.d.ts"),
-            getDefinition("https://raw.githubusercontent.com/MKHenson/modepress/dev/src/definitions/custom/modepress-api.d.ts", "lib/definitions/required/", "modepress-api.d.ts"),
-            getDefinition("https://raw.githubusercontent.com/MKHenson/modepress-client-angular/master/src/definitions/generated/plugin.d.ts", "lib/definitions/required/", "modepress-client.d.ts")
+            getDefinition("https://raw.githubusercontent.com/Webinate/users/dev/src/definitions/custom/definitions.d.ts", "lib/definitions/required/", "users.d.ts"),
+            getDefinition("https://raw.githubusercontent.com/Webinate/modepress/dev/src/definitions/custom/modepress-api.d.ts", "lib/definitions/required/", "modepress-api.d.ts"),
+            getDefinition("https://raw.githubusercontent.com/Webinate/modepress-client-angular/master/src/definitions/generated/plugin.d.ts", "lib/definitions/required/", "modepress-client.d.ts")
          ]);
 });
 
@@ -236,7 +236,7 @@ gulp.task('install-third-parties', function () {
         downloadTarball("https://github.com/chieffancypants/angular-loading-bar/tarball/0.9.0", './third-party/angular-loading-bar'),
         downloadTarball("https://github.com/tinymce/tinymce-dist/tarball/4.3.8", './third-party/tinymce'),
         downloadTarball("https://github.com/danialfarid/ng-file-upload/tarball/12.0.4", './third-party/angular-file-upload'),
-        downloadTarball("https://github.com/MKHenson/modepress-client-angular/tarball/master", './third-party/modepress-client')
+        downloadTarball("https://github.com/Webinate/modepress-client-angular/tarball/master", './third-party/modepress-client')
     ]);
 });
 
