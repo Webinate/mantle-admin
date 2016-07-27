@@ -1,7 +1,7 @@
 <div class="users state">
     <error-modal message="controller.errorMsg" visible="controller.error"></error-modal>
 
-    <state-header text="'User Management'">
+    <state-header text="'User Management'" loading="controller.loading">
         <div ng-show="!controller.showUserForm">
             <add-button ng-click="controller.newUserMode()" text="'New User'"></add-button>
             <search-bar value="controller.searchTerm" on-click="controller.pager.invalidate"></search-bar>
