@@ -46,6 +46,10 @@ declare module clientAdmin {
         static $inject: string[];
         constructor(http: ng.IHttpService, q: ng.IQService, usersURL: string, state: ng.ui.IStateService);
         /**
+         * Call this function to send the user password reset instructions
+         */
+        forgotPassword(): void;
+        /**
         * Attempts to log the user in
         */
         logIn(): void;

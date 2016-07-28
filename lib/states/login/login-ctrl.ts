@@ -36,6 +36,41 @@
 		}
 
 		/**
+		 * Call this function to send the user password reset instructions
+		 */
+		forgotPassword()
+		{
+			var that = this;
+			var token = this.loginToken;
+            var host = this.usersURL;
+
+			if ( !token.username || token.username == "" )
+			{
+				this.error = true;
+            	this.errorMsg = "Please enter your email or username";
+				return
+			}
+
+            this.error = false;
+            this.errorMsg = "";
+            this.loading = true;
+
+            this.http.get<UsersInterface.IResponse>(`${host}/users/${token.username}/request-password-reset`, token).then(function (response)
+			{
+				var responseToken = response.data;
+				that.error = true;
+				that.errorMsg = responseToken.message;
+                that.loading = false;
+
+			}).catch( function(err)
+			{
+                that.error = true;
+                that.loading = false;
+				that.errorMsg = "Could not communicate with server";
+			});
+		}
+
+		/**
 		* Attempts to log the user in
 		*/
 		logIn()

@@ -4,6 +4,7 @@
 			<label>Username <input type="text" name="loginUsername" ng-model="controller.loginToken.username" ng-minlength="3" required /></label>
 		</p>
 		<p>
+			<a class="forgot" ng-click="controller.forgotPassword()">Forgot</a>
 			<label>Password <input type="password" name="loginPassword" ng-model="controller.loginToken.password" ng-minlength="3" required /></label>
 		</p>
 		<p class="error" ng-show="controller.error">{{controller.errorMsg}}</p>
