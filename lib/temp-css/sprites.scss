@@ -1,18 +1,19 @@
-$comments-active: -32px -128px 32px 32px;
-$comments-norm: -0px -128px 32px 32px;
-$folder: -32px -64px 32px 64px;
-$media: -96px -64px 32px 64px;
-$posts: -64px -64px 32px 64px;
-$search: -131px -64px 30px 60px;
-$seo: -131px -0px 32px 64px;
-$standard-file: -0px -0px 64px 64px;
-$users: -0px -64px 32px 64px;
-$file-info-clock: -64px -35px 20px 20px;
-$file-info-downloads: -84px -35px 20px 20px;
-$file-info-id: -104px -35px 20px 20px;
-$file-info-mime: -64px -128px 20px 20px;
-$file-info-size: -84px -128px 20px 20px;
-$logo-home-small: -64px -0px 67px 35px;
+$comments-active: -163px -50px 32px 32px;
+$comments-norm: -131px -50px 32px 32px;
+$folder: -32px -114px 32px 64px;
+$logo: -0px -0px 200px 50px;
+$media: -96px -114px 32px 64px;
+$posts: -64px -114px 32px 64px;
+$search: -160px -114px 30px 60px;
+$seo: -128px -114px 32px 64px;
+$standard-file: -0px -50px 64px 64px;
+$users: -0px -114px 32px 64px;
+$file-info-clock: -64px -85px 20px 20px;
+$file-info-downloads: -84px -85px 20px 20px;
+$file-info-id: -104px -85px 20px 20px;
+$file-info-mime: -124px -85px 20px 20px;
+$file-info-size: -144px -85px 20px 20px;
+$logo-home-small: -64px -50px 67px 35px;
 @mixin sprite-width($sprite) {
   width: nth($sprite, 3);
 }

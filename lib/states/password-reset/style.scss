@@ -1,9 +1,13 @@
 .password-reset {
   @extend .admin-message;
+
+  .sprite-logo {
+    @include sprite($logo, inline-block);
+  }
 }
 
 .password-reset-form-label {
-    margin: 50px 0 20px 0;
+    margin: 20px 0 20px 0;
     font-weight: bold;
     color: #6E98D1;
 }
