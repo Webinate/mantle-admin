@@ -29,7 +29,6 @@
 				password: "",
 				email: "",
                 captcha: "",
-                challenge: "",
                 privileges: 3,
                 meta: {}
 			};
@@ -106,7 +105,6 @@
 			this.errorMsg = "";
 			this.successMessage = "";
 
-			token.challenge = Recaptcha.get_challenge();
 			token.captcha = Recaptcha.get_response();
 
             this.http.post<UsersInterface.IAuthenticationResponse>(`${that.usersURL}/users/register`, token).then(function (response)
