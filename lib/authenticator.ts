@@ -28,7 +28,7 @@
             var that = this;
             return new this._q(function (resolve, reject)
             {
-                that._http.get<UsersInterface.IResponse>(`${that._usersURL}/logout`).then(function (response)
+                that._http.get<UsersInterface.IResponse>(`${that._usersURL}/users/logout`).then(function (response)
                 {
                     var token: UsersInterface.IResponse = response.data;
                     if (token.error)
@@ -52,7 +52,7 @@
             var that = this;
             return new this._q( function(resolve, reject)
             {
-                that._http.get<UsersInterface.IAuthenticationResponse>(`${that._usersURL}/authenticated`).then(function (response)
+                that._http.get<UsersInterface.IAuthenticationResponse>(`${that._usersURL}/users/authenticated`).then(function (response)
                 {
                     var token: UsersInterface.IAuthenticationResponse = response.data;
                     if (token.error)

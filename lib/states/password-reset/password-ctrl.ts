@@ -96,7 +96,7 @@
             this.errorMsg = "";
             this.loading = true;
 
-            this.http.put<UsersInterface.IResponse>(`${host}/password-reset`, token).then(function (response)
+            this.http.put<UsersInterface.IResponse>(`${host}/users/password-reset`, token).then(function (response)
 			{
                 var responseToken = response.data;
                 if (responseToken.error)
