@@ -2,7 +2,7 @@
 A small angular app for managing a Modepress server.
 
 ## Current stable version
-* v0.2.1
+* v0.2.2
 
 ## Requirements
 * Node 6.2
