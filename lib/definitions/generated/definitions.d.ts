@@ -116,9 +116,9 @@ declare module clientAdmin {
         folderFormVisible: boolean;
         scope: any;
         entries: Array<any>;
-        selectedEntities: Array<UsersInterface.IBucketEntry | UsersInterface.IFileEntry>;
-        selectedEntity: UsersInterface.IBucketEntry | UsersInterface.IFileEntry;
-        selectedFolder: UsersInterface.IBucketEntry;
+        selectedEntities: Array<Modepress.IBucketEntry | Modepress.IFileEntry>;
+        selectedEntity: Modepress.IBucketEntry | Modepress.IFileEntry;
+        selectedFolder: Modepress.IBucketEntry;
         uploader: any;
         confirmDelete: boolean;
         editMode: boolean;
@@ -141,7 +141,7 @@ declare module clientAdmin {
         /**
         * Attempts to open a folder
         */
-        openFolder(folder: UsersInterface.IBucketEntry): void;
+        openFolder(folder: Modepress.IBucketEntry): void;
         /**
         * Removes the selected entities
         */
@@ -149,7 +149,7 @@ declare module clientAdmin {
         /**
         * Attempts to rename a file
         */
-        renameFile(file: UsersInterface.IFileEntry): void;
+        renameFile(file: Modepress.IFileEntry): void;
         /**
         * Sets the selected status of a file or folder
         */
@@ -168,7 +168,7 @@ declare module clientAdmin {
     class UsersCtrl {
         private newUser;
         private usersURL;
-        protected users: Array<UsersInterface.IUserEntry>;
+        protected users: Array<Modepress.IUserEntry>;
         showUserForm: boolean;
         scope: any;
         private _q;
@@ -193,7 +193,7 @@ declare module clientAdmin {
         * Removes a user from the database
         * @param {UsersInterface.IUserEntry} user The user to remove
         */
-        removeUser(user: UsersInterface.IUserEntry): void;
+        removeUser(user: Modepress.IUserEntry): void;
         /**
         * Creates a new user
         */
@@ -245,7 +245,7 @@ declare module clientAdmin {
         /**
         * Selects a file from the media browser
         */
-        selectFile(file: UsersInterface.IFileEntry): void;
+        selectFile(file: Modepress.IFileEntry): void;
         /**
         * Makes sure the slug doesnt have any spaces
         */
@@ -586,7 +586,7 @@ declare module clientAdmin {
         private _http;
         private _q;
         private _usersURL;
-        static user: UsersInterface.IUserEntry;
+        static user: Modepress.IUserEntry;
         static $inject: string[];
         constructor(http: ng.IHttpService, q: ng.IQService, usersURL: string);
         /**

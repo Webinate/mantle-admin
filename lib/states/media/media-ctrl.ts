@@ -9,9 +9,9 @@
         public folderFormVisible: boolean;
         public scope: any;
         public entries: Array<any>;
-        public selectedEntities: Array<UsersInterface.IBucketEntry | UsersInterface.IFileEntry>;
-        public selectedEntity: UsersInterface.IBucketEntry | UsersInterface.IFileEntry;
-        public selectedFolder: UsersInterface.IBucketEntry;
+        public selectedEntities: Array<Modepress.IBucketEntry | Modepress.IFileEntry>;
+        public selectedEntity: Modepress.IBucketEntry | Modepress.IFileEntry;
+        public selectedFolder: Modepress.IBucketEntry;
         public uploader: any;
         public confirmDelete: boolean;
         public editMode: boolean;
@@ -99,7 +99,7 @@
                 return;
             }
 
-            this.http.post<UsersInterface.IResponse>(`${that.usersURL}/users/${Authenticator.user.username}/buckets/${folderName}`, null).then(function(token)
+            this.http.post<Modepress.IResponse>(`${that.usersURL}/buckets/user/${Authenticator.user.username}/${folderName}`, null).then(function(token)
             {
                 if (token.data.error)
                 {
@@ -119,7 +119,7 @@
         /**
         * Attempts to open a folder
         */
-        openFolder(folder: UsersInterface.IBucketEntry)
+        openFolder(folder: Modepress.IBucketEntry)
         {
             var that = this;
             var command = "files";
@@ -145,17 +145,17 @@
             if (this.selectedFolder)
             {
                 for (var i = 0, l = this.selectedEntities.length; i < l; i++)
-                    entities += (<UsersInterface.IFileEntry>this.selectedEntities[i]).identifier + ",";
+                    entities += (<Modepress.IFileEntry>this.selectedEntities[i]).identifier + ",";
             }
             else
             {
                 for (var i = 0, l = this.selectedEntities.length; i < l; i++)
-                    entities += (<UsersInterface.IBucketEntry>this.selectedEntities[i]).name + ",";
+                    entities += (<Modepress.IBucketEntry>this.selectedEntities[i]).name + ",";
             }
 
             entities = (entities.length > 0 ? entities.substr(0, entities.length - 1) : "" );
 
-            that.http.delete<UsersInterface.IResponse>(`${that.usersURL}/${command}/${entities}`).then(function (token)
+            that.http.delete<Modepress.IResponse>(`${that.usersURL}/${command}/${entities}`).then(function (token)
             {
                 if (token.data.error)
                 {
@@ -173,14 +173,14 @@
         /**
         * Attempts to rename a file
         */
-        renameFile(file: UsersInterface.IFileEntry)
+        renameFile(file: Modepress.IFileEntry)
         {
             var that = this;
             that.error = false;
             that.errorMsg = "";
             that.loading = true;
 
-            that.http.put<UsersInterface.IResponse>(`${that.usersURL}/files/${file.identifier}/rename-file`, { name: $("#file-name").val() }).then(function (token)
+            that.http.put<Modepress.IResponse>(`${that.usersURL}/files/${file.identifier}/rename-file`, { name: $("#file-name").val() }).then(function (token)
             {
                 if (token.data.error)
                 {
@@ -245,13 +245,13 @@
                     var command = "";
 
                     if (that.selectedFolder)
-                        command = `${that.usersURL}/users/${Authenticator.user.username}/buckets/${that.selectedFolder.name}/files?index=${index}&limit=${limit}&search=${that.searchTerm}`
+                        command = `${that.usersURL}/files/users/${Authenticator.user.username}/buckets/${that.selectedFolder.name}?index=${index}&limit=${limit}&search=${that.searchTerm}`
                     else
-                        command = `${that.usersURL}/users/${Authenticator.user.username}/buckets?index=${index}&limit=${limit}&search=${that.searchTerm}`
+                        command = `${that.usersURL}/buckets/user/${Authenticator.user.username}?index=${index}&limit=${limit}&search=${that.searchTerm}`
 
                     return new that._q<number>(function(resolve, reject)
                     {
-                        that.http.get<UsersInterface.IGetFiles>(command).then(function (token)
+                        that.http.get<Modepress.IGetFiles>(command).then(function (token)
                         {
                             if (token.data.error) {
                                 that.error = true;

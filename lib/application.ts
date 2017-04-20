@@ -11,7 +11,7 @@ module clientAdmin
 
     var appModule = angular.module("admin", ["ui.router", "ngAnimate", "ngSanitize", 'angular-loading-bar', 'ngFileUpload', 'admin-templates', 'modepress-client'])
         .value('apiUrl', '.')
-        .constant("usersURL", _users )
+        .constant("usersURL", '' )
         .constant("apiURL", "./api")
         .constant("cacheURL", _cache)
         .constant("capthaPublicKey", "6LdiW-USAAAAAGxGfZnQEPP2gDW2NLZ3kSMu3EtT")

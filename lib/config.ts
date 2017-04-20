@@ -135,10 +135,6 @@
 							controllerAs: "controller"
 						}
                     },
-					onExit: function ()
-					{
-						Recaptcha.destroy();
-					},
                     url: '/register',
                     authenticate: false
 				})

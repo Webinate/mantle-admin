@@ -7,7 +7,7 @@
 	{
         private newUser: { username: string; password: string; email: string; type: string; privileges: number };
         private usersURL: string;
-        protected users: Array<UsersInterface.IUserEntry>;
+        protected users: Array<Modepress.IUserEntry>;
         public showUserForm: boolean;
         public scope: any;
 
@@ -91,14 +91,14 @@
         * Removes a user from the database
         * @param {UsersInterface.IUserEntry} user The user to remove
         */
-        removeUser(user: UsersInterface.IUserEntry)
+        removeUser(user: Modepress.IUserEntry)
         {
             var that = this;
             this.error = false;
             this.errorMsg = "";
             this.loading = true;
 
-            that.http.delete<UsersInterface.IResponse>(`${that.usersURL}/users/${user.username}`).then(function (token)
+            that.http.delete<Modepress.IResponse>(`${that.usersURL}/users/${user.username}`).then(function (token)
             {
                 if (token.data.error) {
                     that.error = true;
@@ -130,7 +130,7 @@
 
             registerToken.privileges = registerToken.type == "2" ? 2 : 3;
 
-            that.http.post<UsersInterface.IGetUser>(`${that.usersURL}/users`, registerToken).then(function(token)
+            that.http.post<Modepress.IGetUser>(`${that.usersURL}/users`, registerToken).then(function(token)
             {
                 if (token.data.error) {
                     that.error = true;

@@ -119,7 +119,7 @@
         /**
         * Selects a file from the media browser
         */
-        selectFile(file: UsersInterface.IFileEntry)
+        selectFile(file: Modepress.IFileEntry)
         {
             this.showMediaBrowser = false;
 

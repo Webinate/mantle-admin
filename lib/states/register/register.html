@@ -14,8 +14,6 @@
 			<div class="error" ng-show="registerForm.registerEmail.$error.email && (registerForm.$submitted || registerForm.registerEmail.$touched)">Please enter a valid email</div>
 		</div>
 
-		<div id="google-captcha"></div>
-
 		<p class="error" ng-show="controller.error">{{controller.errorMsg}}</p>
 		<p class="success" ng-show="controller.showSuccessMessage">{{controller.successMessage}}</p>
 		<img ng-show="controller.loading" src="/media/images/loader.gif" />

@@ -8,7 +8,7 @@
 		private _http: ng.IHttpService;
         private _q: ng.IQService;
         private _usersURL: string;
-        public static user: UsersInterface.IUserEntry;
+        public static user: Modepress.IUserEntry;
 
 		// $inject annotation.
         public static $inject = ["$http", "$q", "usersURL"];
@@ -28,9 +28,9 @@
             var that = this;
             return new this._q(function (resolve, reject)
             {
-                that._http.get<UsersInterface.IResponse>(`${that._usersURL}/users/logout`).then(function (response)
+                that._http.get<Modepress.IResponse>(`${that._usersURL}/auth/logout`).then(function (response)
                 {
-                    var token: UsersInterface.IResponse = response.data;
+                    var token: Modepress.IResponse = response.data;
                     if (token.error)
                         return resolve(false);
 
@@ -52,9 +52,9 @@
             var that = this;
             return new this._q( function(resolve, reject)
             {
-                that._http.get<UsersInterface.IAuthenticationResponse>(`${that._usersURL}/users/authenticated`).then(function (response)
+                that._http.get<Modepress.IAuthenticationResponse>(`${that._usersURL}/auth/authenticated`).then(function (response)
                 {
-                    var token: UsersInterface.IAuthenticationResponse = response.data;
+                    var token: Modepress.IAuthenticationResponse = response.data;
                     if (token.error)
                         return resolve(false);
 

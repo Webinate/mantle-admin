@@ -7,7 +7,7 @@
 	{
 		private http: ng.IHttpService;
         private q: ng.IQService;
-        private registerToken: UsersInterface.IRegisterToken;
+        private registerToken: Modepress.IRegisterToken;
 		private error: boolean;
 		private errorMsg: string;
 		private showSuccessMessage: boolean;
@@ -28,7 +28,7 @@
 				username: "",
 				password: "",
 				email: "",
-                captcha: "",
+                // captcha: "",
                 privileges: 3,
                 meta: {}
 			};
@@ -38,11 +38,6 @@
 			this.errorMsg = "";
 			this.successMessage = "";
 			this.loading = false;
-
-			// Initialize the google captcha
-			jQuery('#google-captcha').each(function(){
-				Recaptcha.create("6LdiW-USAAAAAGxGfZnQEPP2gDW2NLZ3kSMu3EtT", this, { theme: "white" });
-			});
 		}
 
 		/**
@@ -68,7 +63,7 @@
 				return;
 			}
 
-            this.http.get<UsersInterface.IResponse>(`${that.usersURL}/users/${user}/resend-activation`).then(function (response)
+            this.http.get<Modepress.IResponse>(`${that.usersURL}/auth/${user}/resend-activation`).then(function (response)
 			{
 				var responseToken = response.data;
 				if (responseToken.error)
@@ -105,9 +100,9 @@
 			this.errorMsg = "";
 			this.successMessage = "";
 
-			token.captcha = Recaptcha.get_response();
+			// token.captcha = Recaptcha.get_response();
 
-            this.http.post<UsersInterface.IAuthenticationResponse>(`${that.usersURL}/users/register`, token).then(function (response)
+            this.http.post<Modepress.IAuthenticationResponse>(`${that.usersURL}/auth/register`, token).then(function (response)
 			{
 				var responseToken = response.data;
 				if (responseToken.error)

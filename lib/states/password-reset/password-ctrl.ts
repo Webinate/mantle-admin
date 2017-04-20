@@ -58,7 +58,7 @@
             this.errorMsg = "";
             this.loading = true;
 
-            this.http.get<UsersInterface.IResponse>(`${host}/users/${that.loginToken.user}/request-password-reset`).then(function (response)
+            this.http.get<Modepress.IResponse>(`${host}/auth/${that.loginToken.user}/request-password-reset`).then(function (response)
             {
                 var responseToken = response.data;
                 if (responseToken.error)
@@ -96,7 +96,7 @@
             this.errorMsg = "";
             this.loading = true;
 
-            this.http.put<UsersInterface.IResponse>(`${host}/users/password-reset`, token).then(function (response)
+            this.http.put<Modepress.IResponse>(`${host}/auth/password-reset`, token).then(function (response)
 			{
                 var responseToken = response.data;
                 if (responseToken.error)
