@@ -1,0 +1,51 @@
+{
+  "name": "modepress-admin",
+  "version": "0.6.3",
+  "description": "An admin panel for the Modepress server",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --config webpack.config.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Webinate/modepress-admin.git"
+  },
+  "author": "Mathew Henson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Webinate/modepress-admin/issues"
+  },
+  "homepage": "https://github.com/Webinate/modepress-admin#readme",
+  "devDependencies": {
+    "webpack": "^2.5.1",
+    "@types/node": "^7.0.21",
+    "@types/react": "^15.0.20",
+    "@types/react-dom": "^0.14.23",
+    "@types/react-redux": "^4.4.38",
+    "@types/react-tap-event-plugin": "0.0.30",
+    "@types/redux": "^3.6.0",
+    "@types/redux-router": "^1.0.39",
+    "@types/history": "^4.5.1",
+    "@types/material-ui": "^0.17.6",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-redux": "^5.0.4",
+    "react-tap-event-plugin": "^2.0.1",
+    "redux": "^3.6.0",
+    "redux-router": "^2.1.2",
+    "history": "^4.6.1",
+    "material-ui": "^0.18.1",
+    "typescript": "^2.3.2",
+    "ts-loader": "^2.0.3",
+    "file-loader": "^0.11.1",
+    "node-sass": "^4.5.3",
+    "sass-loader": "^6.0.5",
+    "css-loader": "^0.28.2",
+    "style-loader": "^0.18.0",
+    "extract-text-webpack-plugin": "^2.0.0-rc.2",
+    "html-webpack-plugin": "^2.10.0",
+    "source-map-loader": "^0.2.1",
+    "tslint": "^5.2.0"
+  }
+}
