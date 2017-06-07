@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "node",
+            "protocol": "auto",
+            "request": "launch",
+            "program": "${workspaceRoot}/../modepress/dist/main.js",
+            "stopOnEntry": false,
+            "args": [
+                "--config=${workspaceRoot}/../modepress/dist/config.json",
+                "--numThreads=1",
+                "--logging=true",
+                "--inspect=true"
+            ],
+            "cwd": "${workspaceRoot}/../modepress/dist",
+            "preLaunchTask": null,
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "console": "internalConsole",
+            "sourceMaps": false,
+            "outFiles": []
+        }
+    ]
+}

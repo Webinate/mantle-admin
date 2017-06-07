@@ -1,0 +1,13 @@
+{
+  "name": "modepress-admin",
+  "server": {
+    "port": 8000,
+    "host": "localhost",
+    "staticAssets": ["./public"]
+  },
+  "controllers": [
+    { "type": "users" },
+    { "type": "posts" },
+    { "type": "custom", "path": "server/server.js" }
+  ]
+}

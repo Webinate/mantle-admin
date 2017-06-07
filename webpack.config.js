@@ -7,7 +7,7 @@ module.exports = {
   entry: './src/index.tsx',
   output: {
     filename: 'bundle.js',
-    path: path.join( __dirname, 'dist' )
+    path: path.join( __dirname, 'public' )
   },
   plugins: [
     new webpack.DefinePlugin( {
@@ -15,10 +15,10 @@ module.exports = {
         NODE_ENV: JSON.stringify( 'development' )
       }
     } ),
-    new HtmlWebpackPlugin( {
-      template: './src/index.html',
-      filename: 'index.html'
-    } ),
+    // new HtmlWebpackPlugin( {
+    //   template: './src/index.html',
+    //   filename: 'index.html'
+    // } ),
     new ExtractTextPlugin( {
       filename: '[name].css',
       allChunks: true
