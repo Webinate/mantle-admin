@@ -13,6 +13,18 @@
               "run",
               "build"
             ]
+        },
+        {
+            "taskName": "watch",
+            "isBuildCommand": false,
+            "isBackground": true,
+            "showOutput": "always",
+            "problemMatcher": "$tsc",
+            "suppressTaskName": true,
+            "args": [
+              "run",
+              "watch"
+            ]
         }
     ]
 }
