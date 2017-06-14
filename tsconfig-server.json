@@ -8,7 +8,7 @@
       "es7"
     ],
     "sourceMap": false,
-    "outDir": "./server",
+    "outDir": "./dist/server",
     "allowUnusedLabels": false,
     "noUnusedLocals": true,
     "strictNullChecks": true,

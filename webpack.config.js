@@ -7,7 +7,7 @@ module.exports = {
   entry: './src/index.tsx',
   output: {
     filename: 'bundle.js',
-    path: path.join( __dirname, 'public' )
+    path: path.join( __dirname, 'dist/public' )
   },
   plugins: [
     new webpack.DefinePlugin( {

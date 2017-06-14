@@ -12,6 +12,5 @@ pids
 node_modules
 
 # Build directory
-public
-server
+dist
 temp

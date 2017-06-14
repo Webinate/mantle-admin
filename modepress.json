@@ -3,11 +3,11 @@
   "server": {
     "port": 8000,
     "host": "localhost",
-    "staticAssets": ["./public"]
+    "staticAssets": ["./dist/public"]
   },
   "controllers": [
     { "type": "users" },
     { "type": "posts" },
-    { "type": "custom", "path": "server/server.js" }
+    { "type": "custom", "path": "./dist/server/server.js" }
   ]
 }
