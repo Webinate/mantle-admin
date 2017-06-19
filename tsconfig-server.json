@@ -16,6 +16,6 @@
     "jsx": "react"
   },
   "include": [
-    "src/server.tsx"
+    "src/**/*.tsx"
   ]
 }

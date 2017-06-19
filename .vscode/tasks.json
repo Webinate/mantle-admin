@@ -1,6 +1,6 @@
 {
     "version": "0.1.0",
-    "command": "npm",
+    "command": "gulp",
     "isShellCommand": true,
     "tasks": [
         {
@@ -10,7 +10,6 @@
             "problemMatcher": "$tsc",
             "suppressTaskName": true,
             "args": [
-              "run",
               "build"
             ]
         },

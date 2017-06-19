@@ -1,13 +1,11 @@
 const path = require( 'path' );
 const webpack = require( 'webpack' );
-const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
-const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 
 module.exports = {
-  entry: './src/server.tsx',
+  entry: './src/client.tsx',
   output: {
     filename: 'bundle.js',
-    path: path.join( __dirname, 'dist/server' )
+    path: path.join( __dirname, 'dist/client' )
   },
   plugins: [
     new webpack.DefinePlugin( {
@@ -36,7 +34,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [ ".tsx", ".ts", ".js" ]
+    extensions: [ "*", ".tsx", ".ts", ".js" ]
   },
   devtool: 'inline-source-map'
 };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Express} from 'express';
 import {Db} from 'mongodb';
-import {App} from './app';
+import {App} from './components/app';
 const ReactDOMServer = require('react-dom/server');
 
 /**
@@ -14,7 +14,7 @@ export default class Server {
 
   async initialize(app: Express, db: Db) {
     app.use("*", function(req, res) {
-      const html = ReactDOMServer.renderToStaticMarkup(<App />);
+      const html = ReactDOMServer.renderToString(<App />);
       res.send(200, html );
     })
   }

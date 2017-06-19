@@ -3,10 +3,7 @@
   "version": "0.6.3",
   "description": "An admin panel for the Modepress server",
   "main": "index.js",
-  "scripts": {
-    "build": "webpack --config webpack.client.config.js",
-    "watch": "webpack --config webpack.config.js --watch"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Webinate/modepress-admin.git"
@@ -17,31 +14,35 @@
     "url": "https://github.com/Webinate/modepress-admin/issues"
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
-  "devDependencies": {
-    "@types/express": "^4.0.35",
+  "devDependencies": {},
+  "dependencies": {
+    "@types/bson": "^1.0.3",
+    "@types/express": "^4.0.36",
     "@types/history": "^4.5.2",
-    "@types/material-ui": "^0.17.10",
-    "@types/mongodb": "^2.2.4",
-    "@types/node": "^7.0.29",
-    "@types/react": "^15.0.27",
+    "@types/material-ui": "^0.17.11",
+    "@types/mongodb": "^2.2.6",
+    "@types/node": "^7.0.32",
+    "@types/react": "^15.0.29",
     "@types/react-dom": "^0.14.23",
-    "@types/react-redux": "^4.4.42",
+    "@types/react-redux": "^4.4.44",
     "@types/react-tap-event-plugin": "0.0.30",
     "@types/redux": "^3.6.31",
     "@types/redux-router": "^1.0.39",
-    "history": "^4.6.1",
+    "gulp": "^3.9.1",
+    "gulp-sass": "^3.1.0",
+    "gulp-typescript": "^3.1.7",
+    "history": "^4.6.2",
     "material-ui": "^0.18.3",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
     "react-redux": "^5.0.4",
     "react-tap-event-plugin": "^2.0.1",
-    "redux": "^3.6.0",
+    "redux": "^3.7.0",
     "redux-router": "^2.1.2",
     "source-map-loader": "^0.2.1",
     "ts-loader": "^2.0.3",
     "tslint": "^5.4.3",
-    "typescript": "^2.3.4",
-    "gulp": "^3.9.1",
-    "gulp-sass": "^3.1.0"
+    "typescript": "^2.4.0",
+    "webpack": "^2.6.1"
   }
 }

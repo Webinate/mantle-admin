@@ -11,6 +11,13 @@ export class App extends React.Component<any, any> {
                 <head>
                     <title>Universal App with React</title>
                     <link rel='stylesheet' href='/style.css' />
+                    <meta charSet="utf-8" />
+                    <meta name="description" content=""/>
+                    <meta name="HandheldFriendly" content="True"/>
+                    <meta name="MobileOptimized" content="320"/>
+                    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui"/>
+                    <meta httpEquiv="cleartype" content="on"/>
+                    <link rel="shortcut icon" href="favicon.png" type="image/png" />
                 </head>
                 <body>
                     <div>
@@ -18,6 +25,7 @@ export class App extends React.Component<any, any> {
                         <p>Isn't server-side rendering remarkable?</p>
                         <button onClick={this._handleClick}>Click Me</button>
                     </div>
+                    <script src="./bundle.js" />
                 </body>
             </html>
         );
