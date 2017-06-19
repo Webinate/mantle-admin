@@ -14,7 +14,7 @@ export default class Server {
 
   async initialize(app: Express, db: Db) {
     app.use("*", function(req, res) {
-      const html = ReactDOMServer.renderToString(<App />);
+      const html = ReactDOMServer.renderToString(<App title="Modepress Server Rendering" />);
       res.send(200, html );
     })
   }

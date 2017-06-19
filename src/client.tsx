@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {App} from './components/app';
+import {App, Props} from './components/app';
 
-export const app = ReactDOM.render( <App />, document as any );
+const props = (window as any).PROPS as Props;
+
+export const app = ReactDOM.render( <App {...props} />, document as any );
