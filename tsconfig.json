@@ -13,7 +13,8 @@
     "noUnusedLocals": true,
     "strictNullChecks": true,
     "rootDir": "src",
-    "jsx": "react"
+    "jsx": "react",
+    "experimentalDecorators": true
   },
   "include": [
     "src/**/*.tsx"

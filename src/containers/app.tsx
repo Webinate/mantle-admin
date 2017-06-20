@@ -1,16 +1,28 @@
 import * as React from "react";
+import {IRootState} from "../store";
+import {increment} from "../store/counter/actions";
+import {default as connectWrapper, returntypeof} from "../utils/connectWrapper";
 
-export type Props = {
-  title: string;
+// Map state to props
+const mapStateToProps = ( state: IRootState ) => ( {
+  countState: state.countState
+} );
+
+// Map actions to props (This binds the actions to the dispatch fucntion)
+const dispatchToProps = {
+  increment: increment
 }
+
+const stateProps = returntypeof( mapStateToProps );
+type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
-
-}
+};
 
 /**
  * The main application entry point
  */
-export class App extends React.Component<Props, State> {
+@connectWrapper( mapStateToProps, dispatchToProps )
+export class App extends React.Component<Partial<Props>, State> {
 
   constructor(props: Props) {
     super(props);
@@ -20,14 +32,14 @@ export class App extends React.Component<Props, State> {
    * Do something when we click the btn
    */
   private onBtnClick() {
-    alert();
+    this.props.increment!(3);
   }
 
   render() {
     const content = (
       <html>
         <head>
-          <title>{this.props.title}</title>
+          <title>Modepress Example</title>
           <link rel='stylesheet' href='css/main.css' />
           <meta charSet="utf-8" />
           <meta name="description" content=""/>
@@ -39,9 +51,10 @@ export class App extends React.Component<Props, State> {
         </head>
         <body>
             {this.props.children}
-            <button onClick={this.onBtnClick}>Click Me</button>
+            <div>The count is: {this.props.countState!.count}</div>
+            <button onClick={() => this.onBtnClick()}>Increase</button>
             <script dangerouslySetInnerHTML={{
-                __html: 'window.PROPS=' + JSON.stringify({ title: this.props.title } as Props)
+                __html: 'window.PROPS={{{INITIAL_STATE}}}'
             }} />
             <script src="./bundle.js" />
         </body>
