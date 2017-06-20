@@ -35,6 +35,7 @@ export class App extends React.Component<Props, State> {
           <meta name="MobileOptimized" content="320"/>
           <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui"/>
           <meta httpEquiv="cleartype" content="on"/>
+          <link rel="icon" type="image/png" href="images/favicon.png" />
         </head>
         <body>
             {this.props.children}
