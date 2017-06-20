@@ -4,6 +4,12 @@ const webpack = require('webpack');
 const ts = require("gulp-typescript");
 const tsProject = ts.createProject('tsconfig-server.json', { noImplicitAny: true });
 
+
+gulp.task('static', function( callback ) {
+    return gulp.src('./src/static/**/*')
+      .pipe(gulp.dest('./dist/client/'));
+});
+
 gulp.task('build-client', function( callback ) {
     webpack( require('./webpack.config.js'), function(err, stats) {
         if (err)
@@ -30,5 +36,5 @@ gulp.task('sass:watch', function () {
   gulp.watch('./src/**/*.scss', ['sass']);
 });
 
-gulp.task('build', [ 'build-client', 'build-server', 'sass' ]);
+gulp.task('build', [ 'build-client', 'build-server', 'sass', 'static' ]);
 gulp.task('default', [ 'build' ]);
