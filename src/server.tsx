@@ -15,10 +15,15 @@ export default class Server {
   }
 
   async initialize(app: Express, db: Db) {
+    const context = {}
+
     app.use("*", function(req, res) {
       const html = ReactDOMServer.renderToString(
         <App title="Modepress Server Rendering">
-          <StaticRouter>
+          <StaticRouter
+            location={req.url}
+            context={context}
+          >
             <Routes />
           </StaticRouter>
         </App>);
