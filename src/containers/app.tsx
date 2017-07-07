@@ -1,16 +1,20 @@
 import * as React from "react";
-import {IRootState} from "../store";
-import {increment} from "../store/counter/actions";
-import {default as connectWrapper, returntypeof} from "../utils/connectWrapper";
+import { Routes } from "../components/routes";
+import { IRootState } from "../store";
+import { increment } from "../store/counter/actions";
+import { default as connectWrapper, returntypeof } from "../utils/connectWrapper";
+import { push } from 'react-router-redux';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState ) => ( {
-  countState: state.countState
+  countState: state.countState,
+  routing: state.router
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  increment: increment
+  increment: increment,
+  push: push
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -24,41 +28,19 @@ type State = {
 @connectWrapper( mapStateToProps, dispatchToProps )
 export class App extends React.Component<Partial<Props>, State> {
 
-  constructor(props: Props) {
-    super(props);
-  }
-
-  /**
-   * Do something when we click the btn
-   */
-  private onBtnClick() {
-    this.props.increment!(3);
+  constructor( props: Props ) {
+    super( props );
   }
 
   render() {
     const content = (
-      <html>
-        <head>
-          <title>Modepress Example</title>
-          <link rel='stylesheet' href='css/main.css' />
-          <meta charSet="utf-8" />
-          <meta name="description" content=""/>
-          <meta name="HandheldFriendly" content="True"/>
-          <meta name="MobileOptimized" content="320"/>
-          <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui"/>
-          <meta httpEquiv="cleartype" content="on"/>
-          <link rel="icon" type="image/png" href="images/favicon.png" />
-        </head>
-        <body>
-            {this.props.children}
-            <div>The count is: {this.props.countState!.count}</div>
-            <button onClick={() => this.onBtnClick()}>Increase</button>
-            <script dangerouslySetInnerHTML={{
-                __html: 'window.PROPS={{{INITIAL_STATE}}}'
-            }} />
-            <script src="./bundle.js" />
-        </body>
-      </html>
+      <div>
+        <Routes onGoTo={e => this.props.push!( e )} />
+        {
+          this.props.countState!.busy ? "Loading..." : <div>We have this many counters! {this.props.countState!.count}</div>
+        }
+        <button onClick={e => this.props.increment!( 50 )}>Click here to add 50</button>
+      </div>
     );
 
     return content;

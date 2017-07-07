@@ -1,4 +1,4 @@
-import createBrowserHistory from 'history/createBrowserHistory';
-import createMemoryHistory from 'history/createMemoryHistory';
+// import createBrowserHistory from 'history/createBrowserHistory';
+// import createMemoryHistory from 'history/createMemoryHistory';
 
-export default process.env.BROWSER ? createBrowserHistory() : createMemoryHistory();
+// export default process.env.BROWSER ? createBrowserHistory() : createMemoryHistory();

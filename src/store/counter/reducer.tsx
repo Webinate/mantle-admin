@@ -20,7 +20,8 @@ export default function reducer( state: State = initialState, action: Action ): 
   switch ( action.type ) {
     case ActionCreators.SetCount.type:
       partialState = {
-        count: action.payload
+        count: action.payload,
+        busy: false
       };
       break;
 

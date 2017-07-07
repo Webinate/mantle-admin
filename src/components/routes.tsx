@@ -1,5 +1,6 @@
 import * as React from "react";
-import {Route, Link} from "react-router-dom";
+import { Route, Link } from "react-router-dom";
+import { LoginForm } from "../components/login";
 
 const Home = () => {
   return <div>Home</div>
@@ -13,20 +14,37 @@ const Topics = () => {
   return <div>Topics</div>
 }
 
+class CustomLink extends React.Component<{ label: string, to: string, activeOnlyWhenExact?: boolean }, {}> {
+  render() {
+    return <Route path={this.props.to} exact={this.props.activeOnlyWhenExact} children={( { match } ) => {
+      return (
+        <div className={match ? 'active' : ''}>
+          {match ? '> ' : ''}<Link to={this.props.to}>{this.props.label}</Link>
+        </div>
+      )
+    }} />
+  }
+}
 
-export class Routes extends React.Component<any, any> {
+
+export class Routes extends React.Component<{ onGoTo: ( path: string ) => void }, any> {
 
   render() {
     return <div>
       <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/about">About</Link></li>
-        <li><Link to="/topics">Topics</Link></li>
+        <li><CustomLink activeOnlyWhenExact={true} to="/" label="Home" /></li>
+        <li><CustomLink to="/about" label="About" /></li>
+        <li><CustomLink to="/topics" label="Topics" /></li>
+
+        <button onClick={e => {
+          this.props.onGoTo( '/topics' );
+        }}>Programatically go to route</button>
       </ul>
 
-      <Route exact path="/" component={Home}/>
-      <Route path="/about" component={About}/>
-      <Route path="/topics" component={Topics}/>
+      <Route exact path="/" component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/topics" component={Topics} />
+      <Route path="/login" component={LoginForm} />
     </div>
   }
 }

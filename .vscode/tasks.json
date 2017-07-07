@@ -1,29 +1,29 @@
 {
-    "version": "0.1.0",
-    "command": "gulp",
-    "isShellCommand": true,
-    "tasks": [
-        {
-            "taskName": "build",
-            "isBuildCommand": true,
-            "showOutput": "always",
-            "problemMatcher": "$tsc",
-            "suppressTaskName": true,
-            "args": [
-              "build"
-            ]
-        },
-        {
-            "taskName": "watch",
-            "isBuildCommand": false,
-            "isBackground": true,
-            "showOutput": "always",
-            "problemMatcher": "$tsc",
-            "suppressTaskName": true,
-            "args": [
-              "run",
-              "watch"
-            ]
-        }
-    ]
+  "version": "0.1.0",
+  "command": "gulp",
+  "isShellCommand": true,
+  "tasks": [
+    {
+      "taskName": "build",
+      "isBuildCommand": true,
+      "showOutput": "always",
+      "problemMatcher": "$tsc",
+      "suppressTaskName": true,
+      "args": [
+        "build"
+      ]
+    },
+    {
+      "taskName": "watch",
+      "isBuildCommand": false,
+      "isBackground": true,
+      "showOutput": "always",
+      "problemMatcher": "$tsc",
+      "suppressTaskName": true,
+      "args": [
+        "run",
+        "watch"
+      ]
+    }
+  ]
 }

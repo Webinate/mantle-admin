@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { StaticRouter } from 'react-router';
-import {Express} from 'express';
-import {Db} from 'mongodb';
-import {Provider} from 'react-redux';
-import {IRootState} from './store';
-import {App} from './containers/app';
-import {Routes} from './components/routes';
+import { Express } from 'express';
+import { Db } from 'mongodb';
+import { Provider } from 'react-redux';
+import { IRootState } from './store';
+import { App } from './containers/app';
 import createStore from './utils/createStore';
-const ReactDOMServer = require('react-dom/server');
+import { HTML } from './utils/html';
+import createHistory from 'history/createMemoryHistory';
+const ReactDOMServer = require( 'react-dom/server' );
 
 /**
  * The default entry point for the admin server
@@ -17,39 +18,37 @@ export default class Server {
 
   }
 
-  async initialize(app: Express, db: Db) {
-    const context: { url?: string } = { }
+  async initialize( app: Express, db: Db ) {
+    const context: { url?: string } = {}
+    const history = createHistory();
 
-    app.use("*", function(req, res) {
-      const initialState: Partial<IRootState> = {
+    app.use( "/", function( req, res, next ) {
+      let url = req.url;
+      let initialState: Partial<IRootState> = {
         countState: { count: 20, busy: false }
       };
-      const store = createStore( initialState );
+
+      const store = createStore( initialState, history );
       let html = ReactDOMServer.renderToString(
         <Provider store={store}>
-          <App>
-            <StaticRouter
-              location={req.url}
-              context={context}
-            >
-              <Routes />
-            </StaticRouter>
-          </App>
+          <StaticRouter location={url} context={context}>
+            <App />
+          </StaticRouter>
         </Provider>
       );
 
-      if (context.url) {
-        res.writeHead(301, {
+      // Check the context if there needs to be a redirect
+      if ( context.url ) {
+        res.writeHead( 301, {
           Location: context.url,
-        });
+        } );
         res.end();
         return;
       }
 
-      // Grab the initial state from our Redux store
-      // const state = store.getState();
-      html = html.replace( '{{{INITIAL_STATE}}}', JSON.stringify(initialState).replace(/</g, '\\u003c') );
+      initialState = store.getState();
+      html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} /> );
       res.send( 200, html );
-    })
+    } )
   }
 }
