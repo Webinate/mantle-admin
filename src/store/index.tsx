@@ -1,6 +1,5 @@
-import { combineReducers } from 'redux';
+import { combineReducers, ReducersMapObject } from 'redux';
 import { routerReducer } from 'react-router-redux';
-
 import { default as counterReducer, State as ICounterState } from './counter/reducer';
 
 export type IRootState = {
@@ -12,6 +11,6 @@ export type IRootState = {
 const rootReducer = combineReducers<IRootState>( {
   countState: counterReducer,
   router: routerReducer
-} );
+} as ReducersMapObject );
 
 export default rootReducer;
