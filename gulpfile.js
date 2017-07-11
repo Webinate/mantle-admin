@@ -39,6 +39,10 @@ gulp.task( 'sass', function() {
 gulp.task( 'sass:watch', function() {
   gulp.watch( './src/**/*.scss', [ 'sass' ] );
 } );
+gulp.task( 'tsx:watch', function() {
+  gulp.watch( './src/**/*.tsx', [ 'build-ts-files' ] );
+} );
 
 gulp.task( 'build', [ 'build-ts-files', 'sass', 'static' ] );
+gulp.task( 'watch', [ 'sass:watch', 'tsx:watch' ] );
 gulp.task( 'default', [ 'build' ] );

@@ -12,6 +12,11 @@ const ReactDOMServer = require( 'react-dom/server' );
 import { Controller } from 'modepress-api';
 import { IAuthReq } from 'modepress';
 import { MuiThemeProvider, getMuiTheme } from "material-ui/styles";
+import Theme from "./utils/theme";
+
+// Needed for onTouchTap
+import * as injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
 
 /**
  * The default entry point for the admin server
@@ -39,8 +44,9 @@ export default class MainController extends Controller {
         authentication: { authenticated: user ? true : false }
       };
 
+      const muiAgent = req.headers[ 'user-agent' ];
       const store = createStore( initialState, history );
-      const theme = getMuiTheme();
+      const theme = getMuiTheme( Theme, { userAgent: muiAgent } );
 
       let html = ReactDOMServer.renderToString(
         <Provider store={store}>
@@ -62,7 +68,7 @@ export default class MainController extends Controller {
       }
 
       initialState = store.getState();
-      html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} /> );
+      html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} agent={muiAgent} /> );
       res.send( 200, html );
     } )
 

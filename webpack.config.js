@@ -11,7 +11,7 @@ module.exports = {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.DefinePlugin( {
       'process.env': {
-        NODE_ENV: JSON.stringify( 'development' )
+        NODE_ENV: JSON.stringify( process.env.NODE_ENV )
       }
     } )
   ],

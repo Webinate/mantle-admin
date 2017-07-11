@@ -21,7 +21,6 @@
       "problemMatcher": "$tsc",
       "suppressTaskName": true,
       "args": [
-        "run",
         "watch"
       ]
     }
