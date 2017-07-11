@@ -38,7 +38,7 @@ export class Routes extends React.Component<{ onGoTo: ( path: string ) => void }
 
         <button onClick={e => {
           this.props.onGoTo( '/topics' );
-        }}>Programatically go to route</button>
+        }}>Programatically go to topics</button>
       </ul>
 
       <Route exact path="/" component={Home} />

@@ -11,7 +11,7 @@ export class LoginForm extends React.Component<any, any> {
             <TextField type="text" name="username" />
             <TextField type="password" name="password" />
             <FlatButton label="Register" />
-            <RaisedButton label="Login" />
+            <RaisedButton label="Login" primary={true} />
           </form>
         </div>
       </div>

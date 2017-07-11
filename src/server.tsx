@@ -9,13 +9,16 @@ import createStore from './utils/createStore';
 import { HTML } from './utils/html';
 import createHistory from 'history/createMemoryHistory';
 const ReactDOMServer = require( 'react-dom/server' );
+import { Controller } from 'modepress-api';
+import { IAuthReq } from 'modepress';
+import { MuiThemeProvider, getMuiTheme } from "material-ui/styles";
 
 /**
  * The default entry point for the admin server
  */
-export default class Server {
+export default class MainController extends Controller {
   constructor() {
-
+    super( null );
   }
 
   async initialize( app: Express, db: Db ) {
@@ -24,16 +27,28 @@ export default class Server {
 
     app.use( "/", function( req, res, next ) {
       let url = req.url;
+      let user = ( req as Express.Request as IAuthReq )._user;
+
+      if ( !user && url !== '/login' )
+        return res.redirect( '/login' );
+      else if ( user && url === '/login' )
+        return res.redirect( '/' );
+
       let initialState: Partial<IRootState> = {
-        countState: { count: 20, busy: false }
+        countState: { count: 20, busy: false },
+        authentication: { authenticated: user ? true : false }
       };
 
       const store = createStore( initialState, history );
+      const theme = getMuiTheme();
+
       let html = ReactDOMServer.renderToString(
         <Provider store={store}>
-          <StaticRouter location={url} context={context}>
-            <App />
-          </StaticRouter>
+          <MuiThemeProvider muiTheme={theme}>
+            <StaticRouter location={url} context={context}>
+              <App />
+            </StaticRouter>
+          </MuiThemeProvider>
         </Provider>
       );
 
@@ -50,5 +65,7 @@ export default class Server {
       html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} /> );
       res.send( 200, html );
     } )
+
+    return this;
   }
 }

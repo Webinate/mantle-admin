@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Routes } from "../components/routes";
+import { LoginForm } from "../components/login";
 import { IRootState } from "../store";
 import { increment } from "../store/counter/actions";
 import { default as connectWrapper, returntypeof } from "../utils/connectWrapper";
@@ -8,6 +9,7 @@ import { push } from 'react-router-redux';
 // Map state to props
 const mapStateToProps = ( state: IRootState ) => ( {
   countState: state.countState,
+  auth: state.authentication,
   routing: state.router
 } );
 
@@ -33,7 +35,10 @@ export class App extends React.Component<Partial<Props>, State> {
   }
 
   render() {
-    const content = (
+    if ( !this.props.auth!.authenticated )
+      return <LoginForm />;
+
+    return (
       <div>
         <Routes onGoTo={e => this.props.push!( e )} />
         {
@@ -42,7 +47,5 @@ export class App extends React.Component<Partial<Props>, State> {
         <button onClick={e => this.props.increment!( 50 )}>Click here to add 50</button>
       </div>
     );
-
-    return content;
   }
 };
