@@ -14,10 +14,10 @@ export class ConnectedRouter extends React.Component<Props, any> {
   private unsubscribeFromHistory: Function;
 
   handleLocationChange( location: Location ) {
-    this.props.store.dispatch({
+    this.props.store.dispatch( {
       type: LOCATION_CHANGE,
       payload: location
-    })
+    } )
   }
 
   componentWillMount() {
@@ -29,7 +29,7 @@ export class ConnectedRouter extends React.Component<Props, any> {
   }
 
   componentWillUnmount() {
-    if (this.unsubscribeFromHistory)
+    if ( this.unsubscribeFromHistory )
       this.unsubscribeFromHistory()
   }
 
