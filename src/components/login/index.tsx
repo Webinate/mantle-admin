@@ -26,9 +26,14 @@ export class LoginForm extends React.Component<any, any> {
             <TextField fullWidth={true} floatingLabelText="Username" type="text" name="username" id="login-user" />
             <TextField fullWidth={true} floatingLabelText="Password" type="password" name="password" id="login-pass" />
             <div className="buttons">
-              <FlatButton label="Register" icon={<FontIcon className="fa fa-user" />} />
-              <div />
-              <RaisedButton label="Login" icon={<FontIcon className="fa fa-sign-in" />} primary={true} />
+              <RaisedButton
+                label="Login"
+                fullWidth={true}
+                icon={<FontIcon className="fa fa-sign-in" />}
+                primary={true} />
+              <div className="anchor-btns">
+                <a href="/register">Create an Account</a> | <a href="">Retrieve Password</a>
+              </div>
             </div>
           </form>
         </div>
