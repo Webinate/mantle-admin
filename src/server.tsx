@@ -34,9 +34,9 @@ export default class MainController extends Controller {
       let url = req.url;
       let user = ( req as Express.Request as IAuthReq )._user;
 
-      if ( !user && url !== '/login' )
+      if ( !user && ( url !== '/login' && url !== '/register' ) )
         return res.redirect( '/login' );
-      else if ( user && url === '/login' )
+      else if ( user && ( url === '/login' || url !== '/register' ) )
         return res.redirect( '/' );
 
       let initialState: Partial<IRootState> = {

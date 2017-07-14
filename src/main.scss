@@ -11,7 +11,9 @@
   src: local("Roboto"), local("Roboto-Regular"), url(../fonts/Roboto-400.woff2) format("woff2"); }
 
 
-@import './components/login/style.scss';
+@import './components/auth-screen/style.scss';
+@import './components/login-form/style.scss';
+@import './components/register-form/style.scss';
 
 html {
   font-family: 'Roboto', sans-serif;

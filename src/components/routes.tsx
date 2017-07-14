@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Route, Link } from "react-router-dom";
-import { LoginForm } from "../components/login";
 
 const Home = () => {
   return <div>Home</div>
@@ -26,7 +25,6 @@ class CustomLink extends React.Component<{ label: string, to: string, activeOnly
   }
 }
 
-
 export class Routes extends React.Component<{ onGoTo: ( path: string ) => void }, any> {
 
   render() {
@@ -44,7 +42,6 @@ export class Routes extends React.Component<{ onGoTo: ( path: string ) => void }
       <Route exact path="/" component={Home} />
       <Route path="/about" component={About} />
       <Route path="/topics" component={Topics} />
-      <Route path="/login" component={LoginForm} />
     </div>
   }
 }

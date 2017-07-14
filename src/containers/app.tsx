@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Routes } from "../components/routes";
-import { LoginForm } from "../components/login";
 import { IRootState } from "../store";
 import { increment } from "../store/counter/actions";
 import { default as connectWrapper, returntypeof } from "../utils/connectWrapper";
 import { push } from 'react-router-redux';
+import { Route } from "react-router-dom";
+import { AuthScreen } from "../components/auth-screen";
 
 // Map state to props
 const mapStateToProps = ( state: IRootState ) => ( {
@@ -35,12 +36,11 @@ export class App extends React.Component<Partial<Props>, State> {
   }
 
   render() {
-    if ( !this.props.auth!.authenticated )
-      return <LoginForm />;
-
     return (
       <div>
-        <Routes onGoTo={e => this.props.push!( e )} />
+        <Route path="/login" render={props => <AuthScreen activeComponent="login" />} />
+        <Route path="/register" render={props => <AuthScreen activeComponent="register" />} />
+        <Route path="/" exact={true} render={props => <Routes onGoTo={e => this.props.push!( e )} />} />
         {
           this.props.countState!.busy ? "Loading..." : <div>We have this many counters! {this.props.countState!.count}</div>
         }

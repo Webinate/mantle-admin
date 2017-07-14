@@ -1,22 +1,15 @@
-.login-form {
+.auth-screen {
   display: -webkit-flex;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  background: #efefef;
-
-  svg {
-    position: absolute;
-  }
 
   img {
-    margin: 0 0 20px 0;
-    width: 100px;
+    width: 80px;
     position: absolute;
-    top: -200px;
-    left: calc((100% - 118px) / 2);
+    top: -130px;
+    left: calc((100% - 80px) / 2);
   }
 
   > div {
@@ -27,17 +20,5 @@
     border-radius: 5px;
     box-shadow: 4px 4px 18px 0px rgba(0, 0, 0, 0.25);
     position: relative;
-  }
-
-  .buttons {
-    margin: 40px 0 0 0;
-  }
-
-  .anchor-btns {
-    margin: 20px 0 0 0;
-    text-align: center;
-    a {
-      margin: 0 5px;
-    }
   }
 }
