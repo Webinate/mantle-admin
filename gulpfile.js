@@ -36,6 +36,9 @@ gulp.task( 'sass', function() {
     .pipe( gulp.dest( './dist/client/css' ) );
 } );
 
+gulp.task( 'static:watch', function() {
+  gulp.watch( './src/static/**/*.*', [ 'static' ] );
+} );
 gulp.task( 'sass:watch', function() {
   gulp.watch( './src/**/*.scss', [ 'sass' ] );
 } );
@@ -44,5 +47,5 @@ gulp.task( 'tsx:watch', function() {
 } );
 
 gulp.task( 'build', [ 'build-ts-files', 'sass', 'static' ] );
-gulp.task( 'watch', [ 'sass:watch', 'tsx:watch' ] );
+gulp.task( 'watch', [ 'sass:watch', 'tsx:watch', 'static:watch' ] );
 gulp.task( 'default', [ 'build' ] );
