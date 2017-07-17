@@ -2,6 +2,9 @@ import * as React from "react";
 import { Link } from 'react-router-dom';
 import { RaisedButton, TextField, FontIcon } from "material-ui";
 
+type Props = {
+  onRegister: ( user: string, password: string ) => void;
+}
 type State = {
   user: string;
   pass: string;
@@ -9,7 +12,10 @@ type State = {
   formSubmitted: boolean;
 }
 
-export class RegisterForm extends React.Component<any, State> {
+/**
+ * A form for entering user registration information
+ */
+export class RegisterForm extends React.Component<Props, State> {
   constructor() {
     super();
     this.state = {
@@ -22,6 +28,8 @@ export class RegisterForm extends React.Component<any, State> {
 
   private onRegister() {
     this.setState( { formSubmitted: true } );
+    if ( this.state.user !== '' && this.state.pass !== '' )
+      this.props.onRegister( this.state.user, this.state.pass );
   }
 
   render() {
@@ -53,10 +61,10 @@ export class RegisterForm extends React.Component<any, State> {
           id="pass2" />
         <div className="buttons">
           <RaisedButton
-            label="Login"
+            label="Create Account"
             fullWidth={true}
             onClick={e => this.onRegister()}
-            icon={<FontIcon className="fa fa-sign-in" />}
+            icon={<FontIcon className="fa fa-user" />}
             primary={true} />
           <div className="anchor-btns">
             <Link to="/login">🡐 Back to Login</Link>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StaticRouter } from 'react-router';
-import { Express } from 'express';
+import * as express from 'express';
 import { Db } from 'mongodb';
 import { Provider } from 'react-redux';
 import { IRootState } from './store';
@@ -26,11 +26,13 @@ export default class MainController extends Controller {
     super( null );
   }
 
-  async initialize( app: Express, db: Db ) {
+  async initialize( app: express.Express, db: Db ) {
     const context: { url?: string } = {}
     const history = createHistory();
 
-    app.use( "/", function( req, res, next ) {
+    const router = express.Router();
+
+    router.get( '*', function( req, res, next ) {
       let url = req.url;
       let user = ( req as Express.Request as IAuthReq )._user;
 
@@ -41,7 +43,10 @@ export default class MainController extends Controller {
 
       let initialState: Partial<IRootState> = {
         countState: { count: 20, busy: false },
-        authentication: { authenticated: user ? true : false }
+        authentication: {
+          authenticated: user ? true : false,
+          busy: false
+        }
       };
 
       const muiAgent = req.headers[ 'user-agent' ];
@@ -70,8 +75,9 @@ export default class MainController extends Controller {
       initialState = store.getState();
       html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} agent={muiAgent} /> );
       res.send( 200, html );
-    } )
+    } );
 
+    app.use( '/', router );
     return this;
   }
 }

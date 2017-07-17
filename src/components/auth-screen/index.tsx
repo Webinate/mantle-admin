@@ -5,6 +5,11 @@ import MantleDiv from "../mantle-background";
 
 type Prop = {
   activeComponent: 'login' | 'register';
+  error: string | null | undefined;
+  onLogin: ( user: string, password: string ) => void;
+  onPasswordReset: ( user: string ) => void;
+  onActivationReset: ( user: string ) => void;
+  onRegister: ( user: string, password: string ) => void;
 }
 
 export class AuthScreen extends React.Component<Prop, any> {
@@ -19,8 +24,16 @@ export class AuthScreen extends React.Component<Prop, any> {
           <img src="./images/mantle-logo.svg" />
           {
             this.props.activeComponent === 'login' ?
-              <LoginForm /> : <RegisterForm />
+              <LoginForm
+                onLogin={this.props.onLogin}
+                onPasswordReset={this.props.onPasswordReset}
+                onActivationReset={this.props.onActivationReset}
+              /> :
+              <RegisterForm
+                onRegister={this.props.onRegister}
+              />
           }
+          {this.props.error ? <div className="error">{this.props.error}</div> : undefined}
         </div>
       </MantleDiv>
     )

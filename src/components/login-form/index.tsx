@@ -2,28 +2,68 @@ import * as React from "react";
 import { RaisedButton, TextField, FontIcon } from "material-ui";
 import { Link } from 'react-router-dom';
 
+type Props = {
+  onLogin: ( user: string, password: string ) => void;
+  onPasswordReset: ( user: string ) => void;
+  onActivationReset: ( user: string ) => void;
+}
+
 type State = {
   user: string;
   pass: string;
   formSubmitted: boolean;
+  retrievePassError: boolean;
 }
 
-export class LoginForm extends React.Component<any, State> {
+/**
+ * A form for entering user and password information
+ */
+export class LoginForm extends React.Component<Props, State> {
   constructor() {
     super();
     this.state = {
       user: '',
       pass: '',
-      formSubmitted: false
+      formSubmitted: false,
+      retrievePassError: false
     }
   }
 
-  private retrievePass() {
-
+  /**
+   * Requests the password for a given user
+   */
+  private checkUsernameSet( e: React.MouseEvent<HTMLAnchorElement> ) {
+    e.preventDefault();
+    e.stopPropagation();
+    if ( this.state.user === '' ) {
+      this.setState( { retrievePassError: true, formSubmitted: false } );
+      return false;
+    }
+    else {
+      this.setState( { retrievePassError: false } );
+      return true;
+    }
   }
 
+  /**
+   * When we click the login button
+   */
   private onLogin() {
     this.setState( { formSubmitted: true } );
+    if ( this.state.user !== '' && this.state.pass !== '' )
+      this.props.onLogin( this.state.user, this.state.pass );
+  }
+
+  /**
+   * Gets the user error message if there is one
+   */
+  getUserError() {
+    if ( this.state.retrievePassError )
+      return 'Please specify a username';
+    if ( this.state.formSubmitted && !this.state.user )
+      return 'Please specify a username';
+
+    return null;
   }
 
   render() {
@@ -33,7 +73,7 @@ export class LoginForm extends React.Component<any, State> {
           value={this.state.user}
           onChange={( e, text ) => this.setState( { user: text } )}
           fullWidth={true}
-          errorText={this.state.formSubmitted && !this.state.user ? 'Please specify a username' : ''}
+          errorText={this.getUserError()}
           floatingLabelText="Username"
           type="text" name="username"
           id="login-user" />
@@ -53,7 +93,15 @@ export class LoginForm extends React.Component<any, State> {
             icon={<FontIcon className="fa fa-sign-in" />}
             primary={true} />
           <div className="anchor-btns">
-            <Link to="/register">Create an Account</Link> | <a href="" onClick={e => this.retrievePass()}>Retrieve Password</a>
+            <Link to="/register">Create an Account</Link> |
+            <a href="" onClick={e => {
+              if ( this.checkUsernameSet( e ) )
+                this.props.onLogin( this.state.user, this.state.pass );
+            }}>Retrieve Password</a>
+            <a href="" onClick={e => {
+              if ( this.checkUsernameSet( e ) )
+                this.props.onActivationReset( this.state.user );
+            }}> Resend Activation</a>
           </div>
         </div>
       </form>

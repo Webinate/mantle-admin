@@ -9,7 +9,7 @@ export default ( props: React.HTMLAttributes<any> ) => {
           height: '100%',
           background: '#efefef',
           backgroundImage: `url('../images/rocks.svg')`,
-          backgroundSize: '100% auto'
+          backgroundSize: '100% 100%'
         }
       }}
     >
