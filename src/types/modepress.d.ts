@@ -1188,12 +1188,12 @@ declare module "socket-api/client-connection" {
    */
   export class ClientConnection {
     onDisconnected: ( connection: ClientConnection ) => void;
-    ws2: ws;
+    ws: ws;
     user: User | null;
     domain: string;
     authorizedThirdParty: boolean;
     private _controller;
-    constructor( ws2: ws, domain: string, controller: CommsController, authorizedThirdParty: boolean );
+    constructor( ws: ws, domain: string, controller: CommsController, authorizedThirdParty: boolean );
     /**
      * Called whenever we recieve a message from a client
      */
@@ -1303,7 +1303,7 @@ declare module "socket-api/comms-controller" {
     /**
      * Called whenever a new client connection is made to the WS server
      */
-    onWsConnection( ws2: ws ): Promise<void>;
+    onWsConnection( ws: ws ): Promise<void>;
     /**
      * Initializes the comms controller
      */
@@ -2421,6 +2421,59 @@ declare module "models/schema-items/schema-item-factory" {
   export const html: typeof SchemaHtml;
   export const foreignKey: typeof SchemaForeignKey;
 }
+declare module "utils/serializers" {
+  import { IResponse } from 'modepress';
+  import * as express from 'express';
+  /**
+   * Helper function to return a status 200 json object of type T
+   */
+  export function okJson<T extends IResponse>( data: T, res: express.Response ): void;
+  /**
+   * Helper function to return a status 200 json object of type T
+   */
+  export function errJson( err: Error, res: express.Response ): void;
+}
+declare module "utils/permission-controllers" {
+  import { IAuthReq } from 'modepress';
+  import * as express from 'express';
+  import { UserPrivileges } from "core/users";
+  /**
+   * Checks for an id parameter and that its a valid mongodb ID. Returns an error of type IResponse if no ID is detected, or its invalid
+   * @param idName The name of the ID to check for
+   * @param optional If true, then an error wont be thrown if it doesnt exist
+   */
+  export function hasId( idName: string, idLabel?: string, optional?: boolean ): ( req: express.Request, res: express.Response, next: Function ) => void;
+  /**
+   * This funciton checks if the logged in user can make changes to a target 'user'  defined in the express.params
+   */
+  export function canEdit( req: IAuthReq, res: express.Response, next?: Function ): Promise<void>;
+  /**
+   * Checks if the request has owner rights (admin/owner). If not, an error is sent back to the user
+   */
+  export function ownerRights( req: IAuthReq, res: express.Response, next?: Function ): any;
+  /**
+   * Checks if the request has admin rights. If not, an error is sent back to the user
+   */
+  export function adminRights( req: IAuthReq, res: express.Response, next?: Function ): any;
+  export function checkVerbosity( req: IAuthReq, res: express.Response, next?: Function ): any;
+  /**
+   * Checks for session data and fetches the user. Does not throw an error if the user is not present.
+   */
+  export function identifyUser( req: IAuthReq, res: express.Response, next?: Function ): any;
+  /**
+   * Checks for session data and fetches the user. Sends back an error if no user present
+   */
+  export function requireUser( req: IAuthReq, res: express.Response, next?: Function ): any;
+  /**
+   * Checks a user is logged in and has permission
+   * @param level
+   * @param req
+   * @param res
+   * @param existingUser [Optional] If specified this also checks if the authenticated user is the user making the request
+   * @param next
+   */
+  export function requestHasPermission( level: UserPrivileges, req: IAuthReq, res: express.Response, existingUser?: string ): Promise<boolean>;
+}
 declare module "modepress-api" {
   import * as _Controller from "controllers/controller";
   import * as users from "core/users";
@@ -2428,10 +2481,12 @@ declare module "modepress-api" {
   import * as _Models from "models/model";
   import * as _SchemaFactory from "models/schema-items/schema-item-factory";
   import { isValidObjectID } from "utils/utils";
+  import * as permissions from "utils/permission-controllers";
   export const Controller: typeof _Controller.Controller;
   export const Model: typeof _Models.Model;
   export const SchemaFactory: typeof _SchemaFactory;
   export const UserManager: typeof users.UserManager;
   export const BucketManager: typeof bucketManager.BucketManager;
   export const isValidID: typeof isValidObjectID;
+  export const authentication: typeof permissions;
 }
