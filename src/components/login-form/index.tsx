@@ -3,6 +3,7 @@ import { RaisedButton, TextField, FontIcon } from "material-ui";
 import { Link } from 'react-router-dom';
 
 type Props = {
+  loading: boolean;
   onLogin: ( user: string, password: string ) => void;
   onPasswordReset: ( user: string ) => void;
   onActivationReset: ( user: string ) => void;
@@ -87,6 +88,7 @@ export class LoginForm extends React.Component<Props, State> {
           id="login-pass" />
         <div className="buttons">
           <RaisedButton
+            disabled={this.props.loading}
             label="Login"
             fullWidth={true}
             onClick={e => this.onLogin()}
@@ -98,6 +100,7 @@ export class LoginForm extends React.Component<Props, State> {
               if ( this.checkUsernameSet( e ) )
                 this.props.onLogin( this.state.user, this.state.pass );
             }}>Retrieve Password</a>
+            <br />
             <a href="" onClick={e => {
               if ( this.checkUsernameSet( e ) )
                 this.props.onActivationReset( this.state.user );

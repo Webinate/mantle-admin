@@ -1,13 +1,15 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
-import { post } from '../../utils/httpClients';
-import { ILoginToken, IAuthenticationResponse } from 'modepress';
+import { post, get } from '../../utils/httpClients';
+import { ILoginToken, IAuthenticationResponse, IResponse } from 'modepress';
+import { push } from 'react-router-redux';
 
 // Action Creators
 export const ActionCreators = {
   isAuthenticating: new ActionCreator<'isAuthenticating', boolean>( 'isAuthenticating' ),
   authenticationError: new ActionCreator<'authenticationError', string>( 'authenticationError' ),
-  authenticationResponse: new ActionCreator<'authenticationResponse', IAuthenticationResponse>( 'authenticationResponse' )
+  authenticationResponse: new ActionCreator<'authenticationResponse', IAuthenticationResponse>( 'authenticationResponse' ),
+  loggedOut: new ActionCreator<'loggedOut', boolean>( 'loggedOut' )
 };
 
 // Action Types
@@ -21,8 +23,27 @@ export function login( authToken: ILoginToken ) {
       const resp = await post<IAuthenticationResponse>( 'auth/login', authToken );
       if ( resp.error )
         dispatch( ActionCreators.authenticationError.create( resp.message ) );
-      else
+      else {
         dispatch( ActionCreators.authenticationResponse.create( resp ) );
+        dispatch( push( '/' ) );
+      }
+    }
+    catch ( e ) {
+      dispatch( ActionCreators.authenticationError.create( e.toString() ) );
+    }
+  }
+}
+
+export function logout() {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      const resp = await get<IResponse>( 'auth/logout' );
+      if ( resp.error )
+        dispatch( ActionCreators.authenticationError.create( resp.message ) );
+      else {
+        dispatch( ActionCreators.loggedOut.create( true ) );
+        dispatch( push( '/login' ) );
+      }
     }
     catch ( e ) {
       dispatch( ActionCreators.authenticationError.create( e.toString() ) );

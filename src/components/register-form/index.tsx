@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { RaisedButton, TextField, FontIcon } from "material-ui";
 
 type Props = {
+  loading: boolean;
   onRegister: ( user: string, password: string ) => void;
 }
 type State = {
@@ -61,6 +62,7 @@ export class RegisterForm extends React.Component<Props, State> {
           id="pass2" />
         <div className="buttons">
           <RaisedButton
+            disabled={this.props.loading}
             label="Create Account"
             fullWidth={true}
             onClick={e => this.onRegister()}

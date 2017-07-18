@@ -11,6 +11,7 @@ import createHistory from 'history/createMemoryHistory';
 const ReactDOMServer = require( 'react-dom/server' );
 import { Controller } from 'modepress-api';
 import { IAuthReq } from 'modepress';
+import { authentication } from 'modepress-api';
 import { MuiThemeProvider, getMuiTheme } from "material-ui/styles";
 import Theme from "./utils/theme";
 
@@ -27,57 +28,61 @@ export default class MainController extends Controller {
   }
 
   async initialize( app: express.Express, db: Db ) {
-    const context: { url?: string } = {}
-    const history = createHistory();
+    await super.initialize( app, db );
 
     const router = express.Router();
-
-    router.get( '*', function( req, res, next ) {
-      let url = req.url;
-      let user = ( req as Express.Request as IAuthReq )._user;
-
-      if ( !user && ( url !== '/login' && url !== '/register' ) )
-        return res.redirect( '/login' );
-      else if ( user && ( url === '/login' || url !== '/register' ) )
-        return res.redirect( '/' );
-
-      let initialState: Partial<IRootState> = {
-        countState: { count: 20, busy: false },
-        authentication: {
-          authenticated: user ? true : false,
-          busy: false
-        }
-      };
-
-      const muiAgent = req.headers[ 'user-agent' ];
-      const store = createStore( initialState, history );
-      const theme = getMuiTheme( Theme, { userAgent: muiAgent } );
-
-      let html = ReactDOMServer.renderToString(
-        <Provider store={store}>
-          <MuiThemeProvider muiTheme={theme}>
-            <StaticRouter location={url} context={context}>
-              <App />
-            </StaticRouter>
-          </MuiThemeProvider>
-        </Provider>
-      );
-
-      // Check the context if there needs to be a redirect
-      if ( context.url ) {
-        res.writeHead( 301, {
-          Location: context.url,
-        } );
-        res.end();
-        return;
-      }
-
-      initialState = store.getState();
-      html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} agent={muiAgent} /> );
-      res.send( 200, html );
-    } );
-
+    router.get( '*', [ authentication.identifyUser, this.renderPage.bind( this ) ] );
     app.use( '/', router );
     return this;
+  }
+
+  /**
+   * Draws the html page and its initial react state and component tree
+   */
+  private renderPage( req: express.Request, res: express.Response, next: Function ) {
+    const context: { url?: string } = {}
+    const history = createHistory();
+    let url = req.url;
+    let user = ( req as Express.Request as IAuthReq )._user;
+
+    if ( !user && ( url !== '/login' && url !== '/register' ) )
+      return res.redirect( '/login' );
+    else if ( user && ( url === '/login' || url === '/register' ) )
+      return res.redirect( '/' );
+
+    let initialState: Partial<IRootState> = {
+      countState: { count: 20, busy: false },
+      authentication: {
+        authenticated: user ? true : false,
+        busy: false
+      }
+    };
+
+    const muiAgent = req.headers[ 'user-agent' ];
+    const store = createStore( initialState, history );
+    const theme = getMuiTheme( Theme, { userAgent: muiAgent } );
+
+    let html = ReactDOMServer.renderToString(
+      <Provider store={store}>
+        <MuiThemeProvider muiTheme={theme}>
+          <StaticRouter location={url} context={context}>
+            <App />
+          </StaticRouter>
+        </MuiThemeProvider>
+      </Provider>
+    );
+
+    // Check the context if there needs to be a redirect
+    if ( context.url ) {
+      res.writeHead( 301, {
+        Location: context.url,
+      } );
+      res.end();
+      return;
+    }
+
+    initialState = store.getState();
+    html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} intialData={initialState} agent={muiAgent} /> );
+    res.send( 200, html );
   }
 }

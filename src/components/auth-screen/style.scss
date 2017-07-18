@@ -12,11 +12,14 @@
     left: calc((100% - 80px) / 2);
   }
 
-  > div {
+  .inner-container {
     text-align: left;
+    padding: 25px;
+  }
+
+  .outer-container {
     width: 320px;
     background: #fff;
-    padding: 25px;
     border-radius: 5px;
     box-shadow: 4px 4px 18px 0px rgba(0, 0, 0, 0.25);
     position: relative;

@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Routes } from "../components/routes";
+// import { Routes } from "../components/routes";
+import { Dashboard } from "../containers/dashboard";
 import { IRootState } from "../store";
 import { increment } from "../store/counter/actions";
 import { login } from "../store/authentication/actions";
@@ -40,6 +41,7 @@ export class App extends React.Component<Partial<Props>, State> {
 
   getAuthScreen( formType: "login" | "register" ) {
     return <AuthScreen
+      loading={this.props.auth!.busy}
       error={this.props.auth!.error}
       activeComponent={formType}
       onLogin={( user, pass ) => this.props.login!( { username: user, password: pass, rememberMe: true } )}
@@ -50,15 +52,17 @@ export class App extends React.Component<Partial<Props>, State> {
   }
 
   render() {
+    // <Route path="/" exact={true} render={props => <Routes onGoTo={e => this.props.push!( e )} />} />
+    //     {
+    //       this.props.countState!.busy ? "Loading..." : <div>We have this many counters! {this.props.countState!.count}</div>
+    //     }
+    //     <button onClick={e => this.props.increment!( 50 )}>Click here to add 50</button>
+
     return (
       <div>
         <Route path="/login" render={props => this.getAuthScreen( 'login' )} />
         <Route path="/register" render={props => this.getAuthScreen( 'register' )} />
-        <Route path="/" exact={true} render={props => <Routes onGoTo={e => this.props.push!( e )} />} />
-        {
-          this.props.countState!.busy ? "Loading..." : <div>We have this many counters! {this.props.countState!.count}</div>
-        }
-        <button onClick={e => this.props.increment!( 50 )}>Click here to add 50</button>
+        <Route path="/" exact render={props => <Dashboard />} />
       </div>
     );
   }

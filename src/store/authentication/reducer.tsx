@@ -28,14 +28,24 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.authenticationResponse.type:
       partialState = {
+        busy: false,
         authenticated: true,
         error: null
       };
       break;
     case ActionCreators.authenticationError.type:
       partialState = {
+        busy: false,
         authenticated: false,
         error: action.payload
+      };
+      break;
+
+    case ActionCreators.loggedOut.type:
+      partialState = {
+        busy: false,
+        authenticated: false,
+        error: null
       };
       break;
 
