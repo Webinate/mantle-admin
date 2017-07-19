@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
-import { post, get } from '../../utils/httpClients';
+import { post, get, apiUrl } from '../../utils/httpClients';
 import { ILoginToken, IAuthenticationResponse, IResponse } from 'modepress';
 import { push } from 'react-router-redux';
 
@@ -20,7 +20,7 @@ export function login( authToken: ILoginToken ) {
     dispatch( ActionCreators.isAuthenticating.create( true ) );
 
     try {
-      const resp = await post<IAuthenticationResponse>( 'auth/login', authToken );
+      const resp = await post<IAuthenticationResponse>( `${ apiUrl }/auth/login`, authToken );
       if ( resp.error )
         dispatch( ActionCreators.authenticationError.create( resp.message ) );
       else {
@@ -37,7 +37,7 @@ export function login( authToken: ILoginToken ) {
 export function logout() {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
-      const resp = await get<IResponse>( 'auth/logout' );
+      const resp = await get<IResponse>( `${ apiUrl }/auth/logout` );
       if ( resp.error )
         dispatch( ActionCreators.authenticationError.create( resp.message ) );
       else {

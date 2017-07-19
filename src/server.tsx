@@ -7,6 +7,7 @@ import { IRootState } from './store';
 import { App } from './containers/app';
 import createStore from './utils/createStore';
 import { HTML } from './utils/html';
+import { apiUrl } from './utils/httpClients';
 import createHistory from 'history/createMemoryHistory';
 const ReactDOMServer = require( 'react-dom/server' );
 import { Controller } from 'modepress-api';
@@ -32,12 +33,13 @@ export default class MainController extends Controller {
     await Promise.all( [
       super.initialize( app, db ),
       new controllers.auth( {
+        rootPath: apiUrl,
         accountRedirectURL: '/message',
         activateAccountUrl: '/auth/activate-account',
         passwordResetURL: '/reset-password'
       } ).initialize( app, db ),
       new controllers.user( {
-        rootPath: '/api'
+        rootPath: apiUrl
       } ).initialize( app, db )
     ] );
 

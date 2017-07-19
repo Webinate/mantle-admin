@@ -2,7 +2,7 @@ import * as React from "react";
 import { IRootState } from "../../store";
 import { logout } from "../../store/authentication/actions";
 import { default as connectWrapper, returntypeof } from "../../utils/connectWrapper";
-import { Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { push } from "react-router-redux";
 import { AppBar, IconButton, Drawer, MenuItem, FontIcon } from "material-ui";
 
@@ -36,30 +36,47 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
     }
   }
 
+  private logOut() {
+    this.setState( { menuOpen: false } );
+    this.props.logout!();
+  }
+
+  private goTo( path: string ) {
+    this.setState( { menuOpen: false } );
+    this.props.push!( path );
+  }
+
   render() {
 
     return (
       <div className="dashboard">
         <AppBar
           title="Welcome to Modepress"
-          onLeftIconButtonTouchTap={e => this.setState({ menuOpen: true })}
-          iconElementRight={<IconButton iconClassName="fa fa-sign-out" onClick={e => this.props.logout!()} />} />
+          onLeftIconButtonTouchTap={e => this.setState( { menuOpen: true } )}
+          iconElementRight={<IconButton iconClassName="fa fa-sign-out" onClick={e => this.logOut()} />} />
 
-        <Route path="/" exact={true} render={props => <h1>Home</h1>} />
-        <Route path="/users" render={props => <h1>Users</h1>} />
+        <Switch>
+          <Route path="/dashboard" exact={true} render={props => {
+            return <h1>Home</h1>
+          }} />
+          <Route path="/dashboard/users" render={props => {
+            return <h1>Users</h1>
+          }} />
+          <Route render={props => <h1>Not Found</h1>} />
+        </Switch>
 
-        <Drawer open={this.state.menuOpen}>
-          <MenuItem leftIcon={<FontIcon className="fa fa-home" />} onClick={e => this.props.push!('/')}>
+        <Drawer docked={true} width={400} open={this.state.menuOpen}>
+          <MenuItem leftIcon={<FontIcon className="fa fa-home" />} onClick={e => this.goTo( '/dashboard' )}>
             Home
           </MenuItem>
-          <MenuItem leftIcon={<FontIcon className="fa fa-users" />} onClick={e => this.props.push!('/users')}>
+          <MenuItem leftIcon={<FontIcon className="fa fa-users" />} onClick={e => this.goTo( '/dashboard/users' )}>
             Users
           </MenuItem>
-          <MenuItem leftIcon={<FontIcon className="fa fa-sign-out" />} onClick={e => this.props.logout!()}>
+          <MenuItem leftIcon={<FontIcon className="fa fa-sign-out" />} onClick={e => this.logOut()}>
             Sign Out
           </MenuItem>
           <IconButton
-            onClick={e => this.setState({ menuOpen: false }) }
+            onClick={e => this.setState( { menuOpen: false } )}
             style={{ position: 'absolute', bottom: '0', right: '0' }}
             iconClassName="fa fa-chevron-left"
           />

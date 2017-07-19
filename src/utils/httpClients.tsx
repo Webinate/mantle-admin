@@ -1,3 +1,5 @@
+export const apiUrl = "/api";
+
 export async function get<T>( url: string ) {
   const resp = await fetch( url, {
     credentials: 'include',
