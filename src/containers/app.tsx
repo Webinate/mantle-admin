@@ -62,7 +62,7 @@ export class App extends React.Component<Partial<Props>, State> {
       <div>
         <Route path="/login" render={props => this.getAuthScreen( 'login' )} />
         <Route path="/register" render={props => this.getAuthScreen( 'register' )} />
-        <Route path="/" exact render={props => <Dashboard />} />
+        <Route path="/" render={props => <Dashboard />} />
       </div>
     );
   }

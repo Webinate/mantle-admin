@@ -10,8 +10,8 @@ import { HTML } from './utils/html';
 import createHistory from 'history/createMemoryHistory';
 const ReactDOMServer = require( 'react-dom/server' );
 import { Controller } from 'modepress-api';
-import { IAuthReq } from 'modepress';
-import { authentication } from 'modepress-api';
+import { IAuthReq, IClient } from 'modepress';
+import { authentication, controllers } from 'modepress-api';
 import { MuiThemeProvider, getMuiTheme } from "material-ui/styles";
 import Theme from "./utils/theme";
 
@@ -23,12 +23,23 @@ injectTapEventPlugin();
  * The default entry point for the admin server
  */
 export default class MainController extends Controller {
-  constructor() {
+
+  constructor( client: IClient ) {
     super( null );
   }
 
   async initialize( app: express.Express, db: Db ) {
-    await super.initialize( app, db );
+    await Promise.all( [
+      super.initialize( app, db ),
+      new controllers.auth( {
+        accountRedirectURL: '/message',
+        activateAccountUrl: '/auth/activate-account',
+        passwordResetURL: '/reset-password'
+      } ).initialize( app, db ),
+      new controllers.user( {
+        rootPath: '/api'
+      } ).initialize( app, db )
+    ] );
 
     const router = express.Router();
     router.get( '*', [ authentication.identifyUser, this.renderPage.bind( this ) ] );

@@ -15,7 +15,7 @@
         "--inspect=true"
       ],
       "cwd": "${workspaceRoot}/../..",
-      "preLaunchTask": "build",
+      "preLaunchTask": "",
       "runtimeExecutable": null,
       "runtimeArgs": [
         "--nolazy"
