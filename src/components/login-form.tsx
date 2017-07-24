@@ -1,6 +1,7 @@
 import * as React from "react";
 import { RaisedButton, TextField, FontIcon } from "material-ui";
 import { Link } from 'react-router-dom';
+import { default as styled } from "../theme/styled";
 
 type Props = {
   loading: boolean;
@@ -86,7 +87,7 @@ export class LoginForm extends React.Component<Props, State> {
           floatingLabelText="Password"
           type="password" name="password"
           id="login-pass" />
-        <div className="buttons">
+        <ButtonsDiv>
           <RaisedButton
             disabled={this.props.loading}
             label="Login"
@@ -94,20 +95,34 @@ export class LoginForm extends React.Component<Props, State> {
             onClick={e => this.onLogin()}
             icon={<FontIcon className="fa fa-sign-in" />}
             primary={true} />
-          <div className="anchor-btns">
+          <AnchorBtnsDiv>
             <Link to="/register">Create an Account</Link> |
-            <a href="" onClick={e => {
+            <AnchorBtns href="" onClick={e => {
               if ( this.checkUsernameSet( e ) )
                 this.props.onLogin( this.state.user, this.state.pass );
-            }}>Retrieve Password</a>
+            }}>Retrieve Password</AnchorBtns>
             <br />
-            <a href="" onClick={e => {
+            <AnchorBtns href="" onClick={e => {
               if ( this.checkUsernameSet( e ) )
                 this.props.onActivationReset( this.state.user );
-            }}> Resend Activation</a>
-          </div>
-        </div>
+            }}> Resend Activation</AnchorBtns>
+          </AnchorBtnsDiv>
+        </ButtonsDiv>
       </form>
     )
   }
 }
+
+const ButtonsDiv = styled.div`
+  margin: 40px 0 0 0;
+`;
+
+const AnchorBtnsDiv = styled.div`
+  white-space: nowrap;
+  margin: 20px 0 0 0;
+  text-align: center;
+`;
+
+const AnchorBtns = styled.a`
+  margin: 0 5px;
+`;

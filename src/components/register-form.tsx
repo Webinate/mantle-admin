@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link } from 'react-router-dom';
 import { RaisedButton, TextField, FontIcon } from "material-ui";
+import { default as styled } from "../theme/styled";
 
 type Props = {
   loading: boolean;
@@ -60,7 +61,7 @@ export class RegisterForm extends React.Component<Props, State> {
           type="password" name="password2"
           errorText={this.state.pass !== this.state.pass2 ? 'Passwords do not match' : ''}
           id="pass2" />
-        <div className="buttons">
+        <ButtonsDiv>
           <RaisedButton
             disabled={this.props.loading}
             label="Create Account"
@@ -68,11 +69,20 @@ export class RegisterForm extends React.Component<Props, State> {
             onClick={e => this.onRegister()}
             icon={<FontIcon className="fa fa-user" />}
             primary={true} />
-          <div className="anchor-btns">
-            <Link to="/login">🡐 Back to Login</Link>
-          </div>
-        </div>
+          <AnchorBtnsDiv>
+            <Link to="/login" style={{ margin: '0 5px' }}>🡐 Back to Login</Link>
+          </AnchorBtnsDiv>
+        </ButtonsDiv>
       </form>
     )
   }
 }
+
+const ButtonsDiv = styled.div`
+  margin: 40px 0 0 0;
+`;
+
+const AnchorBtnsDiv = styled.div`
+  margin: 20px 0 0 0;
+  text-align: center;
+`;
