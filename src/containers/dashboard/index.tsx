@@ -8,7 +8,8 @@ import { AppBar, IconButton, Drawer, MenuItem, FontIcon } from "material-ui";
 
 // Map state to props
 const mapStateToProps = ( state: IRootState ) => ( {
-  auth: state.authentication
+  auth: state.authentication,
+  router: state.router
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -52,6 +53,8 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
       <div className="dashboard">
         <AppBar
           title="Welcome to Modepress"
+          className="app-bar"
+          style={{ background: '' }}
           onLeftIconButtonTouchTap={e => this.setState( { menuOpen: true } )}
           iconElementRight={<IconButton iconClassName="fa fa-sign-out" onClick={e => this.logOut()} />} />
 
