@@ -1,16 +1,19 @@
 import { ActionCreators, Action } from './actions';
+import { IUserEntry } from 'modepress';
 
 // State
 export type State = {
   readonly busy: boolean;
   readonly authenticated: boolean;
   readonly error?: string | null;
+  readonly user: IUserEntry | null;
 };
 
 export const initialState: State = {
   authenticated: false,
   busy: false,
-  error: null
+  error: null,
+  user: null
 };
 
 // Reducer
@@ -33,6 +36,14 @@ export default function reducer( state: State = initialState, action: Action ): 
         error: null
       };
       break;
+
+    case ActionCreators.setUser.type:
+      partialState = {
+        user: action.payload,
+        authenticated: action.payload ? true : false
+      };
+      break;
+
     case ActionCreators.authenticationError.type:
       partialState = {
         busy: false,

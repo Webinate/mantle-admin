@@ -4,7 +4,7 @@ import { Dashboard } from "../containers/dashboard";
 import { IRootState } from "../store";
 import { increment } from "../store/counter/actions";
 import { login } from "../store/authentication/actions";
-import { default as connectWrapper, returntypeof } from "../utils/connectWrapper";
+import { connectWrapper, returntypeof } from "../utils/decorators";
 import { push } from 'react-router-redux';
 import { Route, Redirect } from "react-router-dom";
 import { AuthScreen } from "../components/auth-screen";

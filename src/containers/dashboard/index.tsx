@@ -1,10 +1,11 @@
 import * as React from "react";
 import { IRootState } from "../../store";
-import { logout } from "../../store/authentication/actions";
-import { default as connectWrapper, returntypeof } from "../../utils/connectWrapper";
+import { logout, ActionCreators } from "../../store/authentication/actions";
+import { connectWrapper, returntypeof, hydrate } from "../../utils/decorators";
 import { Route, Switch } from "react-router-dom";
 import { push } from "react-router-redux";
 import { AppBar, IconButton, Drawer, MenuItem, FontIcon } from "material-ui";
+import { IAuthReq } from 'modepress';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState ) => ( {
@@ -27,6 +28,7 @@ type State = {
 /**
  * The main application entry point
  */
+@hydrate( { path: '/', actions: ( matches, req: IAuthReq ) => [ ActionCreators.setUser.create( req._user ) ] } )
 @connectWrapper( mapStateToProps, dispatchToProps )
 export class Dashboard extends React.Component<Partial<Props>, State> {
 
@@ -52,7 +54,7 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
     return (
       <div className="dashboard">
         <AppBar
-          title="Welcome to Modepress"
+          title={this.props.auth!.user ? `Welcome back ${ this.props.auth!.user!.username }` : "Welcome to Modepress"}
           className="app-bar"
           style={{ background: '' }}
           onLeftIconButtonTouchTap={e => this.setState( { menuOpen: true } )}

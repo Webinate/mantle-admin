@@ -1,11 +1,12 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { post, get, apiUrl } from '../../utils/httpClients';
-import { ILoginToken, IAuthenticationResponse, IResponse } from 'modepress';
+import { ILoginToken, IAuthenticationResponse, IResponse, IUserEntry } from 'modepress';
 import { push } from 'react-router-redux';
 
 // Action Creators
 export const ActionCreators = {
+  setUser: new ActionCreator<'setUser', IUserEntry | null>( 'setUser' ),
   isAuthenticating: new ActionCreator<'isAuthenticating', boolean>( 'isAuthenticating' ),
   authenticationError: new ActionCreator<'authenticationError', string>( 'authenticationError' ),
   authenticationResponse: new ActionCreator<'authenticationResponse', IAuthenticationResponse>( 'authenticationResponse' ),
