@@ -30,7 +30,7 @@ export class HTML extends React.Component<Props, State> {
           <meta httpEquiv="cleartype" content="on" />
           <link rel='stylesheet' href='/css/main.css' />
           <link rel="icon" type="image/png" href="/images/favicon.png" />
-          <link href="/css/font-awesome.css" rel="stylesheet" />
+          <link href="/css/mantle.css" rel="stylesheet" />
         </head>
         <body>
           <div id="application"

@@ -58,7 +58,7 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
           className="app-bar"
           style={{ background: '' }}
           onLeftIconButtonTouchTap={e => this.setState( { menuOpen: true } )}
-          iconElementRight={<IconButton iconClassName="fa fa-sign-out" onClick={e => this.logOut()} />} />
+          iconElementRight={<IconButton iconClassName="icon-sign-out" onClick={e => this.logOut()} />} />
 
         <Switch>
           <Route path="/dashboard" exact={true} render={props => {
@@ -71,19 +71,19 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
         </Switch>
 
         <Drawer docked={true} width={400} open={this.state.menuOpen}>
-          <MenuItem leftIcon={<FontIcon className="fa fa-home" />} onClick={e => this.goTo( '/dashboard' )}>
+          <MenuItem leftIcon={<FontIcon className="icon-home" />} onClick={e => this.goTo( '/dashboard' )}>
             Home
           </MenuItem>
-          <MenuItem leftIcon={<FontIcon className="fa fa-users" />} onClick={e => this.goTo( '/dashboard/users' )}>
+          <MenuItem leftIcon={<FontIcon className="icon-person" />} onClick={e => this.goTo( '/dashboard/users' )}>
             Users
           </MenuItem>
-          <MenuItem leftIcon={<FontIcon className="fa fa-sign-out" />} onClick={e => this.logOut()}>
+          <MenuItem leftIcon={<FontIcon className="icon-sign-out" />} onClick={e => this.logOut()}>
             Sign Out
           </MenuItem>
           <IconButton
             onClick={e => this.setState( { menuOpen: false } )}
             style={{ position: 'absolute', bottom: '0', right: '0' }}
-            iconClassName="fa fa-chevron-left"
+            iconClassName="icon-navigate_before"
           />
         </Drawer>
       </div>

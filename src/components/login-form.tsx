@@ -93,7 +93,7 @@ export class LoginForm extends React.Component<Props, State> {
             label="Login"
             fullWidth={true}
             onClick={e => this.onLogin()}
-            icon={<FontIcon className="fa fa-sign-in" />}
+            icon={<FontIcon className="icon-person" />}
             primary={true} />
           <AnchorBtnsDiv>
             <Link to="/register">Create an Account</Link> |

@@ -67,7 +67,7 @@ export class RegisterForm extends React.Component<Props, State> {
             label="Create Account"
             fullWidth={true}
             onClick={e => this.onRegister()}
-            icon={<FontIcon className="fa fa-user" />}
+            icon={<FontIcon className="icon-person" />}
             primary={true} />
           <AnchorBtnsDiv>
             <Link to="/login" style={{ margin: '0 5px' }}>🡐 Back to Login</Link>
