@@ -29,18 +29,12 @@ export default function reducer( state: State = initialState, action: Action ): 
       };
       break;
 
-    case ActionCreators.authenticationResponse.type:
-      partialState = {
-        busy: false,
-        authenticated: true,
-        error: null
-      };
-      break;
-
     case ActionCreators.setUser.type:
       partialState = {
         user: action.payload,
-        authenticated: action.payload ? true : false
+        authenticated: action.payload ? true : false,
+        busy: false,
+        error: null
       };
       break;
 

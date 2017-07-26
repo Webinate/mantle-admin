@@ -9,7 +9,6 @@ export const ActionCreators = {
   setUser: new ActionCreator<'setUser', IUserEntry | null>( 'setUser' ),
   isAuthenticating: new ActionCreator<'isAuthenticating', boolean>( 'isAuthenticating' ),
   authenticationError: new ActionCreator<'authenticationError', string>( 'authenticationError' ),
-  authenticationResponse: new ActionCreator<'authenticationResponse', IAuthenticationResponse>( 'authenticationResponse' ),
   loggedOut: new ActionCreator<'loggedOut', boolean>( 'loggedOut' )
 };
 
@@ -25,7 +24,7 @@ export function login( authToken: ILoginToken ) {
       if ( resp.error )
         dispatch( ActionCreators.authenticationError.create( resp.message ) );
       else {
-        dispatch( ActionCreators.authenticationResponse.create( resp ) );
+        dispatch( ActionCreators.setUser.create( resp.user ? resp.user : null ) );
         dispatch( push( '/' ) );
       }
     }
