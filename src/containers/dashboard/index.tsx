@@ -1,10 +1,10 @@
 import * as React from "react";
 import { IRootState } from "../../store";
+import { Dashboard as Dash } from "../../components/dashboard";
 import { logout, ActionCreators } from "../../store/authentication/actions";
 import { connectWrapper, returntypeof, hydrate } from "../../utils/decorators";
 import { Route, Switch } from "react-router-dom";
 import { push } from "react-router-redux";
-import { AppBar, IconButton, Drawer, MenuItem, FontIcon } from "material-ui";
 import { IAuthReq } from 'modepress';
 
 // Map state to props
@@ -52,14 +52,14 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
   render() {
 
     return (
-      <div className="dashboard">
-        <AppBar
-          title={this.props.auth!.user ? `Welcome back ${ this.props.auth!.user!.username }` : "Welcome to Modepress"}
-          className="app-bar"
-          style={{ background: '' }}
-          onLeftIconButtonTouchTap={e => this.setState( { menuOpen: true } )}
-          iconElementRight={<IconButton iconClassName="icon-sign-out" onClick={e => this.logOut()} />} />
-
+      <Dash
+        title={this.props.auth!.user ? `Welcome back ${ this.props.auth!.user!.username }` : 'Welcome to Modepress'}
+        items={[
+          { label: 'Users', icon: 'icon-person', onClick: () => this.goTo( '/dashboard/users' ) }
+        ]}
+        onHome={() => this.goTo( '/dashboard' )}
+        onLogOut={() => this.logOut()}
+      >
         <Switch>
           <Route path="/dashboard" exact={true} render={props => {
             return <h1>Home</h1>
@@ -69,24 +69,7 @@ export class Dashboard extends React.Component<Partial<Props>, State> {
           }} />
           <Route render={props => <h1>Not Found</h1>} />
         </Switch>
-
-        <Drawer docked={true} width={400} open={this.state.menuOpen}>
-          <MenuItem leftIcon={<FontIcon className="icon-home" />} onClick={e => this.goTo( '/dashboard' )}>
-            Home
-          </MenuItem>
-          <MenuItem leftIcon={<FontIcon className="icon-person" />} onClick={e => this.goTo( '/dashboard/users' )}>
-            Users
-          </MenuItem>
-          <MenuItem leftIcon={<FontIcon className="icon-sign-out" />} onClick={e => this.logOut()}>
-            Sign Out
-          </MenuItem>
-          <IconButton
-            onClick={e => this.setState( { menuOpen: false } )}
-            style={{ position: 'absolute', bottom: '0', right: '0' }}
-            iconClassName="icon-navigate_before"
-          />
-        </Drawer>
-      </div>
+      </Dash>
     );
   }
 };
