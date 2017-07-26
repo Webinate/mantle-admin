@@ -64,6 +64,8 @@ const Head = styled.div`
   height: 60px;
   position: relative;
   color: #fff;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+
   > * {
     display: inline-block;
     vertical-align: top;
