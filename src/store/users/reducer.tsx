@@ -1,15 +1,14 @@
 import { ActionCreators, Action } from './actions';
-
-export type ViewerMode = 'infinite' | 'paged';
+import { IUserEntry } from 'modepress';
 
 // State
 export type State = {
-  readonly count: number;
+  readonly users: IUserEntry[] | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
-  count: 0,
+  users: null,
   busy: false
 };
 
@@ -18,14 +17,14 @@ export default function reducer( state: State = initialState, action: Action ): 
   let partialState: Partial<State> | undefined;
 
   switch ( action.type ) {
-    case ActionCreators.SetCount.type:
+    case ActionCreators.SetUsers.type:
       partialState = {
-        count: action.payload,
+        users: action.payload,
         busy: false
       };
       break;
 
-    case ActionCreators.IsBusy.type:
+    case ActionCreators.SetUsersBusy.type:
       partialState = { busy: action.payload };
       break;
 

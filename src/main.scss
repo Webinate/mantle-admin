@@ -10,9 +10,6 @@
   font-weight: 400;
   src: local("Roboto"), local("Roboto-Regular"), url(../fonts/Roboto-400.woff2) format("woff2"); }
 
-
-@import './containers/dashboard/style.scss';
-
 html {
   font-family: 'Roboto', sans-serif;
   color: #444;

@@ -19,24 +19,25 @@ export class Dashboard extends React.Component<Prop, any> {
       <DashboardOuter>
         <Head>
           <IconButton
-            style={{ color: 'inherit' }}
-            iconStyle={{ color: 'inherit', fontSize: '30px' }}
-            onClick={e => this.props.onHome()}
-            iconClassName="icon-mantle-solid"
-          />
-          <h1>{this.props.title}</h1>
-          <IconButton
-            style={{ color: 'inherit', float: 'right' }}
+            style={{ color: 'inherit', margin: '5px', float: 'right' }}
             iconStyle={{ color: 'inherit' }}
             onClick={e => this.props.onLogOut()}
             iconClassName="icon-sign-out"
           />
+          <IconButton
+            style={{ color: 'inherit' }}
+            iconStyle={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }}
+            onClick={e => this.props.onHome()}
+            iconClassName="icon-mantle-solid"
+          />
+          <h1>{this.props.title}</h1>
         </Head>
         <Body>
           <Menu>
             <List>
-              {this.props.items.map( i => {
+              {this.props.items.map(( i, index ) => {
                 return <ListItem
+                  key={`menu-item-${ index }`}
                   onClick={e => i.onClick()}
                   primaryText={i.label}
                   leftIcon={<FontIcon className={i.icon}
@@ -68,11 +69,11 @@ const Head = styled.div`
 
   > * {
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
   }
 
   > h1 {
-    margin: 5px;
+    margin: 0px;
   }
 `;
 

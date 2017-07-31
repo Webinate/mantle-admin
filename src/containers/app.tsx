@@ -1,17 +1,16 @@
 import * as React from "react";
-// import { Routes } from "../components/routes";
-import { Dashboard } from "../containers/dashboard";
 import { IRootState } from "../store";
-import { increment } from "../store/counter/actions";
-import { login } from "../store/authentication/actions";
+import { login, logout } from "../store/authentication/actions";
 import { connectWrapper, returntypeof } from "../utils/decorators";
 import { push } from 'react-router-redux';
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, Switch } from "react-router-dom";
 import { AuthScreen } from "../components/auth-screen";
+import { Dashboard } from "../components/dashboard";
+import { UsersList } from "../components/usersList";
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
-  countState: state.countState,
+  users: state.users,
   auth: state.authentication,
   routing: state.router,
   location: ownProps
@@ -19,9 +18,9 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  increment: increment,
   push: push,
-  login: login
+  login: login,
+  logout: logout
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -39,6 +38,16 @@ export class App extends React.Component<Partial<Props>, State> {
     super( props );
   }
 
+  private logOut() {
+    this.setState( { menuOpen: false } );
+    this.props.logout!();
+  }
+
+  private goTo( path: string ) {
+    this.setState( { menuOpen: false } );
+    this.props.push!( path );
+  }
+
   getAuthScreen( formType: "login" | "register" ) {
     return <AuthScreen
       loading={this.props.auth!.busy}
@@ -52,18 +61,31 @@ export class App extends React.Component<Partial<Props>, State> {
   }
 
   render() {
-    // return <div>
-    //   <Route path="/" render={props => <Routes onGoTo={e => this.props.push!( e )} />} />
-    //   {
-    //     this.props.countState!.busy ? "Loading..." : <div>We have this many counters! {this.props.countState!.count}</div>
-    //   }
-    //   <button onClick={e => this.props.increment!( 50 )}>Click here to add 50</button>
-    // </div>
-
     return (
       <div>
         <Route path="/" exact={true} render={props => <Redirect to="/dashboard" />} />
-        <Route path="/dashboard" render={props => <Dashboard />} />
+        <Route path="/dashboard" render={props => {
+          return (
+            <Dashboard
+              title={this.props.auth!.user ? `Welcome back ${ this.props.auth!.user!.username }` : 'Welcome to Modepress'}
+              items={[
+                { label: 'Users', icon: 'icon-person', onClick: () => this.goTo( '/dashboard/users' ) }
+              ]}
+              onHome={() => this.goTo( '/dashboard' )}
+              onLogOut={() => this.logOut()}
+            >
+              <Switch>
+                <Route path="/dashboard" exact={true} render={props => {
+                  return <h1>Home</h1>
+                }} />
+                <Route path="/dashboard/users" render={props => {
+                  return <UsersList users={this.props.users!.users || []} />
+                }} />
+                <Route render={props => <h1>Not Found</h1>} />
+              </Switch>
+            </Dashboard>
+          );
+        }} />
         <Route path="/login" render={props => this.getAuthScreen( 'login' )} />
         <Route path="/register" render={props => this.getAuthScreen( 'register' )} />
       </div>

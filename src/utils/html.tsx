@@ -2,6 +2,7 @@ import * as React from "react";
 
 type Props = {
   html: string;
+  styles: any;
   intialData: any;
   agent: string;
 }
@@ -31,6 +32,7 @@ export class HTML extends React.Component<Props, State> {
           <link rel='stylesheet' href='/css/main.css' />
           <link rel="icon" type="image/png" href="/images/favicon.png" />
           <link href="/css/mantle.css" rel="stylesheet" />
+          {this.props.styles}
         </head>
         <body>
           <div id="application"
