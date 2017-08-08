@@ -73,7 +73,8 @@ const Head = styled.div`
   }
 
   > h1 {
-    margin: 0px;
+    margin: 9px 0 0 0;
+    font-weight: 400;
   }
 `;
 
