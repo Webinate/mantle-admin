@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch",
+      "type": "node",
+      "protocol": "auto",
+      "request": "launch",
+      "program": "${workspaceRoot}/../../dist/main.js",
+      "stopOnEntry": false,
+      "args": [
+        "--config=${workspaceRoot}/../../config.json",
+        "--numThreads=1",
+        "--logging=true",
+        "--inspect=true"
+      ],
+      "cwd": "${workspaceRoot}/../..",
+      "preLaunchTask": "",
+      "runtimeExecutable": null,
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "internalConsole",
+      "sourceMaps": false,
+      "outFiles": []
+    }
+  ]
+}

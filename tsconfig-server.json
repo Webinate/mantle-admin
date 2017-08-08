@@ -7,8 +7,8 @@
       "dom.iterable",
       "es7"
     ],
-    "sourceMap": true,
-    "outDir": "./dist",
+    "sourceMap": false,
+    "outDir": "./dist/server",
     "allowUnusedLabels": false,
     "noUnusedLocals": true,
     "strictNullChecks": true,
@@ -18,8 +18,5 @@
   },
   "include": [
     "src/**/*"
-  ],
-  "exclude": [
-    "src/server/**/*"
   ]
 }
