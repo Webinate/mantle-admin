@@ -3,12 +3,12 @@ import { IUserEntry } from 'modepress';
 
 // State
 export type State = {
-  readonly users: IUserEntry[] | null;
+  readonly users: IUserEntry[] | null | 'not-hydrated';
   readonly busy: boolean;
 };
 
 export const initialState: State = {
-  users: null,
+  users: 'not-hydrated',
   busy: false
 };
 

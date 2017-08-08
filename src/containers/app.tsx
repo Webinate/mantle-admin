@@ -1,16 +1,16 @@
-import * as React from "react";
-import { IRootState } from "../store";
-import { login, logout } from "../store/authentication/actions";
-import { connectWrapper, returntypeof } from "../utils/decorators";
+import * as React from 'react';
+import { IRootState } from '../store';
+import { login, logout } from '../store/authentication/actions';
+import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
-import { Route, Redirect, Switch } from "react-router-dom";
-import { AuthScreen } from "../components/auth-screen";
-import { Dashboard } from "../components/dashboard";
-import { UsersList } from "../components/usersList";
+import { Route, Redirect, Switch } from 'react-router-dom';
+import { AuthScreen } from '../components/auth-screen';
+import { Dashboard } from '../components/dashboard';
+import { Users } from './users';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
-  users: state.users,
+  userState: state.users,
   auth: state.authentication,
   routing: state.router,
   location: ownProps
@@ -48,7 +48,7 @@ export class App extends React.Component<Partial<Props>, State> {
     this.props.push!( path );
   }
 
-  getAuthScreen( formType: "login" | "register" ) {
+  getAuthScreen( formType: 'login' | 'register' ) {
     return <AuthScreen
       loading={this.props.auth!.busy}
       error={this.props.auth!.error}
@@ -69,6 +69,7 @@ export class App extends React.Component<Partial<Props>, State> {
             <Dashboard
               title={this.props.auth!.user ? `Welcome back ${ this.props.auth!.user!.username }` : 'Welcome to Modepress'}
               items={[
+                { label: 'Home', icon: 'icon-home', onClick: () => this.goTo( '/dashboard' ) },
                 { label: 'Users', icon: 'icon-person', onClick: () => this.goTo( '/dashboard/users' ) }
               ]}
               onHome={() => this.goTo( '/dashboard' )}
@@ -79,7 +80,7 @@ export class App extends React.Component<Partial<Props>, State> {
                   return <h1>Home</h1>
                 }} />
                 <Route path="/dashboard/users" render={props => {
-                  return <UsersList users={this.props.users!.users || []} />
+                  return <Users />
                 }} />
                 <Route render={props => <h1>Not Found</h1>} />
               </Switch>
