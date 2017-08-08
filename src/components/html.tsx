@@ -10,7 +10,7 @@ type State = {
 };
 
 /**
- * The main application entry point
+ * An html component that represents the entire html page to be rendered
  */
 export class HTML extends React.Component<Props, State> {
 
@@ -44,8 +44,6 @@ export class HTML extends React.Component<Props, State> {
           <script dangerouslySetInnerHTML={{
             __html: `window.AGENT=${ JSON.stringify( this.props.agent ) }`
           }} />
-
-
           <script src="/bundle.js" />
         </body>
       </html>

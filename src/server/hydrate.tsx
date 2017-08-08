@@ -3,7 +3,7 @@ import { matchPath, match } from 'react-router';
 import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as UserActions } from '../store/users/actions';
 import { IAuthReq } from 'modepress';
-import { UserManager, authentication } from 'modepress-api';
+import { UserManager } from 'modepress-api';
 
 /**
  * This decorator populates the application state with data before the client loads.
