@@ -15,7 +15,7 @@ import { Controller } from 'modepress-api';
 import { IAuthReq, IClient } from 'modepress';
 import { authentication, controllers } from 'modepress-api';
 import { MuiThemeProvider, getMuiTheme } from "material-ui/styles";
-import Theme from "./utils/theme";
+import Theme from "./theme/mui-theme";
 import { ServerStyleSheet } from 'styled-components'
 
 // Needed for onTouchTap

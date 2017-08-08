@@ -1,12 +1,16 @@
+import { ThemeInterface } from './theme';
+
 /**
  *  Light Theme is the default theme used in material-ui. It is guaranteed to
  *  have all theme variables needed for every component. Variables not defined
  *  in a custom theme will default to these values.
  */
 export default {
+  primaryColor: '',
+  primaryColorInverted: '',
+
   spacing: {
     iconSize: 24,
-
     desktopGutter: 24,
     desktopGutterMore: 32,
     desktopGutterLess: 16,
@@ -37,4 +41,5 @@ export default {
     clockCircleColor: 'rgba(0,0,0,0.3)',
     shadowColor: '#000'
   },
-};
+
+} as ThemeInterface;
