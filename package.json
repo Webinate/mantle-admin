@@ -3,7 +3,6 @@
   "version": "0.6.3",
   "description": "An admin panel for the Modepress server",
   "main": "index.js",
-  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Webinate/modepress-admin.git"
@@ -12,6 +11,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Webinate/modepress-admin/issues"
+  },
+  "scripts": {
+    "postinstall": "gulp update-modepress-def"
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
   "devDependencies": {},
