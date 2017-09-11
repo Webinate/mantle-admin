@@ -10,17 +10,17 @@ export class UsersList extends React.PureComponent<Props, any> {
   render() {
     return (
       <div>
-        <Table>
-          <TableHeader>
+        <Table fixedHeader={true} multiSelectable={true} allRowsSelected={true} selectable={true}>
+          <TableHeader displaySelectAll={true} enableSelectAll={true} adjustForCheckbox={true}>
             <TableRow>
               <TableHeaderColumn>User</TableHeaderColumn>
               <TableHeaderColumn>Joined</TableHeaderColumn>
               <TableHeaderColumn>Last Active</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody showRowHover={true}>
             {
-              this.props.users.map(( user, index ) => {
+              this.props.users.map( ( user, index ) => {
                 return (
                   <TableRow key={`user-${ index }`}>
                     <TableRowColumn>
