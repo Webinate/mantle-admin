@@ -98,6 +98,6 @@ export default class MainController extends Controller {
 
     initialState = store.getState();
     html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} styles={styleTags} intialData={initialState} agent={muiAgent} /> );
-    res.send( 200, html );
+    res.send( html );
   }
 }
