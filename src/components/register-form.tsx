@@ -1,7 +1,7 @@
-import * as React from "react";
+import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { RaisedButton, TextField, FontIcon } from "material-ui";
-import { default as styled } from "../theme/styled";
+import { RaisedButton, TextField, FontIcon } from 'material-ui';
+import { default as styled } from '../theme/styled';
 
 type Props = {
   loading: boolean;

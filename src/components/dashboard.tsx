@@ -1,6 +1,6 @@
-import * as React from "react";
-import { IconButton, List, ListItem, FontIcon } from "material-ui"
-import { default as styled } from "../theme/styled";
+import * as React from 'react';
+import { IconButton, List, ListItem, FontIcon } from 'material-ui'
+import { default as styled } from '../theme/styled';
 
 type Prop = {
   title: string;

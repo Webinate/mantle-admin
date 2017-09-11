@@ -6,8 +6,8 @@ import { Provider } from 'react-redux';
 import createStore from './utils/createStore';
 import { IRootState } from './store';
 import createHistory from 'history/createBrowserHistory';
-import { MuiThemeProvider, getMuiTheme } from "material-ui/styles";
-import Theme from "./theme/mui-theme";
+import { MuiThemeProvider, getMuiTheme } from 'material-ui/styles';
+import Theme from './theme/mui-theme';
 
 // Needed for onTouchTap
 import * as injectTapEventPlugin from 'react-tap-event-plugin';

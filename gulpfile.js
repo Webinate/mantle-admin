@@ -1,9 +1,10 @@
 const gulp = require( 'gulp' );
 const sass = require( 'gulp-sass' );
+var tslint = require( 'gulp-tslint' );
 const webpack = require( 'webpack' );
 const ts = require( "gulp-typescript" );
 const tsProject = ts.createProject( 'tsconfig-server.json', { noImplicitAny: true } );
-
+const tsLintProj = ts.createProject( 'tsconfig-lint.json' );
 
 gulp.task( 'static', function( callback ) {
   return gulp.src( './src/static/**/*' )
@@ -41,6 +42,20 @@ gulp.task( 'sass', function() {
     .pipe( gulp.dest( './dist/client/css' ) );
 } );
 
+/**
+ * Ensures the code quality is up to scratch on the server
+ */
+gulp.task( 'lint', function() {
+  return tsLintProj.src()
+    .pipe( tslint( {
+      configuration: 'tslint.json',
+      formatter: 'verbose'
+    } ) )
+    .pipe( tslint.report( {
+      emitError: false
+    } ) )
+} );
+
 gulp.task( 'static:watch', function() {
   gulp.watch( './src/static/**/*.*', [ 'static' ] );
 } );
@@ -51,6 +66,6 @@ gulp.task( 'tsx:watch', function() {
   gulp.watch( './src/**/*.tsx', [ 'build-ts-files' ] );
 } );
 
-gulp.task( 'build', [ 'build-ts-files', 'sass', 'static' ] );
+gulp.task( 'build', [ 'lint', 'build-ts-files', 'sass', 'static' ] );
 gulp.task( 'watch', [ 'sass:watch', 'tsx:watch', 'static:watch' ] );
 gulp.task( 'default', [ 'build' ] );

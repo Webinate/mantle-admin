@@ -10,7 +10,7 @@ export class UsersList extends React.PureComponent<Props, any> {
   render() {
     return (
       <div>
-        <Table fixedHeader={true} multiSelectable={true} allRowsSelected={true} selectable={true}>
+        <Table fixedHeader={true} multiSelectable={true} selectable={true}>
           <TableHeader displaySelectAll={true} enableSelectAll={true} adjustForCheckbox={true}>
             <TableRow>
               <TableHeaderColumn>User</TableHeaderColumn>
@@ -20,7 +20,7 @@ export class UsersList extends React.PureComponent<Props, any> {
           </TableHeader>
           <TableBody showRowHover={true}>
             {
-              this.props.users.map( ( user, index ) => {
+              this.props.users.map(( user, index ) => {
                 return (
                   <TableRow key={`user-${ index }`}>
                     <TableRowColumn>

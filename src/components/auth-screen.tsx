@@ -1,9 +1,9 @@
-import * as React from "react";
-import { LoginForm } from "./login-form";
-import { RegisterForm } from "./register-form";
-import MantleDiv from "./mantle-background";
-import { LinearProgress } from "material-ui";
-import { default as styled } from "../theme/styled";
+import * as React from 'react';
+import { LoginForm } from './login-form';
+import { RegisterForm } from './register-form';
+import MantleDiv from './mantle-background';
+import { LinearProgress } from 'material-ui';
+import { default as styled } from '../theme/styled';
 
 type Prop = {
   loading: boolean;

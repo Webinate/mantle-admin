@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 type Props = {
   html: string;
@@ -29,7 +29,7 @@ export class HTML extends React.Component<Props, State> {
           <meta name="MobileOptimized" content="320" />
           <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui" />
           <meta httpEquiv="cleartype" content="on" />
-          <link rel='stylesheet' href='/css/main.css' />
+          <link rel="stylesheet" href="/css/main.css" />
           <link rel="icon" type="image/png" href="/images/favicon.png" />
           <link href="/css/mantle.css" rel="stylesheet" />
           {this.props.styles}
