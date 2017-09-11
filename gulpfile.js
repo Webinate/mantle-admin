@@ -19,6 +19,11 @@ gulp.task( 'build-client', function( callback ) {
   } );
 } );
 
+gulp.task( 'update-modepress-def', function( callback ) {
+  return gulp.src( '../modepress-api.d.ts' )
+    .pipe( gulp.dest( './src/types' ) );
+} );
+
 gulp.task( 'build-server', function( callback ) {
   const tsResult = tsProject.src()
     .pipe( tsProject() )

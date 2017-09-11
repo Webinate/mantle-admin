@@ -21,12 +21,9 @@ export function login( authToken: ILoginToken ) {
 
     try {
       const resp = await post<IAuthenticationResponse>( `${ apiUrl }/auth/login`, authToken );
-      if ( resp.error )
-        dispatch( ActionCreators.authenticationError.create( resp.message ) );
-      else {
-        dispatch( ActionCreators.setUser.create( resp.user ? resp.user : null ) );
-        dispatch( push( '/' ) );
-      }
+      dispatch( ActionCreators.setUser.create( resp.user ? resp.user : null ) );
+      dispatch( push( '/' ) );
+
     }
     catch ( e ) {
       dispatch( ActionCreators.authenticationError.create( e.toString() ) );
@@ -37,13 +34,10 @@ export function login( authToken: ILoginToken ) {
 export function logout() {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
-      const resp = await get<IResponse>( `${ apiUrl }/auth/logout` );
-      if ( resp.error )
-        dispatch( ActionCreators.authenticationError.create( resp.message ) );
-      else {
-        dispatch( ActionCreators.loggedOut.create( true ) );
-        dispatch( push( '/login' ) );
-      }
+      await get<IResponse>( `${ apiUrl }/auth/logout` );
+      dispatch( ActionCreators.loggedOut.create( true ) );
+      dispatch( push( '/login' ) );
+
     }
     catch ( e ) {
       dispatch( ActionCreators.authenticationError.create( e.toString() ) );

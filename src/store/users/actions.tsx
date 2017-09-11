@@ -21,7 +21,6 @@ export function getUsers() {
 
     const resp = await get<IGetUsers>( `${ apiUrl }/users` );
 
-    if ( !resp.error )
-      dispatch( ActionCreators.SetUsers.create( resp.data ) );
+    dispatch( ActionCreators.SetUsers.create( resp.data ) );
   }
 }
