@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { IconButton, List, ListItem, FontIcon } from 'material-ui'
 import { default as styled } from '../theme/styled';
+import { default as theme } from '../theme/mui-theme';
 
 type Prop = {
+  activePath: string;
   title: string;
-  items: { label: string, icon: string, onClick: () => void }[],
+  items: { label: string, icon: string, path: string; onClick: () => void }[],
   onHome: () => void;
   onLogOut: () => void;
 }
@@ -37,10 +39,11 @@ export class Dashboard extends React.Component<Prop, any> {
             <List>
               {this.props.items.map(( i, index ) => {
                 return <ListItem
+                  className={this.props.activePath === i.path ? 'selected' : ''}
                   key={`menu-item-${ index }`}
                   onClick={e => i.onClick()}
                   primaryText={i.label}
-                  leftIcon={<FontIcon className={i.icon}
+                  leftIcon={<FontIcon style={{ color: 'inherit', transition: '' }} className={i.icon}
                   />} />
               } )
               }
@@ -78,16 +81,21 @@ const Head = styled.div`
   }
 `;
 
-const Body = styled.div`
-  height: calc(100% - 60px);
-`;
-
 const Menu = styled.div`
   float: left;
   width: 200px;
   height: 100%;
   background: #efefef;
   box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+`;
+
+const Body = styled.div`
+height: calc(100% - 60px);
+
+${ Menu } .selected {
+  color: white !important;
+  background: ${ theme.palette!.primary1Color! } !important;
+}
 `;
 
 const Content = styled.div`
