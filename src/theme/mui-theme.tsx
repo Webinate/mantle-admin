@@ -9,6 +9,15 @@ export default {
   primaryColor: '',
   primaryColorInverted: '',
 
+  primary100: { color: '#fff', background: '#B64545' },
+  primary200: { color: '#fff', background: '#CC7A7A', border: '#AD7C7C' },
+
+  secondary100: { color: '#fff', background: '#716E8A' },
+  secondary200: { color: '#fff', background: '#8885A7' },
+
+  light100: { color: '#333', background: '#fff', border: '#ddd' },
+  light200: { color: '#333', background: '#E7E7E7', border: '#ddd' },
+
   spacing: {
     iconSize: 24,
     desktopGutter: 24,
@@ -25,7 +34,7 @@ export default {
   fontFamily: 'Roboto, sans-serif',
   borderRadius: 2,
   palette: {
-    primary1Color: '#2196F3',
+    primary1Color: '#716E8A',
     primary2Color: '#0288D1',
     primary3Color: '#BDBDBD',
     accent1Color: '#FF4081',

@@ -68,7 +68,7 @@ export class App extends React.Component<Partial<Props>, State> {
           return (
             <Dashboard
               activePath={props.location.pathname}
-              title={this.props.auth!.user ? `Welcome back ${ this.props.auth!.user!.username }` : 'Welcome to Modepress'}
+              title={'Mantle'}
               items={[
                 { label: 'Home', icon: 'icon-home', path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
                 { label: 'Users', icon: 'icon-person', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }

@@ -36,8 +36,8 @@ export class Dashboard extends React.Component<Prop, any> {
         </Head>
         <Body>
           <Menu>
-            <List>
-              {this.props.items.map(( i, index ) => {
+            <List style={{ padding: '0' }}>
+              {this.props.items.map( ( i, index ) => {
                 return <ListItem
                   className={this.props.activePath === i.path ? 'selected' : ''}
                   key={`menu-item-${ index }`}
@@ -64,11 +64,12 @@ const DashboardOuter = styled.div`
 `;
 
 const Head = styled.div`
-  background: linear-gradient(-325deg, #f09b74, #c96969, #765b90);
+  background: ${theme.primary200.background };
+  color: ${theme.primary200.color };
+  border-bottom: 1px solid ${theme.primary200.border! };
   height: 60px;
   position: relative;
-  color: #fff;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  box-sizing: border-box;
 
   > * {
     display: inline-block;
@@ -77,7 +78,7 @@ const Head = styled.div`
 
   > h1 {
     margin: 9px 0 0 0;
-    font-weight: 400;
+    font-weight: 300;
   }
 `;
 
@@ -85,16 +86,26 @@ const Menu = styled.div`
   float: left;
   width: 200px;
   height: 100%;
-  background: #efefef;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+  background: ${theme.light100.background };
+  border-right: 1px solid ${theme.light100.border! }
 `;
 
 const Body = styled.div`
 height: calc(100% - 60px);
+background: ${ theme.light200.background };
 
 ${ Menu } .selected {
-  color: white !important;
-  background: ${ theme.palette!.primary1Color! } !important;
+  color: ${ theme.secondary200.color } !important;
+  background: ${ theme.secondary200.background } !important;
+}
+
+${ Menu } .selected::before {
+  content: '';
+  position: absolute;
+  height: 100%;
+  box-sizing: border-box;
+  border-left: 6px solid ${ theme.secondary100.background };
 }
 `;
 
