@@ -13,7 +13,8 @@
     "url": "https://github.com/Webinate/modepress-admin/issues"
   },
   "scripts": {
-    "postinstall": "gulp update-modepress-def"
+    "postinstall": "gulp update-modepress-def",
+    "build": "gulp build"
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
   "devDependencies": {},
@@ -33,8 +34,9 @@
     "@types/redux": "~3.6.31",
     "@types/redux-thunk": "~2.1.32",
     "@types/ws": "^3.0.2",
-    "gulp": "~3.9.1",
+    "gulp": "github:gulpjs/gulp#4.0",
     "gulp-sass": "~3.1.0",
+    "gulp-tslint": "~8.1.2",
     "gulp-typescript": "~3.2.2",
     "history": "~4.6.3",
     "material-ui": "~0.18.6",
@@ -45,13 +47,12 @@
     "react-router-dom": "~4.1.1",
     "react-router-redux": "~4.0.8",
     "react-tap-event-plugin": "~2.0.1",
-    "styled-components": "~2.1.1",
     "redux": "~3.7.1",
     "redux-thunk": "~2.2.0",
     "source-map-loader": "~0.2.1",
+    "styled-components": "~2.1.1",
     "ts-loader": "^2.3.7",
     "tslint": "^5.7.0",
-    "gulp-tslint": "~8.1.2",
     "typescript": "~2.5.2",
     "webpack": "~3.5.6"
   }

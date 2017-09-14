@@ -6,66 +6,68 @@ const ts = require( "gulp-typescript" );
 const tsProject = ts.createProject( 'tsconfig-server.json', { noImplicitAny: true } );
 const tsLintProj = ts.createProject( 'tsconfig-lint.json' );
 
-gulp.task( 'static', function( callback ) {
+function buildStatics() {
   return gulp.src( './src/static/**/*' )
     .pipe( gulp.dest( './dist/client/' ) );
-} );
+};
 
-gulp.task( 'build-client', function( callback ) {
+function buildClient( callback ) {
   webpack( require( './webpack.config.js' ), function( err, stats ) {
     if ( err )
       throw err;
 
     callback();
   } );
-} );
+}
 
-gulp.task( 'update-modepress-def', function( callback ) {
-  return gulp.src( '../modepress-api.d.ts' )
-    .pipe( gulp.dest( './src/types' ) );
-} );
-
-gulp.task( 'build-server', function( callback ) {
+function buildServer() {
+  let didError = false;
   const tsResult = tsProject.src()
     .pipe( tsProject() )
 
-  return tsResult.js.pipe( gulp.dest( './dist/server' ) );
-} );
+    .on( 'error', function( error ) {
+      didError = true;
+    } )
 
-gulp.task( 'build-ts-files', [ 'build-client', 'build-server' ], function( callback ) {
-  callback();
-} );
+  return tsResult.js.pipe( gulp.dest( './dist/server' ) )
+    .on( 'end', function() {
+      if ( didError )
+        throw new Error( 'There were build errors' );
+    } )
+}
 
-gulp.task( 'sass', function() {
+function updateModepressDef() {
+  return gulp.src( '../modepress-api.d.ts' )
+    .pipe( gulp.dest( './src/types' ) );
+}
+
+function buildSass() {
   return gulp.src( './src/main.scss' )
     .pipe( sass().on( 'error', sass.logError ) )
     .pipe( gulp.dest( './dist/client/css' ) );
-} );
+}
 
-/**
- * Ensures the code quality is up to scratch on the server
- */
-gulp.task( 'lint', function() {
+function lint() {
   return tsLintProj.src()
     .pipe( tslint( {
       configuration: 'tslint.json',
       formatter: 'verbose'
     } ) )
     .pipe( tslint.report( {
-      emitError: false
+      emitError: true
     } ) )
-} );
+}
 
-gulp.task( 'static:watch', function() {
-  gulp.watch( './src/static/**/*.*', [ 'static' ] );
-} );
-gulp.task( 'sass:watch', function() {
-  gulp.watch( './src/**/*.scss', [ 'sass' ] );
-} );
-gulp.task( 'tsx:watch', function() {
-  gulp.watch( './src/**/*.tsx', [ 'build-ts-files' ] );
-} );
+/*
+ * You can use CommonJS `exports` module notation to declare tasks
+ */
+exports.buildStatics = buildStatics;
+exports.lint = lint;
+exports.buildSass = buildSass;
+exports.updateModepressDef = updateModepressDef;
 
-gulp.task( 'build', [ 'lint', 'build-ts-files', 'sass', 'static' ] );
-gulp.task( 'watch', [ 'sass:watch', 'tsx:watch', 'static:watch' ] );
-gulp.task( 'default', [ 'build' ] );
+const build = gulp.series( buildServer, lint, buildClient, gulp.parallel( buildSass, buildStatics ) );
+
+gulp.task( 'update-modepress-def', updateModepressDef );
+gulp.task( 'build', build );
+gulp.task( 'default', build );

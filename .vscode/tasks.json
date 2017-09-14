@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "command": "gulp",
+  "command": "npm",
   "isShellCommand": true,
   "tasks": [
     {
@@ -10,43 +10,8 @@
       "problemMatcher": "$tsc",
       "suppressTaskName": true,
       "args": [
+        "run",
         "build"
-      ]
-    },
-    {
-      "taskName": "watch",
-      "isBuildCommand": false,
-      "isBackground": true,
-      "showOutput": "always",
-      "problemMatcher": {
-        "owner": "webpack",
-        "severity": "error",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(Starting 'build-client')|(Starting 'build-server')"
-          },
-          "endsPattern": {
-            "regexp": "(Finished 'build-client')|(Finished 'build-server')"
-          }
-        },
-        "fileLocation": "relative",
-        "pattern": [
-          {
-            "regexp": "ERROR in (.*)",
-            "file": 1
-          },
-          {
-            "regexp": "\\((\\d+),(\\d+)\\):(.*)",
-            "line": 1,
-            "column": 2,
-            "message": 3
-          }
-        ]
-      },
-      "suppressTaskName": true,
-      "args": [
-        "watch"
       ]
     }
   ]
