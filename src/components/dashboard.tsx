@@ -105,7 +105,7 @@ ${ Menu } .selected::before {
   position: absolute;
   height: 100%;
   box-sizing: border-box;
-  border-left: 6px solid ${ theme.secondary100.background };
+  border-left: 8px solid ${ theme.secondary100.background };
 }
 `;
 
