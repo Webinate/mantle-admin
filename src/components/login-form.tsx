@@ -72,6 +72,7 @@ export class LoginForm extends React.Component<Props, State> {
     return (
       <form className="login-form" action="" name="login">
         <TextField
+          className="mt-username"
           value={this.state.user}
           onChange={( e, text ) => this.setState( { user: text } )}
           fullWidth={true}
@@ -80,6 +81,7 @@ export class LoginForm extends React.Component<Props, State> {
           type="text" name="username"
           id="login-user" />
         <TextField
+          className="mt-password"
           value={this.state.pass}
           onChange={( e, text ) => this.setState( { pass: text } )}
           errorText={this.state.formSubmitted && !this.state.pass ? 'Please specify a password' : ''}
@@ -96,13 +98,13 @@ export class LoginForm extends React.Component<Props, State> {
             icon={<FontIcon className="icon-person" />}
             primary={true} />
           <AnchorBtnsDiv>
-            <Link to="/register">Create an Account</Link> |
-            <AnchorBtns href="" onClick={e => {
+            <Link className="mt-create-account" to="/register">Create an Account</Link> |
+            <AnchorBtns className="mt-retrieve-password" href="" onClick={e => {
               if ( this.checkUsernameSet( e ) )
                 this.props.onLogin( this.state.user, this.state.pass );
             }}>Retrieve Password</AnchorBtns>
             <br />
-            <AnchorBtns href="" onClick={e => {
+            <AnchorBtns className="mt-resend-activation" href="" onClick={e => {
               if ( this.checkUsernameSet( e ) )
                 this.props.onActivationReset( this.state.user );
             }}> Resend Activation</AnchorBtns>

@@ -70,7 +70,10 @@ export class RegisterForm extends React.Component<Props, State> {
             icon={<FontIcon className="icon-person" />}
             primary={true} />
           <AnchorBtnsDiv>
-            <Link to="/login" style={{ margin: '0 5px' }}>🡐 Back to Login</Link>
+            <Link
+              to="/login"
+              className="mt-to-login"
+              style={{ margin: '0 5px' }}>🡐 Back to Login</Link>
           </AnchorBtnsDiv>
         </ButtonsDiv>
       </form>
