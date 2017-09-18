@@ -17,7 +17,11 @@
     "build": "gulp build"
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^3.5.3",
+    "puppeteer": "^0.10.2",
+    "yargs": "^9.0.1"
+  },
   "dependencies": {
     "@types/bson": "~1.0.3",
     "@types/history": "^4.5.2",
