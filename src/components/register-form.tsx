@@ -38,22 +38,27 @@ export class RegisterForm extends React.Component<Props, State> {
     return (
       <form className="register-form" action="" name="register">
         <TextField
+          className="mt-username"
           value={this.state.user}
           onChange={( e, text ) => this.setState( { user: text } )}
           fullWidth={true}
           floatingLabelText="Username"
-          type="text" name="username"
+          type="text"
+          name="username"
           errorText={this.state.formSubmitted && !this.state.user ? 'Please specify a username' : ''}
           id="user" />
         <TextField
+          className="mt-password"
           value={this.state.pass}
           onChange={( e, text ) => this.setState( { pass: text } )}
           fullWidth={true}
-          errorText={this.state.formSubmitted && !this.state.user ? 'Please specify a username' : ''}
+          errorText={this.state.formSubmitted && !this.state.pass ? 'Please specify a password' : ''}
           floatingLabelText="Password"
-          type="password" name="password"
+          type="password"
+          name="password"
           id="pass" />
         <TextField
+          className="mt-password2"
           value={this.state.pass2}
           onChange={( e, text ) => this.setState( { pass2: text } )}
           fullWidth={true}
@@ -63,6 +68,7 @@ export class RegisterForm extends React.Component<Props, State> {
           id="pass2" />
         <ButtonsDiv>
           <RaisedButton
+            className="mt-register-btn"
             disabled={this.props.loading}
             label="Create Account"
             fullWidth={true}

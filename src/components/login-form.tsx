@@ -91,6 +91,7 @@ export class LoginForm extends React.Component<Props, State> {
           id="login-pass" />
         <ButtonsDiv>
           <RaisedButton
+            className="mt-login-btn"
             disabled={this.props.loading}
             label="Login"
             fullWidth={true}

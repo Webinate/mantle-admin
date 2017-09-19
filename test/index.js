@@ -23,4 +23,5 @@ describe( 'Initialize Server', function() {
   } );
 } );
 
-require( './login/1-login' );
+require( './login/1-login-validation' );
+require( './login/2-register-validation' );
