@@ -60,11 +60,20 @@ describe( '1. Test login validation', function() {
   } )
 
 
-  it( 'it should not allow empty user input for sending activation or password', async () => {
+  it( 'it should not allow empty user input for sending activation', async () => {
     assert( await auth.username() == '' );
     assert( await auth.usernameError() == null );
 
     await auth.clickResendActivation();
+    assert( await auth.usernameError() == 'Please specify a username' );
+  } );
+
+  it( 'it should not allow empty user input for sending a password reset', async () => {
+    await auth.page.reload();
+    assert( await auth.username() == '' );
+    assert( await auth.usernameError() == null );
+
+    await auth.clickResetPassword();
     assert( await auth.usernameError() == 'Please specify a username' );
   } );
 } );
