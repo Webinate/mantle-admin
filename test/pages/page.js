@@ -29,9 +29,18 @@ class Page {
    * @returns {Promise<string|null>}
    */
   async textfieldError( selector ) {
-    const elm = await this.page.$( `${ selector } > div:nth-child(4)` );
+    return this.getElmText( `${ selector } > div:nth-child(4)` );
+  }
+
+  /**
+   * Gets an elements text content or null
+   * @param {string} selector
+   * @returns {Promise<string|null>}
+   */
+  async getElmText( selector ) {
+    const elm = await this.page.$( `${ selector }` );
     if ( elm )
-      return await this.page.$eval( `${ selector } > div:nth-child(4)`, elm => elm.textContent );
+      return await this.page.$eval( `${ selector }`, elm => elm.textContent );
 
     return null;
   }

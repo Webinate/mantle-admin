@@ -70,6 +70,12 @@ class AuthPage extends Page {
     return this.textfieldError( this.$password2 );
   }
 
+  /**
+   * Gets the server error response text if it exists
+   * @returns {string}
+   */
+  error() { return super.getElmText( '.mt-auth-err' ); }
+
   clickLogin() { return this.page.click( '.mt-login-btn button' ); }
   clickRegister() { return this.page.click( '.mt-register-btn button' ); }
   clickCreateAccount() { return this.page.click( '.mt-create-account' ); }
