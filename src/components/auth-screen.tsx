@@ -41,7 +41,7 @@ export class AuthScreen extends React.Component<Prop, any> {
                     loading={this.props.loading}
                   />
               }
-              {this.props.error ? <Error>{this.props.error}</Error> : undefined}
+              {this.props.error ? <Error className="mt-auth-err">{this.props.error}</Error> : undefined}
             </ContentDiv>
           </InnerDiv>
         </OuterDiv>
