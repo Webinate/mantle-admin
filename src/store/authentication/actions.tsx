@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
-import { post, get, apiUrl } from '../../utils/httpClients';
+import { post, get, apiUrl, ClientError } from '../../utils/httpClients';
 import { ILoginToken, IAuthenticationResponse, IResponse, IUserEntry } from 'modepress';
 import { push } from 'react-router-redux';
 
@@ -26,7 +26,7 @@ export function login( authToken: ILoginToken ) {
 
     }
     catch ( e ) {
-      dispatch( ActionCreators.authenticationError.create( e.toString() ) );
+      dispatch( ActionCreators.authenticationError.create( ( e as ClientError<IResponse> ).json.message ) );
     }
   }
 }
@@ -40,7 +40,7 @@ export function logout() {
 
     }
     catch ( e ) {
-      dispatch( ActionCreators.authenticationError.create( e.toString() ) );
+      dispatch( ActionCreators.authenticationError.create( ( e as ClientError<IResponse> ).json.message ) );
     }
   }
 }
