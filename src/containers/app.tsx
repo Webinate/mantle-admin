@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IRootState } from '../store';
-import { login, logout } from '../store/authentication/actions';
+import { login, logout, register } from '../store/authentication/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
 import { Route, Redirect, Switch } from 'react-router-dom';
@@ -20,6 +20,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 const dispatchToProps = {
   push: push,
   login: login,
+  register: register,
   logout: logout
 }
 
@@ -56,7 +57,7 @@ export class App extends React.Component<Partial<Props>, State> {
       onLogin={( user, pass ) => this.props.login!( { username: user, password: pass, rememberMe: true } )}
       onActivationReset={( user ) => { }}
       onPasswordReset={( user ) => { }}
-      onRegister={( user ) => { }}
+      onRegister={( user, email, password ) => this.props.register!( { username: user, password: password, email: email } )}
     />;
   }
 

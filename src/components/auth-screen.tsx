@@ -12,7 +12,7 @@ type Prop = {
   onLogin: ( user: string, password: string ) => void;
   onPasswordReset: ( user: string ) => void;
   onActivationReset: ( user: string ) => void;
-  onRegister: ( user: string, password: string ) => void;
+  onRegister: ( user: string, email: string, password: string ) => void;
 }
 
 export class AuthScreen extends React.Component<Prop, any> {
@@ -25,7 +25,7 @@ export class AuthScreen extends React.Component<Prop, any> {
       <MantleDiv className="auth-screen">
         <OuterDiv>
           <InnerDiv>
-            {this.props.loading ? <LinearProgress /> : undefined}
+            {this.props.loading ? <span className="mt-loading"><LinearProgress /></span> : undefined}
             <ContentDiv>
               <Logo src="./images/mantle-logo.svg" />
               {

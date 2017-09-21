@@ -5,10 +5,11 @@ import { default as styled } from '../theme/styled';
 
 type Props = {
   loading: boolean;
-  onRegister: ( user: string, password: string ) => void;
+  onRegister: ( user: string, email: string, password: string ) => void;
 }
 type State = {
   user: string;
+  email: string;
   pass: string;
   pass2: string;
   formSubmitted: boolean;
@@ -22,6 +23,7 @@ export class RegisterForm extends React.Component<Props, State> {
     super();
     this.state = {
       user: '',
+      email: '',
       pass: '',
       pass2: '',
       formSubmitted: false
@@ -31,7 +33,7 @@ export class RegisterForm extends React.Component<Props, State> {
   private onRegister() {
     this.setState( { formSubmitted: true } );
     if ( this.state.user !== '' && this.state.pass !== '' )
-      this.props.onRegister( this.state.user, this.state.pass );
+      this.props.onRegister( this.state.user, this.state.email, this.state.pass );
   }
 
   render() {
@@ -47,6 +49,16 @@ export class RegisterForm extends React.Component<Props, State> {
           name="username"
           errorText={this.state.formSubmitted && !this.state.user ? 'Please specify a username' : ''}
           id="user" />
+        <TextField
+          className="mt-email"
+          value={this.state.email}
+          onChange={( e, text ) => this.setState( { email: text } )}
+          fullWidth={true}
+          floatingLabelText="Email"
+          type="text"
+          name="username"
+          errorText={this.state.formSubmitted && !this.state.email ? 'Please specify an email' : ''}
+          id="email" />
         <TextField
           className="mt-password"
           value={this.state.pass}

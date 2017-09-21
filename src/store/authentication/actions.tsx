@@ -1,7 +1,7 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { post, get, apiUrl, ClientError } from '../../utils/httpClients';
-import { ILoginToken, IAuthenticationResponse, IResponse, IUserEntry } from 'modepress';
+import { ILoginToken, IRegisterToken, IAuthenticationResponse, IResponse, IUserEntry } from 'modepress';
 import { push } from 'react-router-redux';
 
 // Action Creators
@@ -24,6 +24,20 @@ export function login( authToken: ILoginToken ) {
       dispatch( ActionCreators.setUser.create( resp.user ? resp.user : null ) );
       dispatch( push( '/' ) );
 
+    }
+    catch ( e ) {
+      dispatch( ActionCreators.authenticationError.create( ( e as ClientError<IResponse> ).json.message ) );
+    }
+  }
+}
+
+export function register( authToken: IRegisterToken ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.isAuthenticating.create( true ) );
+
+    try {
+      const resp = await post<IAuthenticationResponse>( `${ apiUrl }/auth/register`, authToken );
+      dispatch( ActionCreators.authenticationError.create( resp.message ) );
     }
     catch ( e ) {
       dispatch( ActionCreators.authenticationError.create( ( e as ClientError<IResponse> ).json.message ) );
