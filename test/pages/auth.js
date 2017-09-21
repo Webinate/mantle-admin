@@ -4,6 +4,7 @@ class AuthPage extends Page {
   constructor() {
     super();
     this.$username = '.mt-username';
+    this.$email = '.mt-email';
     this.$password = '.mt-password';
     this.$password2 = '.mt-password2';
   }
@@ -35,6 +36,15 @@ class AuthPage extends Page {
   }
 
   /**
+   * Gets or sets the email value
+   * @param {string} val
+   * @returns {Promise<string>}
+   */
+  email( val ) {
+    return super.textfield( this.$email, val )
+  }
+
+  /**
    * Gets or sets the verify password value
    * @param {string} val
    * @returns {Promise<string>}
@@ -50,6 +60,15 @@ class AuthPage extends Page {
    */
   usernameError() {
     return this.textfieldError( this.$username );
+  }
+
+  /**
+   * Gets the email error
+   * @param {string} val
+   * @returns {Promise<string | null>}
+   */
+  emailError() {
+    return this.textfieldError( this.$email );
   }
 
   /**
@@ -75,6 +94,11 @@ class AuthPage extends Page {
    * @returns {string}
    */
   error() { return super.getElmText( '.mt-auth-err' ); }
+
+  /**
+   * Waits for the auth page to not be in a busy state
+   */
+  doneLoading() { return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' ); }
 
   clickLogin() { return this.page.click( '.mt-login-btn button' ); }
   clickRegister() { return this.page.click( '.mt-register-btn button' ); }

@@ -26,3 +26,5 @@ describe( 'Initialize Server', function() {
 require( './login/1-login-validation' );
 require( './login/2-register-validation' );
 require( './login/3-login-failures' );
+require( './login/4-reset-failures' );
+require( './login/5-register-failures' );
