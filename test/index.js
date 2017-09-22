@@ -28,4 +28,4 @@ require( './login/2-register-validation' );
 require( './login/3-login-failures' );
 require( './login/4-reset-failures' );
 require( './login/5-register-failures' );
-require( './login/6-page-redirects' );
+require( './login/6-successful-login-logout' );

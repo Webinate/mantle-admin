@@ -18,9 +18,10 @@ export class Dashboard extends React.Component<Prop, any> {
 
   render() {
     return (
-      <DashboardOuter>
+      <DashboardOuter className="mt-dashboard">
         <Head>
           <IconButton
+            className="mt-logout"
             style={{ color: 'inherit', margin: '5px', float: 'right' }}
             iconStyle={{ color: 'inherit' }}
             onClick={e => this.props.onLogOut()}

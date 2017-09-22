@@ -44,4 +44,15 @@ describe( '3. Login failures', function() {
     await auth.doneLoading();
     assert.equal( await auth.error(), 'The username or password is incorrect.' )
   } );
+
+  it( 'it should not allow you to go to /dashboard when not logged in', async () => {
+    await auth.to( '/dashboard' );
+    await auth.waitFor( '.login-form' );
+    assert.equal( await auth.pathname(), '/login' );
+  } );
+
+  it( 'it should allow you to go to /register when not logged in', async () => {
+    await auth.to( '/register' );
+    await auth.waitFor( '.register-form' );
+  } );
 } );
