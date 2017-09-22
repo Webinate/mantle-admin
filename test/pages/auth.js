@@ -12,9 +12,9 @@ class AuthPage extends Page {
   async load( toLogin = true ) {
     await super.load();
     if ( toLogin )
-      return super.to( 'http://localhost:8000/login' );
+      return super.to( '/login' );
     else
-      return super.to( 'http://localhost:8000/register' );
+      return super.to( '/register' );
   }
 
   /**

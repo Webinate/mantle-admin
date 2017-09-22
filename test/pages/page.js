@@ -20,7 +20,7 @@ class Page {
    * @returns {Promise<void>}
    */
   to( path ) {
-    return this.page.goto( path );
+    return this.page.goto( utils.host + path );
   }
 
   /**
