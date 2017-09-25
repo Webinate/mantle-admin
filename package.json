@@ -14,13 +14,15 @@
   },
   "scripts": {
     "postinstall": "gulp update-modepress-def",
-    "build": "gulp build"
+    "build": "gulp build",
+    "clean": "rimraf dist"
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
   "devDependencies": {
     "mocha": "^3.5.3",
     "puppeteer": "^0.10.2",
-    "yargs": "^9.0.1"
+    "yargs": "^9.0.1",
+    "rimraf": "~2.6.2"
   },
   "dependencies": {
     "@types/bson": "~1.0.3",
