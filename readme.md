@@ -1,9 +1,6 @@
 # Mantle Admin
 A small React app for managing a Mantle Server
 
-## Current stable version
-* v0.2.3
-
 ## Requirements
 * Node v8.2.1
 * MongoDb v3
