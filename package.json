@@ -15,7 +15,10 @@
   "scripts": {
     "postinstall": "gulp update-modepress-def",
     "build": "gulp build",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "patch": "npm version patch --no-git-tag-version",
+    "major": "npm version major --no-git-tag-version",
+    "minor": "npm version minor --no-git-tag-version"
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
   "devDependencies": {
