@@ -17,15 +17,27 @@ declare module 'modepress' {
          * modepress servers.
          */
         remotes: {
-            'google': IGoogleProperties;
-            'local': ILocalBucket;
+            /**
+             * If the property is a string, it must point
+             * to a json file that will be loaded dynamically at startup. The JSON should have the same structure as IGoogleProperties.
+             */
+            'google': string | IGoogleProperties;
+            /**
+             * If the property is a string, it must point
+             * to a json file that will be loaded dynamically at startup. The JSON should have the same structure as ILocalBucket.
+             */
+            'local': string | ILocalBucket;
         };
         /**
          * The length of time a render is kept in the DB before being updated. Stored in seconds.
          * e.g. 86400 (1 day)
          */
         ajaxRenderExpiration: number;
-        database: IDatabase;
+        /**
+         * If the property is a string, it must point
+         * to a json file that will be loaded dynamically at startup. The JSON should have the same structure as IDatabase.
+         */
+        database: string | IDatabase;
         /**
          * If debug is true, certain functions will be emulated and more information logged
          */
@@ -44,7 +56,8 @@ declare module 'modepress' {
         sessionSettings: ISession;
         /**
          * The administrative user. This is the root user that will have access to the information in the database.
-         * This can be anything you like, but try to use passwords that are hard to guess
+         * This can be anything you like, but try to use passwords that are hard to guess. If the property is a string, it must point
+         * to a json file that will be loaded dynamically at startup. The JSON should have the same structure as below.
          * eg:
          * 'adminUser': {
          *  'username': 'root',
@@ -52,7 +65,7 @@ declare module 'modepress' {
          *  'password': 'CHANGE_THIS_PASSWORD'
          * }
          */
-        adminUser: IAdminUser;
+        adminUser: string | IAdminUser;
         /**
          * Information regarding the websocket communication. Used for events and IPC
          */
@@ -171,10 +184,6 @@ declare module 'modepress' {
 declare module 'modepress' {
     interface IMailProperties {
         /**
-         * The from field sent to recipients
-         */
-        from: string;
-        /**
          * Specify the type of mailer to use.
          * Currently we support either 'gmail' or 'mailgun'
          */
@@ -182,9 +191,13 @@ declare module 'modepress' {
         /**
          * Options to be sent to the desired mailer
          */
-        options: IGMail | IMailgun;
+        options: string | IGMail | IMailgun;
     }
     interface IMailOptions {
+        /**
+         * The from field sent to recipients
+         */
+        from: string;
     }
     interface IMailer {
         /**
@@ -354,6 +367,81 @@ declare module "types/interfaces/i-remote" {
     }
 }
 declare module 'modepress' {
+    type ITextOptions = {
+        /** Specify the minimum number of characters for use with this text item */
+        minCharacters?: number;
+        /** Specify the maximum number of characters for use with this text item */
+        maxCharacters?: number;
+        /** If true, the text is cleaned of HTML before insertion. The default is true */
+        htmlClean?: boolean;
+    };
+    type ITextArrOptions = {
+        /** Specify the minimum number of items that can be allowed */
+        minItems?: number;
+        /** Specify the maximum number of items that can be allowed */
+        maxItems?: number;
+        /** Specify the minimum number of characters for each text item */
+        minCharacters?: number;
+        /** Specify the maximum number of characters for each text item */
+        maxCharacters?: number;
+    };
+    type NumType = 'Int' | 'Float';
+    type INumOptions = {
+        /** The minimum value the value can be */
+        min?: number;
+        /** The maximum value the value can be */
+        max?: number;
+        /** The type of number the schema represents */
+        type?: NumType;
+        /** The number of decimal places to use if the type is a Float */
+        decimalPlaces?: number;
+    };
+    type INumArrOptions = {
+        /** Specify the minimum number of items that can be allowed */
+        minItems?: number;
+        /** Specify the maximum number of items that can be allowed */
+        maxItems?: number;
+        /** Specify the minimum a number can be */
+        min?: number;
+        /** Specify the maximum a number can be */
+        max?: number;
+        /** What type of numbers to expect */
+        type?: 'Int' | 'Float';
+        /** The number of decimal places to use if the type is a Float */
+        decimalPlaces?: number;
+    };
+    type IIdArrOptions = {
+        /** Specify the minimum number of items that can be allowed */
+        minItems?: number;
+        /** Specify the maximum number of items that can be allowed */
+        maxItems?: number;
+    };
+    type IHtmlOptions = {
+        /** The tags allowed by the html parser */
+        allowedTags?: string[];
+        /** The attributes allowed by each attribute */
+        allowedAttributes?: {
+            [name: string]: Array<string>;
+        };
+        /** If true, the server will disallow a save or insert value with banned html. If false, the value will be transformed silently for you */
+        errorBadHTML?: boolean;
+        /** Specify the minimum number of characters for use with this text item */
+        minCharacters?: number;
+        /** Specify the maximum number of characters for use with this text item */
+        maxCharacters?: number;
+    };
+    type IForeignKeyOptions = {
+        /** If true, then the key is allowed to be null */
+        keyCanBeNull?: boolean;
+        /** If true, then key will only be nullified if the target is removed. If false, then the instance that owns this item must be removed as it cannot exist without the target. */
+        canAdapt?: boolean;
+    };
+    type IDateOptions = {
+        /** If true, the date will always be updated to use the current date */
+        useNow?: boolean;
+    };
+}
+declare module 'modepress' {
     interface IAuthOptions extends IBaseControler {
         /**
          * The URL to redirect to after the user attempts to activate their account.
@@ -463,7 +551,7 @@ declare module 'modepress' {
         parent?: string;
         public?: boolean;
         content?: string;
-        children?: Array<string>;
+        children?: Array<string | any>;
         createdOn?: number;
         lastUpdated?: number;
     }
@@ -574,7 +662,7 @@ declare module 'modepress' {
     }
 }
 declare module 'modepress' {
-    interface ISessionEntry {
+    interface ISessionEntry extends IModelEntry {
         _id?: any;
         sessionId: string;
         data: any;
@@ -585,7 +673,7 @@ declare module 'modepress' {
     /**
       * The interface for describing each user's bucket
       */
-    interface IStorageStats {
+    interface IStorageStats extends IModelEntry {
         user?: string;
         memoryUsed?: number;
         memoryAllocated?: number;
@@ -596,16 +684,16 @@ declare module 'modepress' {
 declare module 'modepress' {
     interface IUserEntry {
         _id?: any;
-        username?: string;
-        email?: string;
-        password?: string;
-        registerKey?: string;
-        sessionId?: string;
-        createdOn?: number;
-        lastLoggedIn?: number;
-        privileges?: number;
-        passwordTag?: string;
-        meta?: any;
+        username: string;
+        email: string;
+        password: string;
+        registerKey: string;
+        sessionId: string;
+        createdOn: number;
+        lastLoggedIn: number;
+        privileges: number;
+        passwordTag: string;
+        meta: any;
     }
 }
 declare module "types/tokens/i-auth-request" {
@@ -990,33 +1078,9 @@ declare module 'modepress' {
         }
     }
 }
-declare module "models/model-instance" {
-    import { IModelEntry } from 'modepress';
-    import { ObjectID } from 'mongodb';
-    import { Schema } from "models/schema";
-    import { Model } from "models/model";
-    /**
-     * An instance of a model with its own unique schema and ID. The initial schema is a clone
-     * the parent model's
-     */
-    export class ModelInstance<T extends IModelEntry | null> {
-        model: Model;
-        schema: Schema;
-        _id: ObjectID;
-        dbEntry: T;
-        /**
-           * Creates a model instance
-           */
-        constructor(model: Model, dbEntry: T);
-        /**
-         * Gets a string representation of all fields that are unique
-         */
-        uniqueFieldNames(): string;
-    }
-}
 declare module "models/schema-items/schema-item" {
     import { ISchemaOptions, IModelEntry } from 'modepress';
-    import { ModelInstance } from "models/model-instance";
+    import { Schema } from "models/schema";
     /**
      * A definition of each item in the model
      */
@@ -1101,16 +1165,14 @@ declare module "models/schema-items/schema-item" {
         /**
          * Called once a model instance and its schema has been validated and inserted/updated into the database. Useful for
          * doing any post update/insert operations
-         * @param instance The model instance that was inserted or updated
          * @param collection The DB collection that the model was inserted into
          */
-        postUpsert<T extends IModelEntry>(instance: ModelInstance<T>, collection: string): Promise<void>;
+        postUpsert(schema: Schema<IModelEntry>, collection: string): Promise<void>;
         /**
          * Called after a model instance is deleted. Useful for any schema item cleanups.
-         * @param instance The model instance that was deleted
          * @param collection The DB collection that the model was deleted from
          */
-        postDelete<T extends IModelEntry>(instance: ModelInstance<T>, collection: string): Promise<void>;
+        postDelete(schema: Schema<IModelEntry>, collection: string): Promise<void>;
         /**
          * Gets the value of this item in a database safe format
          */
@@ -1130,24 +1192,23 @@ declare module "models/schema-items/schema-item" {
 declare module "models/schema" {
     import { ISchemaOptions, IModelEntry } from 'modepress';
     import { SchemaItem } from "models/schema-items/schema-item";
-    import * as mongodb from 'mongodb';
-    import { ModelInstance } from "models/model-instance";
     /**
      * Gives an overall description of each property in a model
      */
-    export class Schema {
+    export class Schema<T extends IModelEntry> {
         private _items;
+        dbEntry: T;
         constructor();
         /**
          * Creates a copy of the schema
          */
-        clone(): Schema;
+        clone(): Schema<T>;
         /**
          * Sets a schema value by name
          * @param data The data object we are setting
          * @param allowReadOnlyValues If true, then readonly values can be overwritten (Usually the case when the item is first created)
          */
-        set(data: any, allowReadOnlyValues: boolean): void;
+        set(data: T, allowReadOnlyValues: boolean): void;
         /**
          * Sets a schema value by name
          * @param name The name of the schema item
@@ -1165,29 +1226,25 @@ declare module "models/schema" {
         serialize(): any;
         /**
          * Serializes the schema items into a JSON
-         * @param id The models dont store the _id property directly, and so this has to be passed for serialization
          * @param options [Optional] A set of options that can be passed to control how the data must be returned
          */
-        getAsJson<T extends IModelEntry>(id: mongodb.ObjectID, options: ISchemaOptions): Promise<T>;
+        getAsJson(options: ISchemaOptions): Promise<T>;
         /**
          * Checks the values stored in the items to see if they are correct
          * @param checkForRequiredFields If true, then required fields must be present otherwise an error is flagged
-         * @returns Returns true if successful
          */
-        validate(checkForRequiredFields: boolean): Promise<Schema>;
+        validate(checkForRequiredFields: boolean): Promise<this>;
         /**
          * Called after a model instance and its schema has been validated and inserted/updated into the database. Useful for
          * doing any post update/insert operations
-         * @param instance The model instance that was inserted or updated
          * @param collection The DB collection that the model was inserted into
          */
-        postUpsert<T extends IModelEntry>(instance: ModelInstance<T>, collection: string): Promise<Schema>;
+        postUpsert(collection: string): Promise<this>;
         /**
          * Called after a model instance is deleted. Useful for any schema item cleanups.
-         * @param instance The model instance that was deleted
          * @param collection The DB collection that the model was deleted from
          */
-        postDelete<T extends IModelEntry>(instance: ModelInstance<T>, collection: string): Promise<Schema>;
+        postDelete(collection: string): Promise<this>;
         /**
          * Gets a schema item from this schema by name
          * @param val The name of the item
@@ -1207,6 +1264,10 @@ declare module "models/schema" {
          * Gets the schema items associated with this schema
          */
         getItems(): Array<SchemaItem<any>>;
+        /**
+         * Gets a string representation of all fields that are unique
+         */
+        uniqueFieldNames(): string;
     }
 }
 declare module "utils/logger" {
@@ -1241,13 +1302,557 @@ declare module "utils/logger" {
      */
     export function clear(): void;
 }
-declare module "models/model" {
-    import { Collection, Db } from 'mongodb';
+declare module "models/schema-items/schema-number" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { INumOptions, NumType } from 'modepress';
+    /**
+     * A numeric schema item for use in Models
+     */
+    export class SchemaNumber extends SchemaItem<number> {
+        min: number;
+        max: number;
+        type: NumType;
+        decimalPlaces: number;
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The default value of this item
+         */
+        constructor(name: string, val: number, options?: INumOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         */
+        clone(copy?: SchemaNumber): SchemaNumber;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-text" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { ITextOptions } from 'modepress';
+    /**
+     * A text scheme item for use in Models
+     */
+    export class SchemaText extends SchemaItem<string> {
+        minCharacters: number;
+        maxCharacters: number;
+        htmlClean: boolean;
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The text of this item
+         * @param options Optional params
+         */
+        constructor(name: string, val: string, options?: ITextOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         * @returns
+         */
+        clone(copy?: SchemaText): SchemaText;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-bool" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    /**
+     * A bool scheme item for use in Models
+     */
+    export class SchemaBool extends SchemaItem<boolean> {
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The value of this item
+         */
+        constructor(name: string, val: boolean);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+          */
+        clone(copy?: SchemaBool): SchemaBool;
+        /**
+         * Always true
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-date" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { IDateOptions } from 'modepress';
+    /**
+     * A date scheme item for use in Models
+     */
+    export class SchemaDate extends SchemaItem<number> {
+        useNow: boolean;
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The date of this item. If none is specified the Date.now() number is used.
+         */
+        constructor(name: string, val?: number, options?: IDateOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         * @returns
+         */
+        clone(copy?: SchemaDate): SchemaDate;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+        /**
+       * Gets the value of this item
+       */
+        getValue(): Promise<number>;
+    }
+}
+declare module "models/schema-items/schema-text-array" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { ITextArrOptions } from 'modepress';
+    /**
+     * A text scheme item for use in Models
+     */
+    export class SchemaTextArray extends SchemaItem<Array<string>> {
+        minItems: number;
+        maxItems: number;
+        minCharacters: number;
+        maxCharacters: number;
+        /**
+         * Creates a new schema item that holds an array of text items
+         * @param name The name of this item
+         * @param val The text array of this schema item
+         */
+        constructor(name: string, val: Array<string>, options?: ITextArrOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         * @returns
+         */
+        clone(copy?: SchemaTextArray): SchemaTextArray;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-json" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    /**
+     * A json scheme item for use in Models
+     */
+    export class SchemaJSON extends SchemaItem<any> {
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The text of this item
+         */
+        constructor(name: string, val: any);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         */
+        clone(copy?: SchemaJSON): SchemaJSON;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "utils/utils" {
+    /**
+     * Checks a string to see if its a valid mongo id
+     * @param str
+     * @returns True if the string is valid
+     */
+    export function isValidObjectID(str?: string): boolean;
+    /**
+     * Generates a random string
+     * @param len The size of the string
+     */
+    export function generateRandString(len: number): string;
+}
+declare module "models/schema-items/schema-foreign-key" {
+    import { ISchemaOptions, IModelEntry, IForeignKeyOptions } from 'modepress';
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { ObjectID } from 'mongodb';
     import { Schema } from "models/schema";
-    import { ModelInstance } from "models/model-instance";
-    export interface UpdateToken<T> {
+    export type FKeyValues = ObjectID | string | IModelEntry | null;
+    /**
+     * Represents a mongodb ObjectID of a document in separate collection.
+     * Foreign keys are used as a way of relating models to one another. They can be required or optional.
+     * Required keys will mean that the current document cannot exist if the target does not. Optional keys
+     * will simply be nullified if the target no longer exists.
+     */
+    export class SchemaForeignKey extends SchemaItem<FKeyValues> {
+        targetCollection: string;
+        keyCanBeNull: boolean;
+        canAdapt: boolean;
+        curLevel: number;
+        private _targetDoc;
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The string representation of the foreign key's _id
+         * @param targetCollection The name of the collection to which the target exists
+         */
+        constructor(name: string, val: string, targetCollection: string, options?: IForeignKeyOptions);
+        /**
+         * Creates a clone of this item
+         */
+        clone(copy?: SchemaForeignKey): SchemaForeignKey;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+        /**
+         * Called once a model instance and its schema has been validated and inserted/updated into the database. Useful for
+         * doing any post update/insert operations
+         * @param instance The model instance that was inserted or updated
+         * @param collection The DB collection that the model was inserted into
+         */
+        postUpsert(schema: Schema<IModelEntry>, collection: string): Promise<void>;
+        /**
+         * Called after a model instance is deleted. Useful for any schema item cleanups.
+         * @param instance The model instance that was deleted
+         */
+        postDelete(schema: Schema<IModelEntry>, collection: string): Promise<void>;
+        /**
+         * Gets the value of this item
+         * @param options [Optional] A set of options that can be passed to control how the data must be returned
+         */
+        getValue(options: ISchemaOptions): Promise<FKeyValues>;
+    }
+}
+declare module "models/schema-items/schema-id-array" {
+    import { ISchemaOptions, IModelEntry } from 'modepress';
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { ObjectID } from 'mongodb';
+    import { IIdArrOptions } from 'modepress';
+    import { Schema } from "models/schema";
+    export type IdTypes = string | ObjectID | IModelEntry;
+    /**
+     * An ID array scheme item for use in Models. Optionally can be used as a foreign key array
+     * and return objects of the specified ids. In order for the array to return objects you must
+     * specify the targetCollection property. This tells the schema from which model the ids belong to.
+     * Currently we only support Id lookups that exist in the same model - i.e. if the ids are of objects
+     * in different models we cannot get the object values.
+     */
+    export class SchemaIdArray extends SchemaItem<IdTypes[]> {
+        targetCollection: string;
+        minItems: number;
+        maxItems: number;
+        curLevel: number;
+        private _targetDocs;
+        /**
+         * Creates a new schema item that holds an array of id items
+         * @param name The name of this item
+         * @param val The array of ids for this schema item
+         * @param targetCollection Specify the model name to which all the ids belong. If set the item can expand objects on retreival.
+         */
+        constructor(name: string, val: Array<string>, targetCollection: string, options?: IIdArrOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         */
+        clone(copy?: SchemaIdArray): SchemaIdArray;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         * @returns Returns true if successful or an error message string if unsuccessful
+         */
+        validate(): Promise<boolean | Error>;
+        /**
+         * Called once a model instance and its schema has been validated and inserted/updated into the database. Useful for
+         * doing any post update/insert operations
+         * @param collection The DB collection that the model was inserted into
+         */
+        postUpsert(schema: Schema<IModelEntry>, collection: string): Promise<void>;
+        /**
+         * Called after a model instance is deleted. Useful for any schema item cleanups.
+         * @param instance The model instance that was deleted
+         */
+        postDelete(schema: Schema<IModelEntry>, collection: string): Promise<void>;
+        /**
+         * Gets the value of this item
+         * @param options [Optional] A set of options that can be passed to control how the data must be returned
+         */
+        getValue(options: ISchemaOptions): Promise<Array<string | ObjectID | IModelEntry>>;
+    }
+}
+declare module "models/schema-items/schema-num-array" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { NumType, INumArrOptions } from 'modepress';
+    /**
+     * A number array scheme item for use in Models
+     */
+    export class SchemaNumArray extends SchemaItem<Array<number>> {
+        minItems: number;
+        maxItems: number;
+        min: number;
+        max: number;
+        type: NumType;
+        decimalPlaces: number;
+        /**
+         * Creates a new schema item that holds an array of number items
+         * @param name The name of this item
+         * @param val The number array of this schema item
+         */
+        constructor(name: string, val: Array<number>, options?: INumArrOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         */
+        clone(copy?: SchemaNumArray): SchemaNumArray;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-id" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { ObjectID } from 'mongodb';
+    /**
+     * A mongodb ObjectID scheme item for use in Models
+     */
+    export class SchemaId extends SchemaItem<ObjectID | string | null> {
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The string representation of the object ID
+         */
+        constructor(name: string, val: string);
+        /**
+        * Creates a clone of this item
+        * @returns copy A sub class of the copy
+        */
+        clone(copy?: SchemaId): SchemaId;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-html" {
+    import { SchemaItem } from "models/schema-items/schema-item";
+    import { IHtmlOptions } from 'modepress';
+    /**
+    * An html scheme item for use in Models
+    */
+    export class SchemaHtml extends SchemaItem<string> {
+        /**
+         * The default tags allowed
+         * includes: h3, h4, h5, h6, blockquote, p, a, ul, ol,
+         *    nl, li, b, i, strong, em, strike, code, hr, br, div,
+         *    table, thead, caption, tbody, tr, th, td, pre
+         */
+        static defaultTags: Array<string>;
+        /**
+         * The default allowed attributes for each tag
+         */
+        static defaultAllowedAttributes: {
+            [name: string]: Array<string>;
+        };
+        allowedTags: Array<string>;
+        allowedAttributes: {
+            [name: string]: Array<string>;
+        };
+        errorBadHTML: boolean;
+        minCharacters: number;
+        maxCharacters: number;
+        /**
+         * Creates a new schema item
+         * @param name The name of this item
+         * @param val The text of this item
+         */
+        constructor(name: string, val: string, options?: IHtmlOptions);
+        /**
+         * Creates a clone of this item
+         * @returns copy A sub class of the copy
+         */
+        clone(copy?: SchemaHtml): SchemaHtml;
+        /**
+         * Checks the value stored to see if its correct in its current form
+         * @returns Returns true if successful or an error message string if unsuccessful
+         */
+        validate(): Promise<boolean | Error>;
+    }
+}
+declare module "models/schema-items/schema-item-factory" {
+    import * as numbers from "models/schema-items/schema-number";
+    import { SchemaText } from "models/schema-items/schema-text";
+    import { SchemaBool } from "models/schema-items/schema-bool";
+    import { SchemaDate } from "models/schema-items/schema-date";
+    import { SchemaTextArray } from "models/schema-items/schema-text-array";
+    import { SchemaJSON } from "models/schema-items/schema-json";
+    import { SchemaIdArray } from "models/schema-items/schema-id-array";
+    import { SchemaNumArray } from "models/schema-items/schema-num-array";
+    import { SchemaId } from "models/schema-items/schema-id";
+    import { SchemaHtml } from "models/schema-items/schema-html";
+    import { SchemaForeignKey } from "models/schema-items/schema-foreign-key";
+    export const num: typeof numbers.SchemaNumber;
+    export const text: typeof SchemaText;
+    export const textArray: typeof SchemaTextArray;
+    export const json: typeof SchemaJSON;
+    export const idArray: typeof SchemaIdArray;
+    export const numArray: typeof SchemaNumArray;
+    export const date: typeof SchemaDate;
+    export const bool: typeof SchemaBool;
+    export const id: typeof SchemaId;
+    export const html: typeof SchemaHtml;
+    export const foreignKey: typeof SchemaForeignKey;
+}
+declare module "models/bucket-model" {
+    import { Model } from "models/model";
+    import { IBucketEntry } from 'modepress';
+    /**
+     * A model for describing comments
+     */
+    export class BucketModel extends Model<IBucketEntry> {
+        constructor();
+    }
+}
+declare module "models/categories-model" {
+    import { Model } from "models/model";
+    import { ICategory } from 'modepress';
+    /**
+     * A model for describing post categories
+     */
+    export class CategoriesModel extends Model<ICategory> {
+        constructor();
+    }
+}
+declare module "models/comments-model" {
+    import { Model } from "models/model";
+    import { IComment } from 'modepress';
+    /**
+     * A model for describing comments
+     */
+    export class CommentsModel extends Model<IComment> {
+        constructor();
+    }
+}
+declare module "models/file-model" {
+    import { Model } from "models/model";
+    import { IFileEntry } from 'modepress';
+    /**
+     * A model for describing comments
+     */
+    export class FileModel extends Model<IFileEntry> {
+        constructor();
+    }
+}
+declare module "models/posts-model" {
+    import { Model } from "models/model";
+    import { IPost } from 'modepress';
+    /**
+     * A model for describing posts
+     */
+    export class PostsModel extends Model<IPost> {
+        constructor();
+    }
+}
+declare module "models/renders-model" {
+    import { Model } from "models/model";
+    import { IRender } from 'modepress';
+    /**
+     * Describes a model for page renders that can be served to bots or crawlers
+     */
+    export class RendersModel extends Model<IRender> {
+        constructor();
+    }
+}
+declare module "models/session-model" {
+    import { Model } from "models/model";
+    import { ISessionEntry } from 'modepress';
+    /**
+     * A model for describing comments
+     */
+    export class SessionModel extends Model<ISessionEntry> {
+        constructor();
+    }
+}
+declare module "models/storage-stats-model" {
+    import { Model } from "models/model";
+    import { IStorageStats } from 'modepress';
+    /**
+     * A model for describing comments
+     */
+    export class StorageStatsModel extends Model<IStorageStats> {
+        constructor();
+    }
+}
+declare module "models/users-model" {
+    import { Model } from "models/model";
+    import { IUserEntry } from 'modepress';
+    /**
+     * A model for describing comments
+     */
+    export class UsersModel extends Model<IUserEntry> {
+        constructor();
+    }
+}
+declare module "core/model-factory" {
+    import { IConfig, IModelEntry } from 'modepress';
+    import { Db, Collection } from 'mongodb';
+    import { Model } from "models/model";
+    import { BucketModel } from "models/bucket-model";
+    import { CategoriesModel } from "models/categories-model";
+    import { CommentsModel } from "models/comments-model";
+    import { FileModel } from "models/file-model";
+    import { PostsModel } from "models/posts-model";
+    import { RendersModel } from "models/renders-model";
+    import { SessionModel } from "models/session-model";
+    import { StorageStatsModel } from "models/storage-stats-model";
+    import { UsersModel } from "models/users-model";
+    /**
+     * Factory classs for creating & getting models
+     */
+    export class ModelFactory {
+        private _config;
+        private _db;
+        private _models;
+        initialize(config: IConfig, database: Db): void;
+        /**
+         * Adds the default models to the system
+         */
+        addBaseModelFactories(): Promise<void>;
+        /**
+         * Sets up a model's indices
+         * @param model The model to setup
+         */
+        setupIndices(model: Model<IModelEntry>): Promise<Collection<any>>;
+        get(type: 'bucket'): BucketModel;
+        get(type: 'categories'): CategoriesModel;
+        get(type: 'comments'): CommentsModel;
+        get(type: 'file'): FileModel;
+        get(type: 'posts'): PostsModel;
+        get(type: 'renders'): RendersModel;
+        get(type: 'session'): SessionModel;
+        get(type: 'storage'): StorageStatsModel;
+        get(type: 'users'): UsersModel;
+        get(type: string): Model<IModelEntry>;
+        /**
+         * A factory method for creating models
+         * @param type The type of model to create
+         */
+        private create(type);
+    }
+    const _default: ModelFactory;
+    export default _default;
+}
+declare module "models/model" {
+    import { IModelEntry } from 'modepress';
+    import { Collection, Db, ObjectID } from 'mongodb';
+    import { Schema } from "models/schema";
+    export interface UpdateToken<T extends IModelEntry> {
         error: string | boolean;
-        instance: ModelInstance<T>;
+        instance: Schema<T>;
     }
     export interface UpdateRequest<T> {
         error: boolean;
@@ -1267,70 +1872,42 @@ declare module "models/model" {
     /**
      * Models map data in the application/client to data in the database
      */
-    export abstract class Model {
-        collection: Collection;
-        defaultSchema: Schema;
+    export abstract class Model<T extends IModelEntry> {
+        collection: Collection<T>;
+        schema: Schema<T>;
         private _collectionName;
-        private _initialized;
-        private static _registeredModels;
         /**
            * Creates an instance of a Model
            * @param collection The collection name associated with this model
            */
         constructor(collection: string);
         /**
-         * Returns a new model of a given type. However if the model was already registered before,
-         * then the previously created model is returned.
-         * @param modelConstructor The model class
-         * @returns Returns the registered model
-         */
-        static registerModel<T extends Model>(modelConstructor: any): T;
-        /**
-         * Returns a registered model by its name
-         * @param name The name of the model to fetch
-         * @returns Returns the registered model or null if none exists
-         */
-        static getByName(name: string): Model;
-        /**
-         * Creates an index for a collection
-         * @param name The name of the field we are setting an index of
-         * @param collection The collection we are setting the index on
-         */
-        private createIndex(name, collection);
-        /**
            * Gets the name of the collection associated with this model
            */
         readonly collectionName: string;
         /**
            * Initializes the model by setting up the database collections
-           * @param db The database used to create this model
            */
-        initialize(db: Db): Promise<Model>;
+        initialize(collection: Collection, db: Db): Promise<Model<T>>;
         /**
-       * Gets the number of DB entries based on the selector
-       * @param selector The mongodb selector
-       */
+         * Gets the number of DB entries based on the selector
+         * @param selector The mongodb selector
+         */
         count(selector: any): Promise<number>;
         /**
            * Gets an arrray of instances based on the selector search criteria
-           * @param selector The mongodb selector
-           * @param sort Specify an array of items to sort.
-         * Each item key represents a field, and its associated number can be either 1 or -1 (asc / desc)
-         * @param startIndex The start index of where to select from
-           * @param limit The number of results to fetch
-         * @param projection See http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
            */
-        findInstances<T>(options?: ISearchOptions<T>): Promise<Array<ModelInstance<T>>>;
+        findInstances(options?: ISearchOptions<T>): Promise<Schema<T>[]>;
         /**
          * Gets a model instance based on the selector criteria
          * @param selector The mongodb selector
          * @param projection See http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
          */
-        findOne<T>(selector: any, projection?: any): Promise<ModelInstance<T> | null>;
+        findOne(selector: any, projection?: any): Promise<Schema<T> | null>;
         /**
          * Deletes a instance and all its dependencies are updated or deleted accordingly
          */
-        private deleteInstance(instance);
+        private deleteInstance(schema);
         /**
            * Deletes a number of instances based on the selector. The promise reports how many items were deleted
            */
@@ -1344,42 +1921,40 @@ declare module "models/model" {
          * @returns {Promise<UpdateRequest<T>>} An array of objects that contains the field error and instance. Error is false if nothing
          * went wrong when updating the specific instance, and a string message if something did in fact go wrong
          */
-        update<T>(selector: any, data: T): Promise<UpdateRequest<T>>;
+        update(selector: any, data: T): Promise<UpdateRequest<T>>;
         /**
-         * Creates a new model instance. The default schema is saved in the database and an instance is returned on success.
-         * @param data [Optional] You can pass a data object that will attempt to set the instance's schema variables
-         * by parsing the data object and setting each schema item's value by the name/value in the data object.
+         * Checks if the schema item being ammended is unique
          */
-        checkUniqueness<T>(instance: ModelInstance<T>): Promise<boolean>;
+        checkUniqueness(schema: Schema<IModelEntry>, id?: ObjectID): Promise<boolean>;
         /**
            * Creates a new model instance. The default schema is saved in the database and an instance is returned on success.
            * @param data [Optional] You can pass a data object that will attempt to set the instance's schema variables
            * by parsing the data object and setting each schema item's value by the name/value in the data object
            */
-        createInstance<T>(data?: T): Promise<ModelInstance<T | null>>;
+        createInstance(data?: T): Promise<Schema<IModelEntry>>;
         /**
            * Attempts to insert an array of instances of this model into the database.
            * @param instances An array of instances to save
            */
-        insert<T>(instances: Array<ModelInstance<T>>): Promise<Array<ModelInstance<T>>>;
+        insert(instances: Schema<IModelEntry>[]): Promise<Schema<IModelEntry>[]>;
     }
 }
 declare module "controllers/controller" {
     import { Model } from "models/model";
     import * as mongodb from 'mongodb';
     import * as express from 'express';
+    import { IModelEntry } from 'modepress';
     export class Controller {
-        private static _models;
         private _models;
-        constructor(models: Array<Model> | null);
+        constructor(models: Model<IModelEntry>[] | null);
         /**
            * Called to initialize this controller and its related database objects
            */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
            * Gets a model by its collection name
            */
-        getModel(collectionName: string): Model | null;
+        getModel(collectionName: string): Model<IModelEntry> | null;
     }
 }
 declare module "core/user" {
@@ -1734,19 +2309,6 @@ declare module "socket-api/comms-controller" {
         initialize(db: mongodb.Db): Promise<void>;
     }
 }
-declare module "utils/utils" {
-    /**
-     * Checks a string to see if its a valid mongo id
-     * @param str
-     * @returns True if the string is valid
-     */
-    export function isValidObjectID(str?: string): boolean;
-    /**
-     * Generates a random string
-     * @param len The size of the string
-     */
-    export function generateRandString(len: number): string;
-}
 declare module "core/remotes/google-bucket" {
     import { Readable } from 'stream';
     import { IRemote, IGoogleProperties, IUploadOptions } from 'modepress';
@@ -2076,19 +2638,19 @@ declare module "core/user-manager" {
            */
         constructor(userCollection: Collection, config: IConfig);
         /**
-       * Called whenever a session is removed from the database
-       */
+         * Called whenever a session is removed from the database
+         */
         onSessionRemoved(sessionId: string): Promise<void>;
         /**
            * Initializes the API
            */
-        initialize(): Promise<void>;
+        initialize(): Promise<this>;
         /**
            * Attempts to register a new user
            * @param username The username of the user
            * @param pass The users secret password
            * @param email The users email address
-           * @param meta Any optional data associated with this user
+         * @param meta Any optional data associated with this user
            * @param request
            * @param response
            */
@@ -2096,15 +2658,15 @@ declare module "core/user-manager" {
         /**
            * Creates the link to send to the user for activation
            * @param user The user we are activating
-           * @param resetUrl The url of where the activation link should go
-           * @param origin The origin of where the activation link came from
+         * @param resetUrl The url of where the activation link should go
+         * @param origin The origin of where the activation link came from
            */
         private createActivationLink(user, resetUrl, origin);
         /**
            * Creates the link to send to the user for password reset
            * @param username The username of the user
-           * @param origin The origin of where the password reset link came from
-           * @param resetUrl The url of where the password reset link should go
+         * @param origin The origin of where the password reset link came from
+         * @param resetUrl The url of where the password reset link should go
            */
         private createResetLink(user, origin, resetUrl);
         /**
@@ -2113,43 +2675,43 @@ declare module "core/user-manager" {
            */
         approveActivation(username: string): Promise<void>;
         /**
-       * Attempts to send the an email to the admin user
-       * @param message The message body
+         * Attempts to send the an email to the admin user
+         * @param message The message body
          * @param name The name of the sender
          * @param from The email of the sender
-       */
+         */
         sendAdminEmail(message: string, name?: string, from?: string): Promise<boolean>;
         /**
            * Attempts to resend the activation link
            * @param username The username of the user
-           * @param resetUrl The url where the reset password link should direct to
-           * @param origin The origin of where the request came from (this is emailed to the user)
+         * @param resetUrl The url where the reset password link should direct to
+         * @param origin The origin of where the request came from (this is emailed to the user)
            */
         resendActivation(username: string, resetUrl: string, origin: string): Promise<boolean>;
         /**
-       * Sends the user an email with instructions on how to reset their password
-       * @param username The username of the user
+         * Sends the user an email with instructions on how to reset their password
+         * @param username The username of the user
          * @param resetUrl The url where the reset password link should direct to
          * @param origin The site where the request came from
-       */
+         */
         requestPasswordReset(username: string, resetUrl: string, origin: string): Promise<boolean>;
         /**
-       * Creates a hashed password
-       * @param pass The password to hash
-       */
+         * Creates a hashed password
+         * @param pass The password to hash
+         */
         private hashPassword(pass);
         /**
-       * Compares a password to the stored hash in the database
-       * @param pass The password to test
+         * Compares a password to the stored hash in the database
+         * @param pass The password to test
          * @param hash The hash stored in the DB
-       */
+         */
         private comparePassword(pass, hash);
         /**
-       * Attempts to reset a user's password.
-       * @param username The username of the user
+         * Attempts to reset a user's password.
+         * @param username The username of the user
          * @param code The password code
          * @param newPassword The new password
-       */
+         */
         resetPassword(username: string, code: string, newPassword: string): Promise<boolean>;
         /**
            * Checks the users activation code to see if its valid
@@ -2167,10 +2729,10 @@ declare module "core/user-manager" {
            * @param user The unique username
            * @param email The unique email
            * @param password The password for the user
-           * @param activateAccount If true, the account will be automatically activated (no need for email verification)
+         * @param activateAccount If true, the account will be automatically activated (no need for email verification)
            * @param privilege The type of privileges the user has. Defaults to regular
-           * @param meta Any optional data associated with this user
-           * @param allowAdmin Should this be allowed to create a super user
+         * @param meta Any optional data associated with this user
+         * @param allowAdmin Should this be allowed to create a super user
            */
         createUser(user: string, email: string, password: string, activateAccount: boolean, privilege?: UserPrivileges, meta?: any, allowAdmin?: boolean): Promise<User>;
         /**
@@ -2201,37 +2763,37 @@ declare module "core/user-manager" {
            */
         remove(username?: string): Promise<boolean>;
         /**
-       * Sets the meta data associated with the user
-       * @param user The user
+         * Sets the meta data associated with the user
+         * @param user The user
          * @param data The meta data object to set
-       * @returns Returns the data set
-       */
+         * @returns Returns the data set
+         */
         setMeta(user: IUserEntry, data?: any): Promise<any>;
         /**
-       * Sets a meta value on the user. This updates the user's meta value by name
-       * @param user The user
+         * Sets a meta value on the user. This updates the user's meta value by name
+         * @param user The user
          * @param name The name of the meta to set
          * @param data The value of the meta to set
-       * @returns {Promise<boolean|any>} Returns the value of the set
-       */
+         * @returns {Promise<boolean|any>} Returns the value of the set
+         */
         setMetaVal(user: IUserEntry, name: string, val: any): Promise<any>;
         /**
-       * Gets the value of user's meta by name
-       * @param user The user
+         * Gets the value of user's meta by name
+         * @param user The user
          * @param name The name of the meta to get
-       * @returns The value to get
-       */
+         * @returns The value to get
+         */
         getMetaVal(user: IUserEntry, name: string): Promise<any>;
         /**
-       * Gets the meta data of a user
-       * @param user The user
-       * @returns The value to get
-       */
+         * Gets the meta data of a user
+         * @param user The user
+         * @returns The value to get
+         */
         getMetaData(user: IUserEntry): Promise<any>;
         /**
-       * Gets the total number of users
+         * Gets the total number of users
          * @param searchPhrases Search phrases
-       */
+         */
         numUsers(searchPhrases?: RegExp): Promise<number>;
         /**
            * Prints user objects from the database
@@ -2249,430 +2811,6 @@ declare module "core/user-manager" {
          */
         static readonly get: UserManager;
     }
-}
-declare module "models/schema-items/schema-number" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-     * Describes the type of number to store
-     */
-    export enum NumberType {
-        Integer = 0,
-        Float = 1,
-    }
-    /**
-     * A numeric schema item for use in Models
-     */
-    export class SchemaNumber extends SchemaItem<number> {
-        min: number;
-        max: number;
-        type: NumberType;
-        decimalPlaces: number;
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The default value of this item
-         * @param min [Optional] The minimum value the value can be
-         * @param max [Optional] The maximum value the value can be
-         * @param type [Optional] The type of number the schema represents
-         * @param decimalPlaces [Optional] The number of decimal places to use if the type is a Float
-         */
-        constructor(name: string, val: number, min?: number, max?: number, type?: NumberType, decimalPlaces?: number);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         */
-        clone(copy?: SchemaNumber): SchemaNumber;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-text" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-     * A text scheme item for use in Models
-     */
-    export class SchemaText extends SchemaItem<string> {
-        minCharacters: number;
-        maxCharacters: number;
-        htmlClean: boolean;
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The text of this item
-         * @param minCharacters [Optional] Specify the minimum number of characters for use with this text item
-         * @param maxCharacters [Optional] Specify the maximum number of characters for use with this text item
-         * @param htmlClean [Optional] If true, the text is cleaned of HTML before insertion. The default is true
-         */
-        constructor(name: string, val: string, minCharacters?: number, maxCharacters?: number, htmlClean?: boolean);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         * @returns
-         */
-        clone(copy?: SchemaText): SchemaText;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-bool" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-     * A bool scheme item for use in Models
-     */
-    export class SchemaBool extends SchemaItem<boolean> {
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The value of this item
-         */
-        constructor(name: string, val: boolean);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-          */
-        clone(copy?: SchemaBool): SchemaBool;
-        /**
-         * Always true
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-date" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-     * A date scheme item for use in Models
-     */
-    export class SchemaDate extends SchemaItem<number> {
-        useNow: boolean;
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The date of this item. If none is specified the Date.now() number is used.
-         * @param useNow [Optional] If true, the date will always be updated to use the current date
-         */
-        constructor(name: string, val?: number, useNow?: boolean);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         * @returns
-         */
-        clone(copy?: SchemaDate): SchemaDate;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-        /**
-       * Gets the value of this item
-       */
-        getValue(): Promise<number>;
-    }
-}
-declare module "models/schema-items/schema-text-array" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-     * A text scheme item for use in Models
-     */
-    export class SchemaTextArray extends SchemaItem<Array<string>> {
-        minItems: number;
-        maxItems: number;
-        minCharacters: number;
-        maxCharacters: number;
-        /**
-         * Creates a new schema item that holds an array of text items
-         * @param name The name of this item
-         * @param val The text array of this schema item
-         * @param minItems [Optional] Specify the minimum number of items that can be allowed
-         * @param maxItems [Optional] Specify the maximum number of items that can be allowed
-         * @param minCharacters [Optional] Specify the minimum number of characters for each text item
-         * @param maxCharacters [Optional] Specify the maximum number of characters for each text item
-         */
-        constructor(name: string, val: Array<string>, minItems?: number, maxItems?: number, minCharacters?: number, maxCharacters?: number);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         * @returns
-         */
-        clone(copy?: SchemaTextArray): SchemaTextArray;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-json" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-     * A json scheme item for use in Models
-     */
-    export class SchemaJSON extends SchemaItem<any> {
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The text of this item
-         */
-        constructor(name: string, val: any);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         */
-        clone(copy?: SchemaJSON): SchemaJSON;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-foreign-key" {
-    import { ISchemaOptions, IModelEntry } from 'modepress';
-    import { SchemaItem } from "models/schema-items/schema-item";
-    import { ModelInstance } from "models/model-instance";
-    import { ObjectID } from 'mongodb';
-    export type FKeyValues = ObjectID | string | IModelEntry | null;
-    /**
-     * Represents a mongodb ObjectID of a document in separate collection.
-     * Foreign keys are used as a way of relating models to one another. They can be required or optional.
-     * Required keys will mean that the current document cannot exist if the target does not. Optional keys
-     * will simply be nullified if the target no longer exists.
-     */
-    export class SchemaForeignKey extends SchemaItem<FKeyValues> {
-        targetCollection: string;
-        keyCanBeNull: boolean;
-        canAdapt: boolean;
-        curLevel: number;
-        private _targetDoc;
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The string representation of the foreign key's _id
-         * @param targetCollection The name of the collection to which the target exists
-         * @param keyCanBeNull If true, then the key is allowed to be null
-         * @param canAdapt If true, then key will only be nullified if the target is removed. If false, then the instance that
-         * owns this item must be removed as it cannot exist without the target.
-         */
-        constructor(name: string, val: string, targetCollection: string, keyCanBeNull: boolean, canAdapt: boolean);
-        /**
-         * Creates a clone of this item
-         */
-        clone(copy?: SchemaForeignKey): SchemaForeignKey;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-        /**
-         * Called once a model instance and its schema has been validated and inserted/updated into the database. Useful for
-         * doing any post update/insert operations
-         * @param instance The model instance that was inserted or updated
-         * @param collection The DB collection that the model was inserted into
-         */
-        postUpsert<T extends IModelEntry>(instance: ModelInstance<T>, collection: string): Promise<void>;
-        /**
-         * Called after a model instance is deleted. Useful for any schema item cleanups.
-         * @param instance The model instance that was deleted
-         */
-        postDelete<T extends IModelEntry>(instance: ModelInstance<T>): Promise<void>;
-        /**
-         * Gets the value of this item
-         * @param options [Optional] A set of options that can be passed to control how the data must be returned
-         */
-        getValue(options: ISchemaOptions): Promise<FKeyValues>;
-    }
-}
-declare module "models/schema-items/schema-id-array" {
-    import { ISchemaOptions, IModelEntry } from 'modepress';
-    import { SchemaItem } from "models/schema-items/schema-item";
-    import { ModelInstance } from "models/model-instance";
-    import { ObjectID } from 'mongodb';
-    /**
-     * An ID array scheme item for use in Models. Optionally can be used as a foreign key array
-     * and return objects of the specified ids. In order for the array to return objects you must
-     * specify the targetCollection property. This tells the schema from which model the ids belong to.
-     * Currently we only support Id lookups that exist in the same model - i.e. if the ids are of objects
-     * in different models we cannot get the object values.
-     */
-    export class SchemaIdArray extends SchemaItem<Array<string | ObjectID | IModelEntry>> {
-        targetCollection: string;
-        minItems: number;
-        maxItems: number;
-        curLevel: number;
-        private _targetDocs;
-        /**
-         * Creates a new schema item that holds an array of id items
-         * @param name The name of this item
-         * @param val The array of ids for this schema item
-         * @param minItems [Optional] Specify the minimum number of items that can be allowed
-         * @param maxItems [Optional] Specify the maximum number of items that can be allowed
-         * @param targetCollection [Optional] Specify the model name to which all the ids belong. If set
-         * the item can expand objects on retreival.
-         */
-        constructor(name: string, val: Array<string>, minItems: number | undefined, maxItems: number | undefined, targetCollection: string);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         */
-        clone(copy?: SchemaIdArray): SchemaIdArray;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         * @returns Returns true if successful or an error message string if unsuccessful
-         */
-        validate(): Promise<boolean | Error>;
-        /**
-         * Called once a model instance and its schema has been validated and inserted/updated into the database. Useful for
-         * doing any post update/insert operations
-         * @param instance The model instance that was inserted or updated
-         * @param collection The DB collection that the model was inserted into
-         */
-        postUpsert<T extends IModelEntry>(instance: ModelInstance<T>, collection: string): Promise<void>;
-        /**
-         * Called after a model instance is deleted. Useful for any schema item cleanups.
-         * @param instance The model instance that was deleted
-         */
-        postDelete<T extends IModelEntry>(instance: ModelInstance<T>): Promise<void>;
-        /**
-         * Gets the value of this item
-         * @param options [Optional] A set of options that can be passed to control how the data must be returned
-         */
-        getValue(options: ISchemaOptions): Promise<Array<string | ObjectID | IModelEntry>>;
-    }
-}
-declare module "models/schema-items/schema-num-array" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    import { NumberType } from "models/schema-items/schema-number";
-    /**
-     * A number array scheme item for use in Models
-     */
-    export class SchemaNumArray extends SchemaItem<Array<number>> {
-        minItems: number;
-        maxItems: number;
-        min: number;
-        max: number;
-        type: NumberType;
-        decimalPlaces: number;
-        /**
-         * Creates a new schema item that holds an array of number items
-         * @param name The name of this item
-         * @param val The number array of this schema item
-         * @param minItems [Optional] Specify the minimum number of items that can be allowed
-         * @param maxItems [Optional] Specify the maximum number of items that can be allowed
-         * @param min [Optional] Specify the minimum a number can be
-         * @param max [Optional] Specify the maximum a number can be
-         * @param type [Optional] What type of numbers to expect
-         * @param decimalPlaces [Optional] The number of decimal places to use if the type is a Float
-         */
-        constructor(name: string, val: Array<number>, minItems?: number, maxItems?: number, min?: number, max?: number, type?: NumberType, decimalPlaces?: number);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         */
-        clone(copy?: SchemaNumArray): SchemaNumArray;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-id" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    import { ObjectID } from 'mongodb';
-    /**
-     * A mongodb ObjectID scheme item for use in Models
-     */
-    export class SchemaId extends SchemaItem<ObjectID | string | null> {
-        /**
-         * Creates a new schema item
-         * @param name The name of this item
-         * @param val The string representation of the object ID
-         */
-        constructor(name: string, val: string);
-        /**
-        * Creates a clone of this item
-        * @returns copy A sub class of the copy
-        */
-        clone(copy?: SchemaId): SchemaId;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-html" {
-    import { SchemaItem } from "models/schema-items/schema-item";
-    /**
-    * An html scheme item for use in Models
-    */
-    export class SchemaHtml extends SchemaItem<string> {
-        /**
-         * The default tags allowed
-         * includes: h3, h4, h5, h6, blockquote, p, a, ul, ol,
-         *    nl, li, b, i, strong, em, strike, code, hr, br, div,
-         *    table, thead, caption, tbody, tr, th, td, pre
-         */
-        static defaultTags: Array<string>;
-        /**
-         * The default allowed attributes for each tag
-         */
-        static defaultAllowedAttributes: {
-            [name: string]: Array<string>;
-        };
-        allowedTags: Array<string>;
-        allowedAttributes: {
-            [name: string]: Array<string>;
-        };
-        errorBadHTML: boolean;
-        minCharacters: number;
-        maxCharacters: number;
-        /**
-          * Creates a new schema item
-          * @param name The name of this item
-         * @param val The text of this item
-         * @param allowedTags The tags allowed by the html parser
-         * @param allowedAttributes The attributes allowed by each attribute
-         * @param errorBadHTML If true, the server will disallow a save or insert value with banned html. If false, the value will be transformed silently for you
-         * @param minCharacters [Optional] Specify the minimum number of characters for use with this text item
-         * @param maxCharacters [Optional] Specify the maximum number of characters for use with this text item
-         */
-        constructor(name: string, val: string, allowedTags?: Array<string>, allowedAttributes?: {
-            [name: string]: Array<string>;
-        }, errorBadHTML?: boolean, minCharacters?: number, maxCharacters?: number);
-        /**
-         * Creates a clone of this item
-         * @returns copy A sub class of the copy
-         */
-        clone(copy?: SchemaHtml): SchemaHtml;
-        /**
-         * Checks the value stored to see if its correct in its current form
-         * @returns Returns true if successful or an error message string if unsuccessful
-         */
-        validate(): Promise<boolean | Error>;
-    }
-}
-declare module "models/schema-items/schema-item-factory" {
-    import * as numbers from "models/schema-items/schema-number";
-    import { SchemaText } from "models/schema-items/schema-text";
-    import { SchemaBool } from "models/schema-items/schema-bool";
-    import { SchemaDate } from "models/schema-items/schema-date";
-    import { SchemaTextArray } from "models/schema-items/schema-text-array";
-    import { SchemaJSON } from "models/schema-items/schema-json";
-    import { SchemaIdArray } from "models/schema-items/schema-id-array";
-    import { SchemaNumArray } from "models/schema-items/schema-num-array";
-    import { SchemaId } from "models/schema-items/schema-id";
-    import { SchemaHtml } from "models/schema-items/schema-html";
-    import { SchemaForeignKey } from "models/schema-items/schema-foreign-key";
-    export const NumberType: typeof numbers.NumberType;
-    export const num: typeof numbers.SchemaNumber;
-    export const text: typeof SchemaText;
-    export const textArray: typeof SchemaTextArray;
-    export const json: typeof SchemaJSON;
-    export const idArray: typeof SchemaIdArray;
-    export const numArray: typeof SchemaNumArray;
-    export const date: typeof SchemaDate;
-    export const bool: typeof SchemaBool;
-    export const id: typeof SchemaId;
-    export const html: typeof SchemaHtml;
-    export const foreignKey: typeof SchemaForeignKey;
 }
 declare module "utils/errors" {
     /**
@@ -2763,15 +2901,6 @@ declare module "utils/permission-controllers" {
      */
     export function requestHasPermission(level: UserPrivileges, req: IAuthReq, res: express.Response, existingUser?: string): Promise<boolean>;
 }
-declare module "models/users-model" {
-    import { Model } from "models/model";
-    /**
-     * A model for describing comments
-     */
-    export class UsersModel extends Model {
-        constructor();
-    }
-}
 declare module "controllers/admin-controller" {
     import express = require('express');
     import { Controller } from "controllers/controller";
@@ -2786,20 +2915,11 @@ declare module "controllers/admin-controller" {
         /**
        * Called to initialize this controller and its related database objects
        */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
        * Attempts to send the webmaster an email message
        */
         private messageWebmaster(req, res);
-    }
-}
-declare module "models/bucket-model" {
-    import { Model } from "models/model";
-    /**
-     * A model for describing comments
-     */
-    export class BucketModel extends Model {
-        constructor();
     }
 }
 declare module "controllers/bucket-controller" {
@@ -2820,7 +2940,7 @@ declare module "controllers/bucket-controller" {
         /**
        * Called to initialize this controller and its related database objects
        */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Removes buckets specified in the URL
          */
@@ -2860,15 +2980,6 @@ declare module "controllers/bucket-controller" {
         private finalizeUploads(meta, files, user, tokens);
     }
 }
-declare module "models/comments-model" {
-    import { Model } from "models/model";
-    /**
-     * A model for describing comments
-     */
-    export class CommentsModel extends Model {
-        constructor();
-    }
-}
 declare module "controllers/comments-controller" {
     import * as mongodb from 'mongodb';
     import * as express from 'express';
@@ -2886,7 +2997,7 @@ declare module "controllers/comments-controller" {
         /**
        * Called to initialize this controller and its related database objects
        */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Returns an array of IComment items
          */
@@ -2927,7 +3038,7 @@ declare module "controllers/cors-controller" {
         /**
        * Called to initialize this controller and its related database objects
        */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
     }
 }
 declare module "controllers/emails-controller" {
@@ -2944,7 +3055,7 @@ declare module "controllers/emails-controller" {
         /**
        * Called to initialize this controller and its related database objects
        */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
            * Called whenever a post request is caught by this controller
            */
@@ -2966,7 +3077,7 @@ declare module "controllers/error-controller" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
     }
 }
 declare module "controllers/file-controller" {
@@ -2988,7 +3099,7 @@ declare module "controllers/file-controller" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Removes files specified in the URL
          */
@@ -3001,15 +3112,6 @@ declare module "controllers/file-controller" {
          * Fetches all file entries from the database. Optionally specifying the bucket to fetch from.
          */
         private getFiles(req, res);
-    }
-}
-declare module "models/renders-model" {
-    import { Model } from "models/model";
-    /**
-     * Describes a model for page renders that can be served to bots or crawlers
-     */
-    export class RendersModel extends Model {
-        constructor();
     }
 }
 declare module "controllers/page-renderer" {
@@ -3034,7 +3136,7 @@ declare module "controllers/page-renderer" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Strips the html page of any script tags
          */
@@ -3073,24 +3175,6 @@ declare module "controllers/page-renderer" {
         private clearRenders(req, res);
     }
 }
-declare module "models/posts-model" {
-    import { Model } from "models/model";
-    /**
-     * A model for describing posts
-     */
-    export class PostsModel extends Model {
-        constructor();
-    }
-}
-declare module "models/categories-model" {
-    import { Model } from "models/model";
-    /**
-     * A model for describing post categories
-     */
-    export class CategoriesModel extends Model {
-        constructor();
-    }
-}
 declare module "controllers/posts-controller" {
     import * as mongodb from 'mongodb';
     import * as express from 'express';
@@ -3108,7 +3192,7 @@ declare module "controllers/posts-controller" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Returns an array of IPost items
          */
@@ -3148,7 +3232,7 @@ declare module "controllers/categories-controller" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Returns an array of ICategory items
          */
@@ -3180,7 +3264,7 @@ declare module "controllers/session-controller" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
            * Gets a list of active sessions. You can limit the haul by specifying the 'index' and 'limit' query parameters.
            */
@@ -3211,7 +3295,7 @@ declare module "controllers/stats-controller" {
         /**
          * Called to initialize this controller and its related database objects
          */
-        initialize(e: express.Express, db: mongodb.Db): Promise<Controller>;
+        initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
          * Makes sure the target user exists and the numeric value specified is valid
          */
