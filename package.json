@@ -15,7 +15,7 @@
   "scripts": {
     "postinstall": "gulp update-modepress-def",
     "build": "gulp build",
-    "watch": "gulp watch-client",
+    "watch-client": "gulp watch-client",
     "clean": "rimraf dist",
     "patch": "npm version patch --no-git-tag-version",
     "major": "npm version major --no-git-tag-version",
