@@ -15,6 +15,7 @@
   "scripts": {
     "postinstall": "gulp update-modepress-def",
     "build": "gulp build",
+    "watch": "gulp watch-client",
     "clean": "rimraf dist",
     "patch": "npm version patch --no-git-tag-version",
     "major": "npm version major --no-git-tag-version",
@@ -24,10 +25,12 @@
   },
   "homepage": "https://github.com/Webinate/modepress-admin#readme",
   "devDependencies": {
+    "browser-sync": "^2.18.13",
+    "gulp": "github:gulpjs/gulp#4.0",
     "mocha": "^3.5.3",
     "puppeteer": "^0.10.2",
-    "yargs": "^9.0.1",
-    "rimraf": "~2.6.2"
+    "rimraf": "~2.6.2",
+    "yargs": "^9.0.1"
   },
   "dependencies": {
     "@types/bson": "~1.0.3",
@@ -45,7 +48,6 @@
     "@types/redux": "~3.6.31",
     "@types/redux-thunk": "~2.1.32",
     "@types/ws": "^3.0.2",
-    "gulp": "github:gulpjs/gulp#4.0",
     "gulp-sass": "~3.1.0",
     "gulp-tslint": "~8.1.2",
     "gulp-typescript": "~3.2.2",

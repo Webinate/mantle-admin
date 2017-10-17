@@ -5,6 +5,17 @@ const webpack = require( 'webpack' );
 const ts = require( "gulp-typescript" );
 const tsProject = ts.createProject( 'tsconfig-server.json', { noImplicitAny: true } );
 const tsLintProj = ts.createProject( 'tsconfig-lint.json' );
+const browserSync = require( 'browser-sync' ).create();
+const fs = require( 'fs' );
+
+const modepressJson = JSON.parse( fs.readFileSync( './modepress.json', { encoding: 'utf8' } ) );
+
+// Initialize browsersync
+browserSync.init( {
+  proxy: 'localhost:' + modepressJson.server.port,
+  port: modepressJson.server.port
+} );
+
 
 function buildStatics() {
   return gulp.src( './src/static/**/*' )
@@ -17,6 +28,33 @@ function buildClient( callback ) {
       throw err;
 
     callback();
+  } );
+}
+
+function watchClient( callback ) {
+
+  // returns a Compiler instance
+  const compiler = webpack( require( './webpack.config.js' ) );
+
+  compiler.watch( { aggregateTimeout: 300, poll: true }, function( err, stats ) {
+
+    console.clear();
+    console.log( '[webpack:build]', stats.toString( {
+      chunks: false, // Makes the build much quieter
+      colors: true
+    } ) );
+
+    if ( err )
+      return;
+
+    var jsonStats = stats.toJson();
+
+    if ( jsonStats.errors.length > 0 || jsonStats.warnings.length > 0 )
+      return;
+    else {
+      console.info( 'Compiled successfully!' );
+      browserSync.reload();
+    }
   } );
 }
 
@@ -70,4 +108,5 @@ const build = gulp.series( buildServer, lint, buildClient, gulp.parallel( buildS
 
 gulp.task( 'update-modepress-def', updateModepressDef );
 gulp.task( 'build', build );
+gulp.task( 'watch-client', watchClient );
 gulp.task( 'default', build );
