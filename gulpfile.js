@@ -10,12 +10,6 @@ const fs = require( 'fs' );
 
 const modepressJson = JSON.parse( fs.readFileSync( './modepress.json', { encoding: 'utf8' } ) );
 
-// Initialize browsersync
-browserSync.init( {
-  proxy: 'localhost:' + modepressJson.server.port,
-  port: modepressJson.server.port
-} );
-
 function buildStatics() {
   return gulp.src( './src/static/**/*' )
     .pipe( gulp.dest( './dist/client/' ) );
@@ -113,6 +107,16 @@ function lint() {
     } ) )
 }
 
+function initBrowserSync( callback ) {
+  // Initialize browsersync
+  browserSync.init( {
+    proxy: 'localhost:' + modepressJson.server.port,
+    port: modepressJson.server.port
+  } );
+
+  callback();
+}
+
 /*
  * You can use CommonJS `exports` module notation to declare tasks
  */
@@ -122,8 +126,9 @@ exports.buildSass = buildSass;
 exports.updateModepressDef = updateModepressDef;
 
 const build = gulp.series( buildServer, lint, buildClient, gulp.parallel( buildSass, buildStatics ) );
+const watch = gulp.series( initBrowserSync, watchClient );
 
 gulp.task( 'update-modepress-def', updateModepressDef );
 gulp.task( 'build', build );
 gulp.task( 'default', build );
-gulp.task( 'watch-client', watchClient );
+gulp.task( 'watch-client', watch );
