@@ -16,12 +16,14 @@ browserSync.init( {
   port: modepressJson.server.port
 } );
 
-
 function buildStatics() {
   return gulp.src( './src/static/**/*' )
     .pipe( gulp.dest( './dist/client/' ) );
 };
 
+/**
+ * Builds the client TS code
+ */
 function buildClient( callback ) {
   webpack( require( './webpack.config.js' ), function( err, stats ) {
     if ( err )
@@ -31,6 +33,9 @@ function buildClient( callback ) {
   } );
 }
 
+/**
+ * Watches the client and reloads the page on successful compilation
+ */
 function watchClient( callback ) {
 
   // returns a Compiler instance
@@ -58,6 +63,9 @@ function watchClient( callback ) {
   } );
 }
 
+/**
+ * Builds the server ts code
+ */
 function buildServer() {
   let didError = false;
   const tsResult = tsProject.src()
@@ -74,17 +82,26 @@ function buildServer() {
     } )
 }
 
+/**
+ * Updates the modepress definition file
+ */
 function updateModepressDef() {
   return gulp.src( '../modepress-api.d.ts' )
     .pipe( gulp.dest( './src/types' ) );
 }
 
+/**
+ * Builds any sass files
+ */
 function buildSass() {
   return gulp.src( './src/main.scss' )
     .pipe( sass().on( 'error', sass.logError ) )
     .pipe( gulp.dest( './dist/client/css' ) );
 }
 
+/**
+ * Notifies of any lint errors
+ */
 function lint() {
   return tsLintProj.src()
     .pipe( tslint( {
@@ -108,5 +125,5 @@ const build = gulp.series( buildServer, lint, buildClient, gulp.parallel( buildS
 
 gulp.task( 'update-modepress-def', updateModepressDef );
 gulp.task( 'build', build );
-gulp.task( 'watch-client', watchClient );
 gulp.task( 'default', build );
+gulp.task( 'watch-client', watchClient );
