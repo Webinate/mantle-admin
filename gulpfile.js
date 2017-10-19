@@ -7,6 +7,7 @@ const tsProject = ts.createProject( 'tsconfig-server.json', { noImplicitAny: tru
 const tsLintProj = ts.createProject( 'tsconfig-lint.json' );
 const browserSync = require( 'browser-sync' ).create();
 const fs = require( 'fs' );
+var spawn = require( 'child_process' )
 
 const modepressJson = JSON.parse( fs.readFileSync( './modepress.json', { encoding: 'utf8' } ) );
 
@@ -28,9 +29,27 @@ function buildClient( callback ) {
 }
 
 /**
- * Watches the client and reloads the page on successful compilation
+ * Builds the server ts code
  */
-function watchClient( callback ) {
+function buildServer() {
+  let didError = false;
+  const tsResult = tsProject.src()
+    .pipe( tsProject() )
+    .on( 'error', function( error ) {
+      didError = true;
+    } );
+
+  return tsResult.js.pipe( gulp.dest( './dist/server' ) )
+    .on( 'end', function() {
+      if ( didError )
+        throw new Error( 'There were build errors' );
+    } );
+}
+
+/**
+ * Watches the source files and reloads a browsersync page on successful compilation
+ */
+function startWatchClient( callback ) {
 
   // returns a Compiler instance
   const compiler = webpack( require( './webpack.config.js' ) );
@@ -58,22 +77,58 @@ function watchClient( callback ) {
 }
 
 /**
- * Builds the server ts code
+ * Watches the source files and reloads the server on successful compilation
  */
-function buildServer() {
-  let didError = false;
-  const tsResult = tsProject.src()
-    .pipe( tsProject() )
+function startWatchServer() {
 
-    .on( 'error', function( error ) {
-      didError = true;
-    } )
+  let existingProc = runServer();
 
-  return tsResult.js.pipe( gulp.dest( './dist/server' ) )
-    .on( 'end', function() {
-      if ( didError )
-        throw new Error( 'There were build errors' );
-    } )
+  gulp.watch( './src/**/*', ( done ) => {
+
+    let error = false;
+
+    const tsResult = tsProject.src()
+      .pipe( tsProject() )
+      .on( 'error', function() {
+        error = true;
+      } );
+
+    tsResult.js.pipe( gulp.dest( './dist/server' ) )
+      .on( 'end', function() {
+        if ( existingProc )
+          existingProc.kill();
+
+        if ( !error ) {
+          existingProc = runServer();
+        }
+
+        done();
+      } );
+  } );
+}
+
+/**
+ * Starts a child process that runs the modepress server
+ */
+function runServer() {
+  let prc = spawn.spawn( 'node', [ "./dist/main.js", "--config=./config.json", "--numThreads=1", "--logging=true" ], { cwd: '../../' } );
+  prc.stdout.setEncoding( 'utf8' );
+  prc.stderr.setEncoding( 'utf8' );
+  prc.stdout.on( 'data', function( data ) {
+    var str = data.toString();
+    console.log( str );
+  } );
+
+  prc.stderr.on( 'data', function( data ) {
+    var str = data.toString();
+    console.error( str );
+  } );
+
+  prc.on( 'close', function( code ) {
+    console.error( 'Server closed prematurely' );
+  } );
+
+  return prc;
 }
 
 /**
@@ -107,8 +162,10 @@ function lint() {
     } ) )
 }
 
+/**
+ * Initializes browsersync
+ */
 function initBrowserSync( callback ) {
-  // Initialize browsersync
   browserSync.init( {
     proxy: 'localhost:' + modepressJson.server.port,
     port: modepressJson.server.port
@@ -117,18 +174,10 @@ function initBrowserSync( callback ) {
   callback();
 }
 
-/*
- * You can use CommonJS `exports` module notation to declare tasks
- */
-exports.buildStatics = buildStatics;
-exports.lint = lint;
-exports.buildSass = buildSass;
-exports.updateModepressDef = updateModepressDef;
-
-const build = gulp.series( buildServer, lint, buildClient, gulp.parallel( buildSass, buildStatics ) );
-const watch = gulp.series( initBrowserSync, watchClient );
-
 gulp.task( 'update-modepress-def', updateModepressDef );
-gulp.task( 'build', build );
-gulp.task( 'default', build );
-gulp.task( 'watch-client', watch );
+gulp.task( 'build-client', buildClient );
+gulp.task( 'build-server', buildServer );
+gulp.task( 'build', gulp.series( buildServer, gulp.parallel( lint, buildClient, buildSass, buildStatics ), ) );
+gulp.task( 'default', gulp.series( buildServer, gulp.parallel( lint, buildClient, buildSass, buildStatics ), ) );
+gulp.task( 'watch-client', gulp.series( initBrowserSync, startWatchClient ) );
+gulp.task( 'watch-server', startWatchServer );
