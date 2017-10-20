@@ -7,6 +7,7 @@ import { Route, Redirect, Switch } from 'react-router-dom';
 import { AuthScreen } from '../components/auth-screen';
 import { Dashboard } from '../components/dashboard';
 import { Users } from './users';
+import { List, ListItem, FontIcon } from 'material-ui';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -62,18 +63,37 @@ export class App extends React.Component<Partial<Props>, State> {
   }
 
   render() {
+
+    const items = [
+      { label: 'Home', icon: 'icon-home', path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
+      { label: 'Users', icon: 'icon-person', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
+    ];
+
     return (
       <div>
         <Route path="/" exact={true} render={props => <Redirect to="/dashboard" />} />
         <Route path="/dashboard" render={props => {
           return (
             <Dashboard
-              activePath={props.location.pathname}
               title={'Mantle'}
-              items={[
-                { label: 'Home', icon: 'icon-home', path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
-                { label: 'Users', icon: 'icon-person', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
-              ]}
+              renderRight={() => <h3>Properties</h3>}
+              renderLeft={() => {
+                return (
+                  <List style={{ padding: '0' }}>
+                    {items.map( ( i, index ) => {
+                      return <ListItem
+                        className={props.location.pathname === i.path ? 'selected' : ''}
+                        key={`menu-item-${ index }`}
+                        onClick={e => i.onClick()}
+                        primaryText={i.label}
+                        leftIcon={<FontIcon style={{ color: 'inherit', transition: '' }} className={i.icon}
+                        />} />
+                    } )
+                    }
+                  </List>
+                );
+              }}
+
               onHome={() => this.goTo( '/dashboard' )}
               onLogOut={() => this.logOut()}
             >
