@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { default as theme } from '../theme/mui-theme';
 
 type Prop = {
+  style?: React.CSSProperties;
   rightOpen?: boolean;
   leftOpen?: boolean;
   renderLeft?: () => JSX.Element;
@@ -51,7 +51,7 @@ export class Stage extends React.Component<Prop, any> {
     }
 
     return (
-      <Container className="mt-curtain">
+      <Container style={this.props.style} className="mt-curtain">
         {left}
         <Content style={this.getStageStyle()}>
           {this.props.children}
@@ -70,8 +70,6 @@ const LeftCurtain = styled.div`
   width: 25%;
   height: 100%;
   float: left;
-  background: ${theme.light100.background };
-  border-right: 1px solid ${theme.light100.border! };
   overflow: auto;
   box-sizing: border-box;
 `;
@@ -82,8 +80,6 @@ const RightCurtain = styled.div`
   float: left;
   overflow: auto;
   box-sizing: border-box;
-  background: ${theme.light100.background };
-  border-left: 1px solid ${theme.light100.border! };
 `;
 
 const Content = styled.div`
@@ -93,5 +89,4 @@ const Content = styled.div`
   overflow: auto;
   box-sizing: border-box;
   box-shadow: 0px 1px 10px 1px rgba(0,0,0,0.2) inset;
-  background: ${ theme.light200.background } !important;
 `;
