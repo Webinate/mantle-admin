@@ -37,9 +37,11 @@ export class Users extends React.Component<Partial<Props>, State> {
   render() {
     const users = this.props.userState!.users;
     return (
-      <div>
+      <div style={{ height: '100%' }}>
         <h1>Users</h1>
-        {users && users !== 'not-hydrated' ? <UsersList users={users} /> : undefined}
+        <div style={{ height: 'calc(100% - 50px)' }}>
+          {users && users !== 'not-hydrated' ? <UsersList users={users} /> : undefined}
+        </div>
       </div>
     );
   }
