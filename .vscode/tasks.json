@@ -11,7 +11,7 @@
       "suppressTaskName": true,
       "args": [
         "run",
-        "build"
+        "build-server"
       ]
     },
     {
