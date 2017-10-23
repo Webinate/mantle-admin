@@ -31,13 +31,13 @@ export class Dashboard extends React.Component<Prop, any> {
             style={{ color: 'inherit', margin: '5px', float: 'right' }}
             iconStyle={{ color: 'inherit' }}
             onClick={e => this.props.onLogOut()}
-            iconClassName="icon-sign-out"
+            iconClassName="icon-exit_to_app"
           />
           <IconButton
             style={{ color: 'inherit' }}
             iconStyle={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }}
             onClick={e => this.props.onHome()}
-            iconClassName="icon-mantle-solid"
+            iconClassName="icon-mantle"
           />
           <h1>{this.props.title}</h1>
         </Head>

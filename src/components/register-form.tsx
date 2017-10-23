@@ -85,7 +85,7 @@ export class RegisterForm extends React.Component<Props, State> {
             label="Create Account"
             fullWidth={true}
             onClick={e => this.onRegister()}
-            icon={<FontIcon className="icon-person" />}
+            icon={<FontIcon className="icon-group_add" />}
             primary={true} />
           <AnchorBtnsDiv>
             <Link

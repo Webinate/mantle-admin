@@ -66,7 +66,7 @@ export class App extends React.Component<Partial<Props>, State> {
 
     const items = [
       { label: 'Home', icon: 'icon-home', path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
-      { label: 'Users', icon: 'icon-person', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
+      { label: 'Users', icon: 'icon-people', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
     ];
 
     return (
