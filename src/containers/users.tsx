@@ -3,6 +3,7 @@ import { IRootState } from '../store';
 import { getUsers } from '../store/users/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/usersList';
+import { ContentHeader } from '../components/content-header';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -38,8 +39,8 @@ export class Users extends React.Component<Partial<Props>, State> {
     const users = this.props.userState!.users;
     return (
       <div style={{ height: '100%' }}>
-        <h1>Users</h1>
-        <div style={{ height: 'calc(100% - 50px)' }}>
+        <ContentHeader title="Users" />
+        <div style={{ height: 'calc(100% - 100px)' }}>
           {users && users !== 'not-hydrated' ? <UsersList users={users} /> : undefined}
         </div>
       </div>

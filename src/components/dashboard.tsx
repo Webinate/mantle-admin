@@ -105,8 +105,6 @@ const Properties = styled.div`
 const Content = styled.div`
   height: 100%;
   overflow: auto;
-  padding: 0 10px;
   box-sizing: border-box;
-  box-shadow: 0px 1px 10px 1px rgba(0,0,0,0.2) inset;
   background: ${ theme.light200.background } !important;
 `;

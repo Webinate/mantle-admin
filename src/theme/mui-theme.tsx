@@ -10,7 +10,7 @@ const s200 = '#8885A7';
 
 // Lights BGs
 const l100 = '#fff';
-const l200 = '#E7E7E7';
+const l200 = '#f3f3f3';
 
 /**
  *  Light Theme is the default theme used in material-ui. It is guaranteed to

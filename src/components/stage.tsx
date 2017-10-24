@@ -5,6 +5,8 @@ type Prop = {
   style?: React.CSSProperties;
   rightOpen?: boolean;
   leftOpen?: boolean;
+  leftPerctage?: number;
+  rightPerctage?: number;
   renderLeft?: () => JSX.Element;
   renderRight?: () => JSX.Element;
 }
@@ -13,38 +15,35 @@ export class Stage extends React.Component<Prop, any> {
 
   static defaultProps: Partial<Prop> = {
     rightOpen: true,
-    leftOpen: true
+    leftOpen: true,
+    leftPerctage: 15,
+    rightPerctage: 25
   }
 
   constructor() {
     super();
   }
 
-  getStageStyle() {
-    if ( this.props.leftOpen && this.props.rightOpen )
-      return { width: '50%' };
-    else if ( !this.props.leftOpen && this.props.rightOpen ||
-      !this.props.rightOpen && this.props.leftOpen )
-      return { width: '75%' };
-    else
-      return { width: '' };
-  }
-
   render() {
     let left: JSX.Element | undefined;
     let right: JSX.Element | undefined;
+    let contentSize = 100;
 
     if ( this.props.leftOpen ) {
+      contentSize -= this.props.leftPerctage!;
+
       left = (
-        <LeftCurtain>
+        <LeftCurtain size={this.props.leftPerctage!}>
           {this.props.renderLeft && this.props.renderLeft()}
         </LeftCurtain>
       );
     }
 
     if ( this.props.rightOpen ) {
+      contentSize -= this.props.rightPerctage!;
+
       right = (
-        <RightCurtain>
+        <RightCurtain size={this.props.rightPerctage!}>
           {this.props.renderRight && this.props.renderRight()}
         </RightCurtain>
       );
@@ -53,7 +52,7 @@ export class Stage extends React.Component<Prop, any> {
     return (
       <Container style={this.props.style} className="mt-curtain">
         {left}
-        <Content style={this.getStageStyle()}>
+        <Content size={contentSize}>
           {this.props.children}
         </Content>
         {right}
@@ -67,15 +66,18 @@ const Container = styled.div`
 `;
 
 const LeftCurtain = styled.div`
-  width: 25%;
+  width: ${( props: { size: number; } ) => props.size }%;
   height: 100%;
   float: left;
   overflow: auto;
   box-sizing: border-box;
+  box-shadow: 0px 5px 10px 1px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
 `;
 
 const RightCurtain = styled.div`
-  width: 25%;
+  width: ${( props: { size: number; } ) => props.size }%;
   height: 100%;
   float: left;
   overflow: auto;
@@ -83,10 +85,9 @@ const RightCurtain = styled.div`
 `;
 
 const Content = styled.div`
-  width: 50%;
+  width: ${( props: { size: number; } ) => props.size }%;
   height: 100%;
   float: left;
   overflow: auto;
   box-sizing: border-box;
-  box-shadow: 0px 1px 10px 1px rgba(0,0,0,0.2) inset;
 `;

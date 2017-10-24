@@ -6,6 +6,7 @@ import { push } from 'react-router-redux';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { AuthScreen } from '../components/auth-screen';
 import { Dashboard } from '../components/dashboard';
+import { ContentHeader } from '../components/content-header';
 import { Users } from './users';
 import { List, ListItem, FontIcon } from 'material-ui';
 
@@ -99,7 +100,7 @@ export class App extends React.Component<Partial<Props>, State> {
             >
               <Switch>
                 <Route path="/dashboard" exact={true} render={props => {
-                  return <h1>Home</h1>
+                  return <ContentHeader title="Home" />
                 }} />
                 <Route path="/dashboard/users" render={props => {
                   return <Users />
