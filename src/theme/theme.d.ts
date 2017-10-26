@@ -2,8 +2,9 @@ import { MuiTheme } from 'material-ui/styles';
 
 export type ThemeValue = {
   color: string;
+  softColor: string;
   background: string;
-  border?: string;
+  border: string;
 }
 
 export interface ThemeInterface extends MuiTheme {

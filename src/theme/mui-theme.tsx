@@ -22,16 +22,16 @@ export default {
   primaryColorInverted: '',
 
   // Reds
-  primary100: { color: '#fff', background: p100 },
-  primary200: { color: '#fff', background: p200, border: '#835151' },
+  primary100: { color: '#fff', softColor: '#eee', background: p100, border: '#ccc' },
+  primary200: { color: '#fff', softColor: '#eee', background: p200, border: '#835151' },
 
   // Purples
-  secondary100: { color: '#fff', background: s100 },
-  secondary200: { color: '#fff', background: s200 },
+  secondary100: { color: '#fff', softColor: '#eee', background: s100, border: '#ccc' },
+  secondary200: { color: '#fff', softColor: '#eee', background: s200, border: '#ccc' },
 
   // Light
-  light100: { color: '#333', background: l100, border: '#ccc' },
-  light200: { color: '#333', background: l200, border: '#ccc' },
+  light100: { color: '#333', softColor: '#aaa', background: l100, border: '#ddd' },
+  light200: { color: '#333', softColor: '#aaa', background: l200, border: '#ddd' },
 
   spacing: {
     iconSize: 24,

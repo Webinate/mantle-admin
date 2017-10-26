@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { IconButton, FontIcon } from 'material-ui';
 import { default as styled } from '../theme/styled';
+import { default as theme } from '../theme/mui-theme';
 
 export type Props = {
   offset: number;
@@ -33,13 +34,7 @@ export class Pager extends React.Component<Props, State> {
     const limit = this.props.limit;
     const isOverflowing = !( ( offset === 0 ) && ( offset + limit >= total ) );
 
-    const iconStyle: React.CSSProperties = {
-      background: 'inherit',
-      lineHeight: '12px',
-      border: '1px solid #ddd',
-      padding: '12px 0',
-      color: 'inherit'
-    };
+
 
     return (
       <Container>
@@ -54,20 +49,18 @@ export class Pager extends React.Component<Props, State> {
             <Buttons>
               <NavBtn>
                 <IconButton
-                  style={iconStyle}
                   disabled={offset === 0}
                   onClick={e => this.props.onPage( this.props.offset - 1 )}
                 >
-                  <FontIcon style={{ color: 'inherit' }} className="icon-keyboard_arrow_left" />
+                  <FontIcon className="icon-keyboard_arrow_left" />
                 </IconButton>
               </NavBtn>
               <NavBtn>
                 <IconButton
-                  style={iconStyle}
                   disabled={offset + limit >= total}
                   onClick={e => this.props.onPage( this.props.offset + 1 )}
                 >
-                  <FontIcon style={{ color: 'inherit' }} className="icon-keyboard_arrow_right" />
+                  <FontIcon className="icon-keyboard_arrow_right" />
                 </IconButton>
               </NavBtn>
             </Buttons>
@@ -89,6 +82,9 @@ const Content = styled.div`
 
 const Footer = styled.div`
   height: 50px;
+  background: ${theme.light100.background };
+  border-top: 1px solid ${theme.light100.border };
+  box-sizing: border-box;
 `;
 
 const Buttons = styled.div`

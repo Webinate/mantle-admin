@@ -9,3 +9,8 @@ declare module 'gcloud' {
 declare module 'googleapis' {
   class GMail { }
 }
+
+declare module '*.png' {
+  const value: string;
+  export default value;
+}
