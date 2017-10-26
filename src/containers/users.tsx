@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { getUsers } from '../store/users/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
-import { UsersList } from '../components/usersList';
+import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
 
 // Map state to props
