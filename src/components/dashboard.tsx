@@ -61,9 +61,9 @@ const DashboardOuter = styled.div`
 `;
 
 const Head = styled.div`
-  background: ${theme.primary200.background };
-  color: ${theme.primary200.color };
-  border-bottom: 1px solid ${theme.primary200.border! };
+  background: ${theme.secondary200.background };
+  color: ${theme.secondary200.color };
+  border-bottom: 1px solid ${theme.secondary200.border! };
   box-sizing: border-box;
 
   > * {
@@ -84,8 +84,8 @@ const Menu = styled.div`
   height: 100%;
 
   > div > div .selected {
-    color: ${ theme.secondary200.color } !important;
-    background: ${ theme.secondary200.background } !important;
+    color: ${ theme.primary100.color } !important;
+    background: ${ theme.primary100.background } !important;
   }
 
   > div > div .selected::before {
@@ -93,7 +93,7 @@ const Menu = styled.div`
     position: absolute;
     height: 100%;
     box-sizing: border-box;
-    border-left: 8px solid ${ theme.secondary100.background };
+    border-left: 8px solid ${ theme.primary200.background };
   }
 `;
 
