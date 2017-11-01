@@ -7,8 +7,10 @@ type Prop = {
   leftOpen?: boolean;
   leftPerctage?: number;
   rightPerctage?: number;
-  renderLeft?: () => JSX.Element;
-  renderRight?: () => JSX.Element;
+  renderLeft?: () => JSX.Element | undefined | null;
+  renderRight?: () => JSX.Element | undefined | null;
+  leftStyle?: React.CSSProperties;
+  rightStyle?: React.CSSProperties;
 }
 
 export class Stage extends React.Component<Prop, any> {
@@ -22,6 +24,7 @@ export class Stage extends React.Component<Prop, any> {
 
   constructor() {
     super();
+    React.PureComponent
   }
 
   render() {
@@ -33,7 +36,10 @@ export class Stage extends React.Component<Prop, any> {
       contentSize -= this.props.leftPerctage!;
 
       left = (
-        <LeftCurtain size={this.props.leftPerctage!}>
+        <LeftCurtain
+          size={this.props.leftPerctage!}
+          style={this.props.leftStyle}
+        >
           {this.props.renderLeft && this.props.renderLeft()}
         </LeftCurtain>
       );
@@ -43,7 +49,19 @@ export class Stage extends React.Component<Prop, any> {
       contentSize -= this.props.rightPerctage!;
 
       right = (
-        <RightCurtain size={this.props.rightPerctage!}>
+        <RightCurtain
+          size={this.props.rightPerctage!}
+          style={this.props.rightStyle}
+          innerRef={( e: HTMLDivElement ) => {
+            if ( !e )
+              return
+
+            e.style.transform = `scale(0, 1)`;
+            setTimeout( () => {
+              e.style.transform = 'scale(1, 1)';
+            }, 30 );
+          }}
+        >
           {this.props.renderRight && this.props.renderRight()}
         </RightCurtain>
       );
@@ -70,10 +88,9 @@ const LeftCurtain = styled.div`
   height: 100%;
   float: left;
   overflow: auto;
+  transition: 0.5s width;
   box-sizing: border-box;
-  box-shadow: 0px 5px 10px 1px rgba(0,0,0,0.2);
-  position: relative;
-  z-index: 1;
+  transform-origin: 100% 0;
 `;
 
 const RightCurtain = styled.div`
@@ -81,7 +98,9 @@ const RightCurtain = styled.div`
   height: 100%;
   float: left;
   overflow: auto;
+  transition: 0.5s transform;
   box-sizing: border-box;
+  transform-origin: 100% 0;
 `;
 
 const Content = styled.div`

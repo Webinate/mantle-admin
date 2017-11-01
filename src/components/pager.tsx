@@ -8,10 +8,7 @@ export type Props = {
   total: number;
   limit: number;
   onPage: ( offset: number ) => void;
-}
-
-interface ContainerProps extends React.HTMLProps<HTMLDivElement> {
-  isOverflowing: boolean;
+  contentProps: React.HTMLProps<HTMLDivElement>;
 }
 
 type State = {
@@ -38,9 +35,11 @@ export class Pager extends React.Component<Props, State> {
 
     return (
       <Container>
-        <Content isOverflowing={isOverflowing}>
+        <div {...this.props.contentProps}
+          style={{ height: isOverflowing ? 'calc(100% - 50px)' : '100%', overflow: 'auto' }}
+        >
           {this.props.children}
-        </Content>
+        </div>
         {isOverflowing ? (
           <Footer>
             <Text>
@@ -73,11 +72,6 @@ export class Pager extends React.Component<Props, State> {
 
 const Container = styled.div`
   height: 100%;
-`;
-
-const Content = styled.div`
-  height: ${ ( props: ContainerProps ) => props.isOverflowing ? 'calc(100% - 50px)' : '100%' };
-  overflow: auto;
 `;
 
 const Footer = styled.div`

@@ -1,11 +1,15 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
 import { IRootState } from '../store';
+import { Avatar } from 'material-ui';
 import { getUsers } from '../store/users/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
+import { Stage } from '../components/stage';
+import { default as styled } from '../theme/styled';
+import { default as theme } from '../theme/mui-theme';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -65,18 +69,47 @@ export class Users extends React.Component<Partial<Props>, State> {
     }
   }
 
+  private getProperties() {
+    const selected = this.state.selectedUsers.length > 0 ?
+      this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
+
+    if ( !selected )
+      return undefined;
+
+    return (
+      <Properties>
+        <Avatar
+          src="/images/avatar.svg"
+          size={200}
+        />
+        <h2>{selected.username}</h2>
+      </Properties>
+    );
+  }
+
   render() {
     const users = this.props.userState!.users;
+    const selected = this.state.selectedUsers.length > 0 ?
+      this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
+
     return (
       <div style={{ height: '100%' }}>
         <ContentHeader title="Users" />
-        <div style={{ height: 'calc(100% - 100px)' }}>
+        <Stage
+          rightOpen={selected ? true : false}
+          leftOpen={false}
+          style={{ height: 'calc(100% - 100px)' }}
+          rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
+          renderRight={() => this.getProperties()}
+        >
           {users && users !== 'not-hydrated' ?
             <Pager
               limit={10}
               onPage={index => { }}
               offset={0}
               total={30}
+              contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
+              }
             >
               <UsersList
                 users={users}
@@ -84,8 +117,18 @@ export class Users extends React.Component<Partial<Props>, State> {
                 onUserSelected={( user, e ) => this.onUserSelected( user, e )}
               />
             </Pager> : undefined}
-        </div>
-      </div>
+        </Stage>
+      </div >
     );
   }
 };
+
+const Properties = styled.div`
+
+height: 100%;
+overflow: auto;
+position: relative;
+padding: 10px;
+box-sizing: border-box;
+background: ${theme.light100.background }
+`;

@@ -45,7 +45,7 @@ export class Dashboard extends React.Component<Prop, any> {
           rightOpen={false}
           style={{ height: `calc(100% - ${ headerHeight }px)` }}
           renderLeft={() => <Menu>{this.props.renderLeft && this.props.renderLeft()}</Menu>}
-          renderRight={() => <Properties>{this.props.renderRight && this.props.renderRight()}</Properties>}
+          leftStyle={{ boxShadow: '0px 5px 10px 1px rgba(0,0,0,0.2)', position: 'relative' }}
         >
           <Content>
             {this.props.children}
@@ -95,11 +95,6 @@ const Menu = styled.div`
     box-sizing: border-box;
     border-left: 8px solid ${ theme.primary200.background };
   }
-`;
-
-const Properties = styled.div`
-  height: 100%;
-  overflow: auto;
 `;
 
 const Content = styled.div`
