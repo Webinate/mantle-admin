@@ -19,10 +19,10 @@ export class UsersList extends React.PureComponent<Props, any> {
   render() {
     const selectedUsers = this.props.selected;
     let selected = false;
-
+    const users = this.props.users;
     return (
       <div className="mt-user-list">
-        {this.props.users.map( ( user, index ) => {
+        {users.map( ( user, index ) => {
           selected = selectedUsers.indexOf( user ) === -1 ? false : true;
 
           return <User
@@ -31,7 +31,7 @@ export class UsersList extends React.PureComponent<Props, any> {
             onMouseDown={e => this.props.onUserSelected( user, e )}
           >
             <Avatar
-              src="/images/avatar.svg"
+              src={`/images/avatar-${ ( index % 5 ) + 1 }.svg`}
               size={80}
             />
             <Details selected={selected}>

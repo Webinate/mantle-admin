@@ -1,14 +1,14 @@
 import { ActionCreators, Action } from './actions';
-import { IUserEntry } from 'modepress';
+import { UserTokens } from 'modepress';
 
 // State
 export type State = {
-  readonly users: IUserEntry[] | null | 'not-hydrated';
+  readonly userPage: UserTokens.GetAll.Response | null | 'not-hydrated';
   readonly busy: boolean;
 };
 
 export const initialState: State = {
-  users: 'not-hydrated',
+  userPage: 'not-hydrated',
   busy: false
 };
 
@@ -19,7 +19,7 @@ export default function reducer( state: State = initialState, action: Action ): 
   switch ( action.type ) {
     case ActionCreators.SetUsers.type:
       partialState = {
-        users: action.payload,
+        userPage: action.payload,
         busy: false
       };
       break;

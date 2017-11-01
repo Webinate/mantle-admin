@@ -20,8 +20,14 @@ export async function hydrate( req: IAuthReq ) {
   // Get users if neccessary
   matches = matchPath( req.url, { path: '/dashboard/users' } );
   if ( matches ) {
-    const users = await UserManager.get.getUsers();
-    actions.push( UserActions.SetUsers.create( users.map( u => u.dbEntry ) ) );
+    const count = await UserManager.get.numUsers();
+    const users = await UserManager.get.getUsers( 0, 10 );
+    actions.push( UserActions.SetUsers.create( {
+      index: 0,
+      limit: 10,
+      count: count,
+      data: users.map( u => u.dbEntry )
+    } ) );
   }
 
   return actions;

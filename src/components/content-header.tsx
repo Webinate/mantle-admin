@@ -34,6 +34,8 @@ const Container = styled.div`
   position: relative;
   background: #fff;
   height: 100px;
+  position: relative;
+  z-index: 1;
 `;
 
 const Header = styled.div`

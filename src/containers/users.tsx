@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from 'modepress';
+import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import { Avatar } from 'material-ui';
 import { getUsers } from '../store/users/actions';
@@ -40,8 +40,8 @@ export class Users extends React.Component<Partial<Props>, State> {
     }
   }
 
-  componentDidMount() {
-    if ( this.props.userState!.users === 'not-hydrated' )
+  componentWillMount() {
+    if ( this.props.userState!.userPage === 'not-hydrated' )
       this.props.getUsers!();
   }
 
@@ -59,13 +59,13 @@ export class Users extends React.Component<Partial<Props>, State> {
         this.setState( { selectedUsers: this.state.selectedUsers.filter( i => i !== user ) } );
     }
     else {
-      const users = this.props.userState!.users as IUserEntry[];
+      const userPage = this.props.userState!.userPage as UserTokens.GetAll.Response;
       const selected = this.state.selectedUsers;
 
-      let firstIndex = Math.min( users.indexOf( user ), selected.length > 0 ? users.indexOf( selected[ 0 ] ) : 0 );
-      let lastIndex = Math.max( users.indexOf( user ), selected.length > 0 ? users.indexOf( selected[ 0 ] ) : 0 );
+      let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
 
-      this.setState( { selectedUsers: users.slice( firstIndex, lastIndex + 1 ) } );
+      this.setState( { selectedUsers: userPage.data.slice( firstIndex, lastIndex + 1 ) } );
     }
   }
 
@@ -74,12 +74,14 @@ export class Users extends React.Component<Partial<Props>, State> {
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
 
     if ( !selected )
-      return undefined;
+      return <Properties />;
+
+    const page = this.props.userState!.userPage! as UserTokens.GetAll.Response;
 
     return (
       <Properties>
         <Avatar
-          src="/images/avatar.svg"
+          src={`/images/avatar-${ page.data.indexOf( selected ) + 1 }.svg`}
           size={200}
         />
         <h2>{selected.username}</h2>
@@ -88,7 +90,8 @@ export class Users extends React.Component<Partial<Props>, State> {
   }
 
   render() {
-    const users = this.props.userState!.users;
+    const page = ( typeof ( this.props.userState!.userPage! ) === 'string' ? null : this.props.userState!.userPage! as UserTokens.GetAll.Response );
+
     const selected = this.state.selectedUsers.length > 0 ?
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
 
@@ -98,25 +101,27 @@ export class Users extends React.Component<Partial<Props>, State> {
         <Stage
           rightOpen={selected ? true : false}
           leftOpen={false}
+          rightSize={35}
           style={{ height: 'calc(100% - 100px)' }}
           rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
           renderRight={() => this.getProperties()}
         >
-          {users && users !== 'not-hydrated' ?
+          {page ?
             <Pager
-              limit={10}
-              onPage={index => { }}
-              offset={0}
-              total={30}
+              limit={page.limit}
+              onPage={index => this.props.getUsers!( index )}
+              offset={page.index}
+              total={page.count}
               contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
               }
             >
               <UsersList
-                users={users}
+                users={page.data}
                 selected={this.state.selectedUsers}
                 onUserSelected={( user, e ) => this.onUserSelected( user, e )}
               />
-            </Pager> : undefined}
+            </Pager>
+            : undefined}
         </Stage>
       </div >
     );
