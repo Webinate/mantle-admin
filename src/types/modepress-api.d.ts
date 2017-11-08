@@ -802,9 +802,6 @@ declare module 'modepress' {
         message: string;
         tokens: Array<IUploadToken>;
     }
-    interface IGetResponse<T> extends IResponse {
-        data: T;
-    }
     interface Page<T> {
         count: number;
         data: Array<T>;
@@ -820,7 +817,7 @@ declare module 'modepress' {
         /** GET /auth/logout */
         namespace Logout {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** GET /auth/activate-account */
         namespace ActivateAccount {
@@ -867,7 +864,7 @@ declare module 'modepress' {
         /** POST /users/ */
         namespace Post {
             type Body = IUserEntry;
-            type Response = IGetResponse<IUserEntry>;
+            type Response = IUserEntry;
         }
         /** GET /users/:user/meta */
         namespace GetUserMeta {
@@ -882,7 +879,7 @@ declare module 'modepress' {
         /** GET /users/:username */
         namespace GetOne {
             type Body = void;
-            type Response = IGetResponse<IUserEntry>;
+            type Response = IUserEntry;
         }
         /** DELETE /users/:username */
         namespace DeleteOne {
@@ -892,19 +889,19 @@ declare module 'modepress' {
         /** POST /users/:user/meta/:name */
         namespace PostUserMeta {
             type Body = any;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** POST /users/:user/meta */
         namespace PostUserMetaVal {
             type Body = any;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
     }
     namespace StatTokens {
         /** GET /stats/users/:user/get-stats */
         namespace GetOne {
             type Body = void;
-            type Response = IGetResponse<IStorageStats>;
+            type Response = IStorageStats;
         }
         /** POST /stats/create-stats/:target */
         namespace Post {
@@ -914,22 +911,22 @@ declare module 'modepress' {
         /** PUT /stats/storage-calls/:target/:value */
         namespace PutStorageCalls {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** PUT /stats/storage-memory/:target/:value */
         namespace PutStorageMemory {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** PUT /stats/storage-allocated-calls/:target/:value */
         namespace PutStorageAlocCalls {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** PUT /stats/storage-allocated-memory/:target/:value */
         namespace PutStorageAlocMemory {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
     }
     namespace SessionTokens {
@@ -956,7 +953,7 @@ declare module 'modepress' {
          * */
         namespace GetOne {
             type Body = void;
-            type Response = IGetResponse<IPost>;
+            type Response = IPost;
         }
         /** DELETE /posts/:id */
         namespace DeleteOne {
@@ -966,12 +963,12 @@ declare module 'modepress' {
         /** PUT /posts/:id */
         namespace PutOne {
             type Body = IPost;
-            type Response = ISimpleResponse;
+            type Response = IPost;
         }
         /** POST /posts/ */
         namespace Post {
             type Body = IPost;
-            type Response = IGetResponse<IPost>;
+            type Response = IPost;
         }
     }
     namespace CommentTokens {
@@ -983,7 +980,7 @@ declare module 'modepress' {
         /** GET /comments/:id */
         namespace GetOne {
             type Body = void;
-            type Response = IGetResponse<IComment>;
+            type Response = IComment;
         }
         /** DELETE /comments/:id */
         namespace DeleteOne {
@@ -993,12 +990,12 @@ declare module 'modepress' {
         /** PUT /comments/:id */
         namespace PutOne {
             type Body = IComment;
-            type Response = ISimpleResponse;
+            type Response = IComment;
         }
         /** POST /posts/:postId/comments/:parent? */
         namespace Post {
             type Body = IComment;
-            type Response = IGetResponse<IComment>;
+            type Response = IComment;
         }
     }
     namespace CategoriesTokens {
@@ -1015,7 +1012,7 @@ declare module 'modepress' {
         /** POST /categories */
         namespace Post {
             type Body = ICategory;
-            type Response = IGetResponse<ICategory>;
+            type Response = ICategory;
         }
     }
     namespace RenderTokens {
@@ -1032,7 +1029,7 @@ declare module 'modepress' {
         /** DELETE /renders/clear */
         namespace DeleteAll {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
     }
     namespace FileTokens {
@@ -1046,7 +1043,7 @@ declare module 'modepress' {
             type Body = {
                 name: string;
             };
-            type Response = ISimpleResponse;
+            type Response = IFileEntry;
         }
         /** DELETE /files/:files */
         namespace DeleteAll {
@@ -1063,7 +1060,7 @@ declare module 'modepress' {
         /** POST /buckets/user/:user/:name */
         namespace Post {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = IBucketEntry;
         }
         /** POST /buckets/:bucket/upload/:parentFile? */
         namespace PostFile {
@@ -2435,7 +2432,7 @@ declare module "core/bucket-manager" {
          * @param name The name of the bucket
          * @param user The user associated with this bucket
          */
-        createBucket(name: string, user: string): Promise<void>;
+        createBucket(name: string, user: string): Promise<IBucketEntry>;
         /**
          * Attempts to remove buckets of the given search result. This will also update the file and stats collection.
          * @param searchQuery A valid mongodb search query
@@ -2957,8 +2954,8 @@ declare module "controllers/bucket-controller" {
         private getBuckets(req, res);
         private alphaNumericDashSpace(str);
         /**
-       * Creates a new user bucket based on the target provided
-       */
+         * Creates a new user bucket based on the target provided
+         */
         private createBucket(req, res);
         /**
          * Checks if a part is allowed to be uploaded
