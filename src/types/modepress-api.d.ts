@@ -887,7 +887,7 @@ declare module 'modepress' {
         /** DELETE /users/:username */
         namespace DeleteOne {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** POST /users/:user/meta/:name */
         namespace PostUserMeta {
@@ -941,7 +941,7 @@ declare module 'modepress' {
         /** DELETE /sessions/:id */
         namespace DeleteOne {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
     }
     namespace PostTokens {
@@ -961,7 +961,7 @@ declare module 'modepress' {
         /** DELETE /posts/:id */
         namespace DeleteOne {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** PUT /posts/:id */
         namespace PutOne {
@@ -988,7 +988,7 @@ declare module 'modepress' {
         /** DELETE /comments/:id */
         namespace DeleteOne {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** PUT /comments/:id */
         namespace PutOne {
@@ -1010,7 +1010,7 @@ declare module 'modepress' {
         /** DELETE /categories/:id */
         namespace DeleteOne {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** POST /categories */
         namespace Post {
@@ -1027,7 +1027,7 @@ declare module 'modepress' {
         /** DELETE /renders/:id */
         namespace DeleteOne {
             type Body = void;
-            type Response = ISimpleResponse;
+            type Response = void;
         }
         /** DELETE /renders/clear */
         namespace DeleteAll {
@@ -1803,7 +1803,7 @@ declare module "models/users-model" {
         constructor();
     }
 }
-declare module "core/controller-factory" {
+declare module "core/model-factory" {
     import { IConfig, IModelEntry } from 'modepress';
     import { Db, Collection } from 'mongodb';
     import { Model } from "models/model";
@@ -1819,15 +1819,15 @@ declare module "core/controller-factory" {
     /**
      * Factory classs for creating & getting models
      */
-    export class ControllerFactory {
+    export class ModelFactory {
         private _config;
         private _db;
-        private _controllers;
+        private _models;
         initialize(config: IConfig, database: Db): void;
         /**
-         * Adds the default controllers to the system
+         * Adds the default models to the system
          */
-        addBaseControllers(): Promise<void>;
+        addBaseModelFactories(): Promise<void>;
         /**
          * Sets up a model's indices
          * @param model The model to setup
@@ -1844,12 +1844,12 @@ declare module "core/controller-factory" {
         get(type: 'users'): UsersModel;
         get(type: string): Model<IModelEntry>;
         /**
-         * A factory method for creating controllers
-         * @param type The type of controller to create
+         * A factory method for creating models
+         * @param type The type of model to create
          */
         private create(type);
     }
-    const _default: ControllerFactory;
+    const _default: ModelFactory;
     export default _default;
 }
 declare module "models/model" {
@@ -2857,7 +2857,7 @@ declare module "utils/serializers" {
      * a 200 response code.
      * @param errCode The type of error code to raise for errors
      */
-    export function j200(errCode?: number): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
+    export function j200(code?: number, errCode?: number): (target: any, propertyKey: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
     /**
      * Helper function to return a status 200 json object of type T
      */
