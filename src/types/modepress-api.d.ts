@@ -358,11 +358,11 @@ declare module "types/interfaces/i-remote" {
          */
         interface IRemote {
             initialize(options: IRemoteOptions): Promise<void>;
-            createBucket(id: string, options?: any): Promise<string>;
-            uploadFile(bucket: string, source: Readable, uploadOptions: IUploadOptions): Promise<string>;
-            removeFile(bucket: string, id: string): Promise<void>;
-            removeBucket(id: string): Promise<void>;
-            generateUrl(bucketIdentifier: string, fileIdentifier: string): string;
+            createBucket(bucket: IBucketEntry, options?: any): Promise<string>;
+            uploadFile(bucket: IBucketEntry, file: IFileEntry, source: Readable, uploadOptions: IUploadOptions): Promise<string>;
+            removeFile(bucket: IBucketEntry, id: IFileEntry): Promise<void>;
+            removeBucket(bucket: IBucketEntry): Promise<void>;
+            generateUrl(bucket: IBucketEntry, file: IFileEntry): string;
         }
     }
 }
@@ -433,7 +433,11 @@ declare module 'modepress' {
     type IForeignKeyOptions = {
         /** If true, then the key is allowed to be null */
         keyCanBeNull?: boolean;
-        /** If true, then key will only be nullified if the target is removed. If false, then the instance that owns this item must be removed as it cannot exist without the target. */
+        /**
+         * Determines if the model can adapt to this item not being present.
+         * If true, then item will be nullified if the target is removed.
+         * If false, then the model instance will be removed as it cannot exist without the target item.
+         */
         canAdapt?: boolean;
     };
     type IDateOptions = {
@@ -522,18 +526,21 @@ declare module 'modepress' {
         expandSchemaBlacklist?: Array<string>;
     }
 }
-declare module 'modepress' {
-    /**
-     * The interface for describing each user's bucket
-     */
-    interface IBucketEntry {
-        _id?: any;
-        name?: string;
-        identifier?: string;
-        user?: string;
-        created?: number;
-        memoryUsed?: number;
-        meta?: any;
+declare module "types/models/i-bucket-entry" {
+    import { ObjectID } from 'mongodb';
+    module 'modepress' {
+        /**
+         * The interface for describing each user's bucket
+         */
+        interface IBucketEntry {
+            _id?: string | ObjectID;
+            name: string;
+            identifier: string;
+            user: string;
+            created: number;
+            memoryUsed: number;
+            meta: any;
+        }
     }
 }
 declare module 'modepress' {
@@ -556,25 +563,28 @@ declare module 'modepress' {
         lastUpdated?: number;
     }
 }
-declare module 'modepress' {
-    /**
-     * The interface for describing each user's file
-     */
-    interface IFileEntry {
-        _id?: any;
-        name?: string;
-        user?: string;
-        identifier?: string;
-        bucketId?: string;
-        bucketName?: string;
-        publicURL?: string;
-        created?: number;
-        size?: number;
-        mimeType?: string;
-        isPublic?: boolean;
-        numDownloads?: number;
-        parentFile?: string | null;
-        meta?: any;
+declare module "types/models/i-file-entry" {
+    import { ObjectID } from 'mongodb';
+    module 'modepress' {
+        /**
+         * The interface for describing each user's file
+         */
+        interface IFileEntry {
+            _id?: string | ObjectID;
+            name: string;
+            user: string;
+            identifier?: string;
+            bucketId: string | ObjectID;
+            bucketName: string;
+            publicURL?: string;
+            created: number;
+            size: number;
+            mimeType: string;
+            isPublic: boolean;
+            numDownloads: number;
+            parentFile: string | null;
+            meta: any;
+        }
     }
 }
 declare module 'modepress' {
@@ -1043,12 +1053,12 @@ declare module 'modepress' {
             type Body = {
                 name: string;
             };
-            type Response = IFileEntry;
+            type Response = Partial<IFileEntry>;
         }
-        /** DELETE /files/:files */
+        /** DELETE /files/:file */
         namespace DeleteAll {
             type Body = void;
-            type Response = Page<string>;
+            type Response = void;
         }
     }
     namespace BucketTokens {
@@ -1070,7 +1080,7 @@ declare module 'modepress' {
         /** DELETE /buckets/:buckets */
         namespace DeleteAll {
             type Body = void;
-            type Response = Page<string>;
+            type Response = void;
         }
     }
     namespace EmailTokens {
@@ -1211,7 +1221,7 @@ declare module "models/schema" {
          * @param data The data object we are setting
          * @param allowReadOnlyValues If true, then readonly values can be overwritten (Usually the case when the item is first created)
          */
-        set(data: T, allowReadOnlyValues: boolean): void;
+        set(data: Partial<T>, allowReadOnlyValues: boolean): void;
         /**
          * Sets a schema value by name
          * @param name The name of the schema item
@@ -1817,7 +1827,6 @@ declare module "core/model-factory" {
      * Factory classs for creating & getting models
      */
     export class ModelFactory {
-        private _config;
         private _db;
         private _models;
         initialize(config: IConfig, database: Db): void;
@@ -1830,13 +1839,13 @@ declare module "core/model-factory" {
          * @param model The model to setup
          */
         setupIndices(model: Model<IModelEntry>): Promise<Collection<any>>;
-        get(type: 'bucket'): BucketModel;
+        get(type: 'buckets'): BucketModel;
         get(type: 'categories'): CategoriesModel;
         get(type: 'comments'): CommentsModel;
-        get(type: 'file'): FileModel;
+        get(type: 'files'): FileModel;
         get(type: 'posts'): PostsModel;
         get(type: 'renders'): RendersModel;
-        get(type: 'session'): SessionModel;
+        get(type: 'sessions'): SessionModel;
         get(type: 'storage'): StorageStatsModel;
         get(type: 'users'): UsersModel;
         get(type: string): Model<IModelEntry>;
@@ -1850,17 +1859,9 @@ declare module "core/model-factory" {
     export default _default;
 }
 declare module "models/model" {
-    import { IModelEntry } from 'modepress';
+    import { IModelEntry, ISchemaOptions } from 'modepress';
     import { Collection, Db, ObjectID } from 'mongodb';
     import { Schema } from "models/schema";
-    export interface UpdateToken<T extends IModelEntry> {
-        error: string | boolean;
-        instance: Schema<T>;
-    }
-    export interface UpdateRequest<T> {
-        error: boolean;
-        tokens: Array<UpdateToken<T>>;
-    }
     export interface ISearchOptions<T> {
         selector?: any;
         sort?: {
@@ -1903,10 +1904,11 @@ declare module "models/model" {
         findInstances(options?: ISearchOptions<T>): Promise<Schema<T>[]>;
         /**
          * Gets a model instance based on the selector criteria
-         * @param selector The mongodb selector
-         * @param projection See http://docs.mongodb.org/manual/reference/method/db.collection.find/#projections
+         * @param selector The selector object for selecting files
+         * @param options [Optional] If options provided, the resource itself is returned instead of its schema
          */
-        findOne(selector: any, projection?: any): Promise<Schema<T> | null>;
+        findOne(selector: any): Promise<Schema<T> | null>;
+        findOne(selector: any, options: ISchemaOptions): Promise<T | null>;
         /**
          * Deletes a instance and all its dependencies are updated or deleted accordingly
          */
@@ -1916,15 +1918,12 @@ declare module "models/model" {
            */
         deleteInstances(selector: any): Promise<number>;
         /**
-         * Updates a selection of instances. The update process will fetch all instances, validate the new data and check that
-         * unique fields are still being respected. An array is returned of each instance along with an error string if anything went wrong
-         * with updating the specific instance.
-         * @param selector The selector for updating instances
-         * @param data The data object that will attempt to set the instance's schema variables
-         * @returns {Promise<UpdateRequest<T>>} An array of objects that contains the field error and instance. Error is false if nothing
-         * went wrong when updating the specific instance, and a string message if something did in fact go wrong
+         * Updates an instance with new data. The update process will validate the new data and check that
+         * unique fields are still being respected.
+         * @param selector The selector to determine which model to update
+         * @param data The data to update the model with
          */
-        update(selector: any, data: T): Promise<UpdateRequest<T>>;
+        update(selector: any, data: Partial<T>, options?: ISchemaOptions): Promise<T>;
         /**
          * Checks if the schema item being ammended is unique
          */
@@ -1934,7 +1933,7 @@ declare module "models/model" {
            * @param data [Optional] You can pass a data object that will attempt to set the instance's schema variables
            * by parsing the data object and setting each schema item's value by the name/value in the data object
            */
-        createInstance(data?: T): Promise<Schema<IModelEntry>>;
+        createInstance(data?: T): Promise<Schema<T>>;
         /**
            * Attempts to insert an array of instances of this model into the database.
            * @param instances An array of instances to save
@@ -1960,34 +1959,21 @@ declare module "serializers/serializer" {
         getModel(collectionName: string): Model<IModelEntry> | null;
     }
 }
-declare module "core/user" {
-    import { IUserEntry } from 'modepress';
-    export enum UserPrivileges {
-        SuperAdmin = 1,
-        Admin = 2,
-        Regular = 3,
-    }
-    export class User {
-        dbEntry: IUserEntry;
+declare module "controllers/controller" {
+    import { Db } from 'mongodb';
+    import { IConfig } from 'modepress';
+    import { EventEmitter } from 'events';
+    /**
+     * The root class for all controllers
+     */
+    export default abstract class Controller extends EventEmitter {
+        protected _config: IConfig;
+        constructor(config: IConfig);
         /**
-           * Creates a new User instance
-           * @param dbEntry The data object that represents the user in the DB
-           */
-        constructor(dbEntry: IUserEntry);
-        /**
-         * Generates an object that can be sent to clients.
-         * @param verbose If true, sensitive database data will be sent (things like passwords will still be obscured)
+         * Initializes the controller
+         * @param db The mongo db
          */
-        generateCleanedData(verbose?: boolean): IUserEntry;
-        /**
-           * Generates the object to be stored in the database
-           */
-        generateDbEntry(): IUserEntry;
-        /**
-           * Creates a random string that is assigned to the dbEntry registration key
-           * @param length The length of the password
-           */
-        generateKey(length?: number): string;
+        abstract initialize(db: Db): any;
     }
 }
 declare module "socket-api/socket-event-types" {
@@ -2052,133 +2038,34 @@ declare module "socket-api/socket-event-types" {
         MetaRequest = 9,
     }
 }
-declare module "core/session" {
-    import { ISessionEntry, ISession, IUserEntry } from 'modepress';
-    import { ServerRequest } from 'http';
-    import { ObjectID } from 'mongodb';
-    import { User } from "core/user";
-    /**
-     * A class to represent session data
-     */
-    export class Session {
-        user: User;
-        _id: ObjectID;
-        sessionId: string;
-        data: any;
-        /**
-         * The specific time when this session will expire
-         */
-        expiration: number;
-        /**
-         * The options of this session system
-         */
-        options: ISession;
-        /**
-         * Creates an instance of the session
-         */
-        constructor(sessionId: string, options: ISession, userEntry: IUserEntry);
-        /**
-         * Fills in the data of this session from the data saved in the database
-         * @param data The data fetched from the database
-         */
-        deserialize(data: ISessionEntry): void;
-        /**
-         * Creates an object that represents this session to be saved in the database
-         */
-        serialize(): ISessionEntry;
-        private getHost(request);
-        /**
-         * This method returns the value to send in the Set-Cookie header which you should send with every request that goes back to the browser, e.g.
-         * response.setHeader('Set-Cookie', session.getSetCookieHeaderValue());
-         */
-        getSetCookieHeaderValue(request: ServerRequest): any;
-        /**
-         * Converts from milliseconds to string, since the epoch to Cookie 'expires' format which is Wdy, DD-Mon-YYYY HH:MM:SS GMT
-         */
-        private dateCookieString(ms);
-        /**
-         * Pads a string with 0's
-         */
-        private pad(n);
+declare module "core/user" {
+    import { IUserEntry } from 'modepress';
+    export enum UserPrivileges {
+        SuperAdmin = 1,
+        Admin = 2,
+        Regular = 3,
     }
-}
-declare module "controllers/sessions" {
-    import { EventEmitter } from 'events';
-    import { ISessionEntry, ISession } from 'modepress';
-    import { ServerRequest, ServerResponse } from 'http';
-    import { Collection } from 'mongodb';
-    import { Session } from "core/session";
-    /**
-    * A class that manages session data for active users
-     */
-    export class SessionsController extends EventEmitter {
-        private static _singleton;
-        private _sessions;
-        private _users;
-        private _timeout;
-        private _cleanupProxy;
-        private _options;
+    export class User {
+        dbEntry: IUserEntry;
         /**
-         * Creates an instance of a session manager
-         */
-        constructor(sessionCollection: Collection, userCollection: Collection, options: ISession);
+           * Creates a new User instance
+           * @param dbEntry The data object that represents the user in the DB
+           */
+        constructor(dbEntry: IUserEntry);
         /**
-         * Gets an array of all active sessions
+         * Generates an object that can be sent to clients.
+         * @param verbose If true, sensitive database data will be sent (things like passwords will still be obscured)
          */
-        numActiveSessions(): Promise<number>;
+        generateCleanedData(verbose?: boolean): IUserEntry;
         /**
-         * Gets an array of all active sessions
-         * @param startIndex
-         * @param limit
-         */
-        getActiveSessions(startIndex?: number, limit?: number): Promise<ISessionEntry[]>;
+           * Generates the object to be stored in the database
+           */
+        generateDbEntry(): IUserEntry;
         /**
-         * Clears the users session cookie so that its no longer tracked
-         * @param sessionId The session ID to remove, if null then the currently authenticated session will be used
-         * @param request
-         * @param response
-         */
-        clearSession(sessionId: string | null, request: ServerRequest, response: ServerResponse): Promise<boolean>;
-        /**
-         * Gets and initializes a session by its id
-         */
-        getSessionById(sessionId: string): Promise<Session | null>;
-        /**
-         * Attempts to get a session from the request object of the client
-         */
-        getSession(request: ServerRequest): Promise<Session | null>;
-        setSessionHeader(session: Session, request: ServerRequest, response: ServerResponse): Promise<void>;
-        /**
-         * Attempts to create a session from the request object of the client
-         */
-        createSession(request: ServerRequest, response: ServerResponse, userId: string): Promise<Session>;
-        /**
-         * Each time a session is created, a timer is started to check all sessions in the DB.
-         * Once the lifetime of a session is up its then removed from the DB and we check for any remaining sessions.
-         * @param force If true, this will force a cleanup instead of waiting on the next timer
-         */
-        cleanup(force?: boolean): Promise<void>;
-        /**
-         * Looks at the headers from the HTTP request to determine if a session cookie has been asssigned and returns the ID.
-         * @param req
-         * @returns The ID of the user session, or an empty string
-         */
-        private getIDFromRequest(req);
-        /**
-         * Creates a random session ID.
-         * The ID is a pseude-random ASCII string which contains at least the specified number of bits of entropy (64 in this case)
-         * the return value is a string of length [bits/6] of characters from the base64 alphabet
-         * @returns A user session ID
-         */
-        private createID();
-        /**
-         * Creates the singlton
-         */
-        static create(sessionCollection: Collection, userCollection: Collection, options: ISession): SessionsController;
-        /**
-         * Gets the singleton
-         */
-        static readonly get: SessionsController;
+           * Creates a random string that is assigned to the dbEntry registration key
+           * @param length The length of the password
+           */
+        generateKey(length?: number): string;
     }
 }
 declare module "socket-api/client-connection" {
@@ -2314,148 +2201,107 @@ declare module "socket-api/comms-controller" {
 }
 declare module "core/remotes/google-bucket" {
     import { Readable } from 'stream';
-    import { IRemote, IGoogleProperties, IUploadOptions } from 'modepress';
+    import { IRemote, IGoogleProperties, IUploadOptions, IBucketEntry, IFileEntry } from 'modepress';
     export class GoogleBucket implements IRemote {
         private _zipper;
         private _gcs;
         constructor();
         initialize(options: IGoogleProperties): Promise<void>;
-        generateUrl(bucketIdentifier: string, fileIdentifier: string): string;
-        createBucket(id: string, options?: any): Promise<string>;
+        generateUrl(bucket: IBucketEntry, file: IFileEntry): string;
+        createBucket(bucket: IBucketEntry, options?: any): Promise<string>;
         /**
          * Wraps a source and destination stream in a promise that catches error
          * and completion events
          */
         private handleStreamsEvents(source, dest);
-        uploadFile(bucket: string, source: Readable, uploadOptions: IUploadOptions): Promise<string>;
-        removeFile(bucket: string, id: string): Promise<void>;
-        removeBucket(id: string): Promise<void>;
+        uploadFile(bucket: IBucketEntry, file: IFileEntry, source: Readable, uploadOptions: IUploadOptions): Promise<string>;
+        removeFile(bucket: IBucketEntry, file: IFileEntry): Promise<void>;
+        removeBucket(entry: IBucketEntry): Promise<void>;
     }
     export const googleBucket: GoogleBucket;
 }
 declare module "core/remotes/local-bucket" {
     import { Readable } from 'stream';
-    import { IRemote, IUploadOptions, ILocalBucket } from 'modepress';
+    import { IRemote, IUploadOptions, ILocalBucket, IBucketEntry, IFileEntry } from 'modepress';
     export class LocalBucket implements IRemote {
         private _zipper;
         private _path;
         private _url;
         constructor();
         initialize(options: ILocalBucket): Promise<void>;
-        createBucket(id: string, options?: any): Promise<string>;
+        createBucket(bucket: IBucketEntry, options?: any): Promise<string>;
         private exists(path);
-        generateUrl(bucketIdentifier: string, fileIdentifier: string): string;
+        generateUrl(bucket: IBucketEntry, file: IFileEntry): string;
         /**
          * Wraps a source and destination stream in a promise that catches error
          * and completion events
          */
         private handleStreamsEvents(source, dest);
-        uploadFile(bucket: string, source: Readable, uploadOptions: IUploadOptions): Promise<string>;
-        removeFile(bucket: string, id: string): Promise<void>;
+        uploadFile(bucket: IBucketEntry, file: IFileEntry, source: Readable, uploadOptions: IUploadOptions): Promise<string>;
+        removeFile(bucket: IBucketEntry, file: IFileEntry): Promise<void>;
         private deletePath(path);
-        removeBucket(id: string): Promise<void>;
+        removeBucket(bucket: IBucketEntry): Promise<void>;
     }
     export const localBucket: LocalBucket;
 }
-declare module "controllers/buckets" {
-    import { IConfig, IBucketEntry, IFileEntry, IStorageStats } from 'modepress';
-    import { Collection } from 'mongodb';
-    import { Part } from 'multiparty';
+declare module "controllers/files" {
+    import { IConfig, IFileEntry, Page } from 'modepress';
+    import { Db, ObjectID } from 'mongodb';
+    import Controller from "controllers/controller";
+    export type GetOptions = {
+        bucketId?: string | ObjectID;
+        user?: string;
+        index?: number;
+        limit?: number;
+        searchTerm?: RegExp;
+        verbose?: boolean;
+    };
+    export type DeleteOptions = {
+        bucketId?: string | ObjectID;
+        user?: string;
+        fileId?: string | ObjectID;
+    };
     /**
-     * Class responsible for managing buckets and uploads
+     * Class responsible for managing files
      */
-    export class BucketsController {
-        private static MEMORY_ALLOCATED;
-        private static API_CALLS_ALLOCATED;
-        private static _singleton;
-        private _buckets;
+    export class FilesController extends Controller {
         private _files;
+        private _buckets;
         private _stats;
-        private _zipper;
-        private _unzipper;
-        private _deflater;
         private _activeManager;
-        constructor(buckets: Collection, files: Collection, stats: Collection, config: IConfig);
+        constructor(config: IConfig);
         /**
-         * Fetches all bucket entries from the database
-         * @param user [Optional] Specify the user. If none provided, then all buckets are retrieved
-         * @param searchTerm [Optional] Specify a search term
+         * Initializes the controller
+         * @param db The mongo db
          */
-        getBucketEntries(user?: string, searchTerm?: RegExp): Promise<IBucketEntry[]>;
+        initialize(db: Db): Promise<void>;
+        /**
+         * Fetches a file by its ID
+         * @param fileID The file ID of the file on the bucket
+         * @param user Optionally specify the user of the file
+         * @param searchTerm Specify a search term
+         */
+        getFile(fileID: string, user?: string, searchTerm?: RegExp): Promise<IFileEntry>;
+        /**
+         * Fetches all file entries by a given query
+         */
+        getFiles(options: GetOptions): Promise<Page<IFileEntry>>;
         /**
          * Fetches the file count based on the given query
          * @param searchQuery The search query to idenfify files
          */
-        numFiles(searchQuery: IFileEntry): Promise<number>;
+        count(searchQuery: IFileEntry): Promise<number>;
         /**
-         * Fetches all file entries by a given query
-         * @param searchQuery The search query to idenfify files
+         * Renames a file
+         * @param fileId The id of the file to rename
+         * @param name The new name of the file
          */
-        getFiles(searchQuery: any, startIndex?: number, limit?: number): Promise<IFileEntry[]>;
+        update(fileId: string | ObjectID, token: Partial<IFileEntry>): Promise<IFileEntry>;
         /**
-         * Updates all file entries for a given search criteria with custom meta data
-         * @param searchQuery The search query to idenfify files
-         * @param meta Optional meta data to associate with the files
+         * Adds an API call to a user
+         * @param user The username
          */
-        setMeta(searchQuery: any, meta: any): Promise<boolean>;
-        /**
-         * Fetches all file entries from the database for a given bucket
-         * @param bucket Specify the bucket from which he files belong to
-         * @param startIndex Specify the start index
-         * @param limit Specify the number of files to retrieve
-         * @param searchTerm Specify a search term
-         */
-        getFilesByBucket(bucket: IBucketEntry, startIndex?: number, limit?: number, searchTerm?: RegExp): Promise<IFileEntry[]>;
-        /**
-         * Fetches the storage/api data for a given user
-         * @param user The user whos data we are fetching
-         */
-        getUserStats(user?: string): Promise<IStorageStats>;
-        /**
-         * Attempts to create a user usage statistics
-         * @param user The user associated with this bucket
-         */
-        createUserStats(user: string): Promise<IStorageStats>;
-        /**
-         * Attempts to remove the usage stats of a given user
-         * @param user The user associated with this bucket
-         * @returns A promise of the number of stats removed
-         */
-        removeUserStats(user: string): Promise<number>;
-        /**
-         * Attempts to remove all data associated with a user
-         * @param user The user we are removing
-         */
-        removeUser(user: string): Promise<void>;
-        /**
-         * Attempts to create a new user bucket by first creating the storage on the cloud and then updating the internal DB
-         * @param name The name of the bucket
-         * @param user The user associated with this bucket
-         */
-        createBucket(name: string, user: string): Promise<IBucketEntry>;
-        /**
-         * Attempts to remove buckets of the given search result. This will also update the file and stats collection.
-         * @param searchQuery A valid mongodb search query
-         * @returns An array of ID's of the buckets removed
-         */
-        private removeBuckets(searchQuery);
-        /**
-         * Attempts to remove buckets by id
-         * @param buckets An array of bucket IDs to remove
-         * @param user The user to whome these buckets belong
-         * @returns An array of ID's of the buckets removed
-         */
-        removeBucketsByName(buckets: Array<string>, user: string): Promise<Array<string>>;
-        /**
-         * Attempts to remove a user bucket
-         * @param user The user associated with this bucket
-         * @returns An array of ID's of the buckets removed
-         */
-        removeBucketsByUser(user: string): Promise<Array<string>>;
-        /**
-         * Deletes the bucket from storage and updates the databases
-         */
-        private deleteBucket(bucketEntry);
+        private incrementAPI(user);
         /**
          * Deletes the file from storage and updates the databases
          * @param fileEntry
@@ -2466,26 +2312,115 @@ declare module "controllers/buckets" {
          * @param searchQuery The query we use to select the files
          * @returns Returns the file IDs of the files removed
          */
-        removeFiles(searchQuery: any): Promise<string[]>;
+        removeFiles(options: DeleteOptions): Promise<void>;
+    }
+}
+declare module "controllers/stats" {
+    import { IConfig, IStorageStats } from 'modepress';
+    import { Db } from 'mongodb';
+    import Controller from "controllers/controller";
+    /**
+     * Class responsible for managing user stats
+     */
+    export class StatsController extends Controller {
+        private static MEMORY_ALLOCATED;
+        private static API_CALLS_ALLOCATED;
+        private _stats;
+        constructor(config: IConfig);
         /**
-         * Attempts to remove files from the cloud and database
-        * @param fileIDs The file IDs to remove
-        * @param user Optionally pass in the user to refine the search
-        * @returns Returns the file IDs of the files removed
-        */
-        removeFilesByIdentifiers(fileIDs: string[], user?: string): Promise<string[]>;
-        /**
-         * Attempts to remove files from the cloud and database that are in a given bucket
-         * @param bucket The id or name of the bucket to remove
-         * @returns Returns the file IDs of the files removed
+         * Initializes the controller
+         * @param db The mongo db
          */
-        removeFilesByBucket(bucket: string): Promise<string[]>;
+        initialize(db: Db): Promise<void>;
+        /**
+         * Fetches the storage/api data for a given user
+         * @param user The user whos data we are fetching
+         */
+        get(user?: string): Promise<IStorageStats>;
+        /**
+         * Attempts to create a user usage statistics
+         * @param user The user associated with this bucket
+         */
+        createUserStats(user: string): Promise<IStorageStats>;
+        /**
+         * Attempts to remove the usage stats of a given user
+         * @param user The user associated with this bucket
+         */
+        remove(user: string): Promise<number>;
+        /**
+         * Finds and downloads a file
+         * @param fileID The file ID of the file on the bucket
+         * @returns Returns the number of results affected
+         */
+        update(user: string, value: Partial<IStorageStats>): Promise<IStorageStats>;
+    }
+}
+declare module "controllers/buckets" {
+    import { IConfig, IBucketEntry, IFileEntry, Page } from 'modepress';
+    import { Db, ObjectID } from 'mongodb';
+    import { Part } from 'multiparty';
+    import Controller from "controllers/controller";
+    export type GetManyOptions = {
+        user?: string;
+        searchTerm?: RegExp;
+        index?: number;
+        limit?: number;
+    };
+    export type GetOptions = {
+        user?: string;
+        identifier?: string;
+        name?: string;
+    };
+    export type DeleteOptions = {
+        user?: string;
+        _id?: string | ObjectID;
+    };
+    /**
+     * Class responsible for managing buckets and uploads
+     */
+    export class BucketsController extends Controller {
+        private _buckets;
+        private _files;
+        private _stats;
+        private _activeManager;
+        private _filesController;
+        private _statsController;
+        constructor(config: IConfig);
+        /**
+         * Initializes the controller
+         * @param db The mongo db
+         */
+        initialize(db: Db): Promise<void>;
+        /**
+         * Fetches all bucket entries from the database
+         * @param options Options for defining which buckets to return
+         */
+        getMany(options?: GetManyOptions): Promise<Page<IBucketEntry>>;
         /**
          * Gets a bucket entry by its name or ID
-         * @param bucket The id of the bucket. You can also use the name if you provide the user
-         * @param user The username associated with the bucket (Only applicable if bucket is a name and not an ID)
          */
-        getIBucket(bucket: string, user?: string): Promise<IBucketEntry | null>;
+        get(options?: GetOptions): Promise<IBucketEntry | null>;
+        /**
+         * Attempts to remove all data associated with a user
+         * @param user The user we are removing
+         */
+        removeUser(user: string): Promise<void>;
+        /**
+         * Attempts to create a new user bucket by first creating the storage on the cloud and then updating the internal DB
+         * @param name The name of the bucket
+         * @param user The user associated with this bucket
+         */
+        create(name: string, user: string): Promise<IBucketEntry>;
+        /**
+         * Attempts to remove buckets of the given search result. This will also update the file and stats collection.
+         * @param searchQuery A valid mongodb search query
+         * @returns An array of ID's of the buckets removed
+         */
+        remove(options: DeleteOptions): Promise<string[]>;
+        /**
+         * Deletes the bucket from storage and updates the databases
+         */
+        private deleteBucket(bucketEntry);
         /**
          * Checks to see the user's storage limits to see if they are allowed to upload data
          * @param user The username
@@ -2498,21 +2433,6 @@ declare module "controllers/buckets" {
          */
         withinAPILimit(user: string): Promise<boolean>;
         /**
-         * Adds an API call to a user
-         * @param user The username
-         */
-        incrementAPI(user: string): Promise<boolean>;
-        /**
-         * Registers an uploaded part as a new user file in the local dbs
-         * @param identifier The id of the file on the bucket
-         * @param bucketID The id of the bucket this file belongs to
-         * @param part
-         * @param user The username
-         * @param isPublic IF true, the file will be set as public
-         * @param parentFile Sets an optional parent file - if the parent is removed, then so is this one
-         */
-        private registerFile(identifier, bucket, part, user, isPublic, parentFile);
-        /**
          * Uploads a part stream as a new user file. This checks permissions, updates the local db and uploads the stream to the bucket
          * @param part
          * @param bucket The bucket to which we are uploading to
@@ -2521,33 +2441,195 @@ declare module "controllers/buckets" {
          * @param parentFile [Optional] Set a parent file which when deleted will detelete this upload as well
          */
         uploadStream(part: Part, bucketEntry: IBucketEntry, user: string, makePublic?: boolean, parentFile?: string | null): Promise<IFileEntry>;
+    }
+}
+declare module "controllers/posts" {
+    import { IPost, Page, IConfig } from 'modepress';
+    import * as mongodb from 'mongodb';
+    import Controller from "controllers/controller";
+    export type GetManyOptions = {
+        verbose?: boolean;
+        keyword?: RegExp;
+        author?: RegExp;
+        public?: boolean;
+        tags?: string[];
+        requiredTags?: string[];
+        categories?: string[];
+        sort?: boolean;
+        sortOrder?: 'asc' | 'desc';
+        minimal?: boolean;
+        index?: number;
+        limit?: number;
+    };
+    export type GetOneOptions = {
+        id?: string;
+        slug?: string;
+        verbose?: boolean;
+        public?: boolean;
+    };
+    /**
+     * A controller that deals with the management of posts
+     */
+    export class PostsController extends Controller {
+        private _postsModel;
         /**
-         * Fetches a file by its ID
-         * @param fileID The file ID of the file on the bucket
-         * @param user Optionally specify the user of the file
-         * @param searchTerm Specify a search term
-         */
-        getFile(fileID: string, user?: string, searchTerm?: RegExp): Promise<IFileEntry>;
+           * Creates a new instance of the controller
+           */
+        constructor(config: IConfig);
         /**
-         * Renames a file
-         * @param file The file to rename
-         * @param name The new name of the file
+         * Called to initialize this controller and its related database objects
          */
-        renameFile(file: IFileEntry, name: string): Promise<IFileEntry>;
+        initialize(db: mongodb.Db): Promise<this>;
         /**
-         * Finds and downloads a file
-         * @param fileID The file ID of the file on the bucket
-         * @returns Returns the number of results affected
+         * Returns an array of IPost items
          */
-        updateStorage(user: string, value: IStorageStats): Promise<number>;
+        getPosts(options?: GetManyOptions): Promise<Page<IPost>>;
         /**
-         * Creates the bucket manager singleton
+         * Removes a post by ID
+         * @param id The id of the post we are removing
          */
-        static create(buckets: Collection, files: Collection, stats: Collection, config: IConfig): BucketsController;
+        removePost(id: string): Promise<void>;
         /**
-         * Gets the bucket singleton
+         * Updates a post resource
+         * @param id The id of the post to edit
+         * @param token The edit token
          */
-        static readonly get: BucketsController;
+        update(id: string, token: IPost): Promise<IPost>;
+        /**
+         * Creates a new post
+         * @param token The initial post data
+         */
+        create(token: IPost): Promise<IPost>;
+        /**
+         * Gets a single post resource
+         * @param options Options for getting the post resource
+         */
+        getPost(options?: GetOneOptions): Promise<IPost>;
+    }
+}
+declare module "core/session" {
+    import { ISessionEntry, ISession, IUserEntry } from 'modepress';
+    import { ServerRequest } from 'http';
+    import { ObjectID } from 'mongodb';
+    import { User } from "core/user";
+    /**
+     * A class to represent session data
+     */
+    export class Session {
+        user: User;
+        _id: ObjectID;
+        sessionId: string;
+        data: any;
+        /**
+         * The specific time when this session will expire
+         */
+        expiration: number;
+        /**
+         * The options of this session system
+         */
+        options: ISession;
+        /**
+         * Creates an instance of the session
+         */
+        constructor(sessionId: string, options: ISession, userEntry: IUserEntry);
+        /**
+         * Fills in the data of this session from the data saved in the database
+         * @param data The data fetched from the database
+         */
+        deserialize(data: ISessionEntry): void;
+        /**
+         * Creates an object that represents this session to be saved in the database
+         */
+        serialize(): ISessionEntry;
+        private getHost(request);
+        /**
+         * This method returns the value to send in the Set-Cookie header which you should send with every request that goes back to the browser, e.g.
+         * response.setHeader('Set-Cookie', session.getSetCookieHeaderValue());
+         */
+        getSetCookieHeaderValue(request: ServerRequest): any;
+        /**
+         * Converts from milliseconds to string, since the epoch to Cookie 'expires' format which is Wdy, DD-Mon-YYYY HH:MM:SS GMT
+         */
+        private dateCookieString(ms);
+        /**
+         * Pads a string with 0's
+         */
+        private pad(n);
+    }
+}
+declare module "controllers/sessions" {
+    import { ISessionEntry, IConfig } from 'modepress';
+    import { ServerRequest, ServerResponse } from 'http';
+    import { Db } from 'mongodb';
+    import { Session } from "core/session";
+    import Controller from "controllers/controller";
+    /**
+    * A class that manages session data for active users
+     */
+    export class SessionsController extends Controller {
+        private _sessions;
+        private _users;
+        private _timeout;
+        private _cleanupProxy;
+        private _session;
+        /**
+         * Creates an instance of a session manager
+         */
+        constructor(config: IConfig);
+        /**
+         * Initializes the controller
+         * @param db The mongo db
+         */
+        initialize(db: Db): Promise<void>;
+        /**
+         * Gets an array of all active sessions
+         */
+        numActiveSessions(): Promise<number>;
+        /**
+         * Gets an array of all active sessions
+         * @param startIndex
+         * @param limit
+         */
+        getActiveSessions(startIndex?: number, limit?: number): Promise<ISessionEntry[]>;
+        /**
+         * Clears the users session cookie so that its no longer tracked
+         * @param sessionId The session ID to remove, if null then the currently authenticated session will be used
+         * @param request
+         * @param response
+         */
+        clearSession(sessionId: string | null, request: ServerRequest, response: ServerResponse): Promise<boolean>;
+        /**
+         * Gets and initializes a session by its id
+         */
+        getSessionById(sessionId: string): Promise<Session | null>;
+        /**
+         * Attempts to get a session from the request object of the client
+         */
+        getSession(request: ServerRequest): Promise<Session | null>;
+        setSessionHeader(session: Session, request: ServerRequest, response: ServerResponse): Promise<void>;
+        /**
+         * Attempts to create a session from the request object of the client
+         */
+        createSession(request: ServerRequest, response: ServerResponse, userId: string): Promise<Session>;
+        /**
+         * Each time a session is created, a timer is started to check all sessions in the DB.
+         * Once the lifetime of a session is up its then removed from the DB and we check for any remaining sessions.
+         * @param force If true, this will force a cleanup instead of waiting on the next timer
+         */
+        cleanup(force?: boolean): Promise<void>;
+        /**
+         * Looks at the headers from the HTTP request to determine if a session cookie has been asssigned and returns the ID.
+         * @param req
+         * @returns The ID of the user session, or an empty string
+         */
+        private getIDFromRequest(req);
+        /**
+         * Creates a random session ID.
+         * The ID is a pseude-random ASCII string which contains at least the specified number of bits of entropy (64 in this case)
+         * the return value is a string of length [bits/6] of characters from the base64 alphabet
+         * @returns A user session ID
+         */
+        private createID();
     }
 }
 declare module "mailers/gmail" {
@@ -2622,32 +2704,32 @@ declare module "mailers/mailgun" {
     }
 }
 declare module "controllers/users" {
-    import { IUserEntry, IConfig } from 'modepress';
-    import { Collection } from 'mongodb';
+    import { IUserEntry, IConfig, Page } from 'modepress';
+    import { Db } from 'mongodb';
     import { ServerRequest, ServerResponse } from 'http';
     import { Request } from 'express';
     import { User, UserPrivileges } from "core/user";
     import { Session } from "core/session";
+    import Controller from "controllers/controller";
     /**
      * Main class to use for managing users
      */
-    export class UsersController {
-        private static _singleton;
+    export class UsersController extends Controller {
         private _collection;
-        private _config;
         private _mailer;
         /**
            * Creates an instance of the user manager
            */
-        constructor(userCollection: Collection, config: IConfig);
+        constructor(config: IConfig);
+        /**
+         * Initializes the controller
+         * @param db The mongo db
+         */
+        initialize(db: Db): Promise<void>;
         /**
          * Called whenever a session is removed from the database
          */
         onSessionRemoved(sessionId: string): Promise<void>;
-        /**
-           * Initializes the API
-           */
-        initialize(): Promise<this>;
         /**
            * Attempts to register a new user
            * @param username The username of the user
@@ -2801,19 +2883,116 @@ declare module "controllers/users" {
         /**
            * Prints user objects from the database
            * @param limit The number of users to fetch
-           * @param startIndex The starting index from where we are fetching users from
+           * @param index The starting index from where we are fetching users from
          * @param searchPhrases Search phrases
+         * @param verbose True if you want to show all user information
            */
-        getUsers(startIndex?: number, limit?: number, searchPhrases?: RegExp): Promise<User[]>;
-        /**
-         * Creates the user manager singlton
-         */
-        static create(users: Collection, config: IConfig): UsersController;
-        /**
-         * Gets the user manager singlton
-         */
-        static readonly get: UsersController;
+        getUsers(index?: number, limit?: number, searchPhrases?: RegExp, verbose?: boolean): Promise<Page<IUserEntry>>;
     }
+}
+declare module "controllers/comments" {
+    import { IComment, Page, IConfig } from 'modepress';
+    import * as mongodb from 'mongodb';
+    import Controller from "controllers/controller";
+    export type GetManyOptions = {
+        public?: boolean;
+        parentId?: string;
+        keyword?: string;
+        user?: string;
+        sort?: boolean;
+        verbose?: boolean;
+        expanded?: boolean;
+        depth?: number;
+        sortType?: 'updated';
+        sortOrder?: 'asc' | 'desc';
+        index?: number;
+        limit?: number;
+    };
+    export type GetOneOptions = {
+        verbose?: boolean;
+        expanded?: boolean;
+        depth?: number;
+    };
+    /**
+     * A controller that deals with the management of comments
+     */
+    export class CommentsController extends Controller {
+        private _commentsModel;
+        /**
+           * Creates a new instance of the controller
+           */
+        constructor(config: IConfig);
+        /**
+         * Called to initialize this controller and its related database objects
+         */
+        initialize(db: mongodb.Db): Promise<this>;
+        /**
+         * Returns an array of comment entries
+         */
+        getAll(options?: GetManyOptions): Promise<Page<IComment>>;
+        /**
+         * Gets a single comment resource
+         * @param id The id of the comment to fetch
+         * @param options Options for getting the resource
+         */
+        getOne(id: string, options?: GetOneOptions): Promise<IComment>;
+        /**
+         * Removes a comment by its id
+         * @param id The id of the comment
+         */
+        remove(id: string): Promise<void>;
+        /**
+         * Updates a comment by id
+         * @param id The id of the comment
+         * @param token The update token of the comment
+         */
+        update(id: string, token: IComment): Promise<IComment>;
+        /**
+         * Creates a new comment
+         * @param token The data of the comment to create
+         */
+        create(token: IComment): Promise<IComment>;
+    }
+}
+declare module "core/controller-factory" {
+    import { IConfig } from 'modepress';
+    import { Db } from 'mongodb';
+    import Controller from "controllers/controller";
+    import { BucketsController } from "controllers/buckets";
+    import { FilesController } from "controllers/files";
+    import { PostsController } from "controllers/posts";
+    import { SessionsController } from "controllers/sessions";
+    import { UsersController } from "controllers/users";
+    import { CommentsController } from "controllers/comments";
+    import { StatsController } from "controllers/stats";
+    /**
+     * Factory classs for creating & getting controllers
+     */
+    export class ControllerFactory {
+        private _config;
+        private _db;
+        private _controllers;
+        initialize(config: IConfig, database: Db): void;
+        /**
+         * Adds the default models to the system
+         */
+        addDefaults(): Promise<void>;
+        get(type: 'buckets'): BucketsController;
+        get(type: 'posts'): PostsController;
+        get(type: 'comments'): CommentsController;
+        get(type: 'sessions'): SessionsController;
+        get(type: 'users'): UsersController;
+        get(type: 'files'): FilesController;
+        get(type: 'stats'): StatsController;
+        get(type: string): Controller;
+        /**
+         * A factory method for creating models
+         * @param type The type of model to create
+         */
+        private create(type);
+    }
+    const _default: ControllerFactory;
+    export default _default;
 }
 declare module "utils/errors" {
     /**
@@ -2914,6 +3093,7 @@ declare module "serializers/admin-serializer" {
      */
     export class AdminSerializer extends Serializer {
         private _options;
+        private _userController;
         constructor(options: IBaseControler);
         /**
        * Called to initialize this controller and its related database objects
@@ -2936,6 +3116,9 @@ declare module "serializers/bucket-serializer" {
     export class BucketSerializer extends Serializer {
         private _allowedFileTypes;
         private _options;
+        private _userController;
+        private _bucketController;
+        private _files;
         /**
            * Creates an instance of the user manager
            */
@@ -2993,6 +3176,7 @@ declare module "serializers/comments-serializer" {
      */
     export class CommentsSerializer extends Serializer {
         private _options;
+        private _controller;
         /**
            * Creates a new instance of the controller
            */
@@ -3033,7 +3217,6 @@ declare module "serializers/cors-serializer" {
      */
     export class CORSSerializer extends Serializer {
         private _approvedDomains;
-        private _options;
         /**
        * Creates an instance of the user manager
        */
@@ -3092,9 +3275,8 @@ declare module "serializers/file-serializer" {
      * Main class to use for managing users
      */
     export class FileSerializer extends Serializer {
-        private _allowedFileTypes;
-        private _cacheLifetime;
         private _options;
+        private _files;
         /**
            * Creates an instance of the user manager
            */
@@ -3104,13 +3286,13 @@ declare module "serializers/file-serializer" {
          */
         initialize(e: express.Express, db: mongodb.Db): Promise<this>;
         /**
-         * Removes files specified in the URL
+         * Removes a file specified in the URL
          */
-        private removeFiles(req, res);
+        private remove(req, res);
         /**
          * Renames a file
          */
-        private renameFile(req, res);
+        private update(req, res);
         /**
          * Fetches all file entries from the database. Optionally specifying the bucket to fetch from.
          */
@@ -3188,6 +3370,7 @@ declare module "serializers/posts-serializer" {
      */
     export class PostsSerializer extends Serializer {
         private _options;
+        private _controller;
         /**
            * Creates a new instance of the controller
            */
@@ -3260,6 +3443,7 @@ declare module "serializers/session-serializer" {
      */
     export class SessionSerializer extends Serializer {
         private _options;
+        private _sessionController;
         /**
            * Creates an instance of the user manager
            */
@@ -3287,8 +3471,9 @@ declare module "serializers/stats-serializer" {
      * Main class to use for managing users
      */
     export class StatsSerializer extends Serializer {
-        private _allowedFileTypes;
         private _options;
+        private _userController;
+        private _statController;
         /**
            * Creates an instance of the user manager
            * @param e The express app
@@ -3339,6 +3524,7 @@ declare module "serializers/user-serializer" {
      */
     export class UserSerializer extends Serializer {
         private _options;
+        private _userController;
         /**
            * Creates an instance of the user manager
            */
@@ -3394,6 +3580,7 @@ declare module "serializers/auth-serializer" {
      */
     export class AuthSerializer extends Serializer {
         private _options;
+        private _userController;
         /**
            * Creates an instance of the user manager
            */
@@ -3442,8 +3629,9 @@ declare module "serializers/auth-serializer" {
 }
 declare module "modepress-api" {
     import * as _Controller from "serializers/serializer";
-    import * as users from "controllers/users";
-    import * as bucketManager from "controllers/buckets";
+    import { UsersController } from "controllers/users";
+    import { BucketsController } from "controllers/buckets";
+    import { PostsController } from "controllers/posts";
     import * as _Models from "models/model";
     import * as _SchemaFactory from "models/schema-items/schema-item-factory";
     import { isValidObjectID } from "utils/utils";
@@ -3462,14 +3650,23 @@ declare module "modepress-api" {
     import { StatsSerializer } from "serializers/stats-serializer";
     import { UserSerializer } from "serializers/user-serializer";
     import { AuthSerializer } from "serializers/auth-serializer";
+    import { FilesController } from "controllers/files";
+    import { StatsController } from "controllers/stats";
+    import { CommentsController } from "controllers/comments";
+    import { SessionsController } from "controllers/sessions";
     export const Controller: typeof _Controller.Serializer;
     export const Model: typeof _Models.Model;
     export const SchemaFactory: typeof _SchemaFactory;
     export const isValidID: typeof isValidObjectID;
     export const authentication: typeof permissions;
     export const controllers: {
-        users: users.UsersController;
-        buckets: bucketManager.BucketsController;
+        users: UsersController;
+        buckets: BucketsController;
+        posts: PostsController;
+        comments: CommentsController;
+        files: FilesController;
+        stats: StatsController;
+        sessions: SessionsController;
     };
     export const serializers: {
         admin: typeof AdminSerializer;
