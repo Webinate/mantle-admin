@@ -1,17 +1,22 @@
 export const apiUrl = '/api';
 
-export class ClientError<T extends any> extends Error {
-  public json: T;
+export class ClientError extends Error {
+  public response: Response;
   public code: number;
 
-  constructor( message: string, code: number, json: T ) {
+  constructor( message: string, code: number, response: Response ) {
     super( message );
-    this.json = json;
+    this.response = response;
     this.code = code;
   }
 }
 
-export async function get<T>( url: string ) {
+export async function getJson<T>( url: string ) {
+  const resp = await get( url );
+  return await resp.json() as T;
+}
+
+export async function get( url: string ) {
   const resp = await fetch( url, {
     credentials: 'include',
     headers: new Headers( {
@@ -19,15 +24,18 @@ export async function get<T>( url: string ) {
     } )
   } );
 
-  const data = await resp.json() as T;
-
   if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, data );
+    throw new ClientError( resp.statusText, resp.status, resp );
 
-  return data;
+  return resp;
 }
 
-export async function post<T>( url: string, data: any ) {
+export async function postJson<T>( url: string, data: any ) {
+  const resp = await post( url, data );
+  return await resp.json() as T;
+}
+
+export async function post( url: string, data: any ) {
   const resp = await fetch( url, {
     method: 'post',
     body: JSON.stringify( data ),
@@ -37,15 +45,18 @@ export async function post<T>( url: string, data: any ) {
     } )
   } );
 
-  const respData = await resp.json() as T;
-
   if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, respData );
+    throw new ClientError( resp.statusText, resp.status, resp );
 
-  return respData;
+  return resp;
 }
 
-export async function del<T>( url: string, data?: any ) {
+export async function delJson<T>( url: string, data: any ) {
+  const resp = await del( url, data );
+  return await resp.json() as T;
+}
+
+export async function del( url: string, data?: any ) {
   const resp = await fetch( url, {
     method: 'delete',
     body: data ? JSON.stringify( data ) : undefined,
@@ -55,15 +66,18 @@ export async function del<T>( url: string, data?: any ) {
     } )
   } );
 
-  const respData = await resp.json() as T;
-
   if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, respData );
+    throw new ClientError( resp.statusText, resp.status, resp );
 
-  return respData;
+  return resp;
 }
 
-export async function put<T>( url: string, data?: any ) {
+export async function putJson<T>( url: string, data: any ) {
+  const resp = await put( url, data );
+  return await resp.json() as T;
+}
+
+export async function put( url: string, data?: any ) {
   const resp = await fetch( url, {
     method: 'put',
     body: data ? JSON.stringify( data ) : undefined,
@@ -73,10 +87,8 @@ export async function put<T>( url: string, data?: any ) {
     } )
   } );
 
-  const respData = await resp.json() as T;
-
   if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, respData );
+    throw new ClientError( resp.statusText, resp.status, resp );
 
-  return respData;
+  return resp;
 }

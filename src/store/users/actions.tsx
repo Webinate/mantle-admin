@@ -1,7 +1,7 @@
 import { ActionCreator } from '../actions-creator';
 import { UserTokens } from 'modepress';
 import { IRootState } from '../';
-import { get, apiUrl } from '../../utils/httpClients';
+import { getJson, apiUrl } from '../../utils/httpClients';
 
 // Action Creators
 export const ActionCreators = {
@@ -18,7 +18,7 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 export function getUsers( index: number = 0 ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetUsersBusy.create( true ) );
-    const resp = await get<UserTokens.GetAll.Response>( `${ apiUrl }/users?index=${ index }` );
+    const resp = await getJson<UserTokens.GetAll.Response>( `${ apiUrl }/users?index=${ index }` );
     dispatch( ActionCreators.SetUsers.create( resp ) );
   }
 }
