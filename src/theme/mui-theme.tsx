@@ -7,8 +7,8 @@ const p100 = '#8885A7';
 const p200 = '#6d689c';
 
 // Reds
-const s100 = '#B64545';
-const s200 = '#CC7A7A';
+const s100 = '#CC7A7A';
+const s200 = '#B64545';
 
 // Lights BGs
 const l100 = '#fff';
@@ -30,11 +30,11 @@ export default {
   primary200: { color: '#fff', softColor: '#eee', background: p200, border: '#ccc' },
 
   // Reds
-  secondary100: { color: '#fff', softColor: '#eee', background: s100, border: '#ccc' },
-  secondary200: { color: '#fff', softColor: '#eee', background: s200, border: '#835151' },
+  secondary100: { color: '#fff', softColor: '#eee', background: s100, border: '#835151' },
+  secondary200: { color: '#fff', softColor: '#eee', background: s200, border: '#ccc' },
 
   // Light
-  light100: { color: '#333', softColor: '#aaa', background: l100, border: '#ddd' },
+  light100: { color: '#333', softColor: '#ccc', background: l100, border: '#ddd' },
   light200: { color: '#333', softColor: '#aaa', background: l200, border: '#ddd' },
   light300: { color: '#333', softColor: '#aaa', background: l300, border: '#ddd' },
   light400: { color: '#333', softColor: '#aaa', background: l400, border: '#ccc' },
@@ -55,7 +55,7 @@ export default {
   fontFamily: 'Roboto, sans-serif',
   borderRadius: 2,
   palette: {
-    primary1Color: p100,
+    primary1Color: p200,
     primary2Color: '#0288D1',
     primary3Color: '#BDBDBD',
     accent1Color: '#FF4081',
@@ -71,5 +71,8 @@ export default {
     clockCircleColor: 'rgba(0,0,0,0.3)',
     shadowColor: '#000'
   },
+  datePicker: {
+
+  }
 
 } as ThemeInterface;
