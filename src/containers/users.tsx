@@ -1,16 +1,13 @@
 import * as React from 'react';
 import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
-import { Avatar } from 'material-ui';
 import { getUsers } from '../store/users/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
 import { Stage } from '../components/stage';
-import { default as styled } from '../theme/styled';
-import { default as theme } from '../theme/mui-theme';
-import { generateAvatarPic } from '../utils/component-utils';
+import { UserProperties } from '../components/users-properties';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -70,26 +67,6 @@ export class Users extends React.Component<Partial<Props>, State> {
     }
   }
 
-  private getProperties() {
-    const selected = this.state.selectedUsers.length > 0 ?
-      this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
-
-    if ( !selected )
-      return <Properties />;
-
-    const page = this.props.userState!.userPage! as UserTokens.GetAll.Response;
-
-    return (
-      <Properties>
-        <Avatar
-          src={generateAvatarPic( page.data.indexOf( selected ) )}
-          size={200}
-        />
-        <h2>{selected.username}</h2>
-      </Properties>
-    );
-  }
-
   render() {
     const page = ( typeof ( this.props.userState!.userPage! ) === 'string' ? null : this.props.userState!.userPage! as UserTokens.GetAll.Response );
 
@@ -105,7 +82,11 @@ export class Users extends React.Component<Partial<Props>, State> {
           rightSize={35}
           style={{ height: 'calc(100% - 100px)' }}
           rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
-          renderRight={() => this.getProperties()}
+          renderRight={() => <UserProperties
+            selectedIndex={page && selected ? page.data.indexOf( selected ) : -1}
+            users={page ? page.data : null}
+          />
+          }
         >
           {page ?
             <Pager
@@ -128,13 +109,3 @@ export class Users extends React.Component<Partial<Props>, State> {
     );
   }
 };
-
-const Properties = styled.div`
-
-height: 100%;
-overflow: auto;
-position: relative;
-padding: 10px;
-box-sizing: border-box;
-background: ${theme.light100.background }
-`;
