@@ -10,6 +10,7 @@ import { Pager } from '../components/pager';
 import { Stage } from '../components/stage';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
+import { generateAvatarPic } from '../utils/component-utils';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -81,7 +82,7 @@ export class Users extends React.Component<Partial<Props>, State> {
     return (
       <Properties>
         <Avatar
-          src={`/images/avatar-${ page.data.indexOf( selected ) + 1 }.svg`}
+          src={generateAvatarPic( page.data.indexOf( selected ) )}
           size={200}
         />
         <h2>{selected.username}</h2>

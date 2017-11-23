@@ -4,6 +4,7 @@ import { Avatar } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import * as moment from 'moment';
+import { generateAvatarPic } from '../utils/component-utils';
 
 type Props = {
   users: IUserEntry[];
@@ -31,7 +32,7 @@ export class UsersList extends React.PureComponent<Props, any> {
             onMouseDown={e => this.props.onUserSelected( user, e )}
           >
             <Avatar
-              src={`/images/avatar-${ ( index % 5 ) + 1 }.svg`}
+              src={generateAvatarPic( ( index ) )}
               size={80}
             />
             <Details selected={selected}>
