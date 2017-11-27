@@ -1,13 +1,14 @@
 const gulp = require( 'gulp' );
 const sass = require( 'gulp-sass' );
-var tslint = require( 'gulp-tslint' );
+const tslint = require( 'gulp-tslint' );
 const webpack = require( 'webpack' );
 const ts = require( "gulp-typescript" );
 const tsProject = ts.createProject( 'tsconfig-server.json', { noImplicitAny: true } );
 const tsLintProj = ts.createProject( 'tsconfig-lint.json' );
 const browserSync = require( 'browser-sync' ).create();
 const fs = require( 'fs' );
-var spawn = require( 'child_process' )
+const spawn = require( 'child_process' );
+const webfontsGenerator = require( 'webfonts-generator' );
 
 const modepressJson = JSON.parse( fs.readFileSync( './modepress.json', { encoding: 'utf8' } ) );
 
@@ -15,6 +16,43 @@ function buildStatics() {
   return gulp.src( './src/static/**/*' )
     .pipe( gulp.dest( './dist/client/' ) );
 };
+
+function generateFonts( callback ) {
+  webfontsGenerator( {
+    fontName: 'mantle',
+    cssFontsPath: '../fonts/',
+    css: true,
+    cssDest: './src/static/css/mantle.css',
+    html: false,
+    types: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
+    order: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
+    files: [
+      './fonts/location.svg',
+      './fonts/tag.svg',
+      './fonts/arrow-down.svg',
+      './fonts/arrow-left.svg',
+      './fonts/arrow-right.svg',
+      './fonts/arrow-up.svg',
+      './fonts/exit.svg',
+      './fonts/expand-less.svg',
+      './fonts/expand-more.svg',
+      './fonts/group-add.svg',
+      './fonts/home.svg',
+      './fonts/key.svg',
+      './fonts/mantle.svg',
+      './fonts/people.svg'
+    ],
+    dest: './dist/client/fonts/',
+  }, function( error ) {
+    if ( error ) {
+      console.log( 'Font generation fail!', error );
+      callback( error )
+    } else {
+      console.log( 'Generated Fonts...' );
+      callback();
+    }
+  } );
+}
 
 /**
  * Builds the client TS code
@@ -177,7 +215,7 @@ function initBrowserSync( callback ) {
 gulp.task( 'update-modepress-def', updateModepressDef );
 gulp.task( 'build-client', buildClient );
 gulp.task( 'build-server', buildServer );
-gulp.task( 'build', gulp.series( buildServer, gulp.parallel( lint, buildClient, buildSass, buildStatics ), ) );
-gulp.task( 'default', gulp.series( buildServer, gulp.parallel( lint, buildClient, buildSass, buildStatics ), ) );
+gulp.task( 'build', gulp.series( buildServer, gulp.parallel( generateFonts, lint, buildClient, buildSass, buildStatics ), ) );
+gulp.task( 'default', gulp.series( buildServer, gulp.parallel( generateFonts, lint, buildClient, buildSass, buildStatics ), ) );
 gulp.task( 'watch-client', gulp.series( initBrowserSync, startWatchClient ) );
 gulp.task( 'watch-server', startWatchServer );
