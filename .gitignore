@@ -14,3 +14,4 @@ node_modules
 # Build directory
 dist
 temp
+./src/static/css/mantle.css
