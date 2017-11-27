@@ -20,9 +20,9 @@ function buildStatics() {
 function generateFonts( callback ) {
   webfontsGenerator( {
     fontName: 'mantle',
-    cssFontsPath: '../fonts/',
+    cssFontsUrl: '../fonts/',
     css: true,
-    cssDest: './src/static/css/mantle.css',
+    cssDest: './dist/client/css/mantle.css',
     html: false,
     types: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
     order: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
