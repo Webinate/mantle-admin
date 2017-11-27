@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
 
-type Prop = {
+type Props = {
   title: string;
   style?: React.CSSProperties;
   renderSubHeader?: () => JSX.Element;
 }
 
-export class ContentHeader extends React.Component<Prop, any> {
+export class ContentHeader extends React.Component<Props, any> {
 
-  constructor() {
-    super();
+  constructor( props: Props ) {
+    super( props );
   }
 
   render() {

@@ -19,8 +19,8 @@ type State = {
  * A form for entering user registration information
  */
 export class RegisterForm extends React.Component<Props, State> {
-  constructor() {
-    super();
+  constructor( props: Props ) {
+    super( props );
     this.state = {
       user: '',
       email: '',

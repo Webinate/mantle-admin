@@ -21,8 +21,8 @@ type State = {
  * A form for entering user and password information
  */
 export class LoginForm extends React.Component<Props, State> {
-  constructor() {
-    super();
+  constructor( props: Props ) {
+    super( props );
     this.state = {
       user: '',
       pass: '',

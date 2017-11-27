@@ -50,7 +50,7 @@ export class Stage extends React.Component<Prop, State> {
   private _rightTimeout: number;
 
   constructor( props: Prop ) {
-    super();
+    super( props );
     this._shouldAnimateLeft = false;
     this._shouldAnimateRight = false;
 

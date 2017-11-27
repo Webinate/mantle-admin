@@ -5,7 +5,7 @@ import MantleDiv from './mantle-background';
 import { LinearProgress } from 'material-ui';
 import { default as styled } from '../theme/styled';
 
-type Prop = {
+type Props = {
   loading: boolean;
   activeComponent: 'login' | 'register';
   error: string | null | undefined;
@@ -15,9 +15,9 @@ type Prop = {
   onRegister: ( user: string, email: string, password: string ) => void;
 }
 
-export class AuthScreen extends React.Component<Prop, any> {
-  constructor() {
-    super();
+export class AuthScreen extends React.Component<Props, any> {
+  constructor( props: Props ) {
+    super( props );
   }
 
   render() {

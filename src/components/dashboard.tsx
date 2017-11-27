@@ -4,7 +4,7 @@ import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { Stage } from './stage';
 
-type Prop = {
+type Props = {
   title: string;
   onHome: () => void;
   onLogOut: () => void;
@@ -12,10 +12,10 @@ type Prop = {
   renderRight?: () => JSX.Element;
 }
 
-export class Dashboard extends React.Component<Prop, any> {
+export class Dashboard extends React.Component<Props, any> {
 
-  constructor() {
-    super();
+  constructor( props: Props ) {
+    super( props );
   }
 
   render() {
