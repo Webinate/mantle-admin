@@ -69,6 +69,7 @@ export class Drawer extends React.Component<Props, State> {
 const DrawerHeader = styled.div`
   padding: 10px;
   cursor: pointer;
+  user-select: none;
   background: ${theme.primary100.background };
   color: ${theme.primary100.color };
   border-top: 1px solid ${theme.primary100.border };
@@ -84,7 +85,7 @@ const DrawerHeader = styled.div`
 const DrawerContent = styled.div`
   visibility: hidden;
   box-shadow: inset -2px 2px 5px 0px rgba(0,0,0,0.2);
-  overflow: auto;
+  overflow: hidden;
   box-sizing: border-box;
   padding: 0 10px;
   transition: 0.25s max-height;

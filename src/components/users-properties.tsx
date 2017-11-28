@@ -14,6 +14,7 @@ type Props = {
 type State = {
   detailsOpen: boolean;
   accountsOpen: boolean;
+  removeOpen: boolean;
 }
 
 export class UserProperties extends React.Component<Props, State> {
@@ -21,8 +22,9 @@ export class UserProperties extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      detailsOpen: false,
-      accountsOpen: false
+      detailsOpen: true,
+      accountsOpen: false,
+      removeOpen: false
     };
   }
 
@@ -74,24 +76,6 @@ export class UserProperties extends React.Component<Props, State> {
               />
             </Field>
             <Field>
-              <TextField
-                name="password-tag"
-                floatingLabelText="Password Tag"
-                floatingLabelStyle={textStyle}
-                value={selected.passwordTag}
-                underlineStyle={underlineStyle}
-              />
-            </Field>
-            <Field>
-              <TextField
-                name="session-id"
-                floatingLabelText="Session ID"
-                floatingLabelStyle={textStyle}
-                value={selected.sessionId}
-                underlineStyle={underlineStyle}
-              />
-            </Field>
-            <Field>
               <DatePicker
                 floatingLabelText="Joined On"
                 floatingLabelStyle={textStyle}
@@ -107,15 +91,36 @@ export class UserProperties extends React.Component<Props, State> {
                 value={new Date( selected.lastLoggedIn )}
               />
             </Field>
-            <EditButtons>
-              <RaisedButton label="Update" primary={true} />
-            </EditButtons>
           </Drawer>
+
           <Drawer
             title="Account Settings"
             onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
             open={this.state.accountsOpen}
           >
+            <InlineField>
+              <div className="mt-inline-label">Send password reset request</div>
+              <div className="mt-inline-input">
+                <RaisedButton label="Send Reset" primary={true} />
+              </div>
+            </InlineField>
+
+            <InlineField>
+              <div className="mt-inline-label">Send activation email</div>
+              <div className="mt-inline-input">
+                <RaisedButton label="Send Activation" primary={true} />
+              </div>
+            </InlineField>
+          </Drawer>
+
+          <Drawer
+            title="Remove Account"
+            onHeaderClick={() => this.setState( { removeOpen: !this.state.removeOpen } )}
+            open={this.state.removeOpen}
+          >
+            <strong>
+              Are you absolutely sure you want to remove this account - this is irreversible?
+            </strong>
           </Drawer>
         </DetailsContainer>
 
@@ -130,6 +135,10 @@ const Properties = styled.div`
   position: relative;
   box-sizing: border-box;
   background: ${theme.light100.background };
+
+  strong {
+    margin: 20px 0;
+  }
 `;
 
 const Field = styled.div`
@@ -139,6 +148,25 @@ margin: 5px 0;
 }
 `;
 
+const InlineField = styled.div`
+margin: 20px 5px;
+clear: both;
+overflow: hidden;
+box-sizing: border-box;
+
+button {
+  min-width: 200px;
+}
+
+> div {
+  overflow: hidden;
+  width: 50%;
+  float: left;
+}
+.mt-inline-input { text-align: right; }
+`;
+
+
 const ImgContainer = styled.div`
   height: 250px;
   box-sizing: border-box;
@@ -147,13 +175,6 @@ const ImgContainer = styled.div`
   background: linear-gradient(-45deg, ${theme.secondary100.background }, ${ theme.primary100.background });
 `;
 
-const EditButtons = styled.div`
-  padding: 10px;
-  box-sizing: border-box;
-  overflow: hidden;
-  text-align: left;
-  margin: 10px 0 20px 0;
-`;
 
 const DetailsContainer = styled.div`
   height: calc( 100% - 250px);
