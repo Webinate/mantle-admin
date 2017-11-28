@@ -4,13 +4,28 @@ import { Avatar, TextField, DatePicker, RaisedButton } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
+import { Drawer } from './drawer';
 
 type Props = {
   users: IUserEntry[] | null;
   selectedIndex: number | null;
 };
 
-export class UserProperties extends React.Component<Props, any> {
+type State = {
+  detailsOpen: boolean;
+  accountsOpen: boolean;
+}
+
+export class UserProperties extends React.Component<Props, State> {
+
+  constructor( props: Props ) {
+    super( props );
+    this.state = {
+      detailsOpen: false,
+      accountsOpen: false
+    };
+  }
+
   render() {
     const users = this.props.users;
     const selectedIndex = this.props.selectedIndex;
@@ -34,66 +49,71 @@ export class UserProperties extends React.Component<Props, any> {
           />
         </ImgContainer>
         <DetailsContainer>
-          <h3>{selected.username}</h3>
-          <Field>
-            <TextField
-              name="username"
-              floatingLabelStyle={textStyle}
-              value={selected.username}
-              floatingLabelText="Username"
-            />
-          </Field>
-
-          <Field>
-            <TextField
-              floatingLabelText="Email"
-              floatingLabelStyle={textStyle}
-              value={selected.email}
-            />
-          </Field>
-
-          <Field>
-            <TextField
-              floatingLabelText="Password Tag"
-              floatingLabelStyle={textStyle}
-              value={selected.passwordTag}
-            />
-          </Field>
-
-          <Field>
-            <TextField
-              floatingLabelText="Session ID"
-              floatingLabelStyle={textStyle}
-              value={selected.sessionId}
-              disabled={true}
-            />
-          </Field>
-
-          <Field>
-            <DatePicker
-              floatingLabelText="Joined On"
-              floatingLabelStyle={textStyle}
-              disabled={true}
-              mode="landscape"
-              value={new Date( selected.createdOn )}
-            />
-          </Field>
-
-          <Field>
-            <DatePicker
-              floatingLabelText="Last Active"
-              floatingLabelStyle={textStyle}
-              disabled={true}
-              mode="landscape"
-              value={new Date( selected.lastLoggedIn )}
-            />
-          </Field>
-
-
+          <Drawer
+            title="User Details"
+            open={this.state.detailsOpen}
+            onHeaderClick={() => this.setState( { detailsOpen: !this.state.detailsOpen } )}
+          >
+            <Field>
+              <TextField
+                name="username"
+                floatingLabelStyle={textStyle}
+                value={selected.username}
+                floatingLabelText="Username"
+              />
+            </Field>
+            <Field>
+              <TextField
+                floatingLabelText="Email"
+                floatingLabelStyle={textStyle}
+                value={selected.email}
+              />
+            </Field>
+            <Field>
+              <TextField
+                floatingLabelText="Password Tag"
+                floatingLabelStyle={textStyle}
+                value={selected.passwordTag}
+              />
+            </Field>
+            <Field>
+              <TextField
+                floatingLabelText="Session ID"
+                floatingLabelStyle={textStyle}
+                value={selected.sessionId}
+                disabled={true}
+              />
+            </Field>
+            <Field>
+              <DatePicker
+                floatingLabelText="Joined On"
+                floatingLabelStyle={textStyle}
+                disabled={true}
+                mode="landscape"
+                value={new Date( selected.createdOn )}
+              />
+            </Field>
+            <Field>
+              <DatePicker
+                floatingLabelText="Last Active"
+                floatingLabelStyle={textStyle}
+                disabled={true}
+                mode="landscape"
+                value={new Date( selected.lastLoggedIn )}
+              />
+            </Field>
+            <EditButtons>
+              <RaisedButton label="Edit" primary={true} />
+            </EditButtons>
+          </Drawer>
+          <Drawer
+            title="Account Settings"
+            onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
+            open={this.state.accountsOpen}
+          >
+          </Drawer>
         </DetailsContainer>
-        <EditButtons>
-          <RaisedButton label="Edit" primary={true} />
-        </EditButtons>
+
       </Properties>
     );
   }
@@ -124,7 +144,6 @@ const ImgContainer = styled.div`
 `;
 
 const EditButtons = styled.div`
-  height: 60px;
   padding: 10px;
   box-sizing: border-box;
   overflow: hidden;
@@ -133,10 +152,8 @@ const EditButtons = styled.div`
 `;
 
 const DetailsContainer = styled.div`
-  height: calc( 100% - (60px + 250px) );
+  height: calc( 100% - 250px);
   overflow: auto;
-  padding: 20px;
-  box-sizing: border-box;
 
   > h3 {
     margin: 0 0 6px 0;
