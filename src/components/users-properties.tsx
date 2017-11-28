@@ -39,6 +39,7 @@ export class UserProperties extends React.Component<Props, State> {
       return <Properties />;
 
     const textStyle: React.CSSProperties = { color: '' };
+    const underlineStyle: React.CSSProperties = { bottom: '4px' };
 
     return (
       <Properties className="mt-user-properties">
@@ -60,35 +61,40 @@ export class UserProperties extends React.Component<Props, State> {
                 floatingLabelStyle={textStyle}
                 value={selected.username}
                 floatingLabelText="Username"
+                underlineStyle={underlineStyle}
               />
             </Field>
             <Field>
               <TextField
+                name="email"
                 floatingLabelText="Email"
                 floatingLabelStyle={textStyle}
                 value={selected.email}
+                underlineStyle={underlineStyle}
               />
             </Field>
             <Field>
               <TextField
+                name="password-tag"
                 floatingLabelText="Password Tag"
                 floatingLabelStyle={textStyle}
                 value={selected.passwordTag}
+                underlineStyle={underlineStyle}
               />
             </Field>
             <Field>
               <TextField
+                name="session-id"
                 floatingLabelText="Session ID"
                 floatingLabelStyle={textStyle}
                 value={selected.sessionId}
-                disabled={true}
+                underlineStyle={underlineStyle}
               />
             </Field>
             <Field>
               <DatePicker
                 floatingLabelText="Joined On"
                 floatingLabelStyle={textStyle}
-                disabled={true}
                 mode="landscape"
                 value={new Date( selected.createdOn )}
               />
@@ -97,13 +103,12 @@ export class UserProperties extends React.Component<Props, State> {
               <DatePicker
                 floatingLabelText="Last Active"
                 floatingLabelStyle={textStyle}
-                disabled={true}
                 mode="landscape"
                 value={new Date( selected.lastLoggedIn )}
               />
             </Field>
             <EditButtons>
-              <RaisedButton label="Edit" primary={true} />
+              <RaisedButton label="Update" primary={true} />
             </EditButtons>
           </Drawer>
           <Drawer
@@ -130,7 +135,6 @@ const Properties = styled.div`
 const Field = styled.div`
 margin: 5px 0;
 > div > label, > div > div > label {
-  font-weight: bold;
   color: ${ theme.light100.softColor };
 }
 `;
@@ -147,8 +151,8 @@ const EditButtons = styled.div`
   padding: 10px;
   box-sizing: border-box;
   overflow: hidden;
-  border-top: 1px solid ${ theme.light100.border };
-  text-align: right;
+  text-align: left;
+  margin: 10px 0 20px 0;
 `;
 
 const DetailsContainer = styled.div`

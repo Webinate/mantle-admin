@@ -26,7 +26,7 @@ export default {
   primaryColorInverted: '',
 
   // Purples
-  primary100: { color: '#fff', softColor: '#eee', background: p100, border: '#ccc' },
+  primary100: { color: '#fff', softColor: '#eee', background: p100, border: '#6d6993' },
   primary200: { color: '#fff', softColor: '#eee', background: p200, border: '#ccc' },
 
   // Reds
@@ -72,7 +72,8 @@ export default {
     shadowColor: '#000'
   },
   datePicker: {
-
+    headerColor: p200,
+    selectColor: p200
   }
 
 } as ThemeInterface;
