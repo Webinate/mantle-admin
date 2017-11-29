@@ -3,8 +3,10 @@ import * as React from 'react';
 import { default as styled } from '../theme/styled';
 
 export interface ISplitPanelProps {
-  first?: () => JSX.Element;
-  second?: () => JSX.Element;
+  first: () => JSX.Element;
+  second: () => JSX.Element;
+  firstOpen?: boolean;
+  secondOpen?: boolean;
   orientation?: 'vertical' | 'horizontal';
   ratio?: number;
   dividerSize?: number;
@@ -28,10 +30,12 @@ interface PanelProps extends React.HTMLProps<HTMLDivElement> {
 */
 export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelState> {
 
-  static defaultProps: ISplitPanelProps = {
+  static defaultProps: Partial<ISplitPanelProps> = {
     orientation: 'vertical',
     ratio: 0.5,
-    dividerSize: 6
+    dividerSize: 6,
+    firstOpen: true,
+    secondOpen: true
   }
 
   private _mouseUpProxy: any;
@@ -58,8 +62,24 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
    * Called when the props are updated
    */
   componentWillReceiveProps( nextProps: ISplitPanelProps ) {
+    let ratio = nextProps.ratio;
+
+    if ( nextProps.firstOpen !== this.props.firstOpen ) {
+      if ( !nextProps.firstOpen )
+        ratio = 0;
+      else
+        ratio = 1;
+    }
+
+    if ( nextProps.secondOpen !== this.props.secondOpen ) {
+      if ( !nextProps.secondOpen )
+        ratio = 1;
+      else
+        ratio = 0;
+    }
+
     this.setState( {
-      ratio: ( nextProps.ratio !== this.props.ratio ? nextProps.ratio : this.state.ratio )
+      ratio: ( ratio !== this.props.ratio ? ratio : this.state.ratio )
     } );
   }
 
@@ -254,6 +274,7 @@ const SplitPanelDivider = styled.div`
 
 const FirstPanel = styled.div`
   overflow:auto;
+  transition: 1s width, 1s height;
   width: ${ ( props: PanelProps ) => props.width };
   height: ${ ( props: PanelProps ) => props.height };
   float: ${ ( props: PanelProps ) => props.isVertical ? 'left' : '' };
@@ -261,6 +282,7 @@ const FirstPanel = styled.div`
 
 const SecondPanel = styled.div`
   overflow:auto;
+  transition: 1s width, 1s height;
   width: ${ ( props: PanelProps ) => props.width };
   height: ${ ( props: PanelProps ) => props.height };
   float: ${ ( props: PanelProps ) => props.isVertical ? 'left' : '' };
