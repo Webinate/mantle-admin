@@ -3,24 +3,26 @@ import * as React from 'react';
 import { default as styled } from '../theme/styled';
 
 export interface ISplitPanelProps {
-  first: () => JSX.Element;
-  second: () => JSX.Element;
-  firstOpen?: boolean;
-  secondOpen?: boolean;
+  first: () => JSX.Element | undefined | null;
+  second: () => JSX.Element | undefined | null;
+  collapsed?: 'none' | 'left' | 'right';
   orientation?: 'vertical' | 'horizontal';
   ratio?: number;
   dividerSize?: number;
   onRatioChanged?: ( ratio: number ) => void;
+  delay?: number;
   style?: React.CSSProperties;
 }
 
 export interface ISplitPanelState {
   ratio?: number;
   dragging?: boolean;
+  animating: boolean;
 }
 
 interface PanelProps extends React.HTMLProps<HTMLDivElement> {
   isVertical: boolean;
+  delay: number;
   width: string;
   height: string;
 }
@@ -34,13 +36,14 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
     orientation: 'vertical',
     ratio: 0.5,
     dividerSize: 6,
-    firstOpen: true,
-    secondOpen: true
+    collapsed: 'none',
+    delay: 1
   }
 
   private _mouseUpProxy: any;
   private _mouseMoveProxy: any;
   private _scrubber: HTMLDivElement | null;
+  private _timer: number;
 
   /**
    * Creates a new instance
@@ -52,9 +55,16 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
     this._mouseMoveProxy = this.onStageMouseMove.bind( this );
     this._scrubber = null;
 
+    let ratio = props.ratio;
+    if ( props.collapsed === 'left' )
+      ratio = 0;
+    else if ( props.collapsed === 'right' )
+      ratio = 1;
+
     this.state = {
       dragging: false,
-      ratio: props.ratio
+      ratio: ratio,
+      animating: false
     };
   }
 
@@ -64,23 +74,26 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
   componentWillReceiveProps( nextProps: ISplitPanelProps ) {
     let ratio = nextProps.ratio;
 
-    if ( nextProps.firstOpen !== this.props.firstOpen ) {
-      if ( !nextProps.firstOpen )
+    if ( nextProps.collapsed !== this.props.collapsed ) {
+      if ( nextProps.collapsed === 'left' )
         ratio = 0;
-      else
+      else if ( nextProps.collapsed === 'right' )
         ratio = 1;
     }
 
-    if ( nextProps.secondOpen !== this.props.secondOpen ) {
-      if ( !nextProps.secondOpen )
-        ratio = 1;
-      else
-        ratio = 0;
-    }
+    if ( ratio !== this.state.ratio ) {
 
-    this.setState( {
-      ratio: ( ratio !== this.props.ratio ? ratio : this.state.ratio )
-    } );
+      if ( this._timer )
+        window.clearTimeout( this._timer );
+
+      if ( this.props.delay )
+        this._timer = setTimeout( () => this.setState( { animating: false } ) );
+
+      this.setState( {
+        ratio: ratio,
+        animating: this.props.delay ? true : false
+      } );
+    }
   }
 
   /**
@@ -98,7 +111,7 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
     // Calculate ratios etc...
     if ( orientation === 'vertical' ) {
       panel1Style = {
-        width: `calc(${ ratio * 100 }% - ${ dividerSizeHalf }px)`,
+        width: `calc( ${ ratio * 100 }% - ${ dividerSizeHalf }px) `,
         height: '100%'
       };
       dividerStyle = {
@@ -106,13 +119,13 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
         height: '100%'
       };
       panel2Style = {
-        width: `calc(${ ( 1 - ratio ) * 100 }% - ${ dividerSizeHalf }px)`,
+        width: `calc( ${ ( 1 - ratio ) * 100 }% - ${ dividerSizeHalf }px)`,
         height: '100%'
       };
     }
     else {
       panel1Style = {
-        height: `calc(${ ratio * 100 }% - ${ dividerSizeHalf }px)`,
+        height: `calc( ${ ratio * 100 }% - ${ dividerSizeHalf }px) `,
         width: '100%'
       };
       dividerStyle = {
@@ -120,7 +133,7 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
         width: '100%'
       };
       panel2Style = {
-        height: `calc(${ ( 1 - ratio ) * 100 }% - ${ dividerSizeHalf }px)`,
+        height: `calc( ${ ( 1 - ratio ) * 100 }% - ${ dividerSizeHalf }px) `,
         width: '100%'
       };
     }
@@ -132,6 +145,7 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
     return <SplitPanelOuter style={this.props.style}>
       <FirstPanel
         style={panel1Style}
+        delay={this.props.delay!}
         isVertical={isVertical}
         width={panel1Style.width}
         height={panel1Style.height}
@@ -141,6 +155,7 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
       </FirstPanel>
       <SplitPanelDivider
         width={dividerStyle.width}
+        delay={this.props.delay!}
         height={dividerStyle.height}
         isVertical={isVertical}
         onMouseDown={( e ) => { this.onDividerMouseDown( e ) }}
@@ -151,15 +166,19 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
         style={{
           display: ( !this.state.dragging ? 'none' : '' )
         }} />
-      <SecondPanel
-        style={panel2Style}
-        isVertical={isVertical}
-        width={panel2Style.width}
-        height={panel2Style.height}
-      >
-        {this.state.dragging ? <PanelInput /> : null}
-        {second}
-      </SecondPanel>
+      {this.state.animating || this.state.ratio !== 1 ?
+        <SecondPanel
+          style={panel2Style}
+          delay={this.props.delay!}
+          isVertical={isVertical}
+          width={panel2Style.width}
+          height={panel2Style.height}
+        >
+          {this.state.dragging ? <PanelInput /> : null}
+          {second}
+        </SecondPanel> : undefined
+      }
+
       <div className="fix"></div>
     </SplitPanelOuter>
   }
@@ -178,8 +197,8 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
 
     scrubber.style.height = ( isVertical ? '100%' : this.props.dividerSize + 'px' );
     scrubber.style.width = ( isVertical ? this.props.dividerSize + 'px' : '100%' );
-    scrubber.style.left = ( isVertical ? `calc(${ ratio * 100 }% - ${ dividerSizeHalf }px)` : `0` );
-    scrubber.style.top = ( isVertical ? `0` : `calc(${ ratio * 100 }% - ${ dividerSizeHalf }px)` );
+    scrubber.style.left = ( isVertical ? `calc( ${ ratio * 100 }% - ${ dividerSizeHalf }px) ` : `0` );
+    scrubber.style.top = ( isVertical ? `0` : `calc( ${ ratio * 100 }% - ${ dividerSizeHalf }px) ` );
 
     window.addEventListener( 'mouseup', this._mouseUpProxy );
     document.body.addEventListener( 'mousemove', this._mouseMoveProxy );
@@ -258,45 +277,46 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
 }
 
 const SplitPanelOuter = styled.div`
-  position:relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+position: relative;
+width: 100%;
+height: 100%;
+overflow: hidden;
+white-space: nowrap;
 `;
 
 const SplitPanelDivider = styled.div`
-  cursor:pointer;
-  width: ${ ( props: PanelProps ) => props.width };
-  height: ${ ( props: PanelProps ) => props.height };
-  float: ${ ( props: PanelProps ) => props.isVertical ? 'left' : '' };
-  background: red;
+cursor: pointer;
+width: ${ ( props: PanelProps ) => props.width };
+height: ${ ( props: PanelProps ) => props.height };
+ ${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };
+background: red;
 `;
 
 const FirstPanel = styled.div`
-  overflow:auto;
-  transition: 1s width, 1s height;
-  width: ${ ( props: PanelProps ) => props.width };
-  height: ${ ( props: PanelProps ) => props.height };
-  float: ${ ( props: PanelProps ) => props.isVertical ? 'left' : '' };
+overflow: auto;
+transition: ${ ( props: PanelProps ) => props.delay ? `${ props.delay }s width, ${ props.delay }s height;` : '' }
+width: ${ ( props: PanelProps ) => props.width };
+height: ${ ( props: PanelProps ) => props.height };
+${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };
 `;
 
 const SecondPanel = styled.div`
-  overflow:auto;
-  transition: 1s width, 1s height;
-  width: ${ ( props: PanelProps ) => props.width };
-  height: ${ ( props: PanelProps ) => props.height };
-  float: ${ ( props: PanelProps ) => props.isVertical ? 'left' : '' };
+overflow: auto;
+transition: ${ ( props: PanelProps ) => props.delay ? `${ props.delay }s width, ${ props.delay }s height;` : '' }
+width: ${ ( props: PanelProps ) => props.width };
+height: ${ ( props: PanelProps ) => props.height };
+${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };
 `;
 
 const PanelInput = styled.div`
-  width:100%;
-  height:100%;
-  z-index:2;
-  position: absolute;
+width: 100%;
+height: 100%;
+z-index:2;
+position: absolute;
 `;
 
 const SplitPanelDividerDragging = styled.div`
-  position:absolute;
-  background-color: rgba( 102, 165, 237, 0.5 );
-  cursor:pointer;
+position: absolute;
+background-color: rgba( 102, 165, 237, 0.5 );
+cursor: pointer;
 `;

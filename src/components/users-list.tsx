@@ -16,7 +16,7 @@ interface SCompProps extends React.HTMLProps<HTMLDivElement> {
   selected: boolean;
 }
 
-export class UsersList extends React.PureComponent<Props, any> {
+export class UsersList extends React.Component<Props, any> {
   render() {
     const selectedUsers = this.props.selected;
     let selected = false;

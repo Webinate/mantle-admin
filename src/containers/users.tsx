@@ -6,8 +6,8 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
-import { Stage } from '../components/stage';
 import { UserProperties } from '../components/users-properties';
+import { SplitPanel } from '../components/split-panel';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -76,35 +76,35 @@ export class Users extends React.Component<Partial<Props>, State> {
     return (
       <div style={{ height: '100%' }}>
         <ContentHeader title="Users" />
-        <Stage
-          rightOpen={selected ? true : false}
-          leftOpen={false}
-          rightSize={35}
+        <SplitPanel
+          collapsed={selected ? 'none' : 'right'}
+          ratio={0.7}
           style={{ height: 'calc(100% - 100px)' }}
-          rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
-          renderRight={() => <UserProperties
+          // rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
+          first={() => {
+            return page ?
+              <Pager
+                limit={page.limit}
+                onPage={index => this.props.getUsers!( index )}
+                offset={page.index}
+                total={page.count}
+                contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
+                }
+              >
+                <UsersList
+                  users={page.data}
+                  selected={this.state.selectedUsers}
+                  onUserSelected={( user, e ) => this.onUserSelected( user, e )}
+                />
+              </Pager>
+              : undefined
+          }}
+          second={() => <UserProperties
             selectedIndex={page && selected ? page.data.indexOf( selected ) : -1}
             users={page ? page.data : null}
           />
           }
-        >
-          {page ?
-            <Pager
-              limit={page.limit}
-              onPage={index => this.props.getUsers!( index )}
-              offset={page.index}
-              total={page.count}
-              contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
-              }
-            >
-              <UsersList
-                users={page.data}
-                selected={this.state.selectedUsers}
-                onUserSelected={( user, e ) => this.onUserSelected( user, e )}
-              />
-            </Pager>
-            : undefined}
-        </Stage>
+        />
       </div >
     );
   }
