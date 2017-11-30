@@ -12,6 +12,9 @@ export interface ISplitPanelProps {
   onRatioChanged?: ( ratio: number ) => void;
   delay?: number;
   style?: React.CSSProperties;
+  resizable?: boolean;
+  leftStyle?: React.CSSProperties;
+  rightStyle?: React.CSSProperties;
 }
 
 export interface ISplitPanelState {
@@ -25,6 +28,7 @@ interface PanelProps extends React.HTMLProps<HTMLDivElement> {
   delay: number;
   width: string;
   height: string;
+  resizable?: boolean;
 }
 
 /**
@@ -37,7 +41,8 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
     ratio: 0.5,
     dividerSize: 6,
     collapsed: 'none',
-    delay: 1
+    delay: 0.5,
+    resizable: true
   }
 
   private _mouseUpProxy: any;
@@ -101,8 +106,8 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
    */
   render(): JSX.Element {
     let orientation = this.props.orientation;
-    let panel1Style: { width: string; height: string; };
-    let panel2Style: { width: string; height: string; };
+    let panel1Style: React.CSSProperties;
+    let panel2Style: React.CSSProperties;
     let dividerStyle: { width: string; height: string; };
     let dividerSize = this.props.dividerSize!;
     let dividerSizeHalf = dividerSize * 0.5;
@@ -110,32 +115,32 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
 
     // Calculate ratios etc...
     if ( orientation === 'vertical' ) {
-      panel1Style = {
+      panel1Style = Object.assign( {}, this.props.leftStyle, {
         width: `calc( ${ ratio * 100 }% - ${ dividerSizeHalf }px) `,
         height: '100%'
-      };
+      } );
       dividerStyle = {
         width: dividerSize + 'px',
         height: '100%'
       };
-      panel2Style = {
+      panel2Style = Object.assign( {}, this.props.rightStyle, {
         width: `calc( ${ ( 1 - ratio ) * 100 }% - ${ dividerSizeHalf }px)`,
         height: '100%'
-      };
+      } );
     }
     else {
-      panel1Style = {
+      panel1Style = Object.assign( {}, this.props.leftStyle, {
         height: `calc( ${ ratio * 100 }% - ${ dividerSizeHalf }px) `,
         width: '100%'
-      };
+      } );
       dividerStyle = {
         height: dividerSize + 'px',
         width: '100%'
       };
-      panel2Style = {
+      panel2Style = Object.assign( {}, this.props.rightStyle, {
         height: `calc( ${ ( 1 - ratio ) * 100 }% - ${ dividerSizeHalf }px) `,
         width: '100%'
-      };
+      } );
     }
 
     const first = this.props.first ? this.props.first() : null;
@@ -143,29 +148,34 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
     const isVertical = orientation === 'vertical' ? true : false;
 
     return <SplitPanelOuter style={this.props.style}>
-      <FirstPanel
-        style={panel1Style}
-        delay={this.props.delay!}
-        isVertical={isVertical}
-        width={panel1Style.width}
-        height={panel1Style.height}
-      >
-        {this.state.dragging ? <PanelInput /> : null}
-        {first}
-      </FirstPanel>
+      {this.state.animating || this.state.ratio !== 0 ?
+        <FirstPanel
+          style={panel1Style}
+          delay={this.props.delay!}
+          isVertical={isVertical}
+          width={panel1Style.width}
+          height={panel1Style.height}
+        >
+          {this.state.dragging ? <PanelInput /> : null}
+          {first}
+        </FirstPanel> : undefined
+      }
       <SplitPanelDivider
         width={dividerStyle.width}
         delay={this.props.delay!}
         height={dividerStyle.height}
         isVertical={isVertical}
-        onMouseDown={( e ) => { this.onDividerMouseDown( e ) }}
+        resizable={this.props.resizable}
+        onMouseDown={this.props.resizable ? ( e ) => { this.onDividerMouseDown( e ) } : undefined}
         style={dividerStyle}
       />
-      <SplitPanelDividerDragging
-        innerRef={elm => this._scrubber = elm}
-        style={{
-          display: ( !this.state.dragging ? 'none' : '' )
-        }} />
+      {this.props.resizable ?
+        <SplitPanelDividerDragging
+          innerRef={elm => this._scrubber = elm}
+          style={{
+            display: ( !this.state.dragging ? 'none' : '' )
+          }} /> : undefined
+      }
       {this.state.animating || this.state.ratio !== 1 ?
         <SecondPanel
           style={panel2Style}
@@ -285,11 +295,11 @@ white-space: nowrap;
 `;
 
 const SplitPanelDivider = styled.div`
-cursor: pointer;
+cursor: ${ ( props: PanelProps ) => props.resizable ? 'pointer' : '' };
 width: ${ ( props: PanelProps ) => props.width };
 height: ${ ( props: PanelProps ) => props.height };
  ${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };
-background: red;
+background: transparent;
 `;
 
 const FirstPanel = styled.div`
@@ -319,4 +329,5 @@ const SplitPanelDividerDragging = styled.div`
 position: absolute;
 background-color: rgba( 102, 165, 237, 0.5 );
 cursor: pointer;
+z-index: 1;
 `;

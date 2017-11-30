@@ -118,9 +118,15 @@ export class UserProperties extends React.Component<Props, State> {
             onHeaderClick={() => this.setState( { removeOpen: !this.state.removeOpen } )}
             open={this.state.removeOpen}
           >
-            <strong>
+            <div className="mt-warning-message">
               Are you absolutely sure you want to remove this account - this is irreversible?
-            </strong>
+              <br />
+              <RaisedButton
+                backgroundColor='rgba(255, 0, 0, 1)'
+                labelColor='rgba(255, 255, 255, 1)'
+                label="Delete Account"
+              />
+            </div>
           </Drawer>
         </DetailsContainer>
 
@@ -135,9 +141,17 @@ const Properties = styled.div`
   position: relative;
   box-sizing: border-box;
   background: ${theme.light100.background };
+  white-space: normal;
 
-  strong {
+  .mt-warning-message {
+    text-align: center;
     margin: 20px 0;
+    color: red;
+    font-weight: bold;
+
+    > div {
+      margin: 10px 0;
+    }
   }
 `;
 
@@ -153,10 +167,6 @@ margin: 20px 5px;
 clear: both;
 overflow: hidden;
 box-sizing: border-box;
-
-button {
-  min-width: 200px;
-}
 
 > div {
   overflow: hidden;

@@ -80,7 +80,7 @@ export class Users extends React.Component<Partial<Props>, State> {
           collapsed={selected ? 'none' : 'right'}
           ratio={0.7}
           style={{ height: 'calc(100% - 100px)' }}
-          // rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
+          rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
           first={() => {
             return page ?
               <Pager
