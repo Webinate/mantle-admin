@@ -10,6 +10,7 @@ type Props = {
   activeUser: IUserEntry;
   users: IUserEntry[] | null;
   selectedIndex: number | null;
+  resetPasswordRequest( username: string ): void;
 };
 
 type State = {
@@ -46,6 +47,7 @@ export class UserProperties extends React.Component<Props, State> {
 
     return (
       <Properties className="mt-user-properties">
+
         <ImgContainer>
           <Avatar
             src={generateAvatarPic( selectedIndex )}
@@ -104,6 +106,7 @@ export class UserProperties extends React.Component<Props, State> {
                 <div className="mt-inline-label">Send password reset request</div>
                 <div className="mt-inline-input">
                   <IconButton
+                    onClick={() => this.props.resetPasswordRequest( selected.username )}
                     iconStyle={{ color: theme.primary200.background }}
                     tooltipPosition="top-left"
                     iconClassName="icon icon-mark-unread"

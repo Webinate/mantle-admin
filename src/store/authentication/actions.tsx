@@ -15,6 +15,7 @@ export const ActionCreators = {
 // Action Types
 export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 
+
 export function login( authToken: AuthTokens.Login.Body ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.isAuthenticating.create( true ) );

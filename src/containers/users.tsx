@@ -2,22 +2,26 @@ import * as React from 'react';
 import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import { getUsers } from '../store/users/actions';
+import { resetPassword } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
 import { UserProperties } from '../components/users-properties';
 import { SplitPanel } from '../components/split-panel';
+import { Snackbar } from 'material-ui';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   userState: state.users,
-  auth: state.authentication
+  auth: state.authentication,
+  admin: state.admin
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  getUsers: getUsers
+  getUsers: getUsers,
+  resetPassword: resetPassword
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -101,11 +105,17 @@ export class Users extends React.Component<Partial<Props>, State> {
               : undefined
           }}
           second={() => <UserProperties
+            resetPasswordRequest={username => { this.props.resetPassword!( username ) }}
             activeUser={this.props.auth!.user!}
             selectedIndex={page && selected ? page.data.indexOf( selected ) : -1}
             users={page ? page.data : null}
           />
           }
+        />
+        <Snackbar
+          open={this.props.admin!.response || this.props.admin!.error ? true : false}
+          autoHideDuration={6000}
+          message={this.props.admin!.response || this.props.admin!.error}
         />
       </div >
     );
