@@ -33,6 +33,10 @@ export default {
   secondary100: { color: '#fff', softColor: '#eee', background: s100, border: '#835151' },
   secondary200: { color: '#fff', softColor: '#eee', background: s200, border: '#ccc' },
 
+  // Warnings & Errors
+  error: { color: '#fff', softColor: '#fff', background: '#ce3131', border: '#ad2828' },
+  warning: { color: '#ca7f30', softColor: '#ca7f30', background: '#fcbe7d', border: '#dfa76d' },
+
   // Light
   light100: { color: '#333', softColor: '#ccc', background: l100, border: '#ddd' },
   light200: { color: '#333', softColor: '#aaa', background: l200, border: '#ddd' },
@@ -51,6 +55,12 @@ export default {
     desktopDrawerMenuItemHeight: 48,
     desktopSubheaderHeight: 48,
     desktopToolbarHeight: 56,
+  },
+  svgIcon: {
+    color: p200
+  },
+  icon: {
+    color: p200
   },
   fontFamily: 'Roboto, sans-serif',
   borderRadius: 2,

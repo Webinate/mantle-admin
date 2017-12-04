@@ -18,6 +18,11 @@ function buildStatics() {
 };
 
 function generateFonts( callback ) {
+  const files = [];
+  fs.readdirSync( './fonts' ).forEach( file => {
+    files.push( './fonts/' + file );
+  } )
+
   webfontsGenerator( {
     fontName: 'mantle',
     cssFontsUrl: '../fonts/',
@@ -26,22 +31,7 @@ function generateFonts( callback ) {
     html: false,
     types: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
     order: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
-    files: [
-      './fonts/location.svg',
-      './fonts/tag.svg',
-      './fonts/arrow-down.svg',
-      './fonts/arrow-left.svg',
-      './fonts/arrow-right.svg',
-      './fonts/arrow-up.svg',
-      './fonts/exit.svg',
-      './fonts/expand-less.svg',
-      './fonts/expand-more.svg',
-      './fonts/group-add.svg',
-      './fonts/home.svg',
-      './fonts/key.svg',
-      './fonts/mantle.svg',
-      './fonts/people.svg'
-    ],
+    files: files,
     dest: './dist/client/fonts/',
   }, function( error ) {
     if ( error ) {
