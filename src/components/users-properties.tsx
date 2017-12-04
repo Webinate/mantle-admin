@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, TextField, DatePicker, RaisedButton } from 'material-ui';
+import { Avatar, TextField, DatePicker, RaisedButton, IconButton } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
@@ -101,14 +101,24 @@ export class UserProperties extends React.Component<Props, State> {
             <InlineField>
               <div className="mt-inline-label">Send password reset request</div>
               <div className="mt-inline-input">
-                <RaisedButton label="Send Reset" primary={true} />
+                <IconButton
+                  iconStyle={{ color: theme.primary200.background }}
+                  tooltipPosition="top-left"
+                  iconClassName="icon icon-mail"
+                  tooltip="Email user"
+                />
               </div>
             </InlineField>
 
             <InlineField>
               <div className="mt-inline-label">Send activation email</div>
               <div className="mt-inline-input">
-                <RaisedButton label="Send Activation" primary={true} />
+                <IconButton
+                  iconStyle={{ color: theme.primary200.background }}
+                  tooltipPosition="top-left"
+                  iconClassName="icon icon-mail"
+                  tooltip="Email user"
+                />
               </div>
             </InlineField>
           </Drawer>
@@ -122,8 +132,8 @@ export class UserProperties extends React.Component<Props, State> {
               Are you absolutely sure you want to remove this account - this is irreversible?
               <br />
               <RaisedButton
-                backgroundColor='rgba(255, 0, 0, 1)'
-                labelColor='rgba(255, 255, 255, 1)'
+                backgroundColor={theme.error.background}
+                labelColor={theme.error.color}
                 label="Delete Account"
               />
             </div>
@@ -146,7 +156,7 @@ const Properties = styled.div`
   .mt-warning-message {
     text-align: center;
     margin: 20px 0;
-    color: red;
+    color: ${theme.error.background };
     font-weight: bold;
 
     > div {
@@ -165,11 +175,9 @@ margin: 5px 0;
 const InlineField = styled.div`
 margin: 20px 5px;
 clear: both;
-overflow: hidden;
 box-sizing: border-box;
 
 > div {
-  overflow: hidden;
   width: 50%;
   float: left;
 }
