@@ -11,7 +11,8 @@ import { SplitPanel } from '../components/split-panel';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
-  userState: state.users
+  userState: state.users,
+  auth: state.authentication
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -100,6 +101,7 @@ export class Users extends React.Component<Partial<Props>, State> {
               : undefined
           }}
           second={() => <UserProperties
+            activeUser={this.props.auth!.user!}
             selectedIndex={page && selected ? page.data.indexOf( selected ) : -1}
             users={page ? page.data : null}
           />

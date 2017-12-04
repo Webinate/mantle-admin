@@ -7,6 +7,7 @@ import { generateAvatarPic } from '../utils/component-utils';
 import { Drawer } from './drawer';
 
 type Props = {
+  activeUser: IUserEntry;
   users: IUserEntry[] | null;
   selectedIndex: number | null;
 };
@@ -93,36 +94,52 @@ export class UserProperties extends React.Component<Props, State> {
             </Field>
           </Drawer>
 
-          <Drawer
-            title="Account Settings"
-            onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
-            open={this.state.accountsOpen}
-          >
-            <InlineField>
-              <div className="mt-inline-label">Send password reset request</div>
-              <div className="mt-inline-input">
-                <IconButton
-                  iconStyle={{ color: theme.primary200.background }}
-                  tooltipPosition="top-left"
-                  iconClassName="icon icon-mail"
-                  tooltip="Email user"
-                />
-              </div>
-            </InlineField>
+          {this.props.activeUser.privileges < 2 ?
+            <Drawer
+              title="Account Settings"
+              onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
+              open={this.state.accountsOpen}
+            >
+              <InlineField>
+                <div className="mt-inline-label">Send password reset request</div>
+                <div className="mt-inline-input">
+                  <IconButton
+                    iconStyle={{ color: theme.primary200.background }}
+                    tooltipPosition="top-left"
+                    iconClassName="icon icon-mark-unread"
+                    tooltip="Email user"
+                  />
+                </div>
+              </InlineField>
 
-            <InlineField>
-              <div className="mt-inline-label">Send activation email</div>
-              <div className="mt-inline-input">
-                <IconButton
-                  iconStyle={{ color: theme.primary200.background }}
-                  tooltipPosition="top-left"
-                  iconClassName="icon icon-mail"
-                  tooltip="Email user"
-                />
-              </div>
-            </InlineField>
-          </Drawer>
+              {selected.registerKey != '' && this.props.activeUser.privileges < 2 ?
+                <InlineField>
+                  <div className="mt-inline-label">Resend activation email</div>
+                  <div className="mt-inline-input">
+                    <IconButton
+                      iconStyle={{ color: theme.primary200.background }}
+                      tooltipPosition="top-left"
+                      iconClassName="icon icon-mark-unread"
+                      tooltip="Email user"
+                    />
+                  </div>
+                </InlineField> : undefined}
 
+              {selected.registerKey != '' && this.props.activeUser.privileges < 2 ?
+                <InlineField>
+                  <div className="mt-inline-label">Activate Account</div>
+                  <div className="mt-inline-input">
+                    <IconButton
+                      iconStyle={{ color: theme.primary200.background }}
+                      tooltipPosition="top-left"
+                      iconClassName="icon icon-done"
+                      tooltip="Email user"
+                    />
+                  </div>
+                </InlineField> : undefined}
+
+            </Drawer>
+            : undefined}
           <Drawer
             title="Remove Account"
             onHeaderClick={() => this.setState( { removeOpen: !this.state.removeOpen } )}
@@ -167,19 +184,23 @@ const Properties = styled.div`
 
 const Field = styled.div`
 margin: 5px 0;
+&:last-child {
+  margin-bottom: 20px;
+}
 > div > label, > div > div > label {
   color: ${ theme.light100.softColor };
 }
 `;
 
 const InlineField = styled.div`
-margin: 20px 5px;
-clear: both;
+margin: 15px 5px;
 box-sizing: border-box;
+display: table;
+white-space: normal;
 
 > div {
   width: 50%;
-  float: left;
+  display: table-cell;
 }
 .mt-inline-input { text-align: right; }
 `;

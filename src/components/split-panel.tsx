@@ -84,15 +84,16 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
         ratio = 0;
       else if ( nextProps.collapsed === 'right' )
         ratio = 1;
-    }
 
-    if ( ratio !== this.state.ratio ) {
+
+      // if ( ratio !== this.state.ratio && nextProps.collapsed === 'none' ) {
 
       if ( this._timer )
         window.clearTimeout( this._timer );
 
       if ( this.props.delay )
-        this._timer = setTimeout( () => this.setState( { animating: false } ) );
+        this._timer = window.setTimeout( () => this.setState( { animating: false } ),
+          this.props.delay * 1000 );
 
       this.setState( {
         ratio: ratio,
