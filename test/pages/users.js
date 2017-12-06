@@ -3,7 +3,8 @@ const Page = require( './page' );
 class UsersPage extends Page {
   constructor() {
     super();
-    this.$username = '.mt-username';
+    this.$filter = '.users-filter';
+    this.$filterSearch = 'button[name=users-search-button]';
   }
 
   async load( agent ) {
@@ -14,13 +15,29 @@ class UsersPage extends Page {
   }
 
   /**
-   * Gets or sets the username value
+   * Gets or sets the user filter value
    * @param {string} val
    * @returns {Promise<string>}
    */
-  username( val ) {
-    return super.textfield( this.$username, val )
+  filter( val ) {
+    return super.textfield( this.$filter, val )
   }
+
+  /**
+   * Waits for the auth page to not be in a busy state
+   */
+  doneLoading() { return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' ); }
+
+  getUserFromList( index ) {
+    return this.page.$eval( `.mt-user-list > div:nth-child(${ index + 1 })`, elm => {
+      return {
+        username: elm.querySelector( '.mt-user-name' ).textContent,
+        email: elm.querySelector( '.mt-user-email' ).textContent
+      }
+    } );
+  }
+
+  clickFilterBtn() { return this.page.click( this.$filterSearch ); }
 }
 
 module.exports = UsersPage;

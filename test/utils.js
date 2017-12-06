@@ -47,6 +47,7 @@ async function createAgent( user, email, password ) {
   const agent = new Agent( getHost(), null, user, password, email );
   let resp;
 
+  resp = await exports.admin.delete( '/api/users/' + user );
   resp = await exports.admin.post( '/api/users', { username: user, password: password, email: email } );
 
   if ( resp.status >= 400 && resp.status <= 500 )

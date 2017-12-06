@@ -87,6 +87,7 @@ export class Users extends React.Component<Partial<Props>, State> {
           renderFilters={() => {
             return <div>
               <TextField
+                className="users-filter"
                 hintText="Filter username or email"
                 value={this.state.userFilter}
                 onKeyDown={e => {
@@ -96,6 +97,7 @@ export class Users extends React.Component<Partial<Props>, State> {
                 onChange={( e, text ) => this.setState( { userFilter: text } )}
               />
               <IconButton
+                name="users-search-button"
                 onClick={e => this.props.getUsers!( 0, this.state.userFilter )}
                 style={{ verticalAlign: 'top' }}
                 iconStyle={{ color: theme.primary200.background }}
@@ -119,7 +121,7 @@ export class Users extends React.Component<Partial<Props>, State> {
                 contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
                 }
               >
-                {isBusy ? <LinearProgress /> : undefined}
+                {isBusy ? <div className="mt-loading"><LinearProgress /></div> : undefined}
                 <UsersList
                   users={page.data}
                   selected={this.state.selectedUsers}
@@ -139,7 +141,7 @@ export class Users extends React.Component<Partial<Props>, State> {
         <Snackbar
           open={this.props.admin!.response || this.props.admin!.error ? true : false}
           autoHideDuration={6000}
-          message={this.props.admin!.response || this.props.admin!.error}
+          message={this.props.admin!.response || this.props.admin!.error || ''}
         />
       </div >
     );
