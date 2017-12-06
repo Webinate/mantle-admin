@@ -14,6 +14,15 @@ class Page {
     this.config = utils.config;
   }
 
+  async setAgent( agent ) {
+    await this.page.setCookie( {
+      name: 'SID',
+      value: agent.getSID(),
+      path: '/',
+      httpOnly: true
+    } );
+  }
+
   /**
    * Go to a given ulr
    * @param {string} path The url to direct the page to
