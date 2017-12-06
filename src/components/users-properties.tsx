@@ -115,7 +115,7 @@ export class UserProperties extends React.Component<Props, State> {
                 </div>
               </InlineField>
 
-              {selected.registerKey != '' && this.props.activeUser.privileges < 2 ?
+              {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
                 <InlineField>
                   <div className="mt-inline-label">Resend activation email</div>
                   <div className="mt-inline-input">
@@ -128,7 +128,7 @@ export class UserProperties extends React.Component<Props, State> {
                   </div>
                 </InlineField> : undefined}
 
-              {selected.registerKey != '' && this.props.activeUser.privileges < 2 ?
+              {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
                 <InlineField>
                   <div className="mt-inline-label">Activate Account</div>
                   <div className="mt-inline-input">

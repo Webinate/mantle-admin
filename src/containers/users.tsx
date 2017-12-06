@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
+import theme from '../theme/mui-theme';
 import { getUsers } from '../store/users/actions';
 import { resetPassword } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
@@ -9,7 +10,7 @@ import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
 import { UserProperties } from '../components/users-properties';
 import { SplitPanel } from '../components/split-panel';
-import { Snackbar } from 'material-ui';
+import { Snackbar, TextField, IconButton, LinearProgress } from 'material-ui';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -28,6 +29,7 @@ const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   selectedUsers: IUserEntry[];
+  userFilter: string;
 };
 
 /**
@@ -39,7 +41,8 @@ export class Users extends React.Component<Partial<Props>, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      selectedUsers: []
+      selectedUsers: [],
+      userFilter: ''
     }
   }
 
@@ -74,17 +77,37 @@ export class Users extends React.Component<Partial<Props>, State> {
 
   render() {
     const page = ( typeof ( this.props.userState!.userPage! ) === 'string' ? null : this.props.userState!.userPage! as UserTokens.GetAll.Response );
-
+    const isBusy = this.props.userState!.busy;
     const selected = this.state.selectedUsers.length > 0 ?
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
 
     return (
       <div style={{ height: '100%' }}>
-        <ContentHeader title="Users" />
+        <ContentHeader title="Users"
+          renderFilters={() => {
+            return <div>
+              <TextField
+                hintText="Filter username or email"
+                value={this.state.userFilter}
+                onKeyDown={e => {
+                  if ( e.keyCode === 13 )
+                    this.props.getUsers!( 0, this.state.userFilter )
+                }}
+                onChange={( e, text ) => this.setState( { userFilter: text } )}
+              />
+              <IconButton
+                onClick={e => this.props.getUsers!( 0, this.state.userFilter )}
+                style={{ verticalAlign: 'top' }}
+                iconStyle={{ color: theme.primary200.background }}
+                iconClassName="icon icon-search"
+              />
+            </div>
+          }}>
+        </ContentHeader>
         <SplitPanel
           collapsed={selected ? 'none' : 'right'}
           ratio={0.7}
-          style={{ height: 'calc(100% - 100px)' }}
+          style={{ height: 'calc(100% - 50px)' }}
           rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
           first={() => {
             return page ?
@@ -96,6 +119,7 @@ export class Users extends React.Component<Partial<Props>, State> {
                 contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
                 }
               >
+                {isBusy ? <LinearProgress /> : undefined}
                 <UsersList
                   users={page.data}
                   selected={this.state.selectedUsers}

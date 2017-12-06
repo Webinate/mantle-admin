@@ -3,25 +3,41 @@ import { default as styled } from '../theme/styled';
 
 type Props = {
   title: string;
+  renderFilters?: () => JSX.Element | undefined | null;
   style?: React.CSSProperties;
-  renderSubHeader?: () => JSX.Element;
+  subPanelStyle?: React.CSSProperties;
+  showSub?: boolean;
 }
 
 export class ContentHeader extends React.Component<Props, any> {
+  static defaultProps: Partial<Props> = {
+    showSub: false
+  }
 
   constructor( props: Props ) {
     super( props );
   }
 
   render() {
+    const showSub = this.props.showSub;
+
     return (
       <Container style={this.props.style} className="mt-content-header">
         <Header>
-          <h2>{this.props.title}</h2>
+          <div>
+            <h2>{this.props.title}</h2>
+          </div>
+          <div>
+            {this.props.renderFilters && this.props.renderFilters()}
+          </div>
         </Header>
-        <SubHeader>
-          {this.props.renderSubHeader ? this.props.renderSubHeader() : undefined}
-        </SubHeader>
+        {
+          showSub ?
+            <div style={this.props.subPanelStyle}>
+              {this.props.children}
+            </div> : undefined
+        }
+
       </Container>
     )
   }
@@ -33,7 +49,7 @@ const Container = styled.div`
   overflow: hidden;
   position: relative;
   background: #fff;
-  height: 100px;
+  height: 50px;
   position: relative;
   z-index: 1;
 `;
@@ -41,8 +57,16 @@ const Container = styled.div`
 const Header = styled.div`
   overflow: hidden;
   padding: 0 20px;
-`;
+  display: table;
+  width: 100%;
+  box-sizing: border-box;
 
-const SubHeader = styled.div`
-  height: 50px;
+  > div {
+    display: table-cell;
+    width: 50%;
+    box-sizing: border-box;
+  }
+  > div:last-child {
+    text-align: right;
+  }
 `;

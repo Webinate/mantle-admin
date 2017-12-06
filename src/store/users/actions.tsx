@@ -15,10 +15,11 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 /**
  * Refreshes the user state
  */
-export function getUsers( index: number = 0 ) {
+export function getUsers( index: number = 0, search?: string ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetUsersBusy.create( true ) );
-    const resp = await getJson<UserTokens.GetAll.Response>( `${ apiUrl }/users?index=${ index }` );
+    const resp = await getJson<UserTokens.GetAll.Response>(
+      `${ apiUrl }/users?index=${ index }${ search && search !== '' ? `&search=${ search }` : '' }` );
     dispatch( ActionCreators.SetUsers.create( resp ) );
   }
 }
