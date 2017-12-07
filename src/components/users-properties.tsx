@@ -62,7 +62,7 @@ export class UserProperties extends React.Component<Props, State> {
           >
             <Field>
               <TextField
-                name="username"
+                className="mt-props-username"
                 floatingLabelStyle={textStyle}
                 value={selected.username}
                 floatingLabelText="Username"
@@ -71,7 +71,7 @@ export class UserProperties extends React.Component<Props, State> {
             </Field>
             <Field>
               <TextField
-                name="email"
+                className="mt-props-email"
                 floatingLabelText="Email"
                 floatingLabelStyle={textStyle}
                 value={selected.email}

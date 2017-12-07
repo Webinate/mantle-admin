@@ -14,6 +14,7 @@ describe( 'Initialize Server', function() {
 
   // Initialize the server
   before( async function() {
+    this.timeout( 20000 );
     await startup.initialize();
     await utils.initialize();
   } )

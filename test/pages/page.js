@@ -19,6 +19,7 @@ class Page {
       name: 'SID',
       value: agent.getSID(),
       path: '/',
+      url: utils.getHost(),
       httpOnly: true
     } );
   }
@@ -101,6 +102,7 @@ class Page {
   }
 
   $( selector ) { return this.page.$( selector ) }
+  $$( selector ) { return this.page.$$( selector ) }
   waitFor( selector ) { return this.page.waitFor( selector ) }
 }
 

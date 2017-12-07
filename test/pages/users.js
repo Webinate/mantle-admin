@@ -28,12 +28,45 @@ class UsersPage extends Page {
    */
   doneLoading() { return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' ); }
 
+  /**
+   * Gets a user element by email
+   * @param {string} email The email of the user to select
+   */
+  async getUserByEmail( email ) {
+    const users = await this.page.$$( `.mt-user-list > div` );
+    for ( const user of users ) {
+      const text = await user.evaluate( elm => elm.querySelector( '.mt-user-email' ).textContent );
+      if ( text === email )
+        return user;
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets a user object { username: string; email: string; } from the user list by index
+   * @param {number} index The index of the user to examine
+   */
   getUserFromList( index ) {
     return this.page.$eval( `.mt-user-list > div:nth-child(${ index + 1 })`, elm => {
       return {
         username: elm.querySelector( '.mt-user-name' ).textContent,
         email: elm.querySelector( '.mt-user-email' ).textContent
       }
+    } );
+  }
+
+  /**
+   * Gets an array of user objects of visible the visible users { username: string; email: string; }
+   */
+  getUsersFromList() {
+    return this.page.$eval( `.mt-user-list`, elm => {
+      return Array.from( elm.children ).map( child => {
+        return {
+          username: child.querySelector( '.mt-user-name' ).textContent,
+          email: child.querySelector( '.mt-user-email' ).textContent
+        }
+      } )
     } );
   }
 
