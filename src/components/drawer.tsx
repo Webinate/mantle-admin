@@ -7,6 +7,7 @@ type Props = {
   title: string;
   open: boolean;
   onHeaderClick: () => void;
+  className?: string;
 }
 
 type State = {
@@ -31,8 +32,8 @@ export class Drawer extends React.Component<Props, State> {
   }
 
   render() {
-    return <div>
-      <DrawerHeader onClick={() => this.props.onHeaderClick()}>
+    return <div className={this.props.className}>
+      <DrawerHeader className="mt-drawer-header" onClick={() => this.props.onHeaderClick()}>
         <IconButton
           iconClassName={this.props.open ? 'icon icon-arrow-down' : 'icon icon-arrow-right'}
           iconStyle={{

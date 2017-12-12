@@ -3,7 +3,7 @@ const assert = require( 'assert' );
 const utils = require( '../utils' );
 
 let users = new UsersPage();
-let joe, joey, mary;
+let joe, joey, mary, unActivatedUser;
 
 describe( '1. Finds users by username and email', function() {
 
@@ -12,6 +12,7 @@ describe( '1. Finds users by username and email', function() {
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
     joey = await utils.createAgent( 'Joey', 'joey444@test.com', 'password' );
     mary = await utils.createAgent( 'Mary', 'mary333@test.com', 'password' );
+    unActivatedUser = await utils.createAgent( 'Unactivated', 'unactivated333@test.com', 'password', true );
 
     await users.load( agent );
   } )
@@ -38,16 +39,44 @@ describe( '1. Finds users by username and email', function() {
     assert.equal( joeElm.email, joe.email );
   } );
 
-  it( 'it should show user details panel when we click on Joe', async () => {
-    await users.filter( 'joe222@test.com' );
-    await users.clickFilterBtn();
-    await users.doneLoading();
-    const joeElm = await users.getUserByEmail( 'joe222@test.com' );
-    await joeElm.click();
-
+  it( 'it should show user details panel when we click on Joe as an admin', async () => {
+    await users.selectUser( 'joe222@test.com' );
     users.waitFor( '.mt-user-properties' );
 
     assert.equal( await users.textfield( '.mt-user-properties .mt-props-username' ), 'Joe' );
     assert.equal( await users.textfield( '.mt-user-properties .mt-props-email' ), 'joe222@test.com' );
+
+    // Open the panels & check the buttons are there
+    await users.clickDrawer( 'Account Settings' );
+    await users.waitFor( '.mt-reset-password' );
+
+    await users.clickDrawer( 'Remove Account' );
+    await users.waitFor( '.mt-remove-acc-btn' );
+  } );
+
+  it( 'it should show limited details when we click on a user thats not the owner', async () => {
+    await users.load( joe );
+    await users.selectUser( 'mary333@test.com' );
+
+    // Joe should not see mary's buttons
+    assert( !( await users.$( '.mt-account-settings' ) ) );
+    assert( !( await users.$( '.mt-remove-account' ) ) );
+
+    await users.selectUser( 'joe222@test.com' );
+
+    // Joe should see his own buttons
+    assert( ( await users.$( '.mt-account-settings' ) ) );
+    assert( ( await users.$( '.mt-remove-account' ) ) );
+  } );
+
+  it( 'it should show activation buttons for non-activated users to the admin', async () => {
+    const admin = await utils.refreshAdminToken();
+    await users.load( admin );
+    await users.selectUser( 'unactivated333@test.com' );
+
+    // We should see activation buttons
+    await users.clickDrawer( 'Account Settings' );
+    assert( ( await users.$( '.mt-resend-activation' ) ) );
+    assert( ( await users.$( '.mt-activate-account' ) ) );
   } );
 } );

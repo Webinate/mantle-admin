@@ -14,6 +14,14 @@ class UsersPage extends Page {
     return super.to( '/dashboard/users' );
   }
 
+  async selectUser( email ) {
+    await this.filter( email );
+    await this.clickFilterBtn();
+    await this.doneLoading();
+    const user = await this.getUserByEmail( email );
+    await user.click();
+  }
+
   /**
    * Gets or sets the user filter value
    * @param {string} val
@@ -23,10 +31,23 @@ class UsersPage extends Page {
     return super.textfield( this.$filter, val )
   }
 
+  async clickDrawer( headerName ) {
+    const headers = await this.page.$$( '.mt-user-properties .mt-drawer-header' );
+    for ( const header of headers ) {
+      const text = await header.evaluate( elm => elm.querySelector( 'h3' ).textContent );
+      if ( text === headerName )
+        return header.click();
+    }
+
+    return null;
+  }
+
   /**
    * Waits for the auth page to not be in a busy state
    */
-  doneLoading() { return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' ); }
+  doneLoading() {
+    return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' );
+  }
 
   /**
    * Gets a user element by email

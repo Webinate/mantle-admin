@@ -39,7 +39,7 @@ function getHost() {
  * @param {string} email The user email
  * @param {string} password The user password
  */
-async function createAgent( user, email, password ) {
+async function createAgent( user, email, password, register = false ) {
 
   if ( user === undefined )
     return new Agent( getHost(), null, user, password, email );
@@ -48,13 +48,19 @@ async function createAgent( user, email, password ) {
   let resp;
 
   resp = await exports.admin.delete( '/api/users/' + user );
-  resp = await exports.admin.post( '/api/users', { username: user, password: password, email: email } );
+  if ( register )
+    resp = await exports.admin.post( '/api/auth/register', { username: user, password: password, email: email } );
+  else
+    resp = await exports.admin.post( '/api/users', { username: user, password: password, email: email } );
 
   if ( resp.status >= 400 && resp.status <= 500 )
     throw new Error( resp.statusText );
 
-  resp = await agent.post( `/api/auth/login`, { username: user, password: password } );
-  agent.updateCookie( resp );
+  if ( !register ) {
+    resp = await agent.post( `/api/auth/login`, { username: user, password: password } );
+    agent.updateCookie( resp );
+  }
+
   return agent;
 }
 

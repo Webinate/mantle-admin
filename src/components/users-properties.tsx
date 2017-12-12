@@ -30,6 +30,18 @@ export class UserProperties extends React.Component<Props, State> {
     };
   }
 
+  userCanInteract( user: IUserEntry ) {
+    const activeUser = this.props.activeUser;
+
+    // If admin
+    if ( activeUser.privileges < 2 )
+      return true;
+
+    // If the same user
+    if ( activeUser._id === user._id )
+      return true;
+  }
+
   render() {
     const users = this.props.users;
     const selectedIndex = this.props.selectedIndex;
@@ -96,9 +108,10 @@ export class UserProperties extends React.Component<Props, State> {
             </Field>
           </Drawer>
 
-          {this.props.activeUser.privileges < 2 ?
+          {this.userCanInteract( selected ) ?
             <Drawer
               title="Account Settings"
+              className="mt-account-settings"
               onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
               open={this.state.accountsOpen}
             >
@@ -109,7 +122,7 @@ export class UserProperties extends React.Component<Props, State> {
                     onClick={() => this.props.resetPasswordRequest( selected.username )}
                     iconStyle={{ color: theme.primary200.background }}
                     tooltipPosition="top-left"
-                    iconClassName="icon icon-mark-unread"
+                    iconClassName="icon icon-mark-unread mt-reset-password"
                     tooltip="Email user"
                   />
                 </div>
@@ -122,7 +135,7 @@ export class UserProperties extends React.Component<Props, State> {
                     <IconButton
                       iconStyle={{ color: theme.primary200.background }}
                       tooltipPosition="top-left"
-                      iconClassName="icon icon-mark-unread"
+                      iconClassName="icon icon-mark-unread mt-resend-activation"
                       tooltip="Email user"
                     />
                   </div>
@@ -135,7 +148,7 @@ export class UserProperties extends React.Component<Props, State> {
                     <IconButton
                       iconStyle={{ color: theme.primary200.background }}
                       tooltipPosition="top-left"
-                      iconClassName="icon icon-done"
+                      iconClassName="icon icon-done mt-activate-account"
                       tooltip="Email user"
                     />
                   </div>
@@ -143,8 +156,9 @@ export class UserProperties extends React.Component<Props, State> {
 
             </Drawer>
             : undefined}
-          <Drawer
+          {this.userCanInteract( selected ) ? <Drawer
             title="Remove Account"
+            className="mt-remove-account"
             onHeaderClick={() => this.setState( { removeOpen: !this.state.removeOpen } )}
             open={this.state.removeOpen}
           >
@@ -155,9 +169,10 @@ export class UserProperties extends React.Component<Props, State> {
                 backgroundColor={theme.error.background}
                 labelColor={theme.error.color}
                 label="Delete Account"
+                className="mt-remove-acc-btn"
               />
             </div>
-          </Drawer>
+          </Drawer> : undefined}
         </DetailsContainer>
 
       </Properties>
