@@ -76,6 +76,7 @@ export class App extends React.Component<Partial<Props>, State> {
         <Route path="/dashboard" render={props => {
           return (
             <Dashboard
+              activeUser={this.props.auth!.user!}
               title={'Mantle'}
               renderRight={() => <h3>Properties</h3>}
               renderLeft={() => {

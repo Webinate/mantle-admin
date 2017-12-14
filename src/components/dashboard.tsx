@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { IconButton } from 'material-ui';
+import { IconButton, IconMenu, MenuItem, FontIcon } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { Stage } from './stage';
+import { IUserEntry } from 'modepress';
 
 type Props = {
+  activeUser: IUserEntry;
   title: string;
   onHome: () => void;
   onLogOut: () => void;
@@ -20,19 +22,34 @@ export class Dashboard extends React.Component<Props, any> {
 
   render() {
     const headerHeight = 60;
+    const menuItemStyle: React.CSSProperties = { color: theme.primary200.background };
 
     return (
       <DashboardOuter className="mt-dashboard">
         <Head
           style={{ height: `${ headerHeight }px` }}
         >
-          <IconButton
-            className="mt-logout"
+          <IconMenu
             style={{ color: 'inherit', margin: '5px', float: 'right' }}
-            iconStyle={{ color: 'inherit' }}
-            onClick={e => this.props.onLogOut()}
-            iconClassName="icon icon-exit"
-          />
+            className="mt-user-menu"
+            iconButtonElement={<IconButton
+              style={{ color: 'inherit' }}
+              iconStyle={{ color: 'inherit' }}
+              iconClassName="icon icon-menu"
+            />}
+          >
+            <MenuItem
+              className="mt-settings"
+              leftIcon={<FontIcon style={menuItemStyle} className="icon icon-settings" />}
+              primaryText="Settings"
+            />
+            <MenuItem
+              className="mt-logout"
+              leftIcon={<FontIcon style={menuItemStyle} className="icon icon-exit" />}
+              onClick={e => this.props.onLogOut()}
+              primaryText="Logout"
+            />
+          </IconMenu>
           <IconButton
             style={{ color: 'inherit' }}
             iconStyle={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }}
