@@ -32,14 +32,14 @@ export class UsersList extends React.Component<Props, any> {
             onMouseDown={e => this.props.onUserSelected( user, e )}
           >
             <Avatar
-              src={generateAvatarPic( ( index ) )}
+              src={generateAvatarPic( user.avatar )}
               size={80}
             />
             <Details selected={selected}>
               <div><strong className="mt-user-name">{user.username}</strong></div>
               <div className="mt-user-email">{user.email}</div>
-              <div><i>Joined: {moment( user.createdOn ).format( 'MMMM Do YYYY' )}</i></div>
-              <div><i>Last Active: {moment( user.lastLoggedIn ).format( 'MMMM Do YYYY' )}</i></div>
+              <div><i>Joined: {moment( user.createdOn ).format( 'MMMM Do, YYYY' )}</i></div>
+              <div><i>Last Active: {moment( user.lastLoggedIn ).format( 'MMMM Do, YYYY' )}</i></div>
             </Details>
           </User>
         } )}

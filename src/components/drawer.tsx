@@ -52,13 +52,18 @@ export class Drawer extends React.Component<Props, State> {
       {this.props.open ?
         <DrawerContent innerRef={
           ( elm: HTMLDivElement ) => {
-            if ( !elm || !this._shouldAnimate )
+            if ( !elm )
               return;
 
+            elm.style.maxHeight = '';
             const height = elm.clientHeight + 'px';
             elm.style.maxHeight = '0px'
             elm.style.visibility = 'visible';
-            setTimeout( () => elm.style.maxHeight = height, 30 );
+
+            if ( !this._shouldAnimate )
+              elm.style.maxHeight = height;
+            else
+              setTimeout( () => elm.style.maxHeight = height, 30 );
           }
         }>
           {this.props.children}

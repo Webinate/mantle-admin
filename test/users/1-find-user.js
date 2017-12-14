@@ -58,6 +58,10 @@ describe( '1. Finds users by username and email', function() {
     await users.load( joe );
     await users.selectUser( 'mary333@test.com' );
 
+    // Joe should not see mary's personal details
+    assert( !( await users.$( '.mt-props-email' ) ) );
+    assert( !( await users.$( '.mt-last-active' ) ) );
+
     // Joe should not see mary's buttons
     assert( !( await users.$( '.mt-account-settings' ) ) );
     assert( !( await users.$( '.mt-remove-account' ) ) );

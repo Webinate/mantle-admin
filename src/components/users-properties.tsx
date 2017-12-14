@@ -5,11 +5,11 @@ import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
 import { Drawer } from './drawer';
+import * as moment from 'moment';
 
 type Props = {
   activeUser: IUserEntry;
-  users: IUserEntry[] | null;
-  selectedIndex: number | null;
+  selected: IUserEntry | null;
   resetPasswordRequest( username: string ): void;
 };
 
@@ -43,13 +43,7 @@ export class UserProperties extends React.Component<Props, State> {
   }
 
   render() {
-    const users = this.props.users;
-    const selectedIndex = this.props.selectedIndex;
-
-    if ( selectedIndex === null || !users )
-      return <Properties />;
-
-    const selected = users[ selectedIndex ];
+    const selected = this.props.selected;
 
     if ( !selected )
       return <Properties />;
@@ -62,7 +56,8 @@ export class UserProperties extends React.Component<Props, State> {
 
         <ImgContainer>
           <Avatar
-            src={generateAvatarPic( selectedIndex )}
+            className="mt-avatar-image"
+            src={generateAvatarPic( selected.avatar )}
             size={200}
           />
         </ImgContainer>
@@ -81,7 +76,7 @@ export class UserProperties extends React.Component<Props, State> {
                 underlineStyle={underlineStyle}
               />
             </Field>
-            <Field>
+            {this.userCanInteract( selected ) ? <Field>
               <TextField
                 className="mt-props-email"
                 floatingLabelText="Email"
@@ -89,23 +84,27 @@ export class UserProperties extends React.Component<Props, State> {
                 value={selected.email}
                 underlineStyle={underlineStyle}
               />
-            </Field>
+            </Field> : undefined}
             <Field>
               <DatePicker
                 floatingLabelText="Joined On"
+                className="mt-joined-on"
                 floatingLabelStyle={textStyle}
                 mode="landscape"
                 value={new Date( selected.createdOn )}
+                formatDate={( date: Date ) => moment( date ).format( 'MMMM Do, YYYY' )}
               />
             </Field>
-            <Field>
+            {this.userCanInteract( selected ) ? <Field>
               <DatePicker
                 floatingLabelText="Last Active"
+                className="mt-last-active"
                 floatingLabelStyle={textStyle}
                 mode="landscape"
                 value={new Date( selected.lastLoggedIn )}
+                formatDate={( date: Date ) => moment( date ).format( 'MMMM Do, YYYY' )}
               />
-            </Field>
+            </Field> : undefined}
           </Drawer>
 
           {this.userCanInteract( selected ) ?
@@ -215,10 +214,12 @@ margin: 15px 5px;
 box-sizing: border-box;
 display: table;
 white-space: normal;
+width: 100%;
 
 > div {
   width: 50%;
   display: table-cell;
+  vertical-align: middle;
 }
 .mt-inline-input { text-align: right; }
 `;

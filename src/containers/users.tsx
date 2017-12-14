@@ -51,6 +51,11 @@ export class Users extends React.Component<Partial<Props>, State> {
       this.props.getUsers!();
   }
 
+  componentWillReceiveProps( next: Props ) {
+    if ( next.userState.userPage !== this.props.userState!.userPage )
+      this.setState( { selectedUsers: [] } );
+  }
+
   private onUserSelected( user: IUserEntry, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();
@@ -133,8 +138,7 @@ export class Users extends React.Component<Partial<Props>, State> {
           second={() => <UserProperties
             resetPasswordRequest={username => { this.props.resetPassword!( username ) }}
             activeUser={this.props.auth!.user!}
-            selectedIndex={page && selected ? page.data.indexOf( selected ) : -1}
-            users={page ? page.data : null}
+            selected={selected}
           />
           }
         />
