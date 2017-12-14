@@ -15,12 +15,8 @@ describe( '1. Finds users by username and email', function() {
     unActivatedUser = await utils.createAgent( 'Unactivated', 'unactivated333@test.com', 'password', true );
 
     await users.load( agent );
-  } )
-
-
-  it( 'it should show the users page', async () => {
     assert( await users.$( '.mt-user-list' ) );
-  } );
+  } )
 
   it( 'it should get at least 2 users for `joe`', async () => {
     await users.filter( 'joe' );

@@ -3,7 +3,7 @@ import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { getUsers } from '../store/users/actions';
-import { resetPassword } from '../store/admin-actions/actions';
+import { resetPassword, activate } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
@@ -22,7 +22,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getUsers: getUsers,
-  resetPassword: resetPassword
+  resetPassword: resetPassword,
+  activate: activate
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -137,12 +138,14 @@ export class Users extends React.Component<Partial<Props>, State> {
           }}
           second={() => <UserProperties
             resetPasswordRequest={username => { this.props.resetPassword!( username ) }}
+            activateAccount={username => { this.props.activate!( username ) }}
             activeUser={this.props.auth!.user!}
             selected={selected}
           />
           }
         />
         <Snackbar
+          className="mt-response-message"
           open={this.props.admin!.response || this.props.admin!.error ? true : false}
           autoHideDuration={6000}
           message={this.props.admin!.response || this.props.admin!.error || ''}

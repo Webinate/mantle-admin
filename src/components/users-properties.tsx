@@ -11,6 +11,7 @@ type Props = {
   activeUser: IUserEntry;
   selected: IUserEntry | null;
   resetPasswordRequest( username: string ): void;
+  activateAccount( username: string ): void;
 };
 
 type State = {
@@ -148,7 +149,8 @@ export class UserProperties extends React.Component<Props, State> {
                       iconStyle={{ color: theme.primary200.background }}
                       tooltipPosition="top-left"
                       iconClassName="icon icon-done mt-activate-account"
-                      tooltip="Email user"
+                      tooltip="Activates the user"
+                      onClick={e => this.props.activateAccount( this.props.selected!.username )}
                     />
                   </div>
                 </InlineField> : undefined}

@@ -20,6 +20,7 @@ class UsersPage extends Page {
     await this.doneLoading();
     const user = await this.getUserByEmail( email );
     await user.click();
+    await this.page.waitFor( '.mt-user-properties' );
   }
 
   /**
