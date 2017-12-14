@@ -5,6 +5,7 @@ import { ThemeInterface } from './theme';
 // Purples
 const p100 = '#8885A7';
 const p200 = '#6d689c';
+const p300 = '#4d496f';
 
 // Reds
 const s100 = '#CC7A7A';
@@ -28,6 +29,7 @@ export default {
   // Purples
   primary100: { color: '#fff', softColor: '#eee', background: p100, border: '#6d6993' },
   primary200: { color: '#fff', softColor: '#eee', background: p200, border: '#ccc' },
+  primary300: { color: '#fff', softColor: '#eee', background: p300, border: '#36334e' },
 
   // Reds
   secondary100: { color: '#fff', softColor: '#eee', background: s100, border: '#835151' },

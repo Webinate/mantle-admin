@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { IconButton, IconMenu, MenuItem, FontIcon } from 'material-ui';
+import { IconButton, IconMenu, MenuItem, FontIcon, Avatar } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { Stage } from './stage';
+import { generateAvatarPic } from '../utils/component-utils';
 import { IUserEntry } from 'modepress';
 
 type Props = {
@@ -22,7 +23,7 @@ export class Dashboard extends React.Component<Props, any> {
 
   render() {
     const headerHeight = 60;
-    const menuItemStyle: React.CSSProperties = { color: theme.primary200.background };
+    const menuItemStyle: React.CSSProperties = { color: theme.primary300.background };
 
     return (
       <DashboardOuter className="mt-dashboard">
@@ -30,12 +31,11 @@ export class Dashboard extends React.Component<Props, any> {
           style={{ height: `${ headerHeight }px` }}
         >
           <IconMenu
-            style={{ color: 'inherit', margin: '5px', float: 'right' }}
-            className="mt-user-menu"
-            iconButtonElement={<IconButton
-              style={{ color: 'inherit' }}
-              iconStyle={{ color: 'inherit' }}
-              iconClassName="icon icon-menu"
+            style={{ color: 'inherit', margin: '10px', float: 'right', cursor: 'pointer' }}
+            iconButtonElement={<Avatar
+              className="mt-user-menu"
+              backgroundColor={theme.primary300.background}
+              src={generateAvatarPic( this.props.activeUser.avatar )}
             />}
           >
             <MenuItem
