@@ -95,6 +95,7 @@ export class Users extends React.Component<Partial<Props>, State> {
               <TextField
                 className="users-filter"
                 hintText="Filter username or email"
+                id="mt-users-filter"
                 value={this.state.userFilter}
                 onKeyDown={e => {
                   if ( e.keyCode === 13 )
