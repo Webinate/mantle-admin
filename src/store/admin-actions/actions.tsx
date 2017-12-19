@@ -1,13 +1,14 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
-import { getJson, get, apiUrl, ClientError } from '../../utils/httpClients';
+import { getJson, put, apiUrl, ClientError } from '../../utils/httpClients';
 import { AuthTokens } from 'modepress';
 
 // Action Creators
 export const ActionCreators = {
   busy: new ActionCreator<'admin-busy', boolean>( 'admin-busy' ),
   response: new ActionCreator<'admin-response', string>( 'admin-response' ),
-  error: new ActionCreator<'admin-error', string>( 'admin-error' )
+  error: new ActionCreator<'admin-error', string>( 'admin-error' ),
+  userActivated: new ActionCreator<'admin-user-activated', string>( 'admin-user-activated' )
 };
 
 // Action Types
@@ -32,8 +33,8 @@ export function activate( username: string ) {
     dispatch( ActionCreators.busy.create( true ) );
 
     try {
-      await get( `${ apiUrl }/auth/${ username }/approve-activation` );
-      dispatch( ActionCreators.response.create( 'User successfully activated' ) );
+      await put( `${ apiUrl }/auth/${ username }/approve-activation` );
+      dispatch( ActionCreators.userActivated.create( username ) );
     }
     catch ( e ) {
       dispatch( ActionCreators.error.create( ( e as ClientError ).response.statusText ) );

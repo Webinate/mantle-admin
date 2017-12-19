@@ -1,4 +1,5 @@
 import { ActionCreators, Action } from './actions';
+import { ActionCreators as AdminActionCreators, Action as AdminAction } from '../admin-actions/actions';
 import { UserTokens } from 'modepress';
 
 // State
@@ -13,7 +14,7 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action ): State {
+export default function reducer( state: State = initialState, action: Action | AdminAction ): State {
   let partialState: Partial<State> | undefined;
 
   switch ( action.type ) {
@@ -26,6 +27,13 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.SetUsersBusy.type:
       partialState = { busy: action.payload };
+      break;
+
+    case AdminActionCreators.userActivated.type:
+      const page = state.userPage as UserTokens.GetAll.Response;
+      partialState = {
+        userPage: { ...page, data: page.data.map( user => { return { ...user, registerKey: '' } } ) }
+      };
       break;
 
     default: return state;

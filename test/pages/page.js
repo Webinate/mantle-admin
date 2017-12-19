@@ -101,6 +101,7 @@ class Page {
     }
   }
 
+  $eval( selector, callback ) { return this.page.$eval( selector, callback ) }
   $( selector ) { return this.page.$( selector ) }
   $$( selector ) { return this.page.$$( selector ) }
   waitFor( selector ) { return this.page.waitFor( selector ) }

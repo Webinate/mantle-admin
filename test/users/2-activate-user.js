@@ -13,11 +13,17 @@ describe( '2. Activate user', function() {
     assert( await users.$( '.mt-user-list' ) );
   } )
 
-  it( 'it should show user details panel when we click on registered user', async () => {
+  it( 'it should activate a user when an admin', async () => {
     await users.selectUser( 'registered333@test.com' );
     await users.clickDrawer( 'Account Settings' );
     await users.waitFor( '.mt-activate-account' );
     await users.page.click( '.mt-activate-account' );
-    users.waitFor( '.mt-response-message' )
+    users.waitFor( '.mt-response-message' );
+    assert.equal( await users.getSnackMessage(), 'User successfully activated' );
+
+    // User should now be activated
+    await users.selectUser( 'registered333@test.com' );
+    await users.clickDrawer( 'Account Settings' );
+    assert( !( await users.$( '.mt-activate-account' ) ) );
   } );
 } );

@@ -37,6 +37,13 @@ export default function reducer( state: State = initialState, action: Action ): 
       };
       break;
 
+    case ActionCreators.userActivated.type:
+      partialState = {
+        response: 'User successfully activated'
+      };
+      break;
+
+
     default: return state;
   }
 

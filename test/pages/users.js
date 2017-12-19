@@ -65,6 +65,14 @@ class UsersPage extends Page {
     return null;
   }
 
+  getSnackMessage() {
+    return this.$eval( '.mt-response-message > div > div > span', elm => elm.textContent );
+  }
+
+  closeSnackMessage() {
+    return this.page.click( '.mt-response-message button' );
+  }
+
   /**
    * Gets a user object { username: string; email: string; } from the user list by index
    * @param {number} index The index of the user to examine

@@ -148,7 +148,7 @@ export class Users extends React.Component<Partial<Props>, State> {
         <Snackbar
           className="mt-response-message"
           open={this.props.admin!.response || this.props.admin!.error ? true : false}
-          autoHideDuration={6000}
+          action="close"
           message={this.props.admin!.response || this.props.admin!.error || ''}
         />
       </div >
