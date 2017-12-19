@@ -31,6 +31,7 @@ describe( '6. Successful login/logout', function() {
 
   it( 'it should logout', async () => {
     await auth.page.click( '.mt-user-menu' );
+    await auth.page.hover( '.mt-logout' );
     await auth.page.click( '.mt-logout' );
     await auth.waitFor( '.login-form' );
     assert.equal( await auth.pathname(), '/login' );

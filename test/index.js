@@ -32,3 +32,4 @@ require( './login/5-register-failures' );
 require( './login/6-successful-login-logout' );
 require( './users/1-find-user' );
 require( './users/2-activate-user' );
+require( './users/3-delete-user' );

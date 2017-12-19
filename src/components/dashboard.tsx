@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, IconMenu, MenuItem, FontIcon, Avatar } from 'material-ui';
+import { IconButton, Popover, MenuItem, FontIcon, Avatar } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { Stage } from './stage';
@@ -15,10 +15,18 @@ type Props = {
   renderRight?: () => JSX.Element;
 }
 
-export class Dashboard extends React.Component<Props, any> {
+type State = {
+  open: boolean;
+  anchorEl?: HTMLDivElement;
+}
+
+export class Dashboard extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );
+    this.state = {
+      open: false
+    }
   }
 
   render() {
@@ -30,26 +38,44 @@ export class Dashboard extends React.Component<Props, any> {
         <Head
           style={{ height: `${ headerHeight }px` }}
         >
-          <IconMenu
-            style={{ color: 'inherit', margin: '10px', float: 'right', cursor: 'pointer' }}
-            iconButtonElement={<Avatar
+          <div className="mt-right-menu">
+            <h2>{this.props.activeUser.username}</h2>
+            <div
+              style={{ color: 'inherit', display: 'inline-block', cursor: 'pointer' }}
               className="mt-user-menu"
-              backgroundColor={theme.primary300.background}
-              src={generateAvatarPic( this.props.activeUser.avatar )}
-            />}
-          >
-            <MenuItem
-              className="mt-settings"
-              leftIcon={<FontIcon style={menuItemStyle} className="icon icon-settings" />}
-              primaryText="Settings"
-            />
-            <MenuItem
-              className="mt-logout"
-              leftIcon={<FontIcon style={menuItemStyle} className="icon icon-exit" />}
-              onClick={e => this.props.onLogOut()}
-              primaryText="Logout"
-            />
-          </IconMenu>
+              onClick={( event ) => {
+                this.setState( { open: true, anchorEl: event.currentTarget } )
+              }}
+            >
+              <Avatar
+                backgroundColor={theme.primary300.background}
+                src={generateAvatarPic( this.props.activeUser.avatar )}
+              />
+            </div>
+
+            <Popover
+              open={this.state.open}
+              anchorEl={this.state.anchorEl}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+              onRequestClose={() => this.setState( { open: false } )}
+            >
+              <Menu>
+                <MenuItem
+                  className="mt-settings"
+                  leftIcon={<FontIcon style={menuItemStyle} className="icon icon-settings" />}
+                  primaryText="Settings"
+                />
+                <MenuItem
+                  className="mt-logout"
+                  leftIcon={<FontIcon style={menuItemStyle} className="icon icon-exit" />}
+                  onClick={e => this.props.onLogOut()}
+                  primaryText="Logout"
+                />
+              </Menu>
+            </Popover>
+          </div>
+
           <IconButton
             style={{ color: 'inherit' }}
             iconStyle={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }}
@@ -91,6 +117,23 @@ const Head = styled.div`
   > h1 {
     margin: 9px 0 0 0;
     font-weight: 300;
+  }
+
+  .mt-right-menu {
+    float: right;
+    color: inherit;
+    margin: 10px 10px 0 0;
+    textAlign: right;
+  }
+
+  .mt-user-menu {
+    vertical-align: middle;
+  }
+
+  h2 {
+    display: inline-block;
+    margin: 0 5px 0 0;
+    vertical-align: middle;
   }
 `;
 

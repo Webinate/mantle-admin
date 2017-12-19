@@ -12,6 +12,7 @@ type Props = {
   selected: IUserEntry | null;
   resetPasswordRequest( username: string ): void;
   activateAccount( username: string ): void;
+  onDeleteRequested( username: IUserEntry ): void;
 };
 
 type State = {
@@ -171,6 +172,7 @@ export class UserProperties extends React.Component<Props, State> {
                 labelColor={theme.error.color}
                 label="Delete Account"
                 className="mt-remove-acc-btn"
+                onClick={e => this.props.onDeleteRequested( selected )}
               />
             </div>
           </Drawer> : undefined}

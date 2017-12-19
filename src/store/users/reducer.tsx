@@ -16,6 +16,7 @@ export const initialState: State = {
 // Reducer
 export default function reducer( state: State = initialState, action: Action | AdminAction ): State {
   let partialState: Partial<State> | undefined;
+  let page = state.userPage as UserTokens.GetAll.Response;
 
   switch ( action.type ) {
     case ActionCreators.SetUsers.type:
@@ -29,8 +30,14 @@ export default function reducer( state: State = initialState, action: Action | A
       partialState = { busy: action.payload };
       break;
 
+    case ActionCreators.RemoveUser.type:
+      partialState = {
+        userPage: { ...page, data: page.data.filter( user => user.username !== action.payload ) },
+        busy: false
+      };
+      break;
+
     case AdminActionCreators.userActivated.type:
-      const page = state.userPage as UserTokens.GetAll.Response;
       partialState = {
         userPage: { ...page, data: page.data.map( user => { return { ...user, registerKey: '' } } ) }
       };

@@ -8,14 +8,15 @@ import { AuthScreen } from '../components/auth-screen';
 import { Dashboard } from '../components/dashboard';
 import { ContentHeader } from '../components/content-header';
 import { Users } from './users';
-import { List, ListItem, FontIcon } from 'material-ui';
+import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   userState: state.users,
   auth: state.authentication,
   routing: state.router,
-  location: ownProps
+  location: ownProps,
+  serverResponses: state.serverResponses
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -113,6 +114,14 @@ export class App extends React.Component<Partial<Props>, State> {
         }} />
         <Route path="/login" render={props => this.getAuthScreen( 'login' )} />
         <Route path="/register" render={props => this.getAuthScreen( 'register' )} />
+
+        <Snackbar
+          className="mt-response-message"
+          autoHideDuration={20000}
+          open={this.props.serverResponses!.response ? true : false}
+          action="close"
+          message={this.props.serverResponses!.response || ''}
+        />
       </div>
     );
   }

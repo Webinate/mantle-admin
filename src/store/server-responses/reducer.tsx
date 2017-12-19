@@ -2,11 +2,11 @@ import { ActionCreators, Action } from './actions';
 
 // State
 export type State = {
-  readonly busy: boolean;
+  readonly response: string | null;
 };
 
 export const initialState: State = {
-  busy: false
+  response: null
 };
 
 // Reducer
@@ -15,9 +15,9 @@ export default function reducer( state: State = initialState, action: Action ): 
 
   switch ( action.type ) {
 
-    case ActionCreators.busy.type:
+    case ActionCreators.serverResponse.type:
       partialState = {
-        busy: action.payload
+        response: action.payload
       };
       break;
 

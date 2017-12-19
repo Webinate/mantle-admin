@@ -2,7 +2,7 @@ import * as React from 'react';
 import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
-import { getUsers } from '../store/users/actions';
+import { getUsers, removeUser } from '../store/users/actions';
 import { resetPassword, activate } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
@@ -10,7 +10,7 @@ import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
 import { UserProperties } from '../components/users-properties';
 import { SplitPanel } from '../components/split-panel';
-import { Snackbar, TextField, IconButton, LinearProgress } from 'material-ui';
+import { TextField, IconButton, LinearProgress, Dialog, FlatButton, RaisedButton } from 'material-ui';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -23,7 +23,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 const dispatchToProps = {
   getUsers: getUsers,
   resetPassword: resetPassword,
-  activate: activate
+  activate: activate,
+  removeUser: removeUser
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -31,6 +32,9 @@ type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   selectedUsers: IUserEntry[];
   userFilter: string;
+  dialogue: null | string;
+  dialogueHeader: string;
+  dialogueConfirmBtn: string;
 };
 
 /**
@@ -43,7 +47,10 @@ export class Users extends React.Component<Partial<Props>, State> {
     super( props );
     this.state = {
       selectedUsers: [],
-      userFilter: ''
+      userFilter: '',
+      dialogueHeader: '',
+      dialogue: null,
+      dialogueConfirmBtn: 'Ok'
     }
   }
 
@@ -79,6 +86,39 @@ export class Users extends React.Component<Partial<Props>, State> {
 
       this.setState( { selectedUsers: userPage.data.slice( firstIndex, lastIndex + 1 ) } );
     }
+  }
+
+  renderModal( onConfirm: () => void ) {
+    const actions = [
+      <FlatButton
+        className="mt-cancel"
+        label="Cancel"
+        primary={true}
+        onClick={e => this.setState( { dialogue: null } )}
+      />,
+      <RaisedButton
+        className="mt-confirm"
+        backgroundColor={theme.error.background}
+        labelColor={theme.error.color}
+        label={this.state.dialogueConfirmBtn}
+        onClick={e => {
+          this.setState( { dialogue: null } );
+          onConfirm();
+        }}
+      />,
+    ];
+
+    return (
+      <Dialog
+        className="mt-users-modal"
+        title={this.state.dialogueHeader}
+        actions={actions}
+        modal={true}
+        open={true}
+      >
+        <span className="mt-modal-message">{this.state.dialogue}</span>
+      </Dialog>
+    );
   }
 
   render() {
@@ -141,16 +181,21 @@ export class Users extends React.Component<Partial<Props>, State> {
             resetPasswordRequest={username => { this.props.resetPassword!( username ) }}
             activateAccount={username => { this.props.activate!( username ) }}
             activeUser={this.props.auth!.user!}
+            onDeleteRequested={( user ) => {
+              this.setState( {
+                dialogueHeader: 'Remove User',
+                dialogue: `Are you sure you want to remove the user '${ user.username }', this action is irreversible?`,
+                dialogueConfirmBtn: `I Understand, Remove User`
+              } )
+            }}
             selected={selected}
           />
           }
         />
-        <Snackbar
-          className="mt-response-message"
-          open={this.props.admin!.response || this.props.admin!.error ? true : false}
-          action="close"
-          message={this.props.admin!.response || this.props.admin!.error || ''}
-        />
+        {this.state.dialogue ?
+          this.renderModal( () => {
+            this.props.removeUser!( selected!.username )
+          } ) : undefined}
       </div >
     );
   }

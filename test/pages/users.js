@@ -65,12 +65,31 @@ class UsersPage extends Page {
     return null;
   }
 
-  getSnackMessage() {
+  async getSnackMessage() {
+    await this.page.waitFor( '.mt-response-message[open]' );
     return this.$eval( '.mt-response-message > div > div > span', elm => elm.textContent );
   }
 
   closeSnackMessage() {
     return this.page.click( '.mt-response-message button' );
+  }
+
+  getModalMessage() {
+    return this.$eval( '.mt-modal-message', elm => elm.textContent );
+  }
+
+  async isModelClosed() {
+    const result = await this.$( '.mt-users-modal' );
+    return result ? false : true;
+  }
+
+  async closeModal( cancel = true ) {
+    await this.waitFor( '.mt-users-modal .mt-cancel' );
+
+    if ( cancel )
+      return this.page.click( '.mt-users-modal .mt-cancel' )
+    else
+      return this.page.click( '.mt-users-modal .mt-confirm' )
   }
 
   /**
