@@ -13,6 +13,7 @@ type Props = {
   onLogOut: () => void;
   renderLeft?: () => JSX.Element;
   renderRight?: () => JSX.Element;
+  animated: boolean;
 }
 
 type State = {
@@ -59,6 +60,7 @@ export class Dashboard extends React.Component<Props, State> {
               anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
               targetOrigin={{ horizontal: 'left', vertical: 'top' }}
               onRequestClose={() => this.setState( { open: false } )}
+              animated={this.props.animated}
             >
               <Menu>
                 <MenuItem

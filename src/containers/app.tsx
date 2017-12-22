@@ -16,7 +16,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   auth: state.authentication,
   routing: state.router,
   location: ownProps,
-  serverResponses: state.serverResponses
+  app: state.app
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -77,6 +77,7 @@ export class App extends React.Component<Partial<Props>, State> {
         <Route path="/dashboard" render={props => {
           return (
             <Dashboard
+              animated={this.props.app!.debugMode ? false : true}
               activeUser={this.props.auth!.user!}
               title={'Mantle'}
               renderRight={() => <h3>Properties</h3>}
@@ -118,9 +119,9 @@ export class App extends React.Component<Partial<Props>, State> {
         <Snackbar
           className="mt-response-message"
           autoHideDuration={20000}
-          open={this.props.serverResponses!.response ? true : false}
+          open={this.props.app!.response ? true : false}
           action="close"
-          message={this.props.serverResponses!.response || ''}
+          message={this.props.app!.response || ''}
         />
       </div>
     );

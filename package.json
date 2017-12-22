@@ -32,7 +32,7 @@
     "browser-sync": "^2.18.13",
     "gulp": "github:gulpjs/gulp#4.0",
     "mocha": "^3.5.3",
-    "puppeteer": "^0.10.2",
+    "puppeteer": "^0.13.0",
     "rimraf": "~2.6.2",
     "yargs": "^9.0.1"
   },

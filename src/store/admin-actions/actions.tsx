@@ -1,7 +1,7 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { getJson, put, apiUrl, ClientError } from '../../utils/httpClients';
-import { ActionCreators as ServerResponseCreators } from '../server-responses/actions';
+import { ActionCreators as AppActionCreators } from '../app/actions';
 import { AuthTokens } from 'modepress';
 
 // Action Creators
@@ -19,10 +19,10 @@ export function resetPassword( username: string ) {
 
     try {
       const resp = await getJson<AuthTokens.RequestPasswordReset.Response>( `${ apiUrl }/auth/${ username }/request-password-reset` );
-      dispatch( ServerResponseCreators.serverResponse.create( resp.message ) );
+      dispatch( AppActionCreators.serverResponse.create( resp.message ) );
     }
     catch ( e ) {
-      dispatch( ServerResponseCreators.serverResponse.create( ( e as ClientError ).response.statusText ) );
+      dispatch( AppActionCreators.serverResponse.create( ( e as ClientError ).response.statusText ) );
     }
   }
 }
@@ -34,10 +34,10 @@ export function activate( username: string ) {
     try {
       await put( `${ apiUrl }/auth/${ username }/approve-activation` );
       dispatch( ActionCreators.userActivated.create( username ) );
-      dispatch( ServerResponseCreators.serverResponse.create( 'User successfully activated' ) );
+      dispatch( AppActionCreators.serverResponse.create( 'User successfully activated' ) );
     }
     catch ( e ) {
-      dispatch( ServerResponseCreators.serverResponse.create( ( e as ClientError ).response.statusText ) );
+      dispatch( AppActionCreators.serverResponse.create( ( e as ClientError ).response.statusText ) );
     }
   }
 }

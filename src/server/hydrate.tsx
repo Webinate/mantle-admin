@@ -2,8 +2,11 @@ import { Action } from 'redux';
 import { matchPath, match } from 'react-router';
 import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as UserActions } from '../store/users/actions';
+import { ActionCreators as AppActions } from '../store/app/actions';
 import { IAuthReq } from 'modepress';
 import { controllers } from 'modepress-api';
+const yargs = require( 'yargs' );
+const args = yargs.argv;
 
 /**
  * This decorator populates the application state with data before the client loads.
@@ -24,6 +27,9 @@ export async function hydrate( req: IAuthReq ) {
     const users = await controllers.users.getUsers( 0, 10 );
     actions.push( UserActions.SetUsers.create( users ) );
   }
+
+  if ( args.runningTests )
+    actions.push( AppActions.setDebugMode.create( true ) );
 
   return actions;
 }

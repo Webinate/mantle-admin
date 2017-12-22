@@ -16,7 +16,7 @@ describe( '3. Delete user', function() {
   it( 'Delete a user when an admin clicks the delete button', async () => {
     await users.selectUser( 'tempuser1122@test.com' );
     await users.clickDrawer( 'Remove Account' );
-    await users.page.click( '.mt-remove-acc-btn' );
+    await users.click( '.mt-remove-acc-btn' );
 
     // Ensure modal is open
     await users.waitFor( '.mt-users-modal' );
@@ -26,7 +26,7 @@ describe( '3. Delete user', function() {
     assert.equal( await users.isModelClosed(), true );
 
     // Re-open the modal
-    await users.page.click( '.mt-remove-acc-btn' );
+    await users.click( '.mt-remove-acc-btn' );
     await users.waitFor( '.mt-users-modal' );
 
     assert.equal( await users.getModalMessage(), `Are you sure you want to remove the user 'TempUser1122', this action is irreversible?` );

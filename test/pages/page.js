@@ -24,6 +24,17 @@ class Page {
     } );
   }
 
+  sleep( milliseconds ) {
+    return this.page.waitFor( milliseconds );
+  }
+
+  async click( selector ) {
+    const handle = await this.page.$( selector );
+    await this.sleep( 50 );
+    await handle.executionContext().evaluate( elm => elm.scrollIntoView(), handle );
+    return this.page.click( selector );
+  }
+
   /**
    * Go to a given ulr
    * @param {string} path The url to direct the page to
@@ -87,7 +98,7 @@ class Page {
         document.querySelector( data ).value = '';
       }, `${ selector } input` );
 
-      await this.page.type( val, { delay: 10 } );
+      await this.page.type( `${ selector } input`, val, { delay: 10 } );
     }
     // Else clear the input
     else {
@@ -95,7 +106,7 @@ class Page {
       const curVal = await this.page.$eval( `${ selector } input`, el => el.value );
       const promises = [];
       for ( let i = 0, l = curVal.length; i < l; i++ )
-        promises.push( this.page.press( 'Backspace' ) );
+        promises.push( this.page.keyboard.press( 'Backspace' ) );
 
       await Promise.all( promises );
     }

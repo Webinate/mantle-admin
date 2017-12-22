@@ -8,6 +8,7 @@ type Props = {
   open: boolean;
   onHeaderClick: () => void;
   className?: string;
+  animate?: boolean;
 }
 
 type State = {
@@ -17,16 +18,21 @@ type State = {
  * An html component that represents the entire html page to be rendered
  */
 export class Drawer extends React.Component<Props, State> {
+
+  static defaultProps: Partial<Props> = {
+    animate: false
+  }
+
   private _shouldAnimate: boolean;
 
   constructor( props: Props ) {
     super( props );
-    this._shouldAnimate = true;
+    this._shouldAnimate = props.animate!;
   }
 
   componentWillReceiveProps( next: Props ) {
     if ( next.open !== this.props.open )
-      this._shouldAnimate = true;
+      this._shouldAnimate = next.animate!;
     else
       this._shouldAnimate = false;
   }

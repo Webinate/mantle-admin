@@ -10,6 +10,7 @@ import * as moment from 'moment';
 type Props = {
   activeUser: IUserEntry;
   selected: IUserEntry | null;
+  animated: boolean;
   resetPasswordRequest( username: string ): void;
   activateAccount( username: string ): void;
   onDeleteRequested( username: IUserEntry ): void;
@@ -66,6 +67,7 @@ export class UserProperties extends React.Component<Props, State> {
         <DetailsContainer>
           <Drawer
             title="User Details"
+            animate={this.props.animated}
             open={this.state.detailsOpen}
             onHeaderClick={() => this.setState( { detailsOpen: !this.state.detailsOpen } )}
           >
@@ -112,6 +114,7 @@ export class UserProperties extends React.Component<Props, State> {
           {this.userCanInteract( selected ) ?
             <Drawer
               title="Account Settings"
+              animate={this.props.animated}
               className="mt-account-settings"
               onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
               open={this.state.accountsOpen}
@@ -160,6 +163,7 @@ export class UserProperties extends React.Component<Props, State> {
             : undefined}
           {this.userCanInteract( selected ) ? <Drawer
             title="Remove Account"
+            animate={this.props.animated}
             className="mt-remove-account"
             onHeaderClick={() => this.setState( { removeOpen: !this.state.removeOpen } )}
             open={this.state.removeOpen}

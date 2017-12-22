@@ -35,9 +35,13 @@ class UsersPage extends Page {
   async clickDrawer( headerName ) {
     const headers = await this.page.$$( '.mt-user-properties .mt-drawer-header' );
     for ( const header of headers ) {
-      const text = await header.evaluate( elm => elm.querySelector( 'h3' ).textContent );
-      if ( text === headerName )
-        return header.click();
+      const text = await header.executionContext().evaluate( elm => elm.querySelector( 'h3' ).textContent, header );
+      if ( text === headerName ) {
+        await this.sleep( 150 );
+        await header.executionContext().evaluate( elm => elm.scrollIntoView(), header );
+        await header.click();
+        return header;
+      }
     }
 
     return null;
@@ -57,7 +61,9 @@ class UsersPage extends Page {
   async getUserByEmail( email ) {
     const users = await this.page.$$( `.mt-user-list > div` );
     for ( const user of users ) {
-      const text = await user.evaluate( elm => elm.querySelector( '.mt-user-email' ).textContent );
+      const text = await user.executionContext().evaluate(
+        ( elm ) => elm.querySelector( '.mt-user-email' ).textContent, user
+      );
       if ( text === email )
         return user;
     }
@@ -71,7 +77,7 @@ class UsersPage extends Page {
   }
 
   closeSnackMessage() {
-    return this.page.click( '.mt-response-message button' );
+    return this.click( '.mt-response-message button' );
   }
 
   getModalMessage() {
@@ -87,9 +93,11 @@ class UsersPage extends Page {
     await this.waitFor( '.mt-users-modal .mt-cancel' );
 
     if ( cancel )
-      return this.page.click( '.mt-users-modal .mt-cancel' )
+      await this.click( '.mt-users-modal .mt-cancel' );
     else
-      return this.page.click( '.mt-users-modal .mt-confirm' )
+      await this.click( '.mt-users-modal .mt-confirm' );
+
+    await this.page.waitForFunction( '!window.document.querySelector(".mt-users-modal")' );
   }
 
   /**

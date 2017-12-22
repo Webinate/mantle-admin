@@ -2,7 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { UserTokens } from 'modepress';
 import { IRootState } from '../';
 import { getJson, del, apiUrl } from '../../utils/httpClients';
-import { ActionCreators as ServerResponseCreators } from '../server-responses/actions';
+import { ActionCreators as AppActionCreators } from '../app/actions';
 
 // Action Creators
 export const ActionCreators = {
@@ -35,7 +35,7 @@ export function removeUser( username: string ) {
       dispatch( ActionCreators.SetUsersBusy.create( true ) );
       await del( `${ apiUrl }/users/${ username }` );
       dispatch( ActionCreators.RemoveUser.create( username ) );
-      dispatch( ServerResponseCreators.serverResponse.create( `User '${ username }' successfully removed` ) );
+      dispatch( AppActionCreators.serverResponse.create( `User '${ username }' successfully removed` ) );
     }
     catch {
       dispatch( ActionCreators.SetUsersBusy.create( true ) );

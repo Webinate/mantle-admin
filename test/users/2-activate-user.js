@@ -19,7 +19,7 @@ describe( '2. Activate user', function() {
 
     await users.waitFor( '.mt-activate-account' );
     await users.page.hover( '.mt-activate-account' );
-    await users.page.click( '.mt-activate-account' );
+    await users.click( '.mt-activate-account' );
 
     assert.equal( await users.getSnackMessage(), 'User successfully activated' );
 

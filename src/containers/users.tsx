@@ -16,7 +16,8 @@ import { TextField, IconButton, LinearProgress, Dialog, FlatButton, RaisedButton
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   userState: state.users,
   auth: state.authentication,
-  admin: state.admin
+  admin: state.admin,
+  app: state.app
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -178,6 +179,7 @@ export class Users extends React.Component<Partial<Props>, State> {
               : undefined
           }}
           second={() => <UserProperties
+            animated={this.props.app!.debugMode ? false : true}
             resetPasswordRequest={username => { this.props.resetPassword!( username ) }}
             activateAccount={username => { this.props.activate!( username ) }}
             activeUser={this.props.auth!.user!}
