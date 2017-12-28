@@ -1,4 +1,4 @@
-const AuthPage = require( '../pages/auth.js' );
+const AuthPage = require( '../../pages/auth.js' );
 const assert = require( 'assert' );
 let auth = new AuthPage();
 

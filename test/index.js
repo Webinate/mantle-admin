@@ -24,12 +24,12 @@ describe( 'Initialize Server', function() {
   } );
 } );
 
-require( './login/1-login-validation' );
-require( './login/2-register-validation' );
-require( './login/3-login-failures' );
-require( './login/4-reset-failures' );
-require( './login/5-register-failures' );
-require( './login/6-successful-login-logout' );
-require( './users/1-find-user' );
-require( './users/2-activate-user' );
-require( './users/3-delete-user' );
+require( './tests/login/1-login-validation' );
+require( './tests/login/2-register-validation' );
+require( './tests/login/3-login-failures' );
+require( './tests/login/4-reset-failures' );
+require( './tests/login/5-register-failures' );
+require( './tests/login/6-successful-login-logout' );
+require( './tests/users/1-find-user' );
+require( './tests/users/2-activate-user' );
+require( './tests/users/3-delete-user' );

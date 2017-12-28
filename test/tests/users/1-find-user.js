@@ -1,6 +1,6 @@
-const UsersPage = require( '../pages/users' );
+const UsersPage = require( '../../pages/users' );
 const assert = require( 'assert' );
-const utils = require( '../utils' );
+const utils = require( '../../utils' );
 
 let users = new UsersPage();
 let joe, joey, mary, unActivatedUser;
