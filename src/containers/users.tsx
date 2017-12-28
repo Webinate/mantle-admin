@@ -3,7 +3,7 @@ import { UserTokens, IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { getUsers, removeUser } from '../store/users/actions';
-import { resetPassword, activate } from '../store/admin-actions/actions';
+import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
 import { ContentHeader } from '../components/content-header';
@@ -23,9 +23,10 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getUsers: getUsers,
-  resetPassword: resetPassword,
+  requestPasswordReset: requestPasswordReset,
   activate: activate,
-  removeUser: removeUser
+  removeUser: removeUser,
+  resendActivation: resendActivation
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -180,8 +181,9 @@ export class Users extends React.Component<Partial<Props>, State> {
           }}
           second={() => <UserProperties
             animated={this.props.app!.debugMode ? false : true}
-            resetPasswordRequest={username => { this.props.resetPassword!( username ) }}
+            resetPasswordRequest={username => { this.props.requestPasswordReset!( username ) }}
             activateAccount={username => { this.props.activate!( username ) }}
+            resendActivation={username => { this.props.resendActivation!( username ) }}
             activeUser={this.props.auth!.user!}
             onDeleteRequested={( user ) => {
               this.setState( {

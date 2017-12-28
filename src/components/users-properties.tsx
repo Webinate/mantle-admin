@@ -14,6 +14,7 @@ type Props = {
   resetPasswordRequest( username: string ): void;
   activateAccount( username: string ): void;
   onDeleteRequested( username: IUserEntry ): void;
+  resendActivation( username: string ): void;
 };
 
 type State = {
@@ -141,6 +142,7 @@ export class UserProperties extends React.Component<Props, State> {
                       tooltipPosition="top-left"
                       iconClassName="icon icon-mark-unread mt-resend-activation"
                       tooltip="Email user"
+                      onClick={e => this.props.resendActivation( this.props.selected!.username )}
                     />
                   </div>
                 </InlineField> : undefined}

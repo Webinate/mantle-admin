@@ -13,7 +13,7 @@ export const ActionCreators = {
 // Action Types
 export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 
-export function resetPassword( username: string ) {
+export function requestPasswordReset( username: string ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.busy.create( true ) );
 
@@ -41,3 +41,19 @@ export function activate( username: string ) {
     }
   }
 }
+
+export function resendActivation( username: string ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.busy.create( true ) );
+
+    try {
+      const resp = await getJson<AuthTokens.ResendActivation.Response>( `${ apiUrl }/auth/${ username }/resend-activation` );
+      dispatch( ActionCreators.busy.create( false ) );
+      dispatch( AppActionCreators.serverResponse.create( resp.message ) );
+    }
+    catch ( e ) {
+      dispatch( AppActionCreators.serverResponse.create( ( e as ClientError ).response.statusText ) );
+    }
+  }
+}
+

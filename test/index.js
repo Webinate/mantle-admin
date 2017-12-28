@@ -33,3 +33,5 @@ require( './tests/login/6-successful-login-logout' );
 require( './tests/users/1-find-user' );
 require( './tests/users/2-activate-user' );
 require( './tests/users/3-delete-user' );
+require( './tests/users/4-resend-activation' );
+require( './tests/users/5-request-password-reset' );
