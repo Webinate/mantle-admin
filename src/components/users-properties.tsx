@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, TextField, DatePicker, RaisedButton, IconButton } from 'material-ui';
+import { Avatar, TextField, DatePicker, RaisedButton, IconButton, FloatingActionButton } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
@@ -59,6 +59,11 @@ export class UserProperties extends React.Component<Props, State> {
       <Properties className="mt-user-properties">
 
         <ImgContainer>
+          <FloatingActionButton
+            iconClassName="icon icon-camera"
+            backgroundColor={theme.primary200.background}
+            style={{ bottom: '10px', right: '10px', position: 'absolute' }}
+          />
           <Avatar
             className="mt-avatar-image"
             src={generateAvatarPic( selected.avatar )}
@@ -241,6 +246,8 @@ const ImgContainer = styled.div`
   text-align: center;
   padding: 20px;
   background: linear-gradient(-45deg, ${theme.secondary100.background }, ${ theme.primary100.background });
+  position: relative;
+  overflow: hidden;
 `;
 
 
