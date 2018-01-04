@@ -8,6 +8,7 @@ import { AuthScreen } from '../components/auth-screen';
 import { Dashboard } from '../components/dashboard';
 import { ContentHeader } from '../components/content-header';
 import { Users } from './users';
+import { Posts } from './posts';
 import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
 
 // Map state to props
@@ -68,6 +69,7 @@ export class App extends React.Component<Partial<Props>, State> {
 
     const items = [
       { label: 'Home', icon: 'icon icon-home', path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
+      { label: 'Posts', icon: 'icon icon-posts', path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
       { label: 'Users', icon: 'icon icon-people', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
     ];
 
@@ -104,6 +106,9 @@ export class App extends React.Component<Partial<Props>, State> {
               <Switch>
                 <Route path="/dashboard" exact={true} render={props => {
                   return <ContentHeader title="Home" />
+                }} />
+                <Route path="/dashboard/posts" render={props => {
+                  return <Posts />
                 }} />
                 <Route path="/dashboard/users" render={props => {
                   return <Users />

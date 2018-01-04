@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@types/bson": "~1.0.3",
+    "@types/draft-js": "^0.10.19",
     "@types/history": "^4.5.2",
     "@types/material-ui": "0.17.14",
     "@types/mongodb": "~2.2.7",
@@ -52,6 +53,7 @@
     "@types/redux": "~3.6.31",
     "@types/redux-thunk": "~2.1.32",
     "@types/ws": "^3.0.2",
+    "draft-js": "^0.10.4",
     "express": "4.15.3",
     "gulp-sass": "~3.1.0",
     "gulp-tslint": "~8.1.2",
