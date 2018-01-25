@@ -3,19 +3,20 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
+import { getPosts } from '../store/posts/actions';
 import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
+import { IPost } from 'modepress';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
-  userState: state.users,
-  auth: state.authentication,
-  admin: state.admin,
+  posts: state.posts,
   app: state.app
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
+  getPosts: getPosts
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -102,6 +103,8 @@ export class Posts extends React.Component<Partial<Props>, State> {
   }
 
   componentWillMount() {
+    if ( this.props.posts!.postPage === 'not-hydrated' )
+      this.props.getPosts!();
   }
 
   // Once component mounts, enable editor
@@ -131,9 +134,16 @@ export class Posts extends React.Component<Partial<Props>, State> {
   }
 
   render() {
+    let posts: IPost[] | null = null;
+    const page = this.props.posts!.postPage!;
+
+    if ( typeof ( page ) !== 'string' )
+      posts = page.data;
+
     return (
       <div style={{ height: '100%' }}>
-        <ContentHeader title="Posts"
+        <ContentHeader
+          title="Posts"
           renderFilters={() => {
             return <div>
               <TextField
@@ -165,6 +175,9 @@ export class Posts extends React.Component<Partial<Props>, State> {
               handleKeyCommand={( command, state ) => this._handleKeyCommand( command, state )}
               onChange={editorState => this.setState( { editorState: editorState } )}
             /> : undefined}
+          </div>
+          <div>
+            There are [{posts ? posts.length : 0}] posts
           </div>
         </div>
       </div >
