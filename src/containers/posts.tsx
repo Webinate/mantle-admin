@@ -7,6 +7,9 @@ import { getPosts } from '../store/posts/actions';
 import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import { IPost } from 'modepress';
+import { Pager } from '../components/pager';
+import { Page } from 'modepress';
+import { default as styled } from '../theme/styled';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -134,11 +137,11 @@ export class Posts extends React.Component<Partial<Props>, State> {
   }
 
   render() {
-    let posts: IPost[] | null = null;
+    let posts: Page<IPost> | null = null;
     const page = this.props.posts!.postPage!;
 
     if ( typeof ( page ) !== 'string' )
-      posts = page.data;
+      posts = page;
 
     return (
       <div style={{ height: '100%' }}>
@@ -177,10 +180,67 @@ export class Posts extends React.Component<Partial<Props>, State> {
             /> : undefined}
           </div>
           <div>
-            There are [{posts ? posts.length : 0}] posts
+            <Pager
+              total={posts!.count}
+              limit={posts!.limit}
+              offset={posts!.index}
+              onPage={index => this.props.getPosts!( index )}
+            >
+              {posts!.data.map( post => {
+                return <Post
+                  selected={false}
+                  className="mt-post"
+                >
+                  <IconButton
+                    style={{ top: 0, right: 0, position: 'absolute' }}
+                    iconClassName="icon icon-delete"
+                  />
+                  <div className="mt-post-content">{post.content}</div>
+                  <h3>{post.title}</h3>
+                </Post>
+              } )}
+            </Pager>
           </div>
         </div>
       </div >
     );
   }
 };
+
+interface PostProps extends React.HTMLProps<HTMLDivElement> {
+}
+
+
+const Post = styled.div`
+  margin: 10px;
+  float: left;
+  padding: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.25s background;
+  width: 300px;
+  height: 300px;
+  background: ${( props: PostProps ) => props.selected ? theme.primary200.background : theme.light100.background };
+  color: ${( props: PostProps ) => props.selected ? theme.primary200.color : theme.light100.color };
+  user-select: none;
+  position: relative;
+
+  &:hover {
+    background: ${( props: PostProps ) => props.selected ? '' : theme.light100.background };
+    color: ${( props: PostProps ) => props.selected ? '' : theme.light100.color };
+  }
+
+  &:active {
+    background: ${( props: PostProps ) => props.selected ? '' : theme.light100.background };
+    color: ${( props: PostProps ) => props.selected ? '' : theme.light100.color };
+  }
+
+  .mt-post-content {
+    height: 220px;
+  }
+
+  h3 {
+    border-top: 1px solid #ccc;
+  }
+`;

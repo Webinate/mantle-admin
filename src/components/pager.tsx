@@ -8,7 +8,7 @@ export type Props = {
   total: number;
   limit: number;
   onPage: ( offset: number ) => void;
-  contentProps: React.HTMLProps<HTMLDivElement>;
+  contentProps?: React.HTMLProps<HTMLDivElement>;
 }
 
 type State = {
