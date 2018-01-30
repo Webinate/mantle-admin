@@ -8,7 +8,8 @@ import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import { IPost } from 'modepress';
 import { Pager } from '../components/pager';
-import { Page } from 'modepress';
+import { Page, PostTokens } from 'modepress';
+import * as moment from 'moment';
 import { default as styled } from '../theme/styled';
 
 // Map state to props
@@ -28,6 +29,7 @@ type State = {
   searchFilter: string;
   editorState: EditorState;
   editor: boolean;
+  selectedPosts: IPost[];
 };
 
 const BLOCK_TYPES = [
@@ -69,6 +71,7 @@ const BlockStyleControls = ( props: any ) => {
 class StyleButton extends React.Component<{ active: boolean; label: string; style: any; onToggle: ( style: string ) => void; }> {
   constructor() {
     super();
+    this.state = {};
   }
 
   onToggle( e: React.MouseEvent<{}> ) {
@@ -101,7 +104,8 @@ export class Posts extends React.Component<Partial<Props>, State> {
     this.state = {
       searchFilter: '',
       editor: false,
-      editorState: EditorState.createEmpty()
+      editorState: EditorState.createEmpty(),
+      selectedPosts: []
     }
   }
 
@@ -134,6 +138,30 @@ export class Posts extends React.Component<Partial<Props>, State> {
         blockType
       )
     } );
+  }
+
+  private onPostSelected( user: IPost, e: React.MouseEvent<HTMLDivElement> ) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if ( !e.ctrlKey && !e.shiftKey ) {
+      this.setState( { selectedPosts: [ user ] } );
+    }
+    else if ( e.ctrlKey ) {
+      if ( this.state.selectedPosts.indexOf( user ) === -1 )
+        this.setState( { selectedPosts: this.state.selectedPosts.concat( user ) } );
+      else
+        this.setState( { selectedPosts: this.state.selectedPosts.filter( i => i !== user ) } );
+    }
+    else {
+      const userPage = this.props.posts!.postPage as PostTokens.GetAll.Response;
+      const selected = this.state.selectedPosts;
+
+      let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
+
+      this.setState( { selectedPosts: userPage.data.slice( firstIndex, lastIndex + 1 ) } );
+    }
   }
 
   render() {
@@ -180,26 +208,40 @@ export class Posts extends React.Component<Partial<Props>, State> {
             /> : undefined}
           </div>
           <div>
-            <Pager
+            {posts ? <Pager
               total={posts!.count}
               limit={posts!.limit}
               offset={posts!.index}
               onPage={index => this.props.getPosts!( index )}
             >
-              {posts!.data.map( post => {
+              {posts.data.map( post => {
+                const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
                 return <Post
-                  selected={false}
+                  selected={selected}
                   className="mt-post"
+                  onClick={e => { this.onPostSelected( post, e ) }}
                 >
                   <IconButton
+                    style={{ top: 0, right: '30px', position: 'absolute' }}
+                    iconStyle={{ color: theme.primary200.background }}
+                    className="mt-post-button"
+                    iconClassName="icon icon-edit"
+                  />
+                  <IconButton
                     style={{ top: 0, right: 0, position: 'absolute' }}
+                    iconStyle={{ color: theme.primary200.background }}
+                    className="mt-post-button"
                     iconClassName="icon icon-delete"
                   />
                   <div className="mt-post-content">{post.content}</div>
-                  <h3>{post.title}</h3>
+                  <div className="mt-post-dates">
+                    <i>{moment( post.lastUpdated ).format( 'MMMM Do, YYYY' )}</i>
+                    <i>{moment( post.createdOn ).format( 'MMMM Do, YYYY' )}</i>
+                  </div>
+                  <h3>{post.title || 'UNTITLED'}</h3>
                 </Post>
               } )}
-            </Pager>
+            </Pager> : undefined}
           </div>
         </div>
       </div >
@@ -214,21 +256,34 @@ interface PostProps extends React.HTMLProps<HTMLDivElement> {
 const Post = styled.div`
   margin: 10px;
   float: left;
-  padding: 10px;
+  padding: 5px;
   box-sizing: border-box;
   cursor: pointer;
   border-radius: 5px;
   transition: 0.25s background;
   width: 300px;
   height: 300px;
-  background: ${( props: PostProps ) => props.selected ? theme.primary200.background : theme.light100.background };
-  color: ${( props: PostProps ) => props.selected ? theme.primary200.color : theme.light100.color };
+  background: ${( props: PostProps ) => props.selected ? theme.primary200.background : '' };
+  color: ${( props: PostProps ) => props.selected ? theme.primary200.color : '' };
   user-select: none;
   position: relative;
 
   &:hover {
     background: ${( props: PostProps ) => props.selected ? '' : theme.light100.background };
     color: ${( props: PostProps ) => props.selected ? '' : theme.light100.color };
+
+    .mt-post-button {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .mt-post-dates {
+    padding: 5px 0 0 0;
+    border-top: 1px solid #ccc;
+
+    i:first-child { float: left; }
+    i:last-child { float: right; }
   }
 
   &:active {
@@ -236,11 +291,19 @@ const Post = styled.div`
     color: ${( props: PostProps ) => props.selected ? '' : theme.light100.color };
   }
 
+  .mt-post-button {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
   .mt-post-content {
-    height: 220px;
+    height: 200px;
+    background: ${( props: PostProps ) => props.selected ? theme.light100.background : '' };
+    color: ${( props: PostProps ) => props.selected ? theme.light100.color : '' };
   }
 
   h3 {
-    border-top: 1px solid #ccc;
+    padding: 5px 0 0 0;
+    clear: both;
   }
 `;
