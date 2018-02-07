@@ -1,6 +1,6 @@
 {
   "name": "modepress-admin",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "An admin panel for the Modepress server",
   "main": "index.js",
   "repository": {
