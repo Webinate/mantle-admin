@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { UserTokens } from 'modepress';
+import { UserTokens } from 'modepress-api';
 import { IRootState } from '../';
 import { getJson, del, apiUrl } from '../../utils/httpClients';
 import { ActionCreators as AppActionCreators } from '../app/actions';

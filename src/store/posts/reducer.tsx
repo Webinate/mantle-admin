@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { PostTokens } from 'modepress';
+import { PostTokens } from 'modepress-api';
 
 // State
 export type State = {

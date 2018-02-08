@@ -6,9 +6,9 @@ import { ContentHeader } from '../components/content-header';
 import { getPosts } from '../store/posts/actions';
 import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
-import { IPost } from 'modepress';
+import { IPost } from 'modepress-api';
 import { Pager } from '../components/pager';
-import { Page, PostTokens } from 'modepress';
+import { Page, PostTokens } from 'modepress-api';
 import * as moment from 'moment';
 import { default as styled } from '../theme/styled';
 

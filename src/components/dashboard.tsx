@@ -4,7 +4,7 @@ import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { Stage } from './stage';
 import { generateAvatarPic } from '../utils/component-utils';
-import { IUserEntry } from 'modepress';
+import { IUserEntry } from 'modepress-api';
 
 type Props = {
   activeUser: IUserEntry;
