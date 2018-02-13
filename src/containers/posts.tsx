@@ -6,9 +6,8 @@ import { ContentHeader } from '../components/content-header';
 import { getPosts } from '../store/posts/actions';
 import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
-import { IPost } from 'modepress-api';
 import { Pager } from '../components/pager';
-import { Page, PostTokens } from 'modepress-api';
+import { Page, IPost } from 'modepress-api';
 import * as moment from 'moment';
 import { default as styled } from '../theme/styled';
 
@@ -154,7 +153,7 @@ export class Posts extends React.Component<Partial<Props>, State> {
         this.setState( { selectedPosts: this.state.selectedPosts.filter( i => i !== user ) } );
     }
     else {
-      const userPage = this.props.posts!.postPage as PostTokens.GetAll.Response;
+      const userPage = this.props.posts!.postPage as Page<IPost>;
       const selected = this.state.selectedPosts;
 
       let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );

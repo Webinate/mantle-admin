@@ -1,9 +1,9 @@
 import { ActionCreators, Action } from './actions';
-import { PostTokens } from 'modepress-api';
+import { Page, IPost } from 'modepress-api';
 
 // State
 export type State = {
-  readonly postPage: PostTokens.GetAll.Response | null | 'not-hydrated';
+  readonly postPage: Page<IPost> | null | 'not-hydrated';
   readonly busy: boolean;
 };
 
