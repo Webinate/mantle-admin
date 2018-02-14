@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { Page, IPost } from 'modepress-api';
+import { Page, IPost } from 'modepress';
 
 // State
 export type State = {

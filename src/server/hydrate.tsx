@@ -4,8 +4,8 @@ import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as UserActions } from '../store/users/actions';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
-import { IAuthReq } from 'modepress-api';
-import { controllers } from 'modepress-api';
+import { IAuthReq } from 'modepress';
+import { controllers } from 'modepress';
 const yargs = require( 'yargs' );
 const args = yargs.argv;
 

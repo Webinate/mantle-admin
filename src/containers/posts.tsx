@@ -7,7 +7,7 @@ import { getPosts } from '../store/posts/actions';
 import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import { Pager } from '../components/pager';
-import { Page, IPost } from 'modepress-api';
+import { Page, IPost } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../theme/styled';
 

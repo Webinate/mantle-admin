@@ -1,7 +1,7 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { postJson, get, apiUrl, ClientError } from '../../utils/httpClients';
-import { AuthTokens, IUserEntry } from 'modepress-api';
+import { AuthTokens, IUserEntry } from 'modepress';
 import { push } from 'react-router-redux';
 
 // Action Creators

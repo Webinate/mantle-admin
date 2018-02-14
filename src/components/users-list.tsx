@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from 'modepress-api';
+import { IUserEntry } from 'modepress';
 import { Avatar } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';

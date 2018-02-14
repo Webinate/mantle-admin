@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IPost } from 'modepress-api';
-import { posts } from 'modepress-api/frontend-api';
+import { Page, IPost } from 'modepress';
+import { posts } from 'modepress/lib-frontend';
 import { IRootState } from '../';
 
 // Action Creators

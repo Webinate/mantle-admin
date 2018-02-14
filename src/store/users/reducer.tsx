@@ -1,6 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import { ActionCreators as AdminActionCreators, Action as AdminAction } from '../admin-actions/actions';
-import { UserTokens } from 'modepress-api';
+import { UserTokens } from 'modepress';
 
 // State
 export type State = {
