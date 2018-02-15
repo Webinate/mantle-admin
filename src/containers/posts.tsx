@@ -3,7 +3,7 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
-import { getPosts } from '../store/posts/actions';
+import { getPosts, ActionCreators } from '../store/posts/actions';
 import { TextField, IconButton } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import { Pager } from '../components/pager';
@@ -19,7 +19,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  getPosts: getPosts
+  getPosts: getPosts,
+  setPrepopulated: ActionCreators.SetPrepopulated.create
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -96,7 +97,7 @@ class StyleButton extends React.Component<{ active: boolean; label: string; styl
  * The main application entry point
  */
 @connectWrapper( mapStateToProps, dispatchToProps )
-export class Posts extends React.Component<Partial<Props>, State> {
+export class Posts extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );
@@ -109,8 +110,10 @@ export class Posts extends React.Component<Partial<Props>, State> {
   }
 
   componentWillMount() {
-    if ( this.props.posts!.postPage === 'not-hydrated' )
-      this.props.getPosts!();
+    if ( !this.props.posts.prepopulated )
+      this.props.getPosts();
+    else
+      this.props.setPrepopulated( false );
   }
 
   // Once component mounts, enable editor
@@ -153,7 +156,7 @@ export class Posts extends React.Component<Partial<Props>, State> {
         this.setState( { selectedPosts: this.state.selectedPosts.filter( i => i !== user ) } );
     }
     else {
-      const userPage = this.props.posts!.postPage as Page<IPost>;
+      const userPage = this.props.posts.postPage!;
       const selected = this.state.selectedPosts;
 
       let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
@@ -165,7 +168,7 @@ export class Posts extends React.Component<Partial<Props>, State> {
 
   render() {
     let posts: Page<IPost> | null = null;
-    const page = this.props.posts!.postPage!;
+    const page = this.props.posts.postPage!;
 
     if ( typeof ( page ) !== 'string' )
       posts = page;
@@ -211,7 +214,7 @@ export class Posts extends React.Component<Partial<Props>, State> {
               total={posts!.count}
               limit={posts!.limit}
               offset={posts!.index}
-              onPage={index => this.props.getPosts!( index )}
+              onPage={index => this.props.getPosts( index )}
             >
               {posts.data.map( post => {
                 const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;

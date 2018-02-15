@@ -108,10 +108,10 @@ export class App extends React.Component<Partial<Props>, State> {
                   return <ContentHeader title="Home" />
                 }} />
                 <Route path="/dashboard/posts" render={props => {
-                  return <Posts />
+                  return <Posts {...{} as any} />
                 }} />
                 <Route path="/dashboard/users" render={props => {
-                  return <Users />
+                  return <Users {...{} as any} />
                 }} />
                 <Route render={props => <h1>Not Found</h1>} />
               </Switch>

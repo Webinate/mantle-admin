@@ -6,7 +6,8 @@ import { IRootState } from '../';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' )
+  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' ),
+  SetPrepopulated: new ActionCreator<'posts-set-prepopulated', boolean>( 'posts-set-prepopulated' )
 };
 
 // Action Types

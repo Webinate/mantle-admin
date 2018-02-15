@@ -34,6 +34,7 @@ export async function hydrate( req: IAuthReq ) {
 
   if ( matches ) {
     const posts = await controllers.posts.getPosts();
+    actions.push( PostActions.SetPrepopulated.create( true ) );
     actions.push( PostActions.SetPosts.create( posts ) );
   }
 

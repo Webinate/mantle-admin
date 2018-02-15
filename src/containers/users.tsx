@@ -43,7 +43,7 @@ type State = {
  * The main application entry point
  */
 @connectWrapper( mapStateToProps, dispatchToProps )
-export class Users extends React.Component<Partial<Props>, State> {
+export class Users extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );
@@ -57,12 +57,12 @@ export class Users extends React.Component<Partial<Props>, State> {
   }
 
   componentWillMount() {
-    if ( this.props.userState!.userPage === 'not-hydrated' )
-      this.props.getUsers!();
+    if ( this.props.userState.userPage === null )
+      this.props.getUsers();
   }
 
   componentWillReceiveProps( next: Props ) {
-    if ( next.userState.userPage !== this.props.userState!.userPage )
+    if ( next.userState.userPage !== this.props.userState.userPage )
       this.setState( { selectedUsers: [] } );
   }
 
@@ -80,7 +80,7 @@ export class Users extends React.Component<Partial<Props>, State> {
         this.setState( { selectedUsers: this.state.selectedUsers.filter( i => i !== user ) } );
     }
     else {
-      const userPage = this.props.userState!.userPage as UserTokens.GetAll.Response;
+      const userPage = this.props.userState.userPage as UserTokens.GetAll.Response;
       const selected = this.state.selectedUsers;
 
       let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
@@ -124,8 +124,8 @@ export class Users extends React.Component<Partial<Props>, State> {
   }
 
   render() {
-    const page = ( typeof ( this.props.userState!.userPage! ) === 'string' ? null : this.props.userState!.userPage! as UserTokens.GetAll.Response );
-    const isBusy = this.props.userState!.busy;
+    const page = ( typeof ( this.props.userState.userPage! ) === 'string' ? null : this.props.userState.userPage! as UserTokens.GetAll.Response );
+    const isBusy = this.props.userState.busy;
     const selected = this.state.selectedUsers.length > 0 ?
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
 
@@ -141,13 +141,13 @@ export class Users extends React.Component<Partial<Props>, State> {
                 value={this.state.userFilter}
                 onKeyDown={e => {
                   if ( e.keyCode === 13 )
-                    this.props.getUsers!( 0, this.state.userFilter )
+                    this.props.getUsers( 0, this.state.userFilter )
                 }}
                 onChange={( e, text ) => this.setState( { userFilter: text } )}
               />
               <IconButton
                 name="users-search-button"
-                onClick={e => this.props.getUsers!( 0, this.state.userFilter )}
+                onClick={e => this.props.getUsers( 0, this.state.userFilter )}
                 style={{ verticalAlign: 'top' }}
                 iconStyle={{ color: theme.primary200.background }}
                 iconClassName="icon icon-search"
@@ -164,7 +164,7 @@ export class Users extends React.Component<Partial<Props>, State> {
             return page ?
               <Pager
                 limit={page.limit}
-                onPage={index => this.props.getUsers!( index )}
+                onPage={index => this.props.getUsers( index )}
                 offset={page.index}
                 total={page.count}
                 contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
@@ -180,11 +180,11 @@ export class Users extends React.Component<Partial<Props>, State> {
               : undefined
           }}
           second={() => <UserProperties
-            animated={this.props.app!.debugMode ? false : true}
-            resetPasswordRequest={username => { this.props.requestPasswordReset!( username ) }}
-            activateAccount={username => { this.props.activate!( username ) }}
-            resendActivation={username => { this.props.resendActivation!( username ) }}
-            activeUser={this.props.auth!.user!}
+            animated={this.props.app.debugMode ? false : true}
+            resetPasswordRequest={username => { this.props.requestPasswordReset( username ) }}
+            activateAccount={username => { this.props.activate( username ) }}
+            resendActivation={username => { this.props.resendActivation( username ) }}
+            activeUser={this.props.auth.user!}
             onDeleteRequested={( user ) => {
               this.setState( {
                 dialogueHeader: 'Remove User',
@@ -198,7 +198,7 @@ export class Users extends React.Component<Partial<Props>, State> {
         />
         {this.state.dialogue ?
           this.renderModal( () => {
-            this.props.removeUser!( selected!.username )
+            this.props.removeUser( selected!.username )
           } ) : undefined}
       </div >
     );

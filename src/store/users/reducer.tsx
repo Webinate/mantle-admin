@@ -1,22 +1,22 @@
 import { ActionCreators, Action } from './actions';
 import { ActionCreators as AdminActionCreators, Action as AdminAction } from '../admin-actions/actions';
-import { UserTokens } from 'modepress';
+import { IUserEntry, Page } from 'modepress';
 
 // State
 export type State = {
-  readonly userPage: UserTokens.GetAll.Response | null | 'not-hydrated';
+  readonly userPage: Page<IUserEntry> | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
-  userPage: 'not-hydrated',
+  userPage: null,
   busy: false
 };
 
 // Reducer
 export default function reducer( state: State = initialState, action: Action | AdminAction ): State {
   let partialState: Partial<State> | undefined;
-  let page = state.userPage as UserTokens.GetAll.Response;
+  let page = state.userPage;
 
   switch ( action.type ) {
     case ActionCreators.SetUsers.type:
@@ -32,14 +32,14 @@ export default function reducer( state: State = initialState, action: Action | A
 
     case ActionCreators.RemoveUser.type:
       partialState = {
-        userPage: { ...page, data: page.data.filter( user => user.username !== action.payload ) },
+        userPage: { ...page!, data: page!.data.filter( user => user.username !== action.payload ) },
         busy: false
       };
       break;
 
     case AdminActionCreators.userActivated.type:
       partialState = {
-        userPage: { ...page, data: page.data.map( user => { return { ...user, registerKey: '' } } ) }
+        userPage: { ...page!, data: page!.data.map( user => { return { ...user, registerKey: '' } } ) }
       };
       break;
 
