@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { UserTokens, IUserEntry } from 'modepress';
+import { IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
-import { getUsers, removeUser } from '../store/users/actions';
+import { getUsers, removeUser, ActionCreators } from '../store/users/actions';
 import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
@@ -26,7 +26,8 @@ const dispatchToProps = {
   requestPasswordReset: requestPasswordReset,
   activate: activate,
   removeUser: removeUser,
-  resendActivation: resendActivation
+  resendActivation: resendActivation,
+  setPrepopulated: ActionCreators.SetPrepopulated.create
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -57,8 +58,10 @@ export class Users extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    if ( this.props.userState.userPage === null )
+    if ( !this.props.userState.prepopulated )
       this.props.getUsers();
+    else
+      this.props.setPrepopulated( false )
   }
 
   componentWillReceiveProps( next: Props ) {
@@ -80,7 +83,7 @@ export class Users extends React.Component<Props, State> {
         this.setState( { selectedUsers: this.state.selectedUsers.filter( i => i !== user ) } );
     }
     else {
-      const userPage = this.props.userState.userPage as UserTokens.GetAll.Response;
+      const userPage = this.props.userState.userPage!;
       const selected = this.state.selectedUsers;
 
       let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
@@ -124,7 +127,7 @@ export class Users extends React.Component<Props, State> {
   }
 
   render() {
-    const page = ( typeof ( this.props.userState.userPage! ) === 'string' ? null : this.props.userState.userPage! as UserTokens.GetAll.Response );
+    const page = ( typeof ( this.props.userState.userPage! ) === 'string' ? null : this.props.userState.userPage! );
     const isBusy = this.props.userState.busy;
     const selected = this.state.selectedUsers.length > 0 ?
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;

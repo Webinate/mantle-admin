@@ -1,8 +1,8 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
-import { getJson, put, apiUrl, ClientError } from '../../utils/httpClients';
+import { ClientError } from '../../utils/httpClients';
 import { ActionCreators as AppActionCreators } from '../app/actions';
-import { AuthTokens } from 'modepress';
+import { auth } from 'modepress/lib-frontend';
 
 // Action Creators
 export const ActionCreators = {
@@ -18,7 +18,7 @@ export function requestPasswordReset( username: string ) {
     dispatch( ActionCreators.busy.create( true ) );
 
     try {
-      const resp = await getJson<AuthTokens.RequestPasswordReset.Response>( `${ apiUrl }/auth/${ username }/request-password-reset` );
+      const resp = await auth.requestPasswordReset( username );
       dispatch( AppActionCreators.serverResponse.create( resp.message ) );
     }
     catch ( e ) {
@@ -32,7 +32,7 @@ export function activate( username: string ) {
     dispatch( ActionCreators.busy.create( true ) );
 
     try {
-      await put( `${ apiUrl }/auth/${ username }/approve-activation` );
+      await auth.approveActivation( username );
       dispatch( ActionCreators.userActivated.create( username ) );
       dispatch( AppActionCreators.serverResponse.create( 'User successfully activated' ) );
     }
@@ -47,7 +47,7 @@ export function resendActivation( username: string ) {
     dispatch( ActionCreators.busy.create( true ) );
 
     try {
-      const resp = await getJson<AuthTokens.ResendActivation.Response>( `${ apiUrl }/auth/${ username }/resend-activation` );
+      const resp = await auth.resendActivation( username );
       dispatch( ActionCreators.busy.create( false ) );
       dispatch( AppActionCreators.serverResponse.create( resp.message ) );
     }

@@ -21,5 +21,6 @@ export function getPosts( index: number = 0, search?: string ) {
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
     const resp = await posts.getAll( { index: index, keyword: search } );
     dispatch( ActionCreators.SetPosts.create( resp ) );
+    dispatch( ActionCreators.SetPrepopulated.create( false ) );
   }
 }
