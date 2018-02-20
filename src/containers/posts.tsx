@@ -4,7 +4,7 @@ import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
 import { getPosts, ActionCreators } from '../store/posts/actions';
-import { TextField, IconButton } from 'material-ui';
+import { TextField, IconButton, LinearProgress } from 'material-ui';
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import { Pager } from '../components/pager';
 import { Page, IPost } from 'modepress';
@@ -142,33 +142,34 @@ export class Posts extends React.Component<Props, State> {
     } );
   }
 
-  private onPostSelected( user: IPost, e: React.MouseEvent<HTMLDivElement> ) {
+  private onPostSelected( post: IPost, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();
 
     if ( !e.ctrlKey && !e.shiftKey ) {
-      this.setState( { selectedPosts: [ user ] } );
+      this.setState( { selectedPosts: [ post ] } );
     }
     else if ( e.ctrlKey ) {
-      if ( this.state.selectedPosts.indexOf( user ) === -1 )
-        this.setState( { selectedPosts: this.state.selectedPosts.concat( user ) } );
+      if ( this.state.selectedPosts.indexOf( post ) === -1 )
+        this.setState( { selectedPosts: this.state.selectedPosts.concat( post ) } );
       else
-        this.setState( { selectedPosts: this.state.selectedPosts.filter( i => i !== user ) } );
+        this.setState( { selectedPosts: this.state.selectedPosts.filter( i => i !== post ) } );
     }
     else {
-      const userPage = this.props.posts.postPage!;
+      const postPage = this.props.posts.postPage!;
       const selected = this.state.selectedPosts;
 
-      let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
-      let lastIndex = Math.max( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
+      let firstIndex = Math.min( postPage.data.indexOf( post ), selected.length > 0 ? postPage.data.indexOf( selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( postPage.data.indexOf( post ), selected.length > 0 ? postPage.data.indexOf( selected[ 0 ] ) : 0 );
 
-      this.setState( { selectedPosts: userPage.data.slice( firstIndex, lastIndex + 1 ) } );
+      this.setState( { selectedPosts: postPage.data.slice( firstIndex, lastIndex + 1 ) } );
     }
   }
 
   render() {
     let posts: Page<IPost> | null = null;
-    const page = this.props.posts.postPage!;
+    const page = this.props.posts.postPage;
+    const isBusy = this.props.posts.busy;
 
     if ( typeof ( page ) !== 'string' )
       posts = page;
@@ -216,33 +217,37 @@ export class Posts extends React.Component<Props, State> {
               offset={posts!.index}
               onPage={index => this.props.getPosts( index )}
             >
-              {posts.data.map( post => {
-                const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
-                return <Post
-                  selected={selected}
-                  className="mt-post"
-                  onClick={e => { this.onPostSelected( post, e ) }}
-                >
-                  <IconButton
-                    style={{ top: 0, right: '30px', position: 'absolute' }}
-                    iconStyle={{ color: theme.primary200.background }}
-                    className="mt-post-button"
-                    iconClassName="icon icon-edit"
-                  />
-                  <IconButton
-                    style={{ top: 0, right: 0, position: 'absolute' }}
-                    iconStyle={{ color: theme.primary200.background }}
-                    className="mt-post-button"
-                    iconClassName="icon icon-delete"
-                  />
-                  <div className="mt-post-content">{post.content}</div>
-                  <div className="mt-post-dates">
-                    <i>{moment( post.lastUpdated ).format( 'MMMM Do, YYYY' )}</i>
-                    <i>{moment( post.createdOn ).format( 'MMMM Do, YYYY' )}</i>
-                  </div>
-                  <h3>{post.title || 'UNTITLED'}</h3>
-                </Post>
-              } )}
+              {isBusy ? <div className="mt-loading"><LinearProgress /></div> : undefined}
+              <PostsContainer className="mt-posts">
+                {posts.data.map( ( post, postIndex ) => {
+                  const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
+                  return <Post
+                    key={'post-' + postIndex}
+                    selected={selected}
+                    className="mt-post"
+                    onClick={e => { this.onPostSelected( post, e ) }}
+                  >
+                    <IconButton
+                      style={{ top: 0, right: '30px', position: 'absolute' }}
+                      iconStyle={{ color: theme.primary200.background }}
+                      className="mt-post-button"
+                      iconClassName="icon icon-edit"
+                    />
+                    <IconButton
+                      style={{ top: 0, right: 0, position: 'absolute' }}
+                      iconStyle={{ color: theme.primary200.background }}
+                      className="mt-post-button"
+                      iconClassName="icon icon-delete"
+                    />
+                    <div className="mt-post-content">{post.content}</div>
+                    <div className="mt-post-dates">
+                      <i>{moment( post.lastUpdated ).format( 'MMMM Do, YYYY' )}</i>
+                      <i>{moment( post.createdOn ).format( 'MMMM Do, YYYY' )}</i>
+                    </div>
+                    <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
+                  </Post>
+                } )}
+              </PostsContainer>
             </Pager> : undefined}
           </div>
         </div>
@@ -255,6 +260,11 @@ interface PostProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 
+
+const PostsContainer = styled.div`
+  height: 100%;
+`;
+
 const Post = styled.div`
   margin: 10px;
   float: left;
@@ -265,14 +275,16 @@ const Post = styled.div`
   transition: 0.25s background;
   width: 300px;
   height: 300px;
-  background: ${( props: PostProps ) => props.selected ? theme.primary200.background : '' };
+  background: ${( props: PostProps ) => props.selected ? theme.primary200.background : theme.light300.background };
   color: ${( props: PostProps ) => props.selected ? theme.primary200.color : '' };
   user-select: none;
   position: relative;
 
+
+
   &:hover {
-    background: ${( props: PostProps ) => props.selected ? '' : theme.light100.background };
-    color: ${( props: PostProps ) => props.selected ? '' : theme.light100.color };
+    background: ${( props: PostProps ) => props.selected ? '' : theme.light400.background };
+    color: ${( props: PostProps ) => props.selected ? '' : theme.light400.color };
 
     .mt-post-button {
       opacity: 1;
@@ -300,7 +312,7 @@ const Post = styled.div`
 
   .mt-post-content {
     height: 200px;
-    background: ${( props: PostProps ) => props.selected ? theme.light100.background : '' };
+    background: ${( props: PostProps ) => props.selected ? theme.light100.background : theme.light100.background };
     color: ${( props: PostProps ) => props.selected ? theme.light100.color : '' };
   }
 

@@ -20,4 +20,6 @@ export interface ThemeInterface extends MuiTheme {
   warning: ThemeValue;
   light100: ThemeValue;
   light200: ThemeValue;
+  light300: ThemeValue;
+  light400: ThemeValue;
 }
