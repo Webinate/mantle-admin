@@ -7,7 +7,7 @@ if ( !args.config || !fs.existsSync( args.config ) ) {
   process.exit();
 }
 
-const startup = require( '../../../dist/core/initialization/startup.js' );
+const startup = require( '../../../lib/core/initialization/startup.js' );
 const utils = require( './utils.js' );
 
 describe( 'Initialize Server', function() {
@@ -35,3 +35,4 @@ require( './tests/users/2-activate-user' );
 require( './tests/users/3-delete-user' );
 require( './tests/users/4-resend-activation' );
 require( './tests/users/5-request-password-reset' );
+require( './tests/posts/1-new-post' );
