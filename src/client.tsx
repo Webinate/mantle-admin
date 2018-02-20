@@ -24,7 +24,7 @@ export const app = ReactDOM.render(
   <Provider store={store}>
     <MuiThemeProvider muiTheme={theme}>
       <ConnectedRouter store={store} history={history}>
-        <App />
+        <App {...{} as any} />
       </ConnectedRouter>
     </MuiThemeProvider>
   </Provider>, mountNode

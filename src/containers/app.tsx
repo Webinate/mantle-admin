@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { IRootState } from '../store';
 import { login, logout, register } from '../store/authentication/actions';
+import { ActionCreators as AppActions } from '../store/app/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
 import { Route, Redirect, Switch } from 'react-router-dom';
@@ -25,7 +26,8 @@ const dispatchToProps = {
   push: push,
   login: login,
   register: register,
-  logout: logout
+  logout: logout,
+  closeSnackbar: AppActions.serverResponse.create
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -37,7 +39,7 @@ type State = {
  * The main application entry point
  */
 @connectWrapper( mapStateToProps, dispatchToProps )
-export class App extends React.Component<Partial<Props>, State> {
+export class App extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );
@@ -45,23 +47,23 @@ export class App extends React.Component<Partial<Props>, State> {
 
   private logOut() {
     this.setState( { menuOpen: false } );
-    this.props.logout!();
+    this.props.logout();
   }
 
   private goTo( path: string ) {
     this.setState( { menuOpen: false } );
-    this.props.push!( path );
+    this.props.push( path );
   }
 
   getAuthScreen( formType: 'login' | 'register' ) {
     return <AuthScreen
-      loading={this.props.auth!.busy}
-      error={this.props.auth!.error}
+      loading={this.props.auth.busy}
+      error={this.props.auth.error}
       activeComponent={formType}
-      onLogin={( user, pass ) => this.props.login!( { username: user, password: pass, rememberMe: true } )}
+      onLogin={( user, pass ) => this.props.login( { username: user, password: pass, rememberMe: true } )}
       onActivationReset={( user ) => { }}
       onPasswordReset={( user ) => { }}
-      onRegister={( user, email, password ) => this.props.register!( { username: user, password: password, email: email } )}
+      onRegister={( user, email, password ) => this.props.register( { username: user, password: password, email: email } )}
     />;
   }
 
@@ -79,8 +81,8 @@ export class App extends React.Component<Partial<Props>, State> {
         <Route path="/dashboard" render={props => {
           return (
             <Dashboard
-              animated={this.props.app!.debugMode ? false : true}
-              activeUser={this.props.auth!.user!}
+              animated={this.props.app.debugMode ? false : true}
+              activeUser={this.props.auth.user!}
               title={'Mantle'}
               renderRight={() => <h3>Properties</h3>}
               renderLeft={() => {
@@ -124,9 +126,11 @@ export class App extends React.Component<Partial<Props>, State> {
         <Snackbar
           className="mt-response-message"
           autoHideDuration={20000}
-          open={this.props.app!.response ? true : false}
+          open={this.props.app.response ? true : false}
+          onRequestClose={() => { this.props.closeSnackbar( null ) }}
+          onActionTouchTap={event => { this.props.closeSnackbar( null ) }}
           action="close"
-          message={this.props.app!.response || ''}
+          message={this.props.app.response || ''}
         />
       </div>
     );

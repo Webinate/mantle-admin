@@ -82,7 +82,7 @@ export default class MainController extends Controller {
       <Provider store={store}>
         <MuiThemeProvider muiTheme={theme}>
           <StaticRouter location={url} context={context}>
-            <App />
+            <App {...{} as any} />
           </StaticRouter>
         </MuiThemeProvider>
       </Provider>

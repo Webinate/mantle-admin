@@ -3,7 +3,7 @@ import { IRootState } from '../';
 
 // Action Creators
 export const ActionCreators = {
-  serverResponse: new ActionCreator<'app-responses-message', string>( 'app-responses-message' ),
+  serverResponse: new ActionCreator<'app-responses-message', string | null>( 'app-responses-message' ),
   setDebugMode: new ActionCreator<'app-debug-mode', boolean>( 'app-debug-mode' )
 };
 
