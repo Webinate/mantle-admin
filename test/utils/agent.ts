@@ -1,4 +1,6 @@
-const fetch = require( "node-fetch" );
+import fetch, { Response, RequestInit } from "node-fetch";
+
+export type Headers = { [ name: string ]: string };
 
 /**
  * Represents an agent that can make calls to the backend
@@ -18,55 +20,95 @@ export default class Agent {
     this.email = email;
   }
 
-  async get( url: string, type = 'application/json', options = {} ) {
-    const headers = {};
-    if ( type )
-      headers[ 'Content-Type' ] = type;
-    if ( this.cookie )
-      headers[ 'Cookie' ] = this.cookie;
+  async get( url: string, options: Headers = {}, init?: RequestInit ) {
+    const headers: Headers = {
+      'cookie': this.cookie,
+      'content-type': 'application/json',
+      ...options
+    };
 
-    return await fetch( `${ this.host }${ url }`, Object.assign( {}, { headers: headers }, options ) );
+    return await fetch( `${ this.host }${ url }`, {
+      method: 'GET',
+      headers: headers,
+      ...init
+    } );
   }
 
-  async put( url: string, data: any, type = 'application/json' ) {
-    const headers = {};
-    if ( type )
-      headers[ 'Content-Type' ] = type;
-    if ( this.cookie )
-      headers[ 'Cookie' ] = this.cookie;
+  async put( url: string, data?: any, options: Headers = {} ) {
+    const headers: Headers = {
+      'cookie': this.cookie,
+      'content-type': 'application/json',
+      ...options
+    };
+
+    const contentType = headers[ 'content-type' ] || headers[ 'Content-Type' ];
 
     return await fetch( `${ this.host }${ url }`, {
       method: 'PUT',
       headers: headers,
-      body: type === 'application/json' ? JSON.stringify( data ) : data
+      body: contentType === 'application/json' ? JSON.stringify( data ) : data
     } );
   }
 
-  async post( url: string, data: any, type = 'application/json', optionalHeaders = {} ) {
-    const headers = Object.assign( {}, optionalHeaders );
-    if ( type )
-      headers[ 'Content-Type' ] = type;
-    if ( this.cookie )
-      headers[ 'Cookie' ] = this.cookie;
+  async post( url: string, data?: any, options = {} ) {
+    const headers: Headers = {
+      'cookie': this.cookie,
+      'content-type': 'application/json',
+      ...options
+    };
+
+    const contentType = headers[ 'content-type' ] || headers[ 'Content-Type' ];
 
     return await fetch( `${ this.host }${ url }`, {
       method: 'POST',
       headers: headers,
-      body: type === 'application/json' ? JSON.stringify( data ) : data
+      body: contentType === 'application/json' ? JSON.stringify( data ) : data
     } );
   }
 
-  async delete( url: string, data: any, type: string ) {
-    const headers = {};
-    if ( type )
-      headers[ 'Content-Type' ] = type;
-    if ( this.cookie )
-      headers[ 'Cookie' ] = this.cookie;
+  async delete( url: string, options: Headers = {} ) {
+    const headers: Headers = {
+      'cookie': this.cookie,
+      'content-type': 'application/json',
+      ...options
+    };
 
     return await fetch( `${ this.host }${ url }`, {
       method: 'DELETE',
       headers: headers
     } );
+  }
+
+  async getJson<T>( url: string, options: Headers = {} ) {
+    return this.json<T>( url, 'get', undefined, options );
+  }
+
+  async putJson<T>( url: string, data: any, options: Headers = {} ) {
+    return this.json<T>( url, 'put', data, options );
+  }
+
+  async postJson<T>( url: string, data: any, options: Headers = {} ) {
+    return this.json<T>( url, 'post', data, options );
+  }
+
+  private async json<T>( url: string, type: string, data?: any, options: Headers = {} ) {
+    const headers: Headers = {
+      'method': type,
+      'content-type': 'application/json',
+      'cookie': this.cookie,
+      ...options
+    };
+
+    const contentType = headers[ 'content-type' ] || headers[ 'Content-Type' ];
+
+    const response = await fetch( `${ this.host }${ url }`, {
+      method: 'PUT',
+      headers: headers,
+      body: contentType === 'application/json' ? JSON.stringify( data ) : data
+    } );
+
+    const json: T = await response.json();
+    return json;
   }
 
   getSID() {
@@ -77,7 +119,7 @@ export default class Agent {
    * Updates the cookie of the agent
    * @param {string} response
    */
-  updateCookie( response: any ) {
+  updateCookie( response: Response ) {
     this.cookie = response.headers.get( "set-cookie" ).split( ";" )[ 0 ];
   }
 }
