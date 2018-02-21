@@ -1,4 +1,4 @@
-import * as utils from '../utils';
+import utils from '../utils';
 import { Browser, Page as PuppeteerPage } from 'puppeteer';
 import Agent from '../utils/agent';
 
@@ -9,7 +9,7 @@ export default class Page {
 
   public page: PuppeteerPage;
   public browser: Browser;
-  private config: any;
+  public config: any;
 
   constructor() {
   }

@@ -54,6 +54,7 @@
     "@types/redux-thunk": "~2.1.32",
     "@types/ws": "^3.0.2",
     "@types/mocha": "2.2.48",
+    "@types/node-fetch": "1.6.7",
     "draft-js": "^0.10.4",
     "express": "4.15.3",
     "gulp-sass": "~3.1.0",

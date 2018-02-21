@@ -241,8 +241,8 @@ export class Posts extends React.Component<Props, State> {
                     />
                     <div className="mt-post-content">{post.content}</div>
                     <div className="mt-post-dates">
-                      <i>{moment( post.lastUpdated ).format( 'MMMM Do, YYYY' )}</i>
-                      <i>{moment( post.createdOn ).format( 'MMMM Do, YYYY' )}</i>
+                      <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
+                      <i>{moment( post.createdOn ).format( 'MMM Do, YYYY' )}</i>
                     </div>
                     <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
                   </Post>
