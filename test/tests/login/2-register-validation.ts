@@ -1,5 +1,7 @@
-const AuthPage = require( '../../pages/auth' ).default;
-const assert = require( 'assert' );
+import AuthPage from '../../pages/auth';
+import * as assert from 'assert';
+import { } from 'mocha';
+
 let auth = new AuthPage();
 
 describe( '2. Test register validation', function() {

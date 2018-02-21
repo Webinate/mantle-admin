@@ -1,9 +1,10 @@
-const UsersPage = require( '../../pages/users' ).default;
-const assert = require( 'assert' );
-const utils = require( '../../utils' );
+import UsersPage from '../../pages/users';
+import * as assert from 'assert';
+import utils from '../../utils';
+import Agent from '../../utils/agent';
 
 let users = new UsersPage();
-let registeredUser;
+let registeredUser: Agent;
 
 describe( '4. Resend Activation', function() {
   before( async () => {

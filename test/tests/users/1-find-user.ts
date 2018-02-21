@@ -1,9 +1,10 @@
-const UsersPage = require( '../../pages/users' ).default;
-const assert = require( 'assert' );
-const utils = require( '../../utils' );
+import UsersPage from '../../pages/users';
+import * as assert from 'assert';
+import utils from '../../utils';
+import Agent from '../../utils/agent';
 
 let users = new UsersPage();
-let joe, joey, mary, unActivatedUser;
+let joe: Agent, joey: Agent, mary: Agent, unActivatedUser: Agent;
 
 describe( '1. Finds users by username and email', function() {
 
