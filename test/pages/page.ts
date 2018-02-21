@@ -1,20 +1,27 @@
-const utils = require( '../utils.js' );
+import * as utils from '../utils';
+import { Browser, Page as PuppeteerPage } from 'puppeteer';
+import Agent from '../utils/agent';
 
 /**
  * Base class for all page tests
  */
-class Page {
+export default class Page {
+
+  public page: PuppeteerPage;
+  public browser: Browser;
+  private config: any;
 
   constructor() {
   }
 
-  async load() {
+  async load( options?: any ): Promise<any> {
     this.page = utils.page;
     this.browser = utils.browser;
     this.config = utils.config;
+    return this.page;
   }
 
-  async setAgent( agent ) {
+  async setAgent( agent: Agent ) {
     await this.page.setCookie( {
       name: 'SID',
       value: agent.getSID(),
@@ -24,11 +31,11 @@ class Page {
     } );
   }
 
-  sleep( milliseconds ) {
+  sleep( milliseconds: number ) {
     return this.page.waitFor( milliseconds );
   }
 
-  async click( selector ) {
+  async click( selector: string ) {
     const handle = await this.page.$( selector );
     await this.sleep( 50 );
     await handle.executionContext().evaluate( elm => elm.scrollIntoView(), handle );
@@ -40,7 +47,7 @@ class Page {
    * @param {string} path The url to direct the page to
    * @returns {Promise<void>}
    */
-  to( path ) {
+  to( path: string ) {
     return this.page.goto( utils.host + path );
   }
 
@@ -49,7 +56,7 @@ class Page {
    * @param {string} selector The selector for targetting the textfield. E.g. '.sometext' or '#sometext'
    * @returns {Promise<string|null>}
    */
-  async textfieldError( selector ) {
+  async textfieldError( selector: string ) {
     return this.getElmText( `${ selector } > div:nth-child(4)` );
   }
 
@@ -58,7 +65,7 @@ class Page {
    * @param {string} selector
    * @returns {Promise<string|null>}
    */
-  async getElmText( selector ) {
+  async getElmText( selector: string ) {
     const elm = await this.page.$( `${ selector }` );
     if ( elm )
       return await this.page.$eval( `${ selector }`, elm => elm.textContent );
@@ -83,11 +90,11 @@ class Page {
    * the input is cleared
    * @returns {Promise<string>}
    */
-  async textfield( selector, val ) {
+  async textfield( selector: string, val?: string ) {
 
     // If nothing specified - then return the value
     if ( val === undefined )
-      return await this.page.$eval( `${ selector } input`, el => el.value );
+      return await this.page.$eval( `${ selector } input`, el => ( el as HTMLInputElement ).value );
 
     // If a string, then type the value
     else if ( val !== '' ) {
@@ -103,7 +110,7 @@ class Page {
     // Else clear the input
     else {
       await this.page.focus( `${ selector } input` );
-      const curVal = await this.page.$eval( `${ selector } input`, el => el.value );
+      const curVal = await this.page.$eval( `${ selector } input`, el => ( el as HTMLInputElement ).value );
       const promises = [];
       for ( let i = 0, l = curVal.length; i < l; i++ )
         promises.push( this.page.keyboard.press( 'Backspace' ) );
@@ -112,11 +119,8 @@ class Page {
     }
   }
 
-  $eval( selector, callback ) { return this.page.$eval( selector, callback ) }
-  $( selector ) { return this.page.$( selector ) }
-  $$( selector ) { return this.page.$$( selector ) }
-  waitFor( selector ) { return this.page.waitFor( selector ) }
+  $eval( selector: string, callback: ( element: Element, ...args: any[] ) => any ) { return this.page.$eval( selector, callback ) }
+  $( selector: string ) { return this.page.$( selector ) }
+  $$( selector: string ) { return this.page.$$( selector ) }
+  waitFor( selector: string ) { return this.page.waitFor( selector ) }
 }
-
-
-module.exports = Page;

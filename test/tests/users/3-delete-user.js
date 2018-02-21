@@ -1,4 +1,4 @@
-const UsersPage = require( '../../pages/users' );
+const UsersPage = require( '../../pages/users' ).default;
 const assert = require( 'assert' );
 const utils = require( '../../utils' );
 

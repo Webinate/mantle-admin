@@ -2,7 +2,7 @@ const puppeteer = require( 'puppeteer' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const yargs = require( 'yargs' );
-const Agent = require( './utils/agent' );
+const Agent = require( './utils/agent' ).default;
 let args = yargs.argv;
 
 /**

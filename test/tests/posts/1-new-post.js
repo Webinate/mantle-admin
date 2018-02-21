@@ -1,4 +1,4 @@
-const PostsPage = require( '../../pages/posts' );
+const PostsPage = require( '../../pages/posts' ).default;
 const assert = require( 'assert' );
 const utils = require( '../../utils' );
 

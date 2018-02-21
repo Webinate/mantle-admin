@@ -2,13 +2,23 @@ var fs = require( 'fs' );
 var yargs = require( 'yargs' );
 var args = yargs.argv;
 
+require("ts-node").register({
+  compilerOptions: {
+    module: "commonjs",
+    rootDir: './test',
+    sourceMap: true,
+    target: "es2017",
+    isolatedModules: true
+  },
+});
+
 if ( !args.config || !fs.existsSync( args.config ) ) {
   console.log( "Please specify a modepress --config file to use in the command line" );
   process.exit();
 }
 
 const startup = require( '../../../lib/core/initialization/startup.js' );
-const utils = require( './utils.js' );
+const utils = require( './utils' );
 
 describe( 'Initialize Server', function() {
 

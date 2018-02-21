@@ -1,6 +1,11 @@
-const Page = require( './page' );
+import Page from './page';
 
-class AuthPage extends Page {
+export default class AuthPage extends Page {
+  private $username: string;
+  private $email: string;
+  private $password: string;
+  private $password2: string;
+
   constructor() {
     super();
     this.$username = '.mt-username';
@@ -22,7 +27,7 @@ class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  username( val ) {
+  username( val?: string ) {
     return super.textfield( this.$username, val )
   }
 
@@ -31,7 +36,7 @@ class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  password( val ) {
+  password( val?: string ) {
     return super.textfield( this.$password, val )
   }
 
@@ -40,7 +45,7 @@ class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  email( val ) {
+  email( val?: string ) {
     return super.textfield( this.$email, val )
   }
 
@@ -49,7 +54,7 @@ class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  password2( val ) {
+  password2( val?: string ) {
     return super.textfield( this.$password2, val )
   }
 
@@ -73,7 +78,7 @@ class AuthPage extends Page {
 
   /**
    * Gets the password error
-   * @param {string } val
+   * @param {string} val
    * @returns {Promise<string | null >}
    */
   passwordError() {
@@ -107,5 +112,3 @@ class AuthPage extends Page {
   clickResendActivation() { return this.page.click( '.mt-resend-activation' ); }
   clickResetPassword() { return this.page.click( '.mt-retrieve-password' ); }
 }
-
-module.exports = AuthPage;

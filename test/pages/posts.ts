@@ -1,11 +1,12 @@
-const Page = require( './page' );
+import Page from './page';
+import Agent from '../utils/agent';
 
-class PostsPage extends Page {
+export default class PostsPage extends Page {
   constructor() {
     super();
   }
 
-  async load( agent ) {
+  async load( agent: Agent ) {
     await super.load();
     if ( agent )
       await this.setAgent( agent );
@@ -32,5 +33,3 @@ class PostsPage extends Page {
     } );
   }
 }
-
-module.exports = PostsPage;

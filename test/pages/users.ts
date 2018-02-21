@@ -1,20 +1,24 @@
-const Page = require( './page' );
+import Page from './page';
+import Agent from '../utils/agent';
 
-class UsersPage extends Page {
+export default class UsersPage extends Page {
+  private $filter: string;
+  private $filterSearch: string;
+
   constructor() {
     super();
     this.$filter = '.users-filter';
     this.$filterSearch = 'button[name=users-search-button]';
   }
 
-  async load( agent ) {
+  async load( agent: Agent ) {
     await super.load();
     if ( agent )
       await this.setAgent( agent );
     return super.to( '/dashboard/users' );
   }
 
-  async selectUser( email ) {
+  async selectUser( email: string ) {
     await this.filter( email );
     await this.clickFilterBtn();
     await this.doneLoading();
@@ -28,11 +32,11 @@ class UsersPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  filter( val ) {
+  filter( val?: string ) {
     return super.textfield( this.$filter, val )
   }
 
-  async clickDrawer( headerName ) {
+  async clickDrawer( headerName: string ) {
     const headers = await this.page.$$( '.mt-user-properties .mt-drawer-header' );
     for ( const header of headers ) {
       const text = await header.executionContext().evaluate( elm => elm.querySelector( 'h3' ).textContent, header );
@@ -58,7 +62,7 @@ class UsersPage extends Page {
    * Gets a user element by email
    * @param {string} email The email of the user to select
    */
-  async getUserByEmail( email ) {
+  async getUserByEmail( email: string ) {
     const users = await this.page.$$( `.mt-user-list > div` );
     for ( const user of users ) {
       const text = await user.executionContext().evaluate(
@@ -104,7 +108,7 @@ class UsersPage extends Page {
    * Gets a user object { username: string; email: string; } from the user list by index
    * @param {number} index The index of the user to examine
    */
-  getUserFromList( index ) {
+  getUserFromList( index: number ) {
     return this.page.$eval( `.mt-user-list > div:nth-child(${ index + 1 })`, elm => {
       return {
         username: elm.querySelector( '.mt-user-name' ).textContent,
@@ -129,5 +133,3 @@ class UsersPage extends Page {
 
   clickFilterBtn() { return this.page.click( this.$filterSearch ); }
 }
-
-module.exports = UsersPage;

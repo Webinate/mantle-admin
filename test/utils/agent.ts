@@ -3,8 +3,14 @@ const fetch = require( "node-fetch" );
 /**
  * Represents an agent that can make calls to the backend
  */
-class Agent {
-  constructor( host, cookie, username, password, email ) {
+export default class Agent {
+  public host: string;
+  public cookie: string;
+  public username: string;
+  public password: string;
+  public email: string;
+
+  constructor( host: string, cookie: string, username: string, password: string, email: string ) {
     this.host = host;
     this.cookie = cookie;
     this.username = username;
@@ -12,7 +18,7 @@ class Agent {
     this.email = email;
   }
 
-  async get( url, type = 'application/json', options = {} ) {
+  async get( url: string, type = 'application/json', options = {} ) {
     const headers = {};
     if ( type )
       headers[ 'Content-Type' ] = type;
@@ -22,7 +28,7 @@ class Agent {
     return await fetch( `${ this.host }${ url }`, Object.assign( {}, { headers: headers }, options ) );
   }
 
-  async put( url, data, type = 'application/json' ) {
+  async put( url: string, data: any, type = 'application/json' ) {
     const headers = {};
     if ( type )
       headers[ 'Content-Type' ] = type;
@@ -36,7 +42,7 @@ class Agent {
     } );
   }
 
-  async post( url, data, type = 'application/json', optionalHeaders = {} ) {
+  async post( url: string, data: any, type = 'application/json', optionalHeaders = {} ) {
     const headers = Object.assign( {}, optionalHeaders );
     if ( type )
       headers[ 'Content-Type' ] = type;
@@ -50,7 +56,7 @@ class Agent {
     } );
   }
 
-  async delete( url, data, type ) {
+  async delete( url: string, data: any, type: string ) {
     const headers = {};
     if ( type )
       headers[ 'Content-Type' ] = type;
@@ -71,9 +77,7 @@ class Agent {
    * Updates the cookie of the agent
    * @param {string} response
    */
-  updateCookie( response ) {
+  updateCookie( response: any ) {
     this.cookie = response.headers.get( "set-cookie" ).split( ";" )[ 0 ];
   }
 }
-
-module.exports = Agent;
