@@ -4,12 +4,14 @@ import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
 import { getPosts, ActionCreators } from '../store/posts/actions';
-import { TextField, IconButton, LinearProgress } from 'material-ui';
-import { Editor, EditorState, RichUtils } from 'draft-js';
+import { TextField, IconButton, LinearProgress, Avatar } from 'material-ui';
+import { EditorState, RichUtils } from 'draft-js';
 import { Pager } from '../components/pager';
 import { Page, IPost } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../theme/styled';
+import { generateAvatarPic } from '../utils/component-utils';
+import { PostEditor } from '../components/post-editor';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -31,67 +33,6 @@ type State = {
   editor: boolean;
   selectedPosts: IPost[];
 };
-
-const BLOCK_TYPES = [
-  { label: 'H1', style: 'header-one' },
-  { label: 'H2', style: 'header-two' },
-  { label: 'H3', style: 'header-three' },
-  { label: 'H4', style: 'header-four' },
-  { label: 'H5', style: 'header-five' },
-  { label: 'H6', style: 'header-six' },
-  { label: 'Blockquote', style: 'blockquote' },
-  { label: 'UL', style: 'unordered-list-item' },
-  { label: 'OL', style: 'ordered-list-item' },
-  { label: 'Code Block', style: 'code-block' },
-];
-
-const BlockStyleControls = ( props: any ) => {
-  const { editorState } = props;
-  const selection = editorState.getSelection();
-  const blockType = editorState
-    .getCurrentContent()
-    .getBlockForKey( selection.getStartKey() )
-    .getType();
-
-  return (
-    <div style={{ margin: '0 0 10px 0', cursor: 'pointer' }} className="RichEditor-controls">
-      {BLOCK_TYPES.map( ( type: any ) =>
-        <StyleButton
-          key={type.label}
-          active={type.style === blockType}
-          label={type.label}
-          onToggle={props.onToggle}
-          style={type.style}
-        />
-      )}
-    </div>
-  );
-};
-
-class StyleButton extends React.Component<{ active: boolean; label: string; style: any; onToggle: ( style: string ) => void; }> {
-  constructor() {
-    super();
-    this.state = {};
-  }
-
-  onToggle( e: React.MouseEvent<{}> ) {
-    e.preventDefault();
-    this.props.onToggle( this.props.style );
-  }
-
-  render() {
-    let className = 'RichEditor-styleButton';
-    if ( this.props.active ) {
-      className += ' RichEditor-activeButton';
-    }
-
-    return (
-      <span style={{ marginRight: '10px' }} className={className} onMouseDown={e => this.onToggle( e )}>
-        {this.props.label}
-      </span>
-    );
-  }
-}
 
 /**
  * The main application entry point
@@ -199,17 +140,7 @@ export class Posts extends React.Component<Props, State> {
           }}>
         </ContentHeader>
         <div style={{ padding: '10px' }}>
-          <BlockStyleControls
-            editorState={this.state.editorState}
-            onToggle={( blockType: any ) => this._toggleBlockType( blockType )}
-          />
-          <div style={{ background: '#fff', padding: '20px' }}>
-            {this.state.editor ? <Editor
-              editorState={this.state.editorState}
-              handleKeyCommand={( command, state ) => this._handleKeyCommand( command, state )}
-              onChange={editorState => this.setState( { editorState: editorState } )}
-            /> : undefined}
-          </div>
+          <PostEditor />
           <div>
             {posts ? <Pager
               total={posts!.count}
@@ -244,7 +175,14 @@ export class Posts extends React.Component<Props, State> {
                       <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
                       <i>{moment( post.createdOn ).format( 'MMM Do, YYYY' )}</i>
                     </div>
-                    <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
+                    <div className="mt-post-info">
+                      <Avatar
+                        src={generateAvatarPic( post.author ? post.author.avatar : '' )}
+                        size={60}
+                        style={{ float: 'right' }}
+                      />
+                      <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
+                    </div>
                   </Post>
                 } )}
               </PostsContainer>
@@ -289,6 +227,13 @@ const Post = styled.div`
     .mt-post-button {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  .mt-post-info {
+    clear: both;
+    > h3 {
+      display: inline-block;
     }
   }
 
