@@ -15,11 +15,13 @@ import { Controller } from 'modepress';
 import { IAuthReq, IClient } from 'modepress';
 import { authentication, serializers } from 'modepress';
 import { MuiThemeProvider, getMuiTheme } from 'material-ui/styles';
+import { ActionCreators } from './store/app/actions';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
 
 // Needed for onTouchTap
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
+import { Action } from 'redux';
 injectTapEventPlugin();
 
 /**
@@ -73,7 +75,15 @@ export default class MainController extends Controller {
     const store = createStore( initialState, history );
     const theme = getMuiTheme( Theme, { userAgent: muiAgent } );
 
-    const actions = await hydrate( req );
+    let actions: Action[];
+    try {
+      actions = await hydrate( req );
+    }
+    catch ( err ) {
+      actions = [ ActionCreators.serverResponse.create( `Error: ${ err.toString() }` ) ];
+    }
+
+
     for ( const action of actions )
       store.dispatch( action );
 
