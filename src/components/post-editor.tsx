@@ -1,8 +1,8 @@
 import * as React from 'react';
 // import theme from '../theme/mui-theme';
-import { Editor, EditorState, RichUtils, DraftBlockType } from 'draft-js';
+import { Editor, EditorState, RichUtils, DraftBlockType, AtomicBlockUtils, ContentBlock } from 'draft-js';
 import { default as styled } from '../theme/styled';
-import { DropDownMenu, MenuItem } from 'material-ui';
+import { DropDownMenu, MenuItem, RaisedButton, TextField } from 'material-ui';
 
 type Props = {
   style?: React.CSSProperties;
@@ -11,7 +11,8 @@ type Props = {
 type State = {
   editorState: EditorState;
   render: boolean;
-
+  showMediaUrl: boolean,
+  mediaUrl: string
 };
 
 const BLOCK_TYPES: { label: string; style: DraftBlockType }[] = [
@@ -26,21 +27,64 @@ const BLOCK_TYPES: { label: string; style: DraftBlockType }[] = [
   { label: 'Blockquote', style: 'blockquote' },
   { label: 'UL', style: 'unordered-list-item' },
   { label: 'OL', style: 'ordered-list-item' },
-  { label: 'Code Block', style: 'code-block' },
-  { label: 'Atomic', style: 'atomic' }
+  { label: 'Code Block', style: 'code-block' }
 ];
+
+const INLINE_STYLES: { label: string; style: string }[] = [
+  { label: 'B', style: 'BOLD' },
+  { label: 'I', style: 'ITALIC' },
+  { label: 'U', style: 'UNDERLINE' },
+  { label: 'S', style: 'STRIKETHROUGH' }
+];
+
+const Audio = ( props ) => {
+  return <audio controls src={props.src} />;
+};
+
+const Image = ( props ) => {
+  return <img src={props.src} />;
+};
+
+const Video = ( props ) => {
+  return <video controls src={props.src} />;
+};
+
+const Media = ( props ) => {
+  const entity = props.contentState.getEntity(
+    props.block.getEntityAt( 0 )
+  );
+  const { src } = entity.getData();
+  const type = entity.getType();
+
+  let media;
+  if ( type === 'audio' ) {
+    media = <Audio src={src} />;
+  } else if ( type === 'image' ) {
+    media = <Image src={src} />;
+  } else if ( type === 'video' ) {
+    media = <Video src={src} />;
+  }
+
+  return media;
+};
 
 /**
  * The main application entry point
  */
 export class PostEditor extends React.Component<Props, State> {
 
+  private _editor: Editor | null;
+
   constructor( props: Props ) {
     super( props );
 
+    this._editor = null;
+
     this.state = {
       editorState: EditorState.createEmpty(),
-      render: false
+      render: false,
+      showMediaUrl: false,
+      mediaUrl: ''
     }
   }
 
@@ -58,7 +102,11 @@ export class PostEditor extends React.Component<Props, State> {
     return 'not-handled';
   }
 
-  _toggleBlockType( blockType: DraftBlockType ) {
+  private focus() {
+    this._editor!.focus();
+  }
+
+  private _toggleBlockType( blockType: DraftBlockType ) {
     this.setState( {
       editorState: RichUtils.toggleBlockType(
         this.state.editorState,
@@ -67,7 +115,51 @@ export class PostEditor extends React.Component<Props, State> {
     } );
   }
 
+  private _toggleInlineStyle( inlineStyle: string ) {
+    const editorState = RichUtils.toggleInlineStyle(
+      this.state.editorState,
+      inlineStyle
+    );
 
+    this.setState( { editorState } )
+  }
+
+  private _confirmMedia( url: string, type: string ) {
+    const contentState = this.state.editorState.getCurrentContent();
+    const contentStateWithEntity = contentState.createEntity(
+      type,
+      'IMMUTABLE',
+      { src: url }
+    );
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+    const newEditorState = EditorState.set(
+      this.state.editorState,
+      { currentContent: contentStateWithEntity }
+    );
+
+    this.setState( {
+      editorState: AtomicBlockUtils.insertAtomicBlock(
+        newEditorState,
+        entityKey,
+        ' '
+      ),
+      showMediaUrl: false,
+      mediaUrl: ''
+    }, () => {
+      setTimeout( () => this.focus(), 0 );
+    } );
+  }
+
+  private mediaBlockRenderer( block: ContentBlock ) {
+    if ( block.getType() === 'atomic' ) {
+      return {
+        component: Media,
+        editable: false,
+      };
+    }
+
+    return null;
+  }
 
   render() {
     const selection = this.state.editorState.getSelection();
@@ -76,22 +168,56 @@ export class PostEditor extends React.Component<Props, State> {
       .getBlockForKey( selection.getStartKey() )
       .getType();
 
+    const activeStyles = this.state.editorState.getCurrentInlineStyle();
+
     return (
       <div style={this.props.style}>
+
+        <div>
+          <RaisedButton onClick={e => this.setState( { showMediaUrl: !this.state.showMediaUrl } )} label="All Media" />
+          {this.state.showMediaUrl ?
+            <TextField
+              value={this.state.mediaUrl}
+              onChange={( e, val ) => this.setState( { mediaUrl: val } )}
+              onKeyDown={e => {
+                if ( e.keyCode === 13 ) {
+                  this.setState( {
+                    showMediaUrl: false
+                  } );
+
+                  this._confirmMedia( this.state.mediaUrl, 'image' )
+                }
+              }}
+            /> : undefined}
+        </div>
         <div style={{ margin: '0 0 10px 0', cursor: 'pointer' }}>
           <DropDownMenu
             value={blockType}
             onChange={( e, index, val ) => this._toggleBlockType( val )}
           >
-            {BLOCK_TYPES.map( ( block ) => <MenuItem value={block.style} primaryText={block.label} /> )}
+            {BLOCK_TYPES.map( ( block ) => <MenuItem key={block.style} value={block.style} primaryText={block.label} /> )}
           </DropDownMenu>
+
+          {INLINE_STYLES.map( style => {
+            const isActive = activeStyles.contains( style.style )
+            return <span
+              style={{ background: isActive ? '#ccc' : '' }}
+              key={style.style}
+              onClick={e => this._toggleInlineStyle( style.style )}
+            >
+              {style.label}
+            </span>
+          } )}
+
 
 
         </div>
         <EditorContainer>
           {this.state.render ?
             <Editor
+              ref={elm => this._editor = elm}
               editorState={this.state.editorState}
+              blockRendererFn={block => this.mediaBlockRenderer( block )}
               handleKeyCommand={( command, state ) => this._handleKeyCommand( command, state )}
               onChange={editorState => this.setState( { editorState: editorState } )}
             /> : undefined}
