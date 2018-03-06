@@ -15,7 +15,6 @@ import { Controller } from 'modepress';
 import { IAuthReq, IClient } from 'modepress';
 import { authentication, serializers } from 'modepress';
 import { MuiThemeProvider, getMuiTheme } from 'material-ui/styles';
-import { ActionCreators } from './store/app/actions';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
 
@@ -80,37 +79,53 @@ export default class MainController extends Controller {
       actions = await hydrate( req );
     }
     catch ( err ) {
-      actions = [ ActionCreators.serverResponse.create( `Error: ${ err.toString() }` ) ];
+      return this.renderError( res, err );
     }
 
+    try {
+      for ( const action of actions )
+        store.dispatch( action );
 
-    for ( const action of actions )
-      store.dispatch( action );
+      const sheet = new ServerStyleSheet();
+      let html = ReactDOMServer.renderToString( sheet.collectStyles(
+        <Provider store={store}>
+          <MuiThemeProvider muiTheme={theme}>
+            <StaticRouter location={url} context={context}>
+              <App {...{} as any} />
+            </StaticRouter>
+          </MuiThemeProvider>
+        </Provider>
+      ) );
 
-    const sheet = new ServerStyleSheet();
-    let html = ReactDOMServer.renderToString( sheet.collectStyles(
-      <Provider store={store}>
-        <MuiThemeProvider muiTheme={theme}>
-          <StaticRouter location={url} context={context}>
-            <App {...{} as any} />
-          </StaticRouter>
-        </MuiThemeProvider>
-      </Provider>
+      const styleTags = sheet.getStyleElement();
+
+      // Check the context if there needs to be a redirect
+      if ( context.url ) {
+        res.writeHead( 301, {
+          Location: context.url,
+        } );
+        res.end();
+        return;
+      }
+
+      initialState = store.getState();
+      html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} styles={styleTags} intialData={initialState} agent={muiAgent} /> );
+      res.send( html );
+    }
+    catch ( err ) {
+      this.renderError( res, err );
+    }
+  }
+
+  private renderError( res: express.Response, err: Error ) {
+    res.status( 500 );
+    res.send( ReactDOMServer.renderToStaticMarkup(
+      <html>
+        <body>
+          <div>An Error occurred while rendering the application: {err.message}</div>
+          <div>Stack Trace: {err.stack}</div>
+        </body>
+      </html>
     ) );
-
-    const styleTags = sheet.getStyleElement();
-
-    // Check the context if there needs to be a redirect
-    if ( context.url ) {
-      res.writeHead( 301, {
-        Location: context.url,
-      } );
-      res.end();
-      return;
-    }
-
-    initialState = store.getState();
-    html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} styles={styleTags} intialData={initialState} agent={muiAgent} /> );
-    res.send( html );
   }
 }
