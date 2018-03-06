@@ -1,6 +1,6 @@
 import * as React from 'react';
 // import theme from '../theme/mui-theme';
-import { Editor, EditorState, RichUtils, DraftBlockType, AtomicBlockUtils, ContentBlock } from 'draft-js';
+import { Editor, EditorState, RichUtils, DraftBlockType, AtomicBlockUtils, ContentBlock, ContentState } from 'draft-js';
 import { default as styled } from '../theme/styled';
 import { DropDownMenu, MenuItem, RaisedButton, TextField } from 'material-ui';
 
@@ -14,6 +14,15 @@ type State = {
   showMediaUrl: boolean,
   mediaUrl: string
 };
+
+export type BlockProps = {
+  contentState: ContentState;
+  block: ContentBlock;
+}
+
+export type MediaProps = {
+  src: string;
+}
 
 const BLOCK_TYPES: { label: string; style: DraftBlockType }[] = [
   { label: 'Regular', style: 'unstyled' },
@@ -37,26 +46,27 @@ const INLINE_STYLES: { label: string; style: string }[] = [
   { label: 'S', style: 'STRIKETHROUGH' }
 ];
 
-const Audio = ( props ) => {
+const Audio = ( props: MediaProps ) => {
   return <audio controls src={props.src} />;
 };
 
-const Image = ( props ) => {
+const Image = ( props: MediaProps ) => {
   return <img src={props.src} />;
 };
 
-const Video = ( props ) => {
+const Video = ( props: MediaProps ) => {
   return <video controls src={props.src} />;
 };
 
-const Media = ( props ) => {
+const Media = ( props: BlockProps ) => {
   const entity = props.contentState.getEntity(
     props.block.getEntityAt( 0 )
   );
+
   const { src } = entity.getData();
   const type = entity.getType();
 
-  let media;
+  let media: JSX.Element | null = null;
   if ( type === 'audio' ) {
     media = <Audio src={src} />;
   } else if ( type === 'image' ) {
