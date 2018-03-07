@@ -102,6 +102,9 @@ export class PostEditor extends React.Component<Props, State> {
     this.setState( { render: true } )
   }
 
+  /**
+   * Handles the most common key commands
+   */
   _handleKeyCommand( command: string, state: EditorState ) {
     const { editorState } = this.state;
     const newState = RichUtils.handleKeyCommand( editorState, command );
@@ -134,7 +137,14 @@ export class PostEditor extends React.Component<Props, State> {
     this.setState( { editorState } )
   }
 
+  /**
+   * When we add a new type of media object
+   * @param url The url of the media
+   * @param type The type of entity we want to create
+   */
   private _confirmMedia( url: string, type: string ) {
+
+    // Create a new entity
     const contentState = this.state.editorState.getCurrentContent();
     const contentStateWithEntity = contentState.createEntity(
       type,
@@ -147,6 +157,7 @@ export class PostEditor extends React.Component<Props, State> {
       { currentContent: contentStateWithEntity }
     );
 
+    // Create a new block and assign the entity to it
     this.setState( {
       editorState: AtomicBlockUtils.insertAtomicBlock(
         newEditorState,
@@ -160,6 +171,10 @@ export class PostEditor extends React.Component<Props, State> {
     } );
   }
 
+  /**
+   * Factory method for defining custom block renderers
+   * @param block The block we are analyzing
+   */
   private mediaBlockRenderer( block: ContentBlock ) {
     if ( block.getType() === 'atomic' ) {
       return {
