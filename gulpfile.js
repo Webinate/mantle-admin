@@ -168,6 +168,11 @@ function buildSass() {
     .pipe( gulp.dest( './dist/client/css' ) );
 }
 
+function copyTinyFiles() {
+  return gulp.src('./node_modules/tinymce/skins/**/*')
+    .pipe( gulp.dest('./dist/client/skins') )
+}
+
 /**
  * Notifies of any lint errors
  */
@@ -200,3 +205,4 @@ gulp.task( 'build', gulp.series( buildServer, gulp.parallel( generateFonts, lint
 gulp.task( 'default', gulp.series( buildServer, gulp.parallel( generateFonts, lint, buildClient, buildSass, buildStatics ), ) );
 gulp.task( 'watch-client', gulp.series( initBrowserSync, startWatchClient ) );
 gulp.task( 'watch-server', startWatchServer );
+gulp.task( 'tiny-files', copyTinyFiles );
