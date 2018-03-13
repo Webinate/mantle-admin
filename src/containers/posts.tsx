@@ -4,33 +4,35 @@ import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
 import { getPosts, ActionCreators } from '../store/posts/actions';
-import { TextField, IconButton, LinearProgress, Avatar } from 'material-ui';
-import { EditorState, RichUtils } from 'draft-js';
+import { TextField, IconButton, LinearProgress, Avatar, FloatingActionButton, FontIcon } from 'material-ui';
 import { Pager } from '../components/pager';
 import { Page, IPost } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../theme/styled';
 import { generateAvatarPic } from '../utils/component-utils';
-import { PostEditor } from '../components/post-editor';
+import TinyPostEditor from '../components/post-editor';
+import { Route, Switch } from 'react-router-dom';
+import { push } from 'react-router-redux';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   posts: state.posts,
-  app: state.app
+  app: state.app,
+  routing: state.router,
+  location: ownProps,
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getPosts: getPosts,
-  setPrepopulated: ActionCreators.SetPrepopulated.create
+  setPrepopulated: ActionCreators.SetPrepopulated.create,
+  push: push
 }
 
 const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   searchFilter: string;
-  editorState: EditorState;
-  editor: boolean;
   selectedPosts: IPost[];
 };
 
@@ -44,8 +46,6 @@ export class Posts extends React.Component<Props, State> {
     super( props );
     this.state = {
       searchFilter: '',
-      editor: false,
-      editorState: EditorState.createEmpty(),
       selectedPosts: []
     }
   }
@@ -55,32 +55,6 @@ export class Posts extends React.Component<Props, State> {
       this.props.getPosts();
     else
       this.props.setPrepopulated( false );
-  }
-
-  // Once component mounts, enable editor
-  componentDidMount() {
-    this.setState( {
-      editor: true
-    } )
-  }
-
-  _handleKeyCommand( command: string, state: EditorState ) {
-    const { editorState } = this.state;
-    const newState = RichUtils.handleKeyCommand( editorState, command );
-    if ( newState ) {
-      this.setState( { editorState: newState } )
-      return 'handled';
-    }
-    return 'not-handled';
-  }
-
-  _toggleBlockType( blockType: any ) {
-    this.setState( {
-      editorState: RichUtils.toggleBlockType(
-        this.state.editorState,
-        blockType
-      )
-    } );
   }
 
   private onPostSelected( post: IPost, e: React.MouseEvent<HTMLDivElement> ) {
@@ -136,58 +110,70 @@ export class Posts extends React.Component<Props, State> {
                 iconStyle={{ color: theme.primary200.background }}
                 iconClassName="icon icon-search"
               />
+              <FloatingActionButton style={{ verticalAlign: 'top' }} mini={true} onClick={e => this.props.push( '/dashboard/posts/new' )}>
+                <FontIcon
+                  name="posts-add-post"
+                  className="icon icon-add"
+                />
+              </FloatingActionButton>
             </div>
           }}>
         </ContentHeader>
         <div style={{ padding: '10px' }}>
-          <PostEditor />
-          <div>
-            {posts ? <Pager
-              total={posts!.count}
-              limit={posts!.limit}
-              offset={posts!.index}
-              onPage={index => this.props.getPosts( index )}
-            >
-              {isBusy ? <div className="mt-loading"><LinearProgress /></div> : undefined}
-              <PostsContainer className="mt-posts">
-                {posts.data.map( ( post, postIndex ) => {
-                  const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
-                  return <Post
-                    key={'post-' + postIndex}
-                    selected={selected}
-                    className="mt-post"
-                    onClick={e => { this.onPostSelected( post, e ) }}
+          <Switch>
+            <Route path="/dashboard/posts/new" render={props => <TinyPostEditor />} />
+            <Route path="/dashboard/posts" exact={true} render={props => {
+              return (
+                <div>
+                  {posts ? <Pager
+                    total={posts!.count}
+                    limit={posts!.limit}
+                    offset={posts!.index}
+                    onPage={index => this.props.getPosts( index )}
                   >
-                    <IconButton
-                      style={{ top: 0, right: '30px', position: 'absolute' }}
-                      iconStyle={{ color: theme.primary200.background }}
-                      className="mt-post-button"
-                      iconClassName="icon icon-edit"
-                    />
-                    <IconButton
-                      style={{ top: 0, right: 0, position: 'absolute' }}
-                      iconStyle={{ color: theme.primary200.background }}
-                      className="mt-post-button"
-                      iconClassName="icon icon-delete"
-                    />
-                    <div className="mt-post-content">{post.content}</div>
-                    <div className="mt-post-dates">
-                      <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
-                      <i>{moment( post.createdOn ).format( 'MMM Do, YYYY' )}</i>
-                    </div>
-                    <div className="mt-post-info">
-                      <Avatar
-                        src={generateAvatarPic( post.author ? post.author.avatar : '' )}
-                        size={60}
-                        style={{ float: 'right' }}
-                      />
-                      <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
-                    </div>
-                  </Post>
-                } )}
-              </PostsContainer>
-            </Pager> : undefined}
-          </div>
+                    {isBusy ? <div className="mt-loading"><LinearProgress /></div> : undefined}
+                    <PostsContainer className="mt-posts">
+                      {posts.data.map( ( post, postIndex ) => {
+                        const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
+                        return <Post
+                          key={'post-' + postIndex}
+                          selected={selected}
+                          className="mt-post"
+                          onClick={e => { this.onPostSelected( post, e ) }}
+                        >
+                          <IconButton
+                            style={{ top: 0, right: '30px', position: 'absolute' }}
+                            iconStyle={{ color: theme.primary200.background }}
+                            className="mt-post-button"
+                            iconClassName="icon icon-edit"
+                          />
+                          <IconButton
+                            style={{ top: 0, right: 0, position: 'absolute' }}
+                            iconStyle={{ color: theme.primary200.background }}
+                            className="mt-post-button"
+                            iconClassName="icon icon-delete"
+                          />
+                          <div className="mt-post-content">{post.content}</div>
+                          <div className="mt-post-dates">
+                            <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
+                            <i>{moment( post.createdOn ).format( 'MMM Do, YYYY' )}</i>
+                          </div>
+                          <div className="mt-post-info">
+                            <Avatar
+                              src={generateAvatarPic( post.author ? post.author.avatar : '' )}
+                              size={60}
+                              style={{ float: 'right' }}
+                            />
+                            <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
+                          </div>
+                        </Post>
+                      } )}
+                    </PostsContainer>
+                  </Pager> : undefined}
+                </div>
+              );
+            }} />
+          </Switch>
         </div>
       </div >
     );
@@ -196,8 +182,6 @@ export class Posts extends React.Component<Props, State> {
 
 interface PostProps extends React.HTMLProps<HTMLDivElement> {
 }
-
-
 
 const PostsContainer = styled.div`
   height: 100%;
@@ -217,8 +201,6 @@ const Post = styled.div`
   color: ${( props: PostProps ) => props.selected ? theme.primary200.color : '' };
   user-select: none;
   position: relative;
-
-
 
   &:hover {
     background: ${( props: PostProps ) => props.selected ? '' : theme.light400.background };
