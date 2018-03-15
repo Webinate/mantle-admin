@@ -3,7 +3,7 @@ import { default as styled } from '../theme/styled';
 
 type Props = {
   title: string;
-  renderFilters?: () => JSX.Element | undefined | null;
+  renderFilters?: () => JSX.Element | JSX.Element[] | undefined | null;
   style?: React.CSSProperties;
   subPanelStyle?: React.CSSProperties;
   showSub?: boolean;
@@ -57,16 +57,17 @@ const Container = styled.div`
 const Header = styled.div`
   overflow: hidden;
   padding: 0 20px;
-  display: table;
+  display: flex;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
 
   > div {
-    display: table-cell;
-    width: 50%;
     box-sizing: border-box;
+    flex-basis: 0;
   }
   > div:last-child {
+    flex-grow: 1;
     text-align: right;
   }
 `;
