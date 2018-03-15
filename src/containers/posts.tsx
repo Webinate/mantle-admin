@@ -4,7 +4,7 @@ import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
 import { getPosts, ActionCreators } from '../store/posts/actions';
-import { TextField, IconButton, LinearProgress, Avatar, FloatingActionButton, FontIcon } from 'material-ui';
+import { TextField, IconButton, LinearProgress, Avatar, FontIcon, RaisedButton } from 'material-ui';
 import { Pager } from '../components/pager';
 import { Page, IPost } from 'modepress';
 import * as moment from 'moment';
@@ -103,23 +103,24 @@ export class Posts extends React.Component<Props, State> {
                 onKeyDown={e => {
                 }}
                 onChange={( e, text ) => this.setState( { searchFilter: text } )}
-              />
+              />,
               <IconButton
                 name="posts-search-button"
                 style={{ verticalAlign: 'top' }}
                 iconStyle={{ color: theme.primary200.background }}
                 iconClassName="icon icon-search"
-              />
-              <FloatingActionButton style={{ verticalAlign: 'top' }} mini={true} onClick={e => this.props.push( '/dashboard/posts/new' )}>
-                <FontIcon
+              />,
+              <RaisedButton
+                onClick={e => this.props.push( '/dashboard/posts/new' )}
+                primary={true}
+                icon={<FontIcon
                   name="posts-add-post"
                   className="icon icon-add"
-                />
-              </FloatingActionButton>
+                />} label="New Post" />
             </div>
           }}>
         </ContentHeader>
-        <div style={{ padding: '10px' }}>
+        <PostsContainer>
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <TinyPostEditor />} />
             <Route path="/dashboard/posts" exact={true} render={props => {
@@ -132,7 +133,7 @@ export class Posts extends React.Component<Props, State> {
                     onPage={index => this.props.getPosts( index )}
                   >
                     {isBusy ? <div className="mt-loading"><LinearProgress /></div> : undefined}
-                    <PostsContainer className="mt-posts">
+                    <PostsInnerContent className="mt-posts">
                       {posts.data.map( ( post, postIndex ) => {
                         const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
                         return <Post
@@ -168,13 +169,13 @@ export class Posts extends React.Component<Props, State> {
                           </div>
                         </Post>
                       } )}
-                    </PostsContainer>
+                    </PostsInnerContent>
                   </Pager> : undefined}
                 </div>
               );
             }} />
           </Switch>
-        </div>
+        </PostsContainer>
       </div >
     );
   }
@@ -184,6 +185,13 @@ interface PostProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 const PostsContainer = styled.div`
+  overflow: auto;
+  padding: 10px;
+  height: calc(100% - 50px);
+  box-sizing: border-box;
+`;
+
+const PostsInnerContent = styled.div`
   height: 100%;
 `;
 
