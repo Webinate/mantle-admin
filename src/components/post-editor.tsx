@@ -30,6 +30,7 @@ export default class TinyPostEditor extends React.Component<Props, State> {
         id="post-editor"
         content=""
         config={{
+          selector: '#post-editor',
           plugins:
             [
               'paste',

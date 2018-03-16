@@ -23,6 +23,7 @@ if ( process.env.client === 'client' ) {
 export type Props = {
   id: string;
   className?: string;
+  containerStyle?: React.CSSProperties;
   content: string;
   config: Settings;
   onContentChanged: ( content: string ) => void;
@@ -50,6 +51,8 @@ export default class TinyEditor extends React.Component<Props, State> {
     if ( typeof window === 'undefined' || typeof document === 'undefined' )
       return;
 
+    this.id = this.id || this.props.id
+
     this.initialiseEditor();
   }
 
@@ -60,6 +63,8 @@ export default class TinyEditor extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps( next: Props ) {
+    this.id = next.id;
+
     if ( !this.state.editor )
       this.initialiseEditor();
     else if ( this.props.content !== next.content )
@@ -110,19 +115,23 @@ export default class TinyEditor extends React.Component<Props, State> {
 
     if ( config.inline ) {
       return (
-        <div
-          id={this.id}
-          className={className}
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <div style={this.props.containerStyle}>
+          <div
+            id={this.id}
+            className={className}
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
+        </div>
       );
     } else {
       return (
-        <textarea
-          id={this.id}
-          style={{ visibility: 'hidden' }}
-          defaultValue={content}
-        />
+        <div style={this.props.containerStyle}>
+          <textarea
+            id={this.id}
+            style={{ visibility: 'hidden' }}
+            defaultValue={content}
+          />
+        </div>
       );
     }
   }
