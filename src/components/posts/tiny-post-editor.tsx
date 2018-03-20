@@ -1,5 +1,5 @@
 import * as React from 'react';
-import TinyEditor from './tiny-editor';
+import TinyEditor from '../tiny-editor';
 
 export type Props = {
 

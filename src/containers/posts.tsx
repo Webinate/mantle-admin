@@ -7,10 +7,10 @@ import { getPosts, ActionCreators } from '../store/posts/actions';
 import { TextField, IconButton, FontIcon, RaisedButton } from 'material-ui';
 import { Page, IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
-import TinyPostEditor from '../components/post-editor';
+import TinyPostEditor from '../components/posts/tiny-post-editor';
 import { Route, Switch } from 'react-router-dom';
 import { push } from 'react-router-redux';
-import { PostList } from '../components/post-list';
+import { PostList } from '../components/posts/post-list';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
