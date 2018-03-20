@@ -21,13 +21,14 @@ export default class PostsPage extends Page {
   }
 
   /**
-   * Gets an array of user objects of visible the visible users { username: string; email: string; }
+   * Gets all of the current posts as an array
    */
-  getPosts() {
+  getPosts(): Promise<{ name: string; content: string; }[]> {
     return this.page.$eval( `.mt-posts`, elm => {
       return Array.from( elm.children ).map( child => {
         return {
-          name: child.querySelector( '.mt-post-name' ).textContent
+          name: child.querySelector( '.mt-post-name' ).textContent,
+          content: child.querySelector( '.mt-post-content' ).textContent
         }
       } )
     } );

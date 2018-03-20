@@ -45,4 +45,4 @@ require( './tests/users/2-activate-user' );
 require( './tests/users/3-delete-user' );
 require( './tests/users/4-resend-activation' );
 require( './tests/users/5-request-password-reset' );
-require( './tests/posts/1-new-post' );
+require( './tests/posts/1-view-post' );

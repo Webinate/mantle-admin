@@ -8,37 +8,48 @@ import ControllerFactory from '../../../../../lib/core/controller-factory';
 import { IPost } from 'modepress';
 import { PostsController } from '../../../../../lib/controllers/posts';
 
-let posts = new PostsPage();
-let admin: Agent;
+let postPage = new PostsPage();
+let admin: Agent, joe: Agent;
 let post: IPost;
 let controller: PostsController;
 
-describe( '1. Show new post as first item in posts page', function() {
+describe( '1. View post created by backend', function() {
 
   before( async () => {
-    admin = await utils.refreshAdminToken();
     controller = ControllerFactory.get( 'posts' );
-    await posts.load( admin );
-    assert( await posts.$( '.mt-posts' ) );
-  } )
+    admin = await utils.refreshAdminToken();
+    joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-  it( 'Removed any existing post with the slug test-post', async () => {
     try {
       post = await controller.getPost( { slug: 'test-post' } );
       if ( post )
         await controller.removePost( post._id.toString() );
     }
     catch { }
-  } )
 
-  it( 'Created a new post with the slug test-post', async () => {
     post = await controller.create( {
-      title: 'New Post',
-      author: 'Joe Duffy',
+      title: 'Test Post',
       slug: 'test-post',
       public: false,
       content: 'This is a post\'s content'
     } )
+
+    await postPage.load( admin );
+    assert( await postPage.$( '.mt-posts' ) );
+  } )
+
+  it( 'Post is available in post dashboard & visible to admin', async () => {
+    const posts = await postPage.getPosts();
+    assert( posts.length > 0 );
+    assert.equal( posts[ 0 ].name, 'Test Post' );
+    assert.equal( posts[ 0 ].content, 'This is a post\'s content' );
+  } )
+
+  it( 'Post is available in post dashboard & not visible guest', async () => {
+    await postPage.load( joe );
+    const posts = await postPage.getPosts();
+    if ( posts.length > 0 )
+      assert.notEqual( posts[ 0 ].name, 'Test Post' );
   } )
 
   after( async () => {
