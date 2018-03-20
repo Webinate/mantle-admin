@@ -42,10 +42,11 @@ describe( '1. View post created by backend', function() {
     const posts = await postPage.getPosts();
     assert( posts.length > 0 );
     assert.equal( posts[ 0 ].name, 'Test Post' );
+    assert.equal( posts[ 0 ].image, '/images/avatar-1.svg' );
     assert.equal( posts[ 0 ].content, 'This is a post\'s content' );
   } )
 
-  it( 'Post is available in post dashboard & not visible guest', async () => {
+  it( 'Post is private & not visible to regular user in dashboard', async () => {
     await postPage.load( joe );
     const posts = await postPage.getPosts();
     if ( posts.length > 0 )

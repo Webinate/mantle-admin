@@ -1,6 +1,12 @@
 import Page from './page';
 import Agent from '../utils/agent';
 
+export type PostProfile = {
+  name: string;
+  content: string;
+  image: string;
+}
+
 export default class PostsPage extends Page {
   constructor() {
     super();
@@ -23,12 +29,13 @@ export default class PostsPage extends Page {
   /**
    * Gets all of the current posts as an array
    */
-  getPosts(): Promise<{ name: string; content: string; }[]> {
+  getPosts(): Promise<PostProfile[]> {
     return this.page.$eval( `.mt-posts`, elm => {
       return Array.from( elm.children ).map( child => {
         return {
           name: child.querySelector( '.mt-post-name' ).textContent,
-          content: child.querySelector( '.mt-post-content' ).textContent
+          content: child.querySelector( '.mt-post-content' ).textContent,
+          image: child.querySelector( '.mt-post-info img' ).getAttribute( 'src' )
         }
       } )
     } );
