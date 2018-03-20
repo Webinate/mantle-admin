@@ -11,26 +11,18 @@ export type Props = {
   loading: boolean;
   posts: Page<IPost> | null;
   getPosts: ( index: number ) => void;
-  onPostSelected?: ( post: IPost[] ) => void
+  onPostSelected: ( post: IPost[] ) => void
+  selected: IPost[];
 }
 
 export type State = {
-  selectedPosts: IPost[];
 }
 
 export class PostList extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      selectedPosts: []
     };
-  }
-
-  private selectPosts( posts: IPost[] ) {
-    this.setState( { selectedPosts: posts }, () => {
-      if ( this.props.onPostSelected )
-        this.props.onPostSelected( posts )
-    } );
   }
 
   private onPostSelected( post: IPost, e: React.MouseEvent<HTMLDivElement> ) {
@@ -38,23 +30,23 @@ export class PostList extends React.Component<Props, State> {
     e.stopPropagation();
 
     if ( !e.ctrlKey && !e.shiftKey ) {
-      this.selectPosts( [ post ] );
+      this.props.onPostSelected( [ post ] );
 
     }
     else if ( e.ctrlKey ) {
-      if ( this.state.selectedPosts.indexOf( post ) === -1 )
-        this.selectPosts( this.state.selectedPosts.concat( post ) );
+      if ( this.props.selected.indexOf( post ) === -1 )
+        this.props.onPostSelected( this.props.selected.concat( post ) );
       else
-        this.selectPosts( this.state.selectedPosts.filter( i => i !== post ) );
+        this.props.onPostSelected( this.props.selected.filter( i => i !== post ) );
     }
     else {
       const postPage = this.props.posts!;
-      const selected = this.state.selectedPosts;
+      const selected = this.props.selected;
 
       let firstIndex = Math.min( postPage.data.indexOf( post ), selected.length > 0 ? postPage.data.indexOf( selected[ 0 ] ) : 0 );
       let lastIndex = Math.max( postPage.data.indexOf( post ), selected.length > 0 ? postPage.data.indexOf( selected[ 0 ] ) : 0 );
 
-      this.selectPosts( postPage.data.slice( firstIndex, lastIndex + 1 ) );
+      this.props.onPostSelected( postPage.data.slice( firstIndex, lastIndex + 1 ) );
     }
   }
 
@@ -71,7 +63,7 @@ export class PostList extends React.Component<Props, State> {
         {this.props.loading ? <div className="mt-loading"><LinearProgress /></div> : undefined}
         <PostsInnerContent className="mt-posts">
           {posts.data.map( ( post, postIndex ) => {
-            const selected = this.state.selectedPosts.indexOf( post ) === -1 ? false : true;
+            const selected = this.props.selected.indexOf( post ) === -1 ? false : true;
             return <Post
               key={'post-' + postIndex}
               selected={selected}

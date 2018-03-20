@@ -7,10 +7,10 @@ import { getPosts, ActionCreators } from '../store/posts/actions';
 import { TextField, IconButton, FontIcon, RaisedButton } from 'material-ui';
 import { Page, IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
-import TinyPostEditor from '../components/posts/tiny-post-editor';
 import { Route, Switch } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import { PostList } from '../components/posts/post-list';
+import { PostForm } from '../components/posts/post-form';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -31,6 +31,7 @@ const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   searchFilter: string;
+  selectedPosts: IPost[];
 };
 
 /**
@@ -42,7 +43,8 @@ export class Posts extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      searchFilter: ''
+      searchFilter: '',
+      selectedPosts: []
     }
   }
 
@@ -94,11 +96,13 @@ export class Posts extends React.Component<Props, State> {
         </ContentHeader>
         <PostsContainer>
           <Switch>
-            <Route path="/dashboard/posts/new" render={props => <TinyPostEditor />} />
+            <Route path="/dashboard/posts/new" render={props => <PostForm loading={isBusy} post={this.state.selectedPosts.length > 0 ? this.state.selectedPosts[ 0 ] : null} />} />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
                 posts={posts}
                 loading={isBusy}
+                selected={this.state.selectedPosts}
+                onPostSelected={selected => this.setState( { selectedPosts: selected } )}
                 getPosts={( index ) => this.props.getPosts( index )}
               />;
             }} />
