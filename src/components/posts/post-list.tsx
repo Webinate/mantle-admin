@@ -12,6 +12,8 @@ export type Props = {
   posts: Page<IPost> | null;
   getPosts: ( index: number ) => void;
   onPostSelected: ( post: IPost[] ) => void
+  onEdit: ( post: IPost ) => void;
+  onDelete: ( post: IPost ) => void;
   selected: IPost[];
 }
 
@@ -75,12 +77,14 @@ export class PostList extends React.Component<Props, State> {
                 iconStyle={{ color: theme.primary200.background }}
                 className="mt-post-button"
                 iconClassName="icon icon-edit"
+                onClick={e => this.props.onEdit( post )}
               />
               <IconButton
                 style={{ top: 0, right: 0, position: 'absolute' }}
                 iconStyle={{ color: theme.primary200.background }}
                 className="mt-post-button"
                 iconClassName="icon icon-delete"
+                onClick={e => this.props.onDelete( post )}
               />
               <div className="mt-post-content">{post.content}</div>
               <div className="mt-post-dates">

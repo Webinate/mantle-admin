@@ -110,7 +110,7 @@ export class App extends React.Component<Props, State> {
                   return <ContentHeader title="Home" />
                 }} />
                 <Route path="/dashboard/posts" render={props => {
-                  return <Posts {...{} as any} />
+                  return <Posts {...{ location: props.location } as any} />
                 }} />
                 <Route path="/dashboard/users" render={props => {
                   return <Users {...{} as any} />

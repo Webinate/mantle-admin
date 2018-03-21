@@ -17,7 +17,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   posts: state.posts,
   app: state.app,
   routing: state.router,
-  location: ownProps,
+  location: ownProps.location
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -49,8 +49,9 @@ export class Posts extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    if ( !this.props.posts.prepopulated )
+    if ( !this.props.posts.prepopulated ) {
       this.props.getPosts();
+    }
     else
       this.props.setPrepopulated( false );
   }
@@ -59,6 +60,7 @@ export class Posts extends React.Component<Props, State> {
     let posts: Page<IPost> | null = null;
     const page = this.props.posts.postPage;
     const isBusy = this.props.posts.busy;
+    const selectedPost = this.state.selectedPosts.length > 0 ? this.state.selectedPosts[ 0 ] : null;
 
     if ( typeof ( page ) !== 'string' )
       posts = page;
@@ -96,12 +98,15 @@ export class Posts extends React.Component<Props, State> {
         </ContentHeader>
         <PostsContainer>
           <Switch>
-            <Route path="/dashboard/posts/new" render={props => <PostForm loading={isBusy} post={this.state.selectedPosts.length > 0 ? this.state.selectedPosts[ 0 ] : null} />} />
+            <Route path="/dashboard/posts/new" render={props => <PostForm loading={isBusy} />} />
+            <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm loading={isBusy} post={selectedPost} />} />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
                 posts={posts}
                 loading={isBusy}
                 selected={this.state.selectedPosts}
+                onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
+                onDelete={post => { }}
                 onPostSelected={selected => this.setState( { selectedPosts: selected } )}
                 getPosts={( index ) => this.props.getPosts( index )}
               />;
