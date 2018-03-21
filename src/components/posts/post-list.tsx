@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import { IconButton, LinearProgress, Avatar } from 'material-ui';
 import { Pager } from '../../components/pager';
 import { Page, IPost } from 'modepress';

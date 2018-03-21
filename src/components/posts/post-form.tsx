@@ -1,8 +1,8 @@
-import * as React from "react";
+import * as React from 'react';
 import { TextField, Toggle } from 'material-ui';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
-import TinyPostEditor from "./tiny-post-editor";
+import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
