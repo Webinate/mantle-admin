@@ -130,7 +130,9 @@ export class Users extends React.Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <ContentHeader title="Users"
+        <ContentHeader
+          title="Users"
+          busy={isBusy}
           renderFilters={() => {
             return <div>
               <TextField

@@ -36,19 +36,31 @@ export function getPost( id: string ) {
 
 export function createPost( post: Partial<IPost> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
-    dispatch( ActionCreators.SetPostsBusy.create( true ) );
-    const resp = await posts.create( post );
-    dispatch( AppActions.serverResponse.create( `New Post '${ resp.title }' created` ) );
-    dispatch( ActionCreators.SetPostsBusy.create( false ) );
-    dispatch( push( '/dashboard/posts' ) );
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const resp = await posts.create( post );
+      dispatch( AppActions.serverResponse.create( `New Post '${ resp.title }' created` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+      dispatch( push( '/dashboard/posts' ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
   }
 }
 
 export function editPost( post: Partial<IPost> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
-    dispatch( ActionCreators.SetPostsBusy.create( true ) );
-    const resp = await posts.update( post._id, post );
-    dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
-    dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const resp = await posts.update( post._id, post );
+      dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
   }
 }

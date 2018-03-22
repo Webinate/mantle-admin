@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextField, Toggle, RaisedButton, CircularProgress } from 'material-ui';
+import { TextField, Toggle, RaisedButton } from 'material-ui';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
@@ -7,7 +7,6 @@ import theme from '../../theme/mui-theme';
 
 export type Props = {
   id?: string;
-  loading: boolean;
   post?: Partial<IPost> | null;
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost> ) => void;
@@ -37,15 +36,18 @@ export class PostForm extends React.Component<Props, State> {
   }
 
   render() {
-    if ( this.props.loading )
-      return <CircularProgress />
-
     return <Form>
       <div>
         <TextField
           value={this.state.editable.title}
           floatingLabelText="Post Title"
           onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, title: value } } )}
+        />
+        <br />
+        <TextField
+          value={this.state.editable.slug}
+          floatingLabelText="Slug"
+          onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
         />
         <br />
         <TextField

@@ -107,7 +107,7 @@ export class App extends React.Component<Props, State> {
             >
               <Switch>
                 <Route path="/dashboard" exact={true} render={props => {
-                  return <ContentHeader title="Home" />
+                  return <ContentHeader title="Home" busy={false} />
                 }} />
                 <Route path="/dashboard/posts" render={props => {
                   return <Posts {...{ location: props.location } as any} />

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, LinearProgress, Avatar } from 'material-ui';
+import { IconButton, Avatar } from 'material-ui';
 import { Pager } from '../../components/pager';
 import { Page, IPost } from 'modepress';
 import * as moment from 'moment';
@@ -8,7 +8,6 @@ import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  loading: boolean;
   posts: Page<IPost> | null;
   getPosts: ( index: number ) => void;
   onPostSelected: ( post: IPost[] ) => void
@@ -66,7 +65,6 @@ export class PostList extends React.Component<Props, State> {
         offset={posts!.index}
         onPage={index => this.props.getPosts( index )}
       >
-        {this.props.loading ? <div className="mt-loading"><LinearProgress /></div> : undefined}
         <PostsInnerContent className="mt-posts">
           {posts.data.map( ( post, postIndex ) => {
             const selected = this.props.selected.indexOf( post ) === -1 ? false : true;

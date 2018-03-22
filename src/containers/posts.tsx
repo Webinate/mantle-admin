@@ -61,6 +61,7 @@ export class Posts extends React.Component<Props, State> {
       <div style={{ height: '100%' }}>
         <ContentHeader
           title="Posts"
+          busy={isBusy}
           renderFilters={() => {
             if ( !inPostsRoot ) {
               return (
@@ -104,20 +105,17 @@ export class Posts extends React.Component<Props, State> {
         <PostsContainer>
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <PostForm
-              loading={isBusy}
               onCreate={post => this.props.createPost( post )} />}
             />
             <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm
               id={props.match.params.postId}
               onFetch={id => this.props.getPost( id )}
-              loading={isBusy}
               post={post}
               onUpdate={post => this.props.editPost( post )} />}
             />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
                 posts={page}
-                loading={isBusy}
                 selected={this.state.selectedPosts}
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
                 onDelete={post => { }}

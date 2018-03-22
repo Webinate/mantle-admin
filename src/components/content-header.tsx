@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
+import { LinearProgress } from 'material-ui';
 
 type Props = {
   title: string;
+  busy: boolean;
   renderFilters?: () => JSX.Element | JSX.Element[] | undefined | null;
   style?: React.CSSProperties;
   subPanelStyle?: React.CSSProperties;
@@ -37,7 +39,7 @@ export class ContentHeader extends React.Component<Props, any> {
               {this.props.children}
             </div> : undefined
         }
-
+        {this.props.busy ? <div className="mt-loading" style={{ position: 'absolute', bottom: '0', width: '100%' }}><LinearProgress /></div> : undefined}
       </Container>
     )
   }
