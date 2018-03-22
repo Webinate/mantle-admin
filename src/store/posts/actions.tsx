@@ -6,8 +6,7 @@ import { IRootState } from '../';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' ),
-  SetPrepopulated: new ActionCreator<'posts-set-prepopulated', boolean>( 'posts-set-prepopulated' )
+  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' )
 };
 
 // Action Types
@@ -21,6 +20,5 @@ export function getPosts( index: number = 0, search?: string ) {
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
     const resp = await posts.getAll( { index: index, keyword: search } );
     dispatch( ActionCreators.SetPosts.create( resp ) );
-    dispatch( ActionCreators.SetPrepopulated.create( false ) );
   }
 }

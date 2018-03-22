@@ -27,7 +27,6 @@ export async function hydrate( req: IAuthReq ) {
   if ( matches ) {
     const users = await controllers.users.getUsers( 0, 10 );
     actions.push( UserActions.SetUsers.create( users ) );
-    actions.push( UserActions.SetPrepopulated.create( true ) );
   }
 
   // Get posts if neccessary
@@ -36,7 +35,6 @@ export async function hydrate( req: IAuthReq ) {
   if ( matches ) {
     const posts = await controllers.posts.getPosts();
     actions.push( PostActions.SetPosts.create( posts ) );
-    actions.push( PostActions.SetPrepopulated.create( true ) );
   }
 
   if ( args.runningTests )

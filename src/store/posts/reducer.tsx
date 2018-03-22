@@ -5,13 +5,11 @@ import { Page, IPost } from 'modepress';
 export type State = {
   readonly postPage: Page<IPost> | null;
   readonly busy: boolean;
-  readonly prepopulated: boolean;
 };
 
 export const initialState: State = {
   postPage: null,
-  busy: false,
-  prepopulated: false
+  busy: false
 };
 
 // Reducer
@@ -24,10 +22,6 @@ export default function reducer( state: State = initialState, action: Action ): 
         postPage: action.payload,
         busy: false
       };
-      break;
-
-    case ActionCreators.SetPrepopulated.type:
-      partialState = { prepopulated: action.payload };
       break;
 
     case ActionCreators.SetPostsBusy.type:

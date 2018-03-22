@@ -3,7 +3,7 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
-import { getPosts, ActionCreators } from '../store/posts/actions';
+import { getPosts } from '../store/posts/actions';
 import { TextField, IconButton, FontIcon, RaisedButton } from 'material-ui';
 import { Page, IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
@@ -23,7 +23,6 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getPosts: getPosts,
-  setPrepopulated: ActionCreators.SetPrepopulated.create,
   push: push
 }
 
@@ -48,12 +47,8 @@ export class Posts extends React.Component<Props, State> {
     }
   }
 
-  componentWillMount() {
-    if ( !this.props.posts.prepopulated ) {
-      this.props.getPosts();
-    }
-    else
-      this.props.setPrepopulated( false );
+  componentDidMount() {
+    this.props.getPosts();
   }
 
   render() {

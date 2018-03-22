@@ -6,13 +6,11 @@ import { IUserEntry, Page } from 'modepress';
 export type State = {
   readonly userPage: Page<IUserEntry> | null;
   readonly busy: boolean;
-  readonly prepopulated: boolean;
 };
 
 export const initialState: State = {
   userPage: null,
-  busy: false,
-  prepopulated: false
+  busy: false
 };
 
 // Reducer
@@ -30,10 +28,6 @@ export default function reducer( state: State = initialState, action: Action | A
 
     case ActionCreators.SetUsersBusy.type:
       partialState = { busy: action.payload };
-      break;
-
-    case ActionCreators.SetPrepopulated.type:
-      partialState = { prepopulated: action.payload };
       break;
 
     case ActionCreators.RemoveUser.type:

@@ -7,7 +7,6 @@ import { ActionCreators as AppActionCreators } from '../app/actions';
 // Action Creators
 export const ActionCreators = {
   SetUsersBusy: new ActionCreator<'users-busy', boolean>( 'users-busy' ),
-  SetPrepopulated: new ActionCreator<'users-set-prepopulated', boolean>( 'users-set-prepopulated' ),
   SetUsers: new ActionCreator<'users-set-users', Page<IUserEntry> | null>( 'users-set-users' ),
   RemoveUser: new ActionCreator<'users-remove-user', string>( 'users-remove-user' )
 };
@@ -23,7 +22,6 @@ export function getUsers( index: number = 0, search?: string ) {
     dispatch( ActionCreators.SetUsersBusy.create( true ) );
     const resp = await users.getAll( { index: index, search: search } );
     dispatch( ActionCreators.SetUsers.create( resp ) );
-    dispatch( ActionCreators.SetPrepopulated.create( false ) );
   }
 }
 

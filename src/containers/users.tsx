@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IUserEntry } from 'modepress';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
-import { getUsers, removeUser, ActionCreators } from '../store/users/actions';
+import { getUsers, removeUser } from '../store/users/actions';
 import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { UsersList } from '../components/users-list';
@@ -26,8 +26,7 @@ const dispatchToProps = {
   requestPasswordReset: requestPasswordReset,
   activate: activate,
   removeUser: removeUser,
-  resendActivation: resendActivation,
-  setPrepopulated: ActionCreators.SetPrepopulated.create
+  resendActivation: resendActivation
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -57,11 +56,8 @@ export class Users extends React.Component<Props, State> {
     }
   }
 
-  componentWillMount() {
-    if ( !this.props.userState.prepopulated )
-      this.props.getUsers();
-    else
-      this.props.setPrepopulated( false )
+  componentDidMount() {
+    this.props.getUsers();
   }
 
   componentWillReceiveProps( next: Props ) {
