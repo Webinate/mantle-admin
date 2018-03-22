@@ -3,8 +3,9 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
-import { getPosts, getPost } from '../store/posts/actions';
-import { TextField, IconButton, FontIcon, RaisedButton } from 'material-ui';
+import { getPosts, getPost, createPost, editPost } from '../store/posts/actions';
+import { TextField, IconButton, FontIcon, RaisedButton, FlatButton } from 'material-ui';
+import FontCancel from 'material-ui/svg-icons/navigation/arrow-back';
 import { IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
@@ -24,6 +25,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 const dispatchToProps = {
   getPosts: getPosts,
   getPost: getPost,
+  createPost: createPost,
+  editPost: editPost,
   push: push
 }
 
@@ -48,54 +51,69 @@ export class Posts extends React.Component<Props, State> {
     }
   }
 
-  componentDidMount() {
-    let match = matchPath<any>( this.props.location.pathname, { exact: true, path: '/dashboard/posts/edit/:postId' } );
-    if ( match )
-      this.props.getPost( match.params.postId );
-    else
-      this.props.getPosts();
-  }
-
   render() {
     let page = this.props.posts.postPage;
     let post = this.props.posts.post;
     const isBusy = this.props.posts.busy;
+    const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
 
     return (
       <div style={{ height: '100%' }}>
         <ContentHeader
           title="Posts"
           renderFilters={() => {
-            return <div>
-              <TextField
-                className="posts-filter"
-                hintText="Filter username or email"
-                id="mt-posts-filter"
-                value={this.state.searchFilter}
-                onKeyDown={e => {
-                }}
-                onChange={( e, text ) => this.setState( { searchFilter: text } )}
-              />,
-              <IconButton
-                name="posts-search-button"
-                style={{ verticalAlign: 'top' }}
-                iconStyle={{ color: theme.primary200.background }}
-                iconClassName="icon icon-search"
-              />,
-              <RaisedButton
-                onClick={e => this.props.push( '/dashboard/posts/new' )}
-                primary={true}
-                icon={<FontIcon
-                  name="posts-add-post"
-                  className="icon icon-add"
-                />} label="New Post" />
-            </div>
+            if ( !inPostsRoot ) {
+              return (
+                <FlatButton
+                  style={{ margin: '5px 0 0 0' }}
+                  onClick={e => this.props.push( '/dashboard/posts' )}
+                  icon={<FontCancel />}
+                  label="Back"
+                />
+              );
+            }
+            else
+              return (
+                <div>
+                  <TextField
+                    className="posts-filter"
+                    hintText="Filter username or email"
+                    id="mt-posts-filter"
+                    value={this.state.searchFilter}
+                    onKeyDown={e => {
+                    }}
+                    onChange={( e, text ) => this.setState( { searchFilter: text } )}
+                  />,
+                  <IconButton
+                    name="posts-search-button"
+                    style={{ verticalAlign: 'top' }}
+                    iconStyle={{ color: theme.primary200.background }}
+                    iconClassName="icon icon-search"
+                  />,
+                  <RaisedButton
+                    onClick={e => this.props.push( '/dashboard/posts/new' )}
+                    primary={true}
+                    icon={<FontIcon
+                      name="posts-add-post"
+                      className="icon icon-add"
+                    />} label="New Post" />
+                </div>
+              )
           }}>
         </ContentHeader>
         <PostsContainer>
           <Switch>
-            <Route path="/dashboard/posts/new" render={props => <PostForm loading={isBusy} />} />
-            <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm loading={isBusy} post={post} />} />
+            <Route path="/dashboard/posts/new" render={props => <PostForm
+              loading={isBusy}
+              onCreate={post => this.props.createPost( post )} />}
+            />
+            <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm
+              id={props.match.params.postId}
+              onFetch={id => this.props.getPost( id )}
+              loading={isBusy}
+              post={post}
+              onUpdate={post => this.props.editPost( post )} />}
+            />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
                 posts={page}

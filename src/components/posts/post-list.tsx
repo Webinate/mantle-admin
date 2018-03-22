@@ -27,6 +27,10 @@ export class PostList extends React.Component<Props, State> {
     };
   }
 
+  componentDidMount() {
+    this.props.getPosts( 0 );
+  }
+
   private onPostSelected( post: IPost, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();

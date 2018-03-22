@@ -33,8 +33,15 @@ export async function hydrate( req: IAuthReq ) {
   matches = matchPath( req.url, { path: '/dashboard/posts' } );
 
   if ( matches ) {
-    const posts = await controllers.posts.getPosts();
-    actions.push( PostActions.SetPosts.create( posts ) );
+    matches = matchPath( req.url, { path: '/dashboard/posts/edit/:id' } );
+    if ( matches ) {
+      const post = await controllers.posts.getPost( { id: matches.params.id } );
+      actions.push( PostActions.SetPost.create( post ) );
+    }
+    else {
+      const posts = await controllers.posts.getPosts();
+      actions.push( PostActions.SetPosts.create( posts ) );
+    }
   }
 
   if ( args.runningTests )

@@ -2,7 +2,8 @@ import * as React from 'react';
 import TinyEditor from '../tiny-editor';
 
 export type Props = {
-
+  content: string;
+  onContentChanged: ( content: string ) => void;
 }
 
 export type State = {
@@ -26,9 +27,9 @@ export default class TinyPostEditor extends React.Component<Props, State> {
   render() {
     return <div>
       {this.state.renderTiny ? <TinyEditor
-        onContentChanged={content => { }}
+        onContentChanged={this.props.onContentChanged}
         id="post-editor"
-        content=""
+        content={this.props.content}
         config={{
           selector: '#post-editor',
           plugins:

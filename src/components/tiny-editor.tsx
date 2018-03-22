@@ -36,6 +36,10 @@ export type State = {
 export default class TinyEditor extends React.Component<Props, State> {
   private id: string;
 
+  static defaultProps: Partial<Props> = {
+    content: ''
+  }
+
   constructor( props: Props ) {
     super( props );
 
@@ -82,21 +86,19 @@ export default class TinyEditor extends React.Component<Props, State> {
     if ( this.state.editor )
       this.removeEditor();
 
-    const component = this;
-
     let config = this.props.config;
-    config.selector = `#${ component.id }`;
+    config.selector = `#${ this.id }`;
 
     config.setup = ( editor: Editor ) => {
-      component.setState( { editor } );
+      this.setState( { editor } );
 
       editor.on( 'init', () => {
-        editor.setContent( component.props.content );
+        editor.setContent( this.props.content );
       } );
 
       editor.on( 'keyup change', () => {
         const content = editor.getContent();
-        component.props.onContentChanged( content );
+        this.props.onContentChanged( content );
       } );
     };
 

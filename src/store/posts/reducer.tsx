@@ -31,7 +31,10 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.SetPost.type:
-      partialState = { post: action.payload };
+      partialState = {
+        post: action.payload,
+        busy: false
+      };
       break;
 
     default: return state;

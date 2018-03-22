@@ -1,13 +1,17 @@
 import * as React from 'react';
-import { TextField, Toggle, RaisedButton } from 'material-ui';
+import { TextField, Toggle, RaisedButton, CircularProgress } from 'material-ui';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
+  id?: string;
   loading: boolean;
   post?: Partial<IPost> | null;
+  onFetch?: ( id: string ) => void;
+  onUpdate?: ( post: Partial<IPost> ) => void;
+  onCreate?: ( post: Partial<IPost> ) => void;
 }
 
 export type State = {
@@ -22,7 +26,20 @@ export class PostForm extends React.Component<Props, State> {
     };
   }
 
+  componentDidMount() {
+    if ( this.props.onFetch )
+      this.props.onFetch( this.props.id! )
+  }
+
+  componentWillReceiveProps( next: Props ) {
+    if ( next.post !== this.props.post )
+      this.setState( { editable: { ...next.post } } );
+  }
+
   render() {
+    if ( this.props.loading )
+      return <CircularProgress />
+
     return <Form>
       <div>
         <TextField
@@ -38,11 +55,27 @@ export class PostForm extends React.Component<Props, State> {
         />
         <br />
         <h3>Content</h3>
-        <TinyPostEditor />
+        <TinyPostEditor
+          content={this.state.editable.content!}
+          onContentChanged={content => {
+            // Doing this in a mutable way becase we dont to overload the tiny editor
+            this.state.editable.content = content;
+          }}
+        />
       </div>
       <div>
         <PublishPanel>
-          <RaisedButton primary={true} fullWidth={true} label={this.props.post ? 'Update' : 'Publish'} />
+          <RaisedButton
+            onClick={e => {
+              if ( this.props.post && this.props.onUpdate )
+                this.props.onUpdate( this.state.editable );
+              else if ( this.props.onCreate )
+                this.props.onCreate( this.state.editable );
+            }}
+            primary={true}
+            fullWidth={true}
+            label={this.props.post ? 'Update' : 'Publish'}
+          />
           <Toggle
             style={{ margin: '20px 0' }}
             name="mt-post-visibility"
