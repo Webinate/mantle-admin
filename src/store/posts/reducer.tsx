@@ -4,11 +4,13 @@ import { Page, IPost } from 'modepress';
 // State
 export type State = {
   readonly postPage: Page<IPost> | null;
+  readonly post: IPost | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
   postPage: null,
+  post: null,
   busy: false
 };
 
@@ -26,6 +28,10 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.SetPostsBusy.type:
       partialState = { busy: action.payload };
+      break;
+
+    case ActionCreators.SetPost.type:
+      partialState = { post: action.payload };
       break;
 
     default: return state;

@@ -6,7 +6,8 @@ import { IRootState } from '../';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' )
+  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' ),
+  SetPost: new ActionCreator<'posts-set-post', IPost>( 'posts-set-post' )
 };
 
 // Action Types
@@ -20,5 +21,13 @@ export function getPosts( index: number = 0, search?: string ) {
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
     const resp = await posts.getAll( { index: index, keyword: search } );
     dispatch( ActionCreators.SetPosts.create( resp ) );
+  }
+}
+
+export function getPost( id: string ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.SetPostsBusy.create( true ) );
+    const resp = await posts.getOne( { id } );
+    dispatch( ActionCreators.SetPost.create( resp ) );
   }
 }

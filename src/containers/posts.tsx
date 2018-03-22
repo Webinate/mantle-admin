@@ -3,11 +3,11 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
-import { getPosts } from '../store/posts/actions';
+import { getPosts, getPost } from '../store/posts/actions';
 import { TextField, IconButton, FontIcon, RaisedButton } from 'material-ui';
-import { Page, IPost } from 'modepress';
+import { IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import { PostList } from '../components/posts/post-list';
 import { PostForm } from '../components/posts/post-form';
@@ -17,12 +17,13 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   posts: state.posts,
   app: state.app,
   routing: state.router,
-  location: ownProps.location
+  location: ownProps.location as Location
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getPosts: getPosts,
+  getPost: getPost,
   push: push
 }
 
@@ -48,17 +49,17 @@ export class Posts extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.props.getPosts();
+    let match = matchPath<any>( this.props.location.pathname, { exact: true, path: '/dashboard/posts/edit/:postId' } );
+    if ( match )
+      this.props.getPost( match.params.postId );
+    else
+      this.props.getPosts();
   }
 
   render() {
-    let posts: Page<IPost> | null = null;
-    const page = this.props.posts.postPage;
+    let page = this.props.posts.postPage;
+    let post = this.props.posts.post;
     const isBusy = this.props.posts.busy;
-    const selectedPost = this.state.selectedPosts.length > 0 ? this.state.selectedPosts[ 0 ] : null;
-
-    if ( typeof ( page ) !== 'string' )
-      posts = page;
 
     return (
       <div style={{ height: '100%' }}>
@@ -94,10 +95,10 @@ export class Posts extends React.Component<Props, State> {
         <PostsContainer>
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <PostForm loading={isBusy} />} />
-            <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm loading={isBusy} post={selectedPost} />} />
+            <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm loading={isBusy} post={post} />} />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
-                posts={posts}
+                posts={page}
                 loading={isBusy}
                 selected={this.state.selectedPosts}
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
