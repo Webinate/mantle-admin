@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { TextField, Toggle, RaisedButton } from 'material-ui';
+import { TextField, Toggle, RaisedButton, IconButton } from 'material-ui';
+import CancelIcon from 'material-ui/svg-icons/navigation/cancel';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
@@ -15,13 +16,15 @@ export type Props = {
 
 export type State = {
   editable: Partial<IPost>;
+  currentTagText: string;
 }
 
 export class PostForm extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      editable: props.post ? { ...props.post } : {}
+      editable: props.post ? { ...props.post } : this.createEmptyPost(),
+      currentTagText: ''
     };
   }
 
@@ -32,7 +35,25 @@ export class PostForm extends React.Component<Props, State> {
 
   componentWillReceiveProps( next: Props ) {
     if ( next.post !== this.props.post )
-      this.setState( { editable: { ...next.post } } );
+      this.setState( {
+        editable: { ...next.post },
+        currentTagText: ''
+      } );
+  }
+
+  private createEmptyPost(): IPost {
+    return {
+      title: '',
+      brief: '',
+      categories: [],
+      tags: [],
+      content: '',
+      public: false,
+      slug: '',
+      featuredImage: '',
+      createdOn: Date.now(),
+      lastUpdated: Date.now()
+    }
   }
 
   render() {
@@ -88,7 +109,37 @@ export class PostForm extends React.Component<Props, State> {
               this.setState( { editable: { ...this.state.editable, public: this.state.editable.public ? false : true } } )
             }}
           />
+        </PublishPanel>
 
+        <PublishPanel>
+          <h3>Tags</h3>
+          <TextField
+            value={this.state.currentTagText}
+            onKeyUp={e => {
+              if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' )
+                this.setState( {
+                  currentTagText: '',
+                  editable: {
+                    ...this.state.editable, tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
+                  }
+                } )
+            }}
+            onChange={( e, val ) => this.setState( { currentTagText: val } )}
+          />
+          {this.state.editable.tags!.map( ( tag, tagIndex ) => {
+            return <Tag key={`tag-${ tagIndex }`}>{tag} <IconButton
+              iconStyle={{
+                width: 16,
+                height: 16
+              }}
+              style={{
+                padding: 0,
+                width: 26,
+                height: 26
+              }}><CancelIcon onClick={e => {
+                this.setState( { editable: { ...this.state.editable, tags: this.state.editable.tags!.filter( t => t !== tag ) } } )
+              }} /></IconButton></Tag>
+          } )}
         </PublishPanel>
       </div>
     </Form>;
@@ -99,18 +150,39 @@ const Form = styled.form`
   padding: 10px;
   display: flex;
 
-  > div {
-    flex: 1;
+  > div:nth-child(1) {
+    flex: 2;
   }
 
   > div:nth-child(2) {
+    flex: 1;
     margin: 0 0 0 20px;
   }
 `;
 
 const PublishPanel = styled.div`
   background: ${theme.light100.background };
+  border: 1px solid ${theme.light100.border };
   padding: 20px;
   border-radius: 5px;
   overflow: hidden;
+  margin: 0 0 10px 0;
+`;
+
+const Tag = styled.div`
+  background: ${theme.primary100.background };
+  color: ${theme.primary100.color };
+  border: 1px solid ${theme.primary100.border };
+  padding: 4px;
+  border-radius: 5px;
+  display: inline-block;
+  margin: 0 5px 5px 0;
+
+  > h2 {
+    margin: 0;
+  }
+
+  > button {
+    vertical-align: middle;
+  }
 `;
