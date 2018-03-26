@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextField, Toggle, RaisedButton, IconButton } from 'material-ui';
 import CancelIcon from 'material-ui/svg-icons/navigation/cancel';
+import AddIcon from 'material-ui/svg-icons/content/add';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
@@ -113,33 +114,47 @@ export class PostForm extends React.Component<Props, State> {
 
         <PublishPanel>
           <h3>Tags</h3>
-          <TextField
-            value={this.state.currentTagText}
-            onKeyUp={e => {
-              if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' )
-                this.setState( {
-                  currentTagText: '',
-                  editable: {
-                    ...this.state.editable, tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
-                  }
-                } )
-            }}
-            onChange={( e, val ) => this.setState( { currentTagText: val } )}
-          />
-          {this.state.editable.tags!.map( ( tag, tagIndex ) => {
-            return <Tag key={`tag-${ tagIndex }`}>{tag} <IconButton
-              iconStyle={{
-                width: 16,
-                height: 16
-              }}
-              style={{
-                padding: 0,
-                width: 26,
-                height: 26
-              }}><CancelIcon onClick={e => {
-                this.setState( { editable: { ...this.state.editable, tags: this.state.editable.tags!.filter( t => t !== tag ) } } )
-              }} /></IconButton></Tag>
-          } )}
+          <TagsInput style={{ display: 'flex' }}>
+            <div>
+              <TextField
+                floatingLabelText="Type a tag and hit enter"
+                value={this.state.currentTagText}
+                fullWidth={true}
+                onKeyUp={e => {
+                  if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' && this.state.editable.tags!.indexOf( this.state.currentTagText.trim() ) === -1 )
+                    this.setState( {
+                      currentTagText: '',
+                      editable: {
+                        ...this.state.editable, tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
+                      }
+                    } )
+                }}
+                onChange={( e, val ) => this.setState( { currentTagText: val } )}
+              />
+            </div>
+            <div>
+              <IconButton
+                iconStyle={{ width: 26, height: 26 }}
+                style={{ padding: 0, width: 30, height: 30 }}><AddIcon />
+              </IconButton>
+            </div>
+          </TagsInput>
+          <div>
+            {this.state.editable.tags!.map( ( tag, tagIndex ) => {
+              return <Tag key={`tag-${ tagIndex }`}>{tag} <IconButton
+                iconStyle={{
+                  width: 16,
+                  height: 16
+                }}
+                style={{
+                  padding: 0,
+                  width: 26,
+                  height: 26
+                }}><CancelIcon onClick={e => {
+                  this.setState( { editable: { ...this.state.editable, tags: this.state.editable.tags!.filter( t => t !== tag ) } } )
+                }} /></IconButton></Tag>
+            } )}
+          </div>
         </PublishPanel>
       </div>
     </Form>;
@@ -160,6 +175,17 @@ const Form = styled.form`
   }
 `;
 
+const TagsInput = styled.div`
+display: flex;
+> div:nth-child(1) {
+  flex: 1;
+}
+> div:nth-child(2) {
+  flex: 1;
+  max-width: 30px;
+}
+`;
+
 const PublishPanel = styled.div`
   background: ${theme.light100.background };
   border: 1px solid ${theme.light100.border };
@@ -167,6 +193,10 @@ const PublishPanel = styled.div`
   border-radius: 5px;
   overflow: hidden;
   margin: 0 0 10px 0;
+
+  > h3 {
+    margin: 0;
+  }
 `;
 
 const Tag = styled.div`
@@ -177,10 +207,6 @@ const Tag = styled.div`
   border-radius: 5px;
   display: inline-block;
   margin: 0 5px 5px 0;
-
-  > h2 {
-    margin: 0;
-  }
 
   > button {
     vertical-align: middle;
