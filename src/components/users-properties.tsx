@@ -245,7 +245,7 @@ const ImgContainer = styled.div`
   box-sizing: border-box;
   text-align: center;
   padding: 20px;
-  background: linear-gradient(-45deg, ${theme.secondary100.background }, ${ theme.primary100.background });
+  background: linear-gradient(-45deg, ${theme.secondary200.background }, ${ theme.primary100.background });
   position: relative;
   overflow: hidden;
 `;

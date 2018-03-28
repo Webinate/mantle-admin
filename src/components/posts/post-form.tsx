@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { TextField, Toggle, RaisedButton, IconButton } from 'material-ui';
-import CancelIcon from 'material-ui/svg-icons/navigation/cancel';
+import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
+import { SlugEditor } from '../slug-editor';
 
 export type Props = {
   id?: string;
@@ -58,6 +58,14 @@ export class PostForm extends React.Component<Props, State> {
   }
 
   private addTag() {
+    const text = this.state.currentTagText.trim();
+
+    if ( this.state.editable.tags!.indexOf( text ) !== -1 )
+      return;
+
+    if ( text === '' )
+      return;
+
     this.setState( {
       currentTagText: '',
       editable: {
@@ -66,28 +74,28 @@ export class PostForm extends React.Component<Props, State> {
     } )
   }
 
+  private getSlug() {
+    if ( this.state.editable.slug )
+      return this.state.editable.slug;
+
+    let toRet = this.state.editable.title!.toLowerCase().replace( /\s+/g, '-' );
+    toRet = toRet.replace( /[^a-zA-Z0-9 -]/g, '' );
+    return toRet;
+  }
+
   render() {
     return <Form>
       <div>
-        <TextField
+        <input
+          id="mt-post-title"
           value={this.state.editable.title}
-          floatingLabelText="Post Title"
-          onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, title: value } } )}
+          placeholder="Enter Post Title"
+          onChange={( e ) => this.setState( { editable: { ...this.state.editable, title: e.currentTarget.value } } )}
         />
-        <br />
-        <TextField
-          value={this.state.editable.slug}
-          floatingLabelText="Slug"
-          onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
+        <SlugEditor
+          value={this.getSlug()}
+          onChange={( value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
         />
-        <br />
-        <TextField
-          value={this.state.editable.brief}
-          floatingLabelText="Post Brief Description"
-          onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, brief: value } } )}
-        />
-        <br />
-        <h3>Content</h3>
         <TinyPostEditor
           content={this.state.editable.content!}
           onContentChanged={content => {
@@ -127,7 +135,7 @@ export class PostForm extends React.Component<Props, State> {
         </PublishPanel>
 
         <PublishPanel>
-          <h3>Tags</h3>
+          <h3>Post Tags</h3>
           <TagsInput style={{ display: 'flex' }}>
             <div>
               <TextField
@@ -135,7 +143,7 @@ export class PostForm extends React.Component<Props, State> {
                 value={this.state.currentTagText}
                 fullWidth={true}
                 onKeyUp={e => {
-                  if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' && this.state.editable.tags!.indexOf( this.state.currentTagText.trim() ) === -1 )
+                  if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' )
                     this.addTag();
                 }}
                 onChange={( e, val ) => this.setState( { currentTagText: val } )}
@@ -149,27 +157,34 @@ export class PostForm extends React.Component<Props, State> {
               </IconButton>
             </div>
           </TagsInput>
-          <div>
+          <TagWrapper>
             {this.state.editable.tags!.map( ( tag, tagIndex ) => {
-              return <Tag key={`tag-${ tagIndex }`}>{tag} <IconButton
-                iconStyle={{
-                  width: 16,
-                  height: 16
-                }}
-                style={{
-                  padding: 0,
-                  width: 26,
-                  height: 26
-                }}><CancelIcon onClick={e => {
+              return <Chip
+                style={{ margin: '4px 4px 0 0' }}
+                onRequestDelete={e => {
                   this.setState( {
                     editable: {
                       ...this.state.editable,
                       tags: this.state.editable.tags!.filter( t => t !== tag )
                     }
                   } )
-                }} /></IconButton></Tag>
+                }}
+              >
+                {tag}
+              </Chip>;
             } )}
-          </div>
+          </TagWrapper>
+        </PublishPanel>
+
+        <PublishPanel>
+          <h3>Post Meta</h3>
+          <TextField
+            value={this.state.editable.brief}
+            fullWidth={true}
+            multiLine={true}
+            floatingLabelText="Post Brief Description"
+            onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, brief: value } } )}
+          />
         </PublishPanel>
       </div>
     </Form >;
@@ -180,6 +195,26 @@ const Form = styled.form`
   padding: 10px;
   display: flex;
 
+  #mt-post-title {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid ${theme.light100.border };
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: 0.5s border;
+    font-size: 20px;
+    font-weight: lighter;
+
+    &::placeholder {
+      color: ${theme.light100.softColor };
+    }
+    &:active, &:focus {
+      border: 1px solid ${theme.primary100.border };
+      outline: none;
+    }
+  }
+
   > div:nth-child(1) {
     flex: 2;
   }
@@ -188,6 +223,11 @@ const Form = styled.form`
     flex: 1;
     margin: 0 0 0 20px;
   }
+`;
+
+const TagWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
 `;
 
 const TagsInput = styled.div`
@@ -215,16 +255,16 @@ const PublishPanel = styled.div`
   }
 `;
 
-const Tag = styled.div`
-  background: ${theme.primary100.background };
-  color: ${theme.primary100.color };
-  border: 1px solid ${theme.primary100.border };
-  padding: 4px;
-  border-radius: 5px;
-  display: inline-block;
-  margin: 0 5px 5px 0;
+// const Tag = styled.div`
+//   background: ${theme.primary100.background };
+//   color: ${theme.primary100.color };
+//   border: 1px solid ${theme.primary100.border };
+//   padding: 4px 4px 4px 8px;
+//   border-radius: 5px;
+//   display: inline-block;
+//   margin: 0 5px 5px 0;
 
-  > button {
-    vertical-align: middle;
-  }
-`;
+//   > button {
+//     vertical-align: middle;
+//   }
+// `;

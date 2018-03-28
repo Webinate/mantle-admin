@@ -106,9 +106,9 @@ const DashboardOuter = styled.div`
 `;
 
 const Head = styled.div`
-  background: ${theme.secondary100.background };
-  color: ${theme.secondary100.color };
-  border-bottom: 1px solid ${theme.secondary100.border! };
+  background: ${theme.secondary200.background };
+  color: ${theme.secondary200.color };
+  border-bottom: 1px solid ${theme.secondary200.border! };
   box-sizing: border-box;
 
   > * {

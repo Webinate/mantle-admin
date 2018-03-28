@@ -16,6 +16,7 @@ export interface ThemeInterface extends MuiTheme {
   primary300: ThemeValue;
   secondary100: ThemeValue;
   secondary200: ThemeValue;
+  secondary300: ThemeValue;
   error: ThemeValue;
   warning: ThemeValue;
   light100: ThemeValue;

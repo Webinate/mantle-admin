@@ -8,8 +8,9 @@ const p200 = '#6d689c';
 const p300 = '#4d496f';
 
 // Reds
-const s100 = '#CC7A7A';
-const s200 = '#B64545';
+const s100 = '#fad1d1';
+const s200 = '#CC7A7A';
+const s300 = '#B64545';
 
 // Lights BGs
 const l100 = '#fff';
@@ -32,8 +33,9 @@ export default {
   primary300: { color: '#fff', softColor: '#eee', background: p300, border: '#36334e' },
 
   // Reds
-  secondary100: { color: '#fff', softColor: '#eee', background: s100, border: '#835151' },
-  secondary200: { color: '#fff', softColor: '#eee', background: s200, border: '#ccc' },
+  secondary100: { color: '#333', softColor: '#333', background: s100, border: '#efabab' },
+  secondary200: { color: '#fff', softColor: '#eee', background: s200, border: '#835151' },
+  secondary300: { color: '#fff', softColor: '#eee', background: s300, border: '#ccc' },
 
   // Warnings & Errors
   error: { color: '#fff', softColor: '#fff', background: '#ce3131', border: '#ad2828' },
