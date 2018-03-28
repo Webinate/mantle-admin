@@ -30,7 +30,7 @@
     {
       "name": "Debug Tests",
       "type": "node",
-      "protocol": "auto",
+      "protocol": "inspector",
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
       "stopOnEntry": false,

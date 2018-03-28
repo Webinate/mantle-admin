@@ -8,7 +8,9 @@ require( "ts-node" ).register( {
     rootDir: './test',
     sourceMap: true,
     target: "es2017",
-    isolatedModules: true
+    isolatedModules: true,
+    inlineSourceMap: true,
+    inlineSources: true
   },
 } );
 
