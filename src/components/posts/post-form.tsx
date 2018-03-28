@@ -57,6 +57,15 @@ export class PostForm extends React.Component<Props, State> {
     }
   }
 
+  private addTag() {
+    this.setState( {
+      currentTagText: '',
+      editable: {
+        ...this.state.editable, tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
+      }
+    } )
+  }
+
   render() {
     return <Form>
       <div>
@@ -107,7 +116,12 @@ export class PostForm extends React.Component<Props, State> {
             labelPosition="right"
             toggled={this.state.editable.public ? true : false}
             onClick={e => {
-              this.setState( { editable: { ...this.state.editable, public: this.state.editable.public ? false : true } } )
+              this.setState( {
+                editable: {
+                  ...this.state.editable,
+                  public: this.state.editable.public ? false : true
+                }
+              } )
             }}
           />
         </PublishPanel>
@@ -122,18 +136,14 @@ export class PostForm extends React.Component<Props, State> {
                 fullWidth={true}
                 onKeyUp={e => {
                   if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' && this.state.editable.tags!.indexOf( this.state.currentTagText.trim() ) === -1 )
-                    this.setState( {
-                      currentTagText: '',
-                      editable: {
-                        ...this.state.editable, tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
-                      }
-                    } )
+                    this.addTag();
                 }}
                 onChange={( e, val ) => this.setState( { currentTagText: val } )}
               />
             </div>
             <div>
               <IconButton
+                onClick={e => this.addTag()}
                 iconStyle={{ width: 26, height: 26 }}
                 style={{ padding: 0, width: 30, height: 30 }}><AddIcon />
               </IconButton>
@@ -151,13 +161,18 @@ export class PostForm extends React.Component<Props, State> {
                   width: 26,
                   height: 26
                 }}><CancelIcon onClick={e => {
-                  this.setState( { editable: { ...this.state.editable, tags: this.state.editable.tags!.filter( t => t !== tag ) } } )
+                  this.setState( {
+                    editable: {
+                      ...this.state.editable,
+                      tags: this.state.editable.tags!.filter( t => t !== tag )
+                    }
+                  } )
                 }} /></IconButton></Tag>
             } )}
           </div>
         </PublishPanel>
       </div>
-    </Form>;
+    </Form >;
   }
 }
 
@@ -177,6 +192,7 @@ const Form = styled.form`
 
 const TagsInput = styled.div`
 display: flex;
+align-items: center;
 > div:nth-child(1) {
   flex: 1;
 }
