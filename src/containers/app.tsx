@@ -11,6 +11,7 @@ import { ContentHeader } from '../components/content-header';
 import { Users } from './users';
 import { Posts } from './posts';
 import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
+import { matchPath } from 'react-router';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -70,9 +71,9 @@ export class App extends React.Component<Props, State> {
   render() {
 
     const items = [
-      { label: 'Home', icon: 'icon icon-home', path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
-      { label: 'Posts', icon: 'icon icon-posts', path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
-      { label: 'Users', icon: 'icon icon-people', path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
+      { label: 'Home', icon: 'icon icon-home', exact: true, path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
+      { label: 'Posts', icon: 'icon icon-posts', exact: false, path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
+      { label: 'Users', icon: 'icon icon-people', exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
     ];
 
     return (
@@ -90,7 +91,7 @@ export class App extends React.Component<Props, State> {
                   <List style={{ padding: '0' }}>
                     {items.map( ( i, index ) => {
                       return <ListItem
-                        className={props.location.pathname === i.path ? 'selected' : ''}
+                        className={matchPath( props.location.pathname, { path: i.path, exact: i.exact } ) ? 'selected' : ''}
                         key={`menu-item-${ index }`}
                         onClick={e => i.onClick()}
                         primaryText={i.label}
