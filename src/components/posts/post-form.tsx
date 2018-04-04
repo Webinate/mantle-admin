@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as moment from 'moment';
 import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { IPost } from 'modepress';
@@ -105,7 +106,7 @@ export class PostForm extends React.Component<Props, State> {
         />
       </div>
       <div>
-        <PublishPanel>
+        <RightPanel>
           <RaisedButton
             onClick={e => {
               if ( this.props.post && this.props.onUpdate )
@@ -132,9 +133,19 @@ export class PostForm extends React.Component<Props, State> {
               } )
             }}
           />
-        </PublishPanel>
+          <Dates>
+            <div>Created: </div>
+            <div>
+              {moment( this.props.post!.createdOn ).format( 'MMM Do, YYYY' )}
+            </div>
+            <div>Updated: </div>
+            <div>
+              {moment( this.props.post!.lastUpdated ).format( 'MMM Do, YYYY' )}
+            </div>
+          </Dates>
+        </RightPanel>
 
-        <PublishPanel>
+        <RightPanel>
           <h3>Post Tags</h3>
           <TagsInput style={{ display: 'flex' }}>
             <div>
@@ -174,9 +185,9 @@ export class PostForm extends React.Component<Props, State> {
               </Chip>;
             } )}
           </TagWrapper>
-        </PublishPanel>
+        </RightPanel>
 
-        <PublishPanel>
+        <RightPanel>
           <h3>Post Meta</h3>
           <TextField
             value={this.state.editable.brief}
@@ -185,7 +196,7 @@ export class PostForm extends React.Component<Props, State> {
             floatingLabelText="Post Brief Description"
             onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, brief: value } } )}
           />
-        </PublishPanel>
+        </RightPanel>
       </div>
     </Form >;
   }
@@ -230,6 +241,21 @@ const TagWrapper = styled.div`
   flex-wrap: wrap;
 `;
 
+const Dates = styled.div`
+display: flex;
+flex-wrap: wrap;
+
+> div {
+  flex: 50%;
+  &:nth-child(2n+1) {
+    font-style: italic;
+  }
+  &:nth-child(2n+0) {
+    text-align: right;
+  }
+}
+`;
+
 const TagsInput = styled.div`
 display: flex;
 align-items: center;
@@ -242,7 +268,7 @@ align-items: center;
 }
 `;
 
-const PublishPanel = styled.div`
+const RightPanel = styled.div`
   background: ${theme.light100.background };
   border: 1px solid ${theme.light100.border };
   padding: 20px;
