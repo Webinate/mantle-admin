@@ -7,6 +7,7 @@ import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 import { SlugEditor } from '../slug-editor';
+import { UserPicker } from '../user-picker';
 
 export type Props = {
   id?: string;
@@ -87,16 +88,27 @@ export class PostForm extends React.Component<Props, State> {
   render() {
     return <Form>
       <div>
-        <input
-          id="mt-post-title"
-          value={this.state.editable.title}
-          placeholder="Enter Post Title"
-          onChange={( e ) => this.setState( { editable: { ...this.state.editable, title: e.currentTarget.value } } )}
-        />
-        <SlugEditor
-          value={this.getSlug()}
-          onChange={( value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
-        />
+        <TitleContainer>
+          <div>
+            <input
+              id="mt-post-title"
+              value={this.state.editable.title}
+              placeholder="Enter Post Title"
+              onChange={( e ) => this.setState( { editable: { ...this.state.editable, title: e.currentTarget.value } } )}
+            />
+            <SlugEditor
+              value={this.getSlug()}
+              onChange={( value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
+            />
+          </div>
+          <div>
+            <UserPicker
+              onChange={user => this.setState( { editable: { ...this.state.editable, author: user } } )}
+              user={this.state.editable.author!}
+            />
+          </div>
+        </TitleContainer>
+
         <TinyPostEditor
           content={this.state.editable.content!}
           onContentChanged={content => {
@@ -133,16 +145,17 @@ export class PostForm extends React.Component<Props, State> {
               } )
             }}
           />
-          <Dates>
-            <div>Created: </div>
-            <div>
-              {moment( this.props.post!.createdOn ).format( 'MMM Do, YYYY' )}
-            </div>
-            <div>Updated: </div>
-            <div>
-              {moment( this.props.post!.lastUpdated ).format( 'MMM Do, YYYY' )}
-            </div>
-          </Dates>
+          {this.props.post ?
+            <Dates>
+              <div>Created: </div>
+              <div>
+                {moment( this.props.post.createdOn ).format( 'MMM Do, YYYY' )}
+              </div>
+              <div>Updated: </div>
+              <div>
+                {moment( this.props.post.lastUpdated ).format( 'MMM Do, YYYY' )}
+              </div>
+            </Dates> : undefined}
         </RightPanel>
 
         <RightPanel>
@@ -150,6 +163,7 @@ export class PostForm extends React.Component<Props, State> {
           <TagsInput style={{ display: 'flex' }}>
             <div>
               <TextField
+                id="mt-add-new-tag"
                 floatingLabelText="Type a tag and hit enter"
                 value={this.state.currentTagText}
                 fullWidth={true}
@@ -171,6 +185,7 @@ export class PostForm extends React.Component<Props, State> {
           <TagWrapper>
             {this.state.editable.tags!.map( ( tag, tagIndex ) => {
               return <Chip
+                key={`tag-${ tagIndex }`}
                 style={{ margin: '4px 4px 0 0' }}
                 onRequestDelete={e => {
                   this.setState( {
@@ -190,6 +205,7 @@ export class PostForm extends React.Component<Props, State> {
         <RightPanel>
           <h3>Post Meta</h3>
           <TextField
+            id="mt-post-desc"
             value={this.state.editable.brief}
             fullWidth={true}
             multiLine={true}
@@ -233,6 +249,19 @@ const Form = styled.form`
   > div:nth-child(2) {
     flex: 1;
     margin: 0 0 0 20px;
+    max-width: 350px;
+  }
+`;
+
+const TitleContainer = styled.div`
+  width: 100%;
+  display: flex;
+  > div:nth-child(1) {
+    flex: 1;
+  }
+
+  > div:nth-child(2) {
+    flex: 0 1 auto;
   }
 `;
 
