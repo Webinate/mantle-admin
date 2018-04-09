@@ -7,6 +7,7 @@ import { users } from 'modepress/lib-frontend';
 
 type Props = {
   user: IUserEntry;
+  canEdit?: boolean;
   onChange: ( user: IUserEntry ) => void;
 };
 
@@ -17,6 +18,11 @@ type State = {
 };
 
 export class UserPicker extends React.Component<Props, State> {
+  static defaultProps: Partial<Props> = {
+    canEdit: true
+  };
+
+
   constructor( props: Props ) {
     super( props );
     this.state = {
@@ -49,8 +55,8 @@ export class UserPicker extends React.Component<Props, State> {
     } );
 
     return <div
-      style={{ padding: '0 0 0 5px', cursor: 'pointer' }}
-      onClick={e => this.setState( { open: true, elm: e.currentTarget } )}
+      style={{ padding: '0 0 0 5px', cursor: this.props.canEdit ? 'pointer' : '' }}
+      onClick={this.props.canEdit ? e => this.setState( { open: true, elm: e.currentTarget } ) : undefined}
     >
       <span
         style={{ verticalAlign: 'middle' }}

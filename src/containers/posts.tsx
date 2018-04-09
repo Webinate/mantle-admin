@@ -16,6 +16,7 @@ import { PostForm } from '../components/posts/post-form';
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   posts: state.posts,
+  user: state.authentication.user,
   app: state.app,
   routing: state.router,
   location: ownProps.location as Location
@@ -55,6 +56,7 @@ export class Posts extends React.Component<Props, State> {
     let page = this.props.posts.postPage;
     let post = this.props.posts.post;
     const isBusy = this.props.posts.busy;
+    const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
 
     return (
@@ -105,13 +107,17 @@ export class Posts extends React.Component<Props, State> {
         <PostsContainer>
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <PostForm
-              onCreate={post => this.props.createPost( post )} />}
+              onCreate={post => this.props.createPost( post )}
+              isAdmin={isAdmin}
+            />}
             />
             <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm
               id={props.match.params.postId}
               onFetch={id => this.props.getPost( id )}
               post={post}
-              onUpdate={post => this.props.editPost( post )} />}
+              onUpdate={post => this.props.editPost( post )}
+              isAdmin={isAdmin}
+            />}
             />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList

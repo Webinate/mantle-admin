@@ -10,6 +10,7 @@ import { SlugEditor } from '../slug-editor';
 import { UserPicker } from '../user-picker';
 
 export type Props = {
+  isAdmin: boolean;
   id?: string;
   post?: Partial<IPost> | null;
   onFetch?: ( id: string ) => void;
@@ -102,10 +103,11 @@ export class PostForm extends React.Component<Props, State> {
             />
           </div>
           <div>
-            <UserPicker
+            {this.state.editable.author ? <UserPicker
+              canEdit={this.props.isAdmin}
               onChange={user => this.setState( { editable: { ...this.state.editable, author: user } } )}
-              user={this.state.editable.author!}
-            />
+              user={this.state.editable.author}
+            /> : undefined}
           </div>
         </TitleContainer>
 
@@ -309,17 +311,3 @@ const RightPanel = styled.div`
     margin: 0;
   }
 `;
-
-// const Tag = styled.div`
-//   background: ${theme.primary100.background };
-//   color: ${theme.primary100.color };
-//   border: 1px solid ${theme.primary100.border };
-//   padding: 4px 4px 4px 8px;
-//   border-radius: 5px;
-//   display: inline-block;
-//   margin: 0 5px 5px 0;
-
-//   > button {
-//     vertical-align: middle;
-//   }
-// `;
