@@ -257,7 +257,7 @@ const Form = styled.form`
     max-width: 350px;
   }
 
-  i {
+  > div > i {
     vertical-align: middle;
     color: ${theme.light200.softColor };
   }
