@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
+import { TextField, Toggle, RaisedButton, IconButton, Chip, Checkbox } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
@@ -218,6 +218,14 @@ export class PostForm extends React.Component<Props, State> {
             onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, brief: value } } )}
           />
         </RightPanel>
+
+        <RightPanel>
+          <h3>Categories</h3>
+          <div style={{ margin: '8px 0 0 0' }}>
+            <Checkbox label="Category 1" />
+            <Checkbox label="Category 2" />
+          </div>
+        </RightPanel>
       </div>
     </Form >;
   }
@@ -256,11 +264,6 @@ const Form = styled.form`
     margin: 0 0 0 20px;
     max-width: 350px;
   }
-
-  > div > i {
-    vertical-align: middle;
-    color: ${theme.light200.softColor };
-  }
   }
 `;
 
@@ -276,6 +279,11 @@ const SlugContainer = styled.div`
 
   > div:nth-child(2) {
     flex: 0 1 auto;
+  }
+
+  > div > i {
+    vertical-align: middle;
+    color: ${theme.light200.softColor };
   }
 `;
 
