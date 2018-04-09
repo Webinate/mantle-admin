@@ -33,6 +33,7 @@ export default class TinyPostEditor extends React.Component<Props, State> {
         config={{
           selector: '#post-editor',
           menubar: false,
+          height: 500,
           plugins:
             [
               'paste',
