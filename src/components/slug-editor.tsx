@@ -80,7 +80,6 @@ export class SlugEditor extends React.Component<Props, State> {
 }
 
 const SlugContainer = styled.div`
-  margin: 5px 0 20px 0;
 
   > strong {
     font-style: italic;

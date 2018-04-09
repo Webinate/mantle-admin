@@ -9,6 +9,7 @@ type Props = {
   user: IUserEntry;
   canEdit?: boolean;
   onChange: ( user: IUserEntry ) => void;
+  labelStyle?: React.CSSProperties;
 };
 
 type State = {
@@ -37,6 +38,8 @@ export class UserPicker extends React.Component<Props, State> {
     this.setState( { users: page.data } );
   }
 
+  private elm: HTMLElement | null;
+
   render() {
     const suggestions = this.state.users.map( ( user, index ) => {
       return {
@@ -55,11 +58,20 @@ export class UserPicker extends React.Component<Props, State> {
     } );
 
     return <div
-      style={{ padding: '0 0 0 5px', cursor: this.props.canEdit ? 'pointer' : '' }}
-      onClick={this.props.canEdit ? e => this.setState( { open: true, elm: e.currentTarget } ) : undefined}
+      ref={e => this.elm = e}
+      style={{
+        display: 'inline-block',
+        padding: '0 0 0 5px',
+        cursor: this.props.canEdit ? 'pointer' : ''
+      }}
+      onClick={this.props.canEdit ? e => {
+        this.setState( { open: true, elm: e.currentTarget }, () => {
+          this.onUpdateInput( '' );
+        } );
+      } : undefined}
     >
       <span
-        style={{ verticalAlign: 'middle' }}
+        style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
       >{this.props.user.username}</span>
       <Avatar
         style={{
@@ -71,15 +83,19 @@ export class UserPicker extends React.Component<Props, State> {
       />
       {this.state.open ? <Popover
         style={{ padding: 5 }}
-        anchorEl={this.state.elm!}
+        anchorEl={this.elm!}
         open={true}
         onRequestClose={e => this.setState( { open: false } )}
       >
         <AutoComplete
+          ref={( e: any ) => {
+            if ( e ) {
+              setTimeout( () => { e.refs.searchTextField && e.focus() }, 100 );
+            }
+          }}
           style={{ padding: 5 }}
           hintText="Type user name"
           openOnFocus={true}
-          autoFocus={true}
           dataSource={suggestions}
           onNewRequest={( item, index ) => {
             const user = this.state.users.find( e => e.username === item.text );

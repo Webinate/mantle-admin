@@ -89,27 +89,30 @@ export class PostForm extends React.Component<Props, State> {
   render() {
     return <Form>
       <div>
-        <TitleContainer>
-          <div>
-            <input
-              id="mt-post-title"
-              value={this.state.editable.title}
-              placeholder="Enter Post Title"
-              onChange={( e ) => this.setState( { editable: { ...this.state.editable, title: e.currentTarget.value } } )}
-            />
-            <SlugEditor
-              value={this.getSlug()}
-              onChange={( value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
-            />
-          </div>
-          <div>
-            {this.state.editable.author ? <UserPicker
-              canEdit={this.props.isAdmin}
-              onChange={user => this.setState( { editable: { ...this.state.editable, author: user } } )}
-              user={this.state.editable.author}
-            /> : undefined}
-          </div>
-        </TitleContainer>
+        <div>
+          <input
+            id="mt-post-title"
+            value={this.state.editable.title}
+            placeholder="Enter Post Title"
+            onChange={( e ) => this.setState( { editable: { ...this.state.editable, title: e.currentTarget.value } } )}
+          />
+          <SlugContainer>
+            <div>
+              <SlugEditor
+                value={this.getSlug()}
+                onChange={( value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
+              />
+            </div>
+            {this.state.editable.author ? <div>
+              <i>Author: </i>
+              <UserPicker
+                canEdit={this.props.isAdmin}
+                onChange={user => this.setState( { editable: { ...this.state.editable, author: user } } )}
+                user={this.state.editable.author}
+              />
+            </div> : undefined}
+          </SlugContainer>
+        </div>
 
         <TinyPostEditor
           content={this.state.editable.content!}
@@ -253,11 +256,20 @@ const Form = styled.form`
     margin: 0 0 0 20px;
     max-width: 350px;
   }
+
+  i {
+    vertical-align: middle;
+    color: ${theme.light200.softColor };
+  }
+  }
 `;
 
-const TitleContainer = styled.div`
+const SlugContainer = styled.div`
   width: 100%;
   display: flex;
+  align-items: center;
+  margin: 2px 0 8px 0;
+
   > div:nth-child(1) {
     flex: 1;
   }
