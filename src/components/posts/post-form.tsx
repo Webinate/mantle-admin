@@ -1,13 +1,14 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import { TextField, Toggle, RaisedButton, IconButton, Chip, Checkbox } from 'material-ui';
+import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
-import { IPost } from 'modepress';
+import { IPost, ICategory } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 import { SlugEditor } from '../slug-editor';
 import { UserPicker } from '../user-picker';
+import { CategoryEditor } from '../category-editor';
 
 export type Props = {
   isAdmin: boolean;
@@ -21,6 +22,7 @@ export type Props = {
 export type State = {
   editable: Partial<IPost>;
   currentTagText: string;
+  categories: ICategory[];
 }
 
 export class PostForm extends React.Component<Props, State> {
@@ -28,7 +30,8 @@ export class PostForm extends React.Component<Props, State> {
     super( props );
     this.state = {
       editable: props.post ? { ...props.post } : this.createEmptyPost(),
-      currentTagText: ''
+      currentTagText: '',
+      categories: []
     };
   }
 
@@ -222,8 +225,16 @@ export class PostForm extends React.Component<Props, State> {
         <RightPanel>
           <h3>Categories</h3>
           <div style={{ margin: '8px 0 0 0' }}>
-            <Checkbox label="Category 1" />
-            <Checkbox label="Category 2" />
+            <CategoryEditor
+              onCategoryAdded={c => this.setState( { categories: this.state.categories.concat( c ) } )}
+              onCategoryRemoved={c => {
+                const index = this.state.categories.indexOf( c );
+                this.state.categories.splice( index, 1 )
+                this.setState( { categories: this.state.categories } )
+              }}
+              categories={this.state.categories}
+              selected={this.state.editable.categories || []}
+            />
           </div>
         </RightPanel>
       </div>
