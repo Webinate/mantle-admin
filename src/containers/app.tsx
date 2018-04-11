@@ -10,6 +10,7 @@ import { Dashboard } from '../components/dashboard';
 import { ContentHeader } from '../components/content-header';
 import { Users } from './users';
 import { Posts } from './posts';
+import theme from '../theme/mui-theme';
 import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
 import { matchPath } from 'react-router';
 
@@ -90,12 +91,14 @@ export class App extends React.Component<Props, State> {
                 return (
                   <List style={{ padding: '0' }}>
                     {items.map( ( i, index ) => {
+                      const selected = matchPath( props.location.pathname, { path: i.path, exact: i.exact } );
+
                       return <ListItem
-                        className={matchPath( props.location.pathname, { path: i.path, exact: i.exact } ) ? 'selected' : ''}
+                        className={selected ? 'selected' : ''}
                         key={`menu-item-${ index }`}
                         onClick={e => i.onClick()}
                         primaryText={i.label}
-                        leftIcon={<FontIcon style={{ color: 'inherit', transition: '' }} className={i.icon}
+                        leftIcon={<FontIcon style={{ color: selected ? 'inherit' : theme.primary200.background, transition: '' }} className={i.icon}
                         />} />
                     } )
                     }
@@ -129,7 +132,6 @@ export class App extends React.Component<Props, State> {
           autoHideDuration={20000}
           open={this.props.app.response ? true : false}
           onRequestClose={() => { this.props.closeSnackbar( null ) }}
-          onActionTouchTap={event => { this.props.closeSnackbar( null ) }}
           action="close"
           message={this.props.app.response || ''}
         />

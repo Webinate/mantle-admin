@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { Checkbox, FlatButton, TextField, MenuItem, SelectField } from 'material-ui';
+import { Checkbox, FlatButton, TextField, MenuItem, SelectField, Dialog } from 'material-ui';
+import AddIcon from 'material-ui/svg-icons/content/add';
 import { ICategory } from 'modepress';
 
 export type Props = {
@@ -27,35 +28,68 @@ export class CategoryEditor extends React.Component<Props, State> {
 
   render() {
     return <div>
-      {!this.state.addCategoryMode ?
-        <ActiveCategories>
-          {this.props.categories.map( ( c, catIndex ) => {
-            return <Checkbox
-              key={`category-${ catIndex }`}
-              label={c.title}
-              checked={this.props.selected.find( i => i === c._id ) ? true : false}
-            />
-          } )}
-        </ActiveCategories> :
+      <ActiveCategories>
+        {this.props.categories.map( ( c, catIndex ) => {
+          return <Checkbox
+            key={`category-${ catIndex }`}
+            label={c.title}
+            checked={this.props.selected.find( i => i === c._id ) ? true : false}
+          />
+        } )}
+      </ActiveCategories>
+      <Dialog
+        title="New Category"
+        onRequestClose={e => this.setState( { addCategoryMode: false } )}
+        open={this.state.addCategoryMode}
+        actions={[
+          <FlatButton
+            onClick={e => this.setState( {
+              addCategoryMode: false
+            } )}
+            label="Cancel"
+          />,
+          <FlatButton
+            primary={true}
+            onClick={e => {
+              this.setState( {
+                addCategoryMode: false
+              } );
+              this.props.onCategoryAdded( this.state.newCategory )
+            }}
+            label="Add"
+          /> ]}
+        contentStyle={{
+          width: '350px',
+        }}
+      >
         <NewCategories>
           <TextField
+            id="mt-new-cat-name"
+            autoFocus={true}
             floatingLabelText="Category name"
             value={this.state.newCategory.title}
+            fullWidth={true}
             onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, title: text } } ) }}
           />
           <TextField
+            id="mt-new-cat-slug"
             floatingLabelText="Category short code"
             value={this.state.newCategory.slug}
+            fullWidth={true}
             onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, slug: text } } ) }}
           />
           <TextField
+            id="mt-new-cat-desc"
             floatingLabelText="Optional category description"
             value={this.state.newCategory.description}
+            fullWidth={true}
             onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, description: text } } ) }}
           />
           <SelectField
+            id="mt-new-cat-parent"
             floatingLabelText="Optional parent category"
             value={this.state.newCategory.parent || ''}
+            fullWidth={true}
             onChange={( e, index, value ) => {
               this.setState( { newCategory: { ...this.state.newCategory, parent: value } }
               )
@@ -74,38 +108,20 @@ export class CategoryEditor extends React.Component<Props, State> {
             } )}
 
           </SelectField>
-
         </NewCategories>
-      }
-      {this.state.addCategoryMode ?
-        <CategoryButtons>
-          <FlatButton
-            onClick={e => this.setState( {
-              addCategoryMode: false
-            } )}
-            label="Cancel"
-          />
+      </Dialog>
 
-          <FlatButton
-            onClick={e => {
-              this.setState( {
-                addCategoryMode: false
-              } );
-              this.props.onCategoryAdded( this.state.newCategory )
-            }}
-            label="Add"
-          />
-
-        </CategoryButtons> :
-        <CategoryButtons>
-          <FlatButton
-            onClick={e => this.setState( {
-              addCategoryMode: true,
-              newCategory: {}
-            } )}
-            label="Add new Category"
-          />
-        </CategoryButtons>}
+      <CategoryButtons>
+        <FlatButton
+          primary={true}
+          icon={<AddIcon />}
+          onClick={e => this.setState( {
+            addCategoryMode: true,
+            newCategory: {}
+          } )}
+          label="Add new Category"
+        />
+      </CategoryButtons>
     </div>
   }
 }

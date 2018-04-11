@@ -75,7 +75,7 @@ export default {
     accent1Color: '#FF4081',
     accent2Color: '#F5F5F5',
     accent3Color: '#9E9E9E',
-    textColor: '#000',
+    textColor: '#333',
     secondaryTextColor: 'rgba(0,0,0,0.54)',
     alternateTextColor: '#fff',
     canvasColor: '#fff',

@@ -61,7 +61,7 @@
     "gulp-tslint": "~8.1.2",
     "gulp-typescript": "~3.2.2",
     "history": "~4.6.3",
-    "material-ui": "~0.18.6",
+    "material-ui": "~0.20.0",
     "modepress": "file:..\\..",
     "moment": "^2.19.1",
     "node-fetch": "^1.7.3",
