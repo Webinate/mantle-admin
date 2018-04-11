@@ -14,15 +14,17 @@ export type Props = {
   isAdmin: boolean;
   id?: string;
   post?: Partial<IPost> | null;
+  categories: ICategory[];
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost> ) => void;
   onCreate?: ( post: Partial<IPost> ) => void;
+  onCategoryAdded: ( category: ICategory ) => void;
+  onCategoryRemoved: ( category: ICategory ) => void;
 }
 
 export type State = {
   editable: Partial<IPost>;
   currentTagText: string;
-  categories: ICategory[];
 }
 
 export class PostForm extends React.Component<Props, State> {
@@ -30,8 +32,7 @@ export class PostForm extends React.Component<Props, State> {
     super( props );
     this.state = {
       editable: props.post ? { ...props.post } : this.createEmptyPost(),
-      currentTagText: '',
-      categories: []
+      currentTagText: ''
     };
   }
 
@@ -226,13 +227,9 @@ export class PostForm extends React.Component<Props, State> {
           <h3>Categories</h3>
           <div style={{ margin: '8px 0 0 0' }}>
             <CategoryEditor
-              onCategoryAdded={c => this.setState( { categories: this.state.categories.concat( c ) } )}
-              onCategoryRemoved={c => {
-                const index = this.state.categories.indexOf( c );
-                this.state.categories.splice( index, 1 )
-                this.setState( { categories: this.state.categories } )
-              }}
-              categories={this.state.categories}
+              onCategoryAdded={c => this.props.onCategoryAdded( c )}
+              onCategoryRemoved={c => this.props.onCategoryRemoved( c )}
+              categories={this.props.categories}
               selected={this.state.editable.categories || []}
             />
           </div>

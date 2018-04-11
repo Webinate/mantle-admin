@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { Checkbox, FlatButton, TextField, MenuItem, SelectField, Dialog } from 'material-ui';
+import { Checkbox, FlatButton, TextField, MenuItem, SelectField, Dialog, RaisedButton } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { ICategory } from 'modepress';
 
@@ -43,23 +43,29 @@ export class CategoryEditor extends React.Component<Props, State> {
         open={this.state.addCategoryMode}
         actions={[
           <FlatButton
+            style={{ verticalAlign: 'middle', margin: '0 4px 0 0' }}
             onClick={e => this.setState( {
               addCategoryMode: false
             } )}
             label="Cancel"
           />,
-          <FlatButton
+          <RaisedButton
             primary={true}
+            style={{ verticalAlign: 'middle' }}
+            icon={<AddIcon />}
             onClick={e => {
               this.setState( {
                 addCategoryMode: false
               } );
               this.props.onCategoryAdded( this.state.newCategory )
             }}
-            label="Add"
+            label="New Category"
           /> ]}
+        actionsContainerStyle={{
+          padding: '0 20px 20px 20px'
+        }}
         contentStyle={{
-          width: '350px',
+          width: '350px'
         }}
       >
         <NewCategories>
