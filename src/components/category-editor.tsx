@@ -1,18 +1,22 @@
 import * as React from 'react';
+import { State as CategoryState } from '../store/categories/reducer';
 import { default as styled } from '../theme/styled';
 import { Checkbox, FlatButton, TextField, MenuItem, SelectField, Dialog, RaisedButton } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
+import RemoveIcon from 'material-ui/svg-icons/content/remove';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import { ICategory } from 'modepress';
 
 export type Props = {
   onCategoryAdded: ( category: ICategory ) => void;
   onCategoryRemoved: ( category: ICategory ) => void;
-  categories: ICategory[];
+  categories: CategoryState;
   selected: string[];
 }
 
 export type State = {
   addCategoryMode: boolean;
+  deleteMode: boolean;
   newCategory: Partial<ICategory>;
 }
 
@@ -22,15 +26,26 @@ export class CategoryEditor extends React.Component<Props, State> {
     super( props );
     this.state = {
       addCategoryMode: false,
+      deleteMode: false,
       newCategory: {}
     }
   }
 
   render() {
+    const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
     return <div>
       <ActiveCategories>
-        {this.props.categories.map( ( c, catIndex ) => {
+        {categories.map( ( c, catIndex ) => {
           return <Checkbox
+            onClick={e => {
+              if ( categories.length === 1 )
+                this.setState( { deleteMode: false } )
+
+              if ( this.state.deleteMode )
+                this.props.onCategoryRemoved( c );
+            }}
+            uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
+            checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
             key={`category-${ catIndex }`}
             label={c.title}
             checked={this.props.selected.find( i => i === c._id ) ? true : false}
@@ -105,7 +120,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               value={''}
               primaryText={''}
             />
-            {this.props.categories.map( ( parent, parentIndex ) => {
+            {categories.map( ( parent, parentIndex ) => {
               return <MenuItem
                 key={`parent-${ parentIndex }`}
                 value={parent._id}
@@ -117,26 +132,51 @@ export class CategoryEditor extends React.Component<Props, State> {
         </NewCategories>
       </Dialog>
 
-      <CategoryButtons>
-        <FlatButton
-          primary={true}
-          icon={<AddIcon />}
-          onClick={e => this.setState( {
-            addCategoryMode: true,
-            newCategory: {}
-          } )}
-          label="Add new Category"
-        />
-      </CategoryButtons>
+      {this.state.deleteMode ?
+        <CategoryButtons>
+          <FlatButton
+            primary={true}
+            onClick={e => this.setState( {
+              deleteMode: false
+            } )}
+            style={{ display: 'block' }}
+            label="Cancel"
+          />
+        </CategoryButtons> :
+        <CategoryButtons>
+          <FlatButton
+            primary={true}
+            icon={<AddIcon />}
+            onClick={e => this.setState( {
+              addCategoryMode: true,
+              newCategory: {}
+            } )}
+            style={{ display: 'block' }}
+            label="Add Category"
+          />
+
+          <FlatButton
+            primary={true}
+            icon={<RemoveIcon />}
+            onClick={e => this.setState( {
+              deleteMode: true
+            } )}
+            style={{ display: 'block' }}
+            label="Remove Category"
+          />
+        </CategoryButtons>
+      }
     </div>
   }
 }
 
 const ActiveCategories = styled.div`
+  padding: 10px 0 0 0;
 `;
 
 const NewCategories = styled.div`
 `;
 
 const CategoryButtons = styled.div`
+  margin: 10px 0 0 0;
 `;

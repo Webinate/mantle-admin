@@ -131,7 +131,12 @@ export class App extends React.Component<Props, State> {
           className="mt-response-message"
           autoHideDuration={20000}
           open={this.props.app.response ? true : false}
-          onRequestClose={() => { this.props.closeSnackbar( null ) }}
+          onRequestClose={() => {
+            this.props.closeSnackbar( null )
+          }}
+          onActionClick={() => {
+            this.props.closeSnackbar( null )
+          }}
           action="close"
           message={this.props.app.response || ''}
         />

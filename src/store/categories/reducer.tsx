@@ -6,11 +6,13 @@ export type State = {
   readonly categoryPage: Page<ICategory> | null;
   readonly category: ICategory | null;
   readonly busy: boolean;
+  readonly error: string | null;
 };
 
 export const initialState: State = {
   categoryPage: null,
   category: null,
+  error: null,
   busy: false
 };
 
@@ -22,6 +24,13 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.SetCategories.type:
       partialState = {
         categoryPage: action.payload,
+        busy: false
+      };
+      break;
+
+    case ActionCreators.SetCategoryErr.type:
+      partialState = {
+        error: action.payload,
         busy: false
       };
       break;

@@ -7,6 +7,7 @@ import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 import { SlugEditor } from '../slug-editor';
+import { State as CategoriesState } from '../../store/categories/reducer';
 import { UserPicker } from '../user-picker';
 import { CategoryEditor } from '../category-editor';
 
@@ -14,7 +15,7 @@ export type Props = {
   isAdmin: boolean;
   id?: string;
   post?: Partial<IPost> | null;
-  categories: ICategory[];
+  categories: CategoriesState;
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost> ) => void;
   onCreate?: ( post: Partial<IPost> ) => void;
@@ -141,7 +142,6 @@ export class PostForm extends React.Component<Props, State> {
           />
           <Toggle
             style={{ margin: '20px 0' }}
-            name="mt-post-visibility"
             label={this.state.editable.public ? 'Post is Public' : 'Post is Private'}
             labelPosition="right"
             toggled={this.state.editable.public ? true : false}

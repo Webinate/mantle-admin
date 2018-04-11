@@ -8,7 +8,7 @@ export default class UsersPage extends Page {
   constructor() {
     super();
     this.$filter = '.users-filter';
-    this.$filterSearch = 'button[name=users-search-button]';
+    this.$filterSearch = '#mt-users-search-button';
   }
 
   async load( agent: Agent ) {

@@ -147,7 +147,7 @@ export class Users extends React.Component<Props, State> {
                 onChange={( e, text ) => this.setState( { userFilter: text } )}
               />
               <IconButton
-                name="users-search-button"
+                id="mt-users-search-button"
                 onClick={e => this.props.getUsers( 0, this.state.userFilter )}
                 style={{ verticalAlign: 'top' }}
                 iconStyle={{ color: theme.primary200.background }}

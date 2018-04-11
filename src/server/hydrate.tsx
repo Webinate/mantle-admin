@@ -3,6 +3,7 @@ import { matchPath, match } from 'react-router';
 import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as UserActions } from '../store/users/actions';
 import { ActionCreators as PostActions } from '../store/posts/actions';
+import { ActionCreators as CategoryActions } from '../store/categories/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
 import { IAuthReq } from 'modepress';
 import { controllers } from 'modepress';
@@ -36,7 +37,9 @@ export async function hydrate( req: IAuthReq ) {
     matches = matchPath( req.url, { path: '/dashboard/posts/edit/:id' } );
     if ( matches ) {
       const post = await controllers.posts.getPost( { id: matches.params.id } );
+      const categories = await controllers.categories.getAll( {} );
       actions.push( PostActions.SetPost.create( post ) );
+      actions.push( CategoryActions.SetCategories.create( categories ) );
     }
     else {
       const posts = await controllers.posts.getPosts();

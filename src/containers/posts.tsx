@@ -4,6 +4,7 @@ import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
 import { getPosts, getPost, createPost, editPost } from '../store/posts/actions';
+import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { TextField, IconButton, FontIcon, RaisedButton, FlatButton } from 'material-ui';
 import FontCancel from 'material-ui/svg-icons/navigation/arrow-back';
 import { IPost } from 'modepress';
@@ -16,6 +17,7 @@ import { PostForm } from '../components/posts/post-form';
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   posts: state.posts,
+  categories: state.categories,
   user: state.authentication.user,
   app: state.app,
   routing: state.router,
@@ -25,8 +27,11 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getPosts: getPosts,
+  getCategories: getCategories,
   getPost: getPost,
   createPost: createPost,
+  createCategory: createCategory,
+  removeCategory: removeCategory,
   editPost: editPost,
   push: push
 }
@@ -88,7 +93,6 @@ export class Posts extends React.Component<Props, State> {
                     onChange={( e, text ) => this.setState( { searchFilter: text } )}
                   />,
                   <IconButton
-                    name="posts-search-button"
                     style={{ verticalAlign: 'top' }}
                     iconStyle={{ color: theme.primary200.background }}
                     iconClassName="icon icon-search"
@@ -97,7 +101,6 @@ export class Posts extends React.Component<Props, State> {
                     onClick={e => this.props.push( '/dashboard/posts/new' )}
                     primary={true}
                     icon={<FontIcon
-                      name="posts-add-post"
                       className="icon icon-add"
                     />} label="New Post" />
                 </div>
@@ -108,13 +111,22 @@ export class Posts extends React.Component<Props, State> {
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <PostForm
               onCreate={post => this.props.createPost( post )}
+              categories={this.props.categories}
+              onCategoryAdded={category => this.props.createCategory( category )}
+              onCategoryRemoved={category => this.props.removeCategory( category )}
               isAdmin={isAdmin}
             />}
             />
             <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm
               id={props.match.params.postId}
-              onFetch={id => this.props.getPost( id )}
+              onFetch={id => {
+                this.props.getPost( id );
+                this.props.getCategories();
+              }}
               post={post}
+              categories={this.props.categories}
+              onCategoryAdded={category => this.props.createCategory( category )}
+              onCategoryRemoved={category => this.props.removeCategory( category )}
               onUpdate={post => this.props.editPost( post )}
               isAdmin={isAdmin}
             />}
