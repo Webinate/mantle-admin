@@ -112,7 +112,7 @@ export class Posts extends React.Component<Props, State> {
             <Route path="/dashboard/posts/new" render={props => <PostForm
               onCreate={post => this.props.createPost( post )}
               categories={this.props.categories}
-              onCategoryAdded={category => this.props.createCategory( category )}
+              onCategoryAdded={( category, callback ) => this.props.createCategory( category, callback )}
               onCategoryRemoved={category => this.props.removeCategory( category )}
               isAdmin={isAdmin}
             />}
@@ -125,7 +125,7 @@ export class Posts extends React.Component<Props, State> {
               }}
               post={post}
               categories={this.props.categories}
-              onCategoryAdded={category => this.props.createCategory( category )}
+              onCategoryAdded={( category, callback ) => this.props.createCategory( category, callback )}
               onCategoryRemoved={category => this.props.removeCategory( category )}
               onUpdate={post => this.props.editPost( post )}
               isAdmin={isAdmin}

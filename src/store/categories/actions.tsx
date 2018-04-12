@@ -23,13 +23,16 @@ export function getCategories( index: number = 0, limit?: number ) {
   }
 }
 
-export function createCategory( category: Partial<ICategory> ) {
+export function createCategory( category: Partial<ICategory>, callback?: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetCategoriesBusy.create( true ) );
       const resp = await categories.create( category );
       dispatch( AppActions.serverResponse.create( `New Category '${ resp.title }' created` ) );
       dispatch( getCategories() )
+
+      if ( callback )
+        callback();
     }
     catch ( err ) {
       dispatch( ActionCreators.SetCategoryErr.create( `Error: ${ err.message }` ) );

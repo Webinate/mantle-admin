@@ -19,7 +19,7 @@ export type Props = {
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost> ) => void;
   onCreate?: ( post: Partial<IPost> ) => void;
-  onCategoryAdded: ( category: ICategory ) => void;
+  onCategoryAdded: ( category: ICategory, onComplete?: () => void ) => void;
   onCategoryRemoved: ( category: ICategory ) => void;
 }
 
@@ -224,15 +224,12 @@ export class PostForm extends React.Component<Props, State> {
         </RightPanel>
 
         <RightPanel>
-          <h3>Categories</h3>
-          <div style={{ margin: '8px 0 0 0' }}>
-            <CategoryEditor
-              onCategoryAdded={c => this.props.onCategoryAdded( c )}
-              onCategoryRemoved={c => this.props.onCategoryRemoved( c )}
-              categories={this.props.categories}
-              selected={this.state.editable.categories || []}
-            />
-          </div>
+          <CategoryEditor
+            onCategoryAdded={( c, callback ) => this.props.onCategoryAdded( c, callback )}
+            onCategoryRemoved={c => this.props.onCategoryRemoved( c )}
+            categories={this.props.categories}
+            selected={this.state.editable.categories || []}
+          />
         </RightPanel>
       </div>
     </Form >;

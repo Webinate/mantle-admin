@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { State as CategoryState } from '../store/categories/reducer';
 import { default as styled } from '../theme/styled';
-import { Checkbox, FlatButton, TextField, MenuItem, SelectField, Dialog, RaisedButton } from 'material-ui';
+import { Checkbox, FlatButton, TextField, MenuItem, SelectField, RaisedButton } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import RemoveIcon from 'material-ui/svg-icons/content/remove';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import theme from '../theme/mui-theme';
 import { ICategory } from 'modepress';
 
 export type Props = {
-  onCategoryAdded: ( category: ICategory ) => void;
+  onCategoryAdded: ( category: ICategory, onComplete?: () => void ) => void;
   onCategoryRemoved: ( category: ICategory ) => void;
   categories: CategoryState;
   selected: string[];
@@ -31,150 +32,188 @@ export class CategoryEditor extends React.Component<Props, State> {
     }
   }
 
-  render() {
-    const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
-    return <div>
-      <ActiveCategories>
-        {categories.map( ( c, catIndex ) => {
-          return <Checkbox
-            onClick={e => {
-              if ( categories.length === 1 )
-                this.setState( { deleteMode: false } )
+  renderNewCategoryForm( categories: ICategory[] ) {
+    const isLoading = this.props.categories.busy;
 
-              if ( this.state.deleteMode )
-                this.props.onCategoryRemoved( c );
-            }}
-            uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
-            checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
-            key={`category-${ catIndex }`}
-            label={c.title}
-            checked={this.props.selected.find( i => i === c._id ) ? true : false}
+    return (
+      <div>
+        <TextField
+          id="mt-new-cat-name"
+          autoFocus={true}
+          floatingLabelText="Category name"
+          value={this.state.newCategory.title}
+          fullWidth={true}
+          onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, title: text } } ) }}
+        />
+        <TextField
+          id="mt-new-cat-slug"
+          floatingLabelText="Category short code"
+          value={this.state.newCategory.slug}
+          fullWidth={true}
+          onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, slug: text } } ) }}
+        />
+        <TextField
+          id="mt-new-cat-desc"
+          floatingLabelText="Optional category description"
+          value={this.state.newCategory.description}
+          fullWidth={true}
+          onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, description: text } } ) }}
+        />
+        <SelectField
+          id="mt-new-cat-parent"
+          floatingLabelText="Optional parent category"
+          value={this.state.newCategory.parent || ''}
+          fullWidth={true}
+          onChange={( e, index, value ) => {
+            this.setState( { newCategory: { ...this.state.newCategory, parent: value } }
+            )
+          }}
+        >
+          <MenuItem
+            value={''}
+            primaryText={''}
           />
-        } )}
-      </ActiveCategories>
-      <Dialog
-        title="New Category"
-        onRequestClose={e => this.setState( { addCategoryMode: false } )}
-        open={this.state.addCategoryMode}
-        actions={[
+          {categories.map( ( parent, parentIndex ) => {
+            return <MenuItem
+              key={`parent-${ parentIndex }`}
+              value={parent._id}
+              primaryText={parent.title}
+            />
+          } )}
+
+        </SelectField>
+        <div className="mt-newcat-error">
+          {this.props.categories.error}
+        </div>
+        <div style={{ display: 'flex', margin: '20px 0 0 0' }}>
           <FlatButton
-            style={{ verticalAlign: 'middle', margin: '0 4px 0 0' }}
+            disabled={isLoading}
+            style={{
+              verticalAlign: 'middle',
+              margin: '0 4px 0 0',
+              flex: '1'
+            }}
             onClick={e => this.setState( {
               addCategoryMode: false
             } )}
             label="Cancel"
-          />,
+          />
           <RaisedButton
+            disabled={isLoading}
             primary={true}
-            style={{ verticalAlign: 'middle' }}
+            style={{
+              verticalAlign: 'middle',
+              flex: '1'
+            }}
             icon={<AddIcon />}
             onClick={e => {
-              this.setState( {
-                addCategoryMode: false
-              } );
-              this.props.onCategoryAdded( this.state.newCategory )
+              this.props.onCategoryAdded( this.state.newCategory, () => {
+                this.setState( {
+                  addCategoryMode: false
+                } )
+              } )
             }}
-            label="New Category"
-          /> ]}
-        actionsContainerStyle={{
-          padding: '0 20px 20px 20px'
-        }}
-        contentStyle={{
-          width: '350px'
-        }}
-      >
-        <NewCategories>
-          <TextField
-            id="mt-new-cat-name"
-            autoFocus={true}
-            floatingLabelText="Category name"
-            value={this.state.newCategory.title}
-            fullWidth={true}
-            onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, title: text } } ) }}
+            label="Add"
           />
-          <TextField
-            id="mt-new-cat-slug"
-            floatingLabelText="Category short code"
-            value={this.state.newCategory.slug}
-            fullWidth={true}
-            onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, slug: text } } ) }}
-          />
-          <TextField
-            id="mt-new-cat-desc"
-            floatingLabelText="Optional category description"
-            value={this.state.newCategory.description}
-            fullWidth={true}
-            onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, description: text } } ) }}
-          />
-          <SelectField
-            id="mt-new-cat-parent"
-            floatingLabelText="Optional parent category"
-            value={this.state.newCategory.parent || ''}
-            fullWidth={true}
-            onChange={( e, index, value ) => {
-              this.setState( { newCategory: { ...this.state.newCategory, parent: value } }
-              )
-            }}
-          >
-            <MenuItem
-              value={''}
-              primaryText={''}
+        </div>
+      </div>
+    );
+  }
+
+  renderAllCategories( categories: ICategory[] ) {
+    return (
+      <div>
+        <ActiveCategories>
+          {categories.map( ( c, catIndex ) => {
+            return <Checkbox
+              iconStyle={{ fill: this.state.deleteMode ? theme.primary200.background : theme.primary300.background }}
+              onClick={e => {
+                if ( categories.length === 1 )
+                  this.setState( { deleteMode: false } )
+
+                if ( this.state.deleteMode )
+                  this.props.onCategoryRemoved( c );
+              }}
+              uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
+              checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
+              key={`category-${ catIndex }`}
+              label={c.title}
+              checked={this.props.selected.find( i => i === c._id ) ? true : false}
             />
-            {categories.map( ( parent, parentIndex ) => {
-              return <MenuItem
-                key={`parent-${ parentIndex }`}
-                value={parent._id}
-                primaryText={parent.title}
-              />
-            } )}
+          } )}
+        </ActiveCategories>
 
-          </SelectField>
-        </NewCategories>
-      </Dialog>
 
-      {this.state.deleteMode ?
-        <CategoryButtons>
-          <FlatButton
-            primary={true}
-            onClick={e => this.setState( {
-              deleteMode: false
-            } )}
-            style={{ display: 'block' }}
-            label="Cancel"
-          />
-        </CategoryButtons> :
-        <CategoryButtons>
-          <FlatButton
-            primary={true}
-            icon={<AddIcon />}
-            onClick={e => this.setState( {
-              addCategoryMode: true,
-              newCategory: {}
-            } )}
-            style={{ display: 'block' }}
-            label="Add Category"
-          />
+        {this.state.deleteMode ?
+          <CategoryButtons>
+            <FlatButton
+              primary={true}
+              onClick={e => this.setState( {
+                deleteMode: false
+              } )}
+              style={{ display: 'block' }}
+              label="Cancel"
+            />
+          </CategoryButtons> :
+          <CategoryButtons>
+            <FlatButton
+              primary={true}
+              icon={<AddIcon />}
+              onClick={e => this.setState( {
+                addCategoryMode: true,
+                newCategory: {}
+              } )}
+              style={{ display: 'block' }}
+              label="Add Category"
+            />
 
-          <FlatButton
-            primary={true}
-            icon={<RemoveIcon />}
-            onClick={e => this.setState( {
-              deleteMode: true
-            } )}
-            style={{ display: 'block' }}
-            label="Remove Category"
-          />
-        </CategoryButtons>
-      }
-    </div>
+            {categories.length > 0 ?
+              <FlatButton
+                primary={true}
+                icon={<RemoveIcon />}
+                onClick={e => this.setState( {
+                  deleteMode: true
+                } )}
+                style={{ display: 'block' }}
+                label="Remove Category"
+              /> : undefined}
+          </CategoryButtons>
+        }
+      </div>
+    );
+  }
+
+  render() {
+    const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
+    return (
+      <Container>
+        <h3>{this.state.addCategoryMode ? 'New Category' : 'Categories'}</h3>
+        <div>
+          {this.state.addCategoryMode ?
+            this.renderNewCategoryForm( categories ) : this.renderAllCategories( categories )}
+        </div>
+      </Container>
+    );
   }
 }
 
-const ActiveCategories = styled.div`
-  padding: 10px 0 0 0;
+const Container = styled.div`
+  > h3 {
+    margin: 0;
+  }
+
+  > div {
+    margin: 8px 0 0 0;
+  }
+
+  .mt-newcat-error {
+    margin: 6px 0;
+    color: ${theme.error.background }
+  }
 `;
 
-const NewCategories = styled.div`
+const ActiveCategories = styled.div`
+  padding: 10px 0 0 0;
 `;
 
 const CategoryButtons = styled.div`
