@@ -2,25 +2,21 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
-import { IPost, ICategory } from 'modepress';
+import { IPost } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 import { SlugEditor } from '../slug-editor';
-import { State as CategoriesState } from '../../store/categories/reducer';
 import { UserPicker } from '../user-picker';
-import { CategoryEditor } from '../category-editor';
+import { CategoryEditor } from '../../containers/category-editor';
 
 export type Props = {
   isAdmin: boolean;
   id?: string;
   post?: Partial<IPost> | null;
-  categories: CategoriesState;
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost> ) => void;
   onCreate?: ( post: Partial<IPost> ) => void;
-  onCategoryAdded: ( category: ICategory, onComplete?: () => void ) => void;
-  onCategoryRemoved: ( category: ICategory ) => void;
 }
 
 export type State = {
@@ -225,10 +221,7 @@ export class PostForm extends React.Component<Props, State> {
 
         <RightPanel>
           <CategoryEditor
-            onCategoryAdded={( c, callback ) => this.props.onCategoryAdded( c, callback )}
-            onCategoryRemoved={c => this.props.onCategoryRemoved( c )}
-            categories={this.props.categories}
-            selected={this.state.editable.categories || []}
+            {...{ selected: this.state.editable.categories || [] } as any}
           />
         </RightPanel>
       </div>

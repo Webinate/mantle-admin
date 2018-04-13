@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { State as CategoryState } from '../store/categories/reducer';
 import { default as styled } from '../theme/styled';
 import { Checkbox, FlatButton, TextField, MenuItem, SelectField, RaisedButton } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
@@ -7,20 +6,35 @@ import RemoveIcon from 'material-ui/svg-icons/content/remove';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import theme from '../theme/mui-theme';
 import { ICategory } from 'modepress';
+import { connectWrapper, returntypeof } from '../utils/decorators';
+import { IRootState } from '../store';
+import { createCategory, removeCategory, getCategories, ActionCreators } from '../store/categories/actions';
 
-export type Props = {
-  onCategoryAdded: ( category: ICategory, onComplete?: () => void ) => void;
-  onCategoryRemoved: ( category: ICategory ) => void;
-  categories: CategoryState;
-  selected: string[];
+// Map state to props
+const mapStateToProps = ( state: IRootState, ownProps: { selected: string[] } ) => ( {
+  categories: state.categories,
+  selected: ownProps.selected
+} );
+
+// Map actions to props (This binds the actions to the dispatch fucntion)
+const dispatchToProps = {
+  createCategory,
+  removeCategory,
+  getCategories,
+  setError: ActionCreators.SetCategoryErr.create
 }
 
-export type State = {
+const stateProps = returntypeof( mapStateToProps );
+type Props = typeof stateProps & typeof dispatchToProps;
+type State = {
   addCategoryMode: boolean;
   deleteMode: boolean;
   newCategory: Partial<ICategory>;
+  autoSlug: string;
+  pristineForm: boolean;
 }
 
+@connectWrapper( mapStateToProps, dispatchToProps )
 export class CategoryEditor extends React.Component<Props, State> {
 
   constructor( props: Props ) {
@@ -28,8 +42,16 @@ export class CategoryEditor extends React.Component<Props, State> {
     this.state = {
       addCategoryMode: false,
       deleteMode: false,
-      newCategory: {}
+      newCategory: {},
+      autoSlug: '',
+      pristineForm: true
     }
+  }
+
+  private getCleanSlugText( text: string ) {
+    let cleanValue = text.replace( /\s+/g, '-' );
+    cleanValue = cleanValue.replace( /[^a-zA-Z0-9 -]/g, '' ).toLowerCase();
+    return cleanValue;
   }
 
   renderNewCategoryForm( categories: ICategory[] ) {
@@ -43,14 +65,22 @@ export class CategoryEditor extends React.Component<Props, State> {
           floatingLabelText="Category name"
           value={this.state.newCategory.title}
           fullWidth={true}
-          onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, title: text } } ) }}
+          onChange={( e, text ) => {
+            this.setState( {
+              newCategory: { ...this.state.newCategory, title: text },
+              autoSlug: this.getCleanSlugText( text )
+            } );
+          }}
         />
         <TextField
           id="mt-new-cat-slug"
           floatingLabelText="Category short code"
-          value={this.state.newCategory.slug}
+          value={this.state.newCategory.slug || this.state.autoSlug}
           fullWidth={true}
-          onChange={( e, text ) => { this.setState( { newCategory: { ...this.state.newCategory, slug: text } } ) }}
+          onChange={( e, text ) => {
+            const slug = this.getCleanSlugText( text );
+            this.setState( { newCategory: { ...this.state.newCategory, slug: slug } } );
+          }}
         />
         <TextField
           id="mt-new-cat-desc"
@@ -93,9 +123,10 @@ export class CategoryEditor extends React.Component<Props, State> {
               margin: '0 4px 0 0',
               flex: '1'
             }}
-            onClick={e => this.setState( {
-              addCategoryMode: false
-            } )}
+            onClick={e => {
+              this.setState( { addCategoryMode: false } );
+              this.props.setError( null );
+            }}
             label="Cancel"
           />
           <RaisedButton
@@ -107,7 +138,7 @@ export class CategoryEditor extends React.Component<Props, State> {
             }}
             icon={<AddIcon />}
             onClick={e => {
-              this.props.onCategoryAdded( this.state.newCategory, () => {
+              this.props.createCategory( this.state.newCategory, () => {
                 this.setState( {
                   addCategoryMode: false
                 } )
@@ -132,7 +163,7 @@ export class CategoryEditor extends React.Component<Props, State> {
                   this.setState( { deleteMode: false } )
 
                 if ( this.state.deleteMode )
-                  this.props.onCategoryRemoved( c );
+                  this.props.removeCategory( c );
               }}
               uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
               checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
@@ -148,9 +179,9 @@ export class CategoryEditor extends React.Component<Props, State> {
           <CategoryButtons>
             <FlatButton
               primary={true}
-              onClick={e => this.setState( {
-                deleteMode: false
-              } )}
+              onClick={e => {
+                this.setState( { deleteMode: false } );
+              }}
               style={{ display: 'block' }}
               label="Cancel"
             />
@@ -161,6 +192,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               icon={<AddIcon />}
               onClick={e => this.setState( {
                 addCategoryMode: true,
+                pristineForm: true,
                 newCategory: {}
               } )}
               style={{ display: 'block' }}
