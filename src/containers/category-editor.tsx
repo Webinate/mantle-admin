@@ -138,7 +138,10 @@ export class CategoryEditor extends React.Component<Props, State> {
             }}
             icon={<AddIcon />}
             onClick={e => {
-              this.props.createCategory( this.state.newCategory, () => {
+              this.props.createCategory( {
+                ...this.state.newCategory,
+                slug: this.state.newCategory.slug || this.state.autoSlug
+              }, () => {
                 this.setState( {
                   addCategoryMode: false
                 } )
