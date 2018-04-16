@@ -88,7 +88,7 @@ export class PostList extends React.Component<Props, State> {
                 iconClassName="icon icon-delete"
                 onClick={e => this.props.onDelete( post )}
               />
-              <div className="mt-post-content">{post.content}</div>
+              <div className="mt-post-content">{post.featuredImage ? <img src={post.featuredImage} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
                 <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
                 <i>{moment( post.createdOn ).format( 'MMM Do, YYYY' )}</i>
@@ -170,6 +170,11 @@ const Post = styled.div`
     height: 200px;
     background: ${( props: PostProps ) => props.selected ? theme.light100.background : theme.light100.background };
     color: ${( props: PostProps ) => props.selected ? theme.light100.color : '' };
+    text-align: center;
+  }
+
+  .mt-post-content img {
+    height: 100%;
   }
 
   h3 {
