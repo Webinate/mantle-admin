@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, ICategory } from 'modepress';
-import { categories } from 'modepress/lib-frontend';
+import { categories } from 'modepress/src/lib-frontend';
 import { IRootState } from '../';
 import { ActionCreators as AppActions } from '../app/actions';
 

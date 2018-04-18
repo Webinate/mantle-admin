@@ -3,7 +3,7 @@ import { IUserEntry } from 'modepress';
 import { Avatar, Popover, AutoComplete, MenuItem } from 'material-ui';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
-import { users } from 'modepress/lib-frontend';
+import { users } from 'modepress/src/lib-frontend';
 
 type Props = {
   user: IUserEntry;

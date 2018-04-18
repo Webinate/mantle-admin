@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, IPost } from 'modepress';
-import { posts } from 'modepress/lib-frontend';
+import { posts } from 'modepress/src/lib-frontend';
 import { IRootState } from '../';
 import { ActionCreators as AppActions } from '../app/actions';
 import { push } from 'react-router-redux';
