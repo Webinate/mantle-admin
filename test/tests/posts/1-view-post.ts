@@ -4,9 +4,9 @@ import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
 
-import ControllerFactory from '../../../../../lib/core/controller-factory';
+import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'modepress';
-import { PostsController } from '../../../../../lib/controllers/posts';
+import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;

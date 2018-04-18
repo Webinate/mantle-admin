@@ -5,12 +5,9 @@ var args = yargs.argv;
 require( "ts-node" ).register( {
   compilerOptions: {
     module: "commonjs",
-    rootDir: './test',
     sourceMap: true,
     target: "es2017",
-    isolatedModules: true,
-    inlineSourceMap: true,
-    inlineSources: true
+    isolatedModules: true
   },
 } );
 
@@ -19,7 +16,7 @@ if ( !args.config || !fs.existsSync( args.config ) ) {
   process.exit();
 }
 
-const startup = require( '../../../lib/core/initialization/startup.js' );
+const startup = require( '../../../src/core/initialization/startup' );
 const utils = require( './utils' ).default;
 
 describe( 'Initialize Server', function() {
