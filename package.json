@@ -15,10 +15,7 @@
   "scripts": {
     "postinstall": "gulp tiny-files",
     "build": "gulp build",
-    "build-client": "gulp build-client",
-    "build-server": "gulp build-server",
     "watch-client": "gulp watch-client",
-    "watch-server": "gulp watch-server",
     "watch": "gulp watch",
     "clean": "rimraf dist",
     "patch": "npm version patch --no-git-tag-version",

@@ -12,7 +12,6 @@
     "allowUnusedLabels": false,
     "noUnusedLocals": true,
     "strictNullChecks": true,
-    "rootDir": "src",
     "jsx": "react",
     "experimentalDecorators": true,
     "noImplicitAny": true

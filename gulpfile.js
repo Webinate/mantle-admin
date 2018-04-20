@@ -3,8 +3,7 @@ const sass = require( 'gulp-sass' );
 const tslint = require( 'gulp-tslint' );
 const webpack = require( 'webpack' );
 const ts = require( "gulp-typescript" );
-const tsProject = ts.createProject( 'tsconfig-server.json', { noImplicitAny: true } );
-const tsLintProj = ts.createProject( 'tsconfig-lint.json' );
+const tsProject = ts.createProject( 'tsconfig.json' );
 const browserSync = require( 'browser-sync' ).create();
 const fs = require( 'fs' );
 const spawn = require( 'child_process' );
@@ -12,11 +11,17 @@ const webfontsGenerator = require( 'webfonts-generator' );
 
 const modepressJson = JSON.parse( fs.readFileSync( './modepress.json', { encoding: 'utf8' } ) );
 
+/**
+ * Moves the static files to dist
+ */
 function buildStatics() {
   return gulp.src( './src/static/**/*' )
     .pipe( gulp.dest( './dist/client/' ) );
 };
 
+/**
+ * Generates the font icons from svgs
+ */
 function generateFonts( callback ) {
   const files = [];
   fs.readdirSync( './fonts' ).forEach( file => {
@@ -57,24 +62,6 @@ function buildClient( callback ) {
 }
 
 /**
- * Builds the server ts code
- */
-function buildServer() {
-  let didError = false;
-  const tsResult = tsProject.src()
-    .pipe( tsProject() )
-    .on( 'error', function( error ) {
-      didError = true;
-    } );
-
-  return tsResult.js.pipe( gulp.dest( './dist/server' ) )
-    .on( 'end', function() {
-      if ( didError )
-        throw new Error( 'There were build errors' );
-    } );
-}
-
-/**
  * Watches the source files and reloads a browsersync page on successful compilation
  */
 function startWatchClient( callback ) {
@@ -101,37 +88,6 @@ function startWatchClient( callback ) {
       console.info( 'Compiled successfully!' );
       browserSync.reload();
     }
-  } );
-}
-
-/**
- * Watches the source files and reloads the server on successful compilation
- */
-function startWatchServer() {
-
-  let existingProc = runServer();
-
-  gulp.watch( './src/**/*', ( done ) => {
-
-    let error = false;
-
-    const tsResult = tsProject.src()
-      .pipe( tsProject() )
-      .on( 'error', function() {
-        error = true;
-      } );
-
-    tsResult.js.pipe( gulp.dest( './dist/server' ) )
-      .on( 'end', function() {
-        if ( existingProc )
-          existingProc.kill();
-
-        if ( !error ) {
-          existingProc = runServer();
-        }
-
-        done();
-      } );
   } );
 }
 
@@ -169,15 +125,15 @@ function buildSass() {
 }
 
 function copyTinyFiles() {
-  return gulp.src('./node_modules/tinymce/skins/**/*')
-    .pipe( gulp.dest('./dist/client/skins') )
+  return gulp.src( './node_modules/tinymce/skins/**/*' )
+    .pipe( gulp.dest( './dist/client/skins' ) )
 }
 
 /**
  * Notifies of any lint errors
  */
 function lint() {
-  return tsLintProj.src()
+  return gulp.src( [ './src/**/*.ts', './src/**/*.tsx' ] )
     .pipe( tslint( {
       configuration: 'tslint.json',
       formatter: 'verbose'
@@ -185,6 +141,28 @@ function lint() {
     .pipe( tslint.report( {
       emitError: true
     } ) )
+    .on( 'error', function( error ) {
+      if ( error )
+        throwerror;
+    } );
+}
+
+/**
+ * Builds the server ts code
+ */
+function quickCheck() {
+  let didError = false;
+  const tsResult = tsProject.src()
+    .pipe( tsProject() )
+    .on( 'error', function( error ) {
+      didError = true;
+    } );
+
+  return tsResult.js.pipe( gulp.dest( './dist/server' ) )
+    .on( 'end', function() {
+      if ( didError )
+        throw new Error( 'There were build errors' );
+    } );
 }
 
 /**
@@ -199,10 +177,7 @@ function initBrowserSync( callback ) {
   callback();
 }
 
-gulp.task( 'build-client', buildClient );
-gulp.task( 'build-server', buildServer );
-gulp.task( 'build', gulp.series( buildServer, gulp.parallel( generateFonts, lint, buildClient, buildSass, buildStatics ), ) );
-gulp.task( 'default', gulp.series( buildServer, gulp.parallel( generateFonts, lint, buildClient, buildSass, buildStatics ), ) );
+gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics ) ) );
+gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics ) ) );
 gulp.task( 'watch-client', gulp.series( initBrowserSync, startWatchClient ) );
-gulp.task( 'watch-server', startWatchServer );
 gulp.task( 'tiny-files', copyTinyFiles );

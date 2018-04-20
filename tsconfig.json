@@ -8,6 +8,7 @@
       "es7"
     ],
     "sourceMap": true,
+    "noImplicitAny": true,
     "outDir": "./dist",
     "allowUnusedLabels": false,
     "noUnusedLocals": true,
@@ -16,6 +17,7 @@
     "experimentalDecorators": true
   },
   "include": [
+    "../../src/types/**/*",
     "src/**/*"
   ],
   "exclude": [

@@ -7,16 +7,17 @@
       "dom.iterable",
       "es7"
     ],
-    "sourceMap": false,
+    "sourceMap": true,
+    "noImplicitAny": true,
     "outDir": "./dist/server",
     "allowUnusedLabels": false,
     "noUnusedLocals": true,
     "strictNullChecks": true,
-    "rootDir": "src",
     "jsx": "react",
     "experimentalDecorators": true
   },
   "include": [
-    "src/**/*"
+    "../../src/types/**/*",
+    "src/server.tsx"
   ]
 }
