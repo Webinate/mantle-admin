@@ -13,7 +13,7 @@
     "url": "https://github.com/Webinate/modepress-admin/issues"
   },
   "scripts": {
-    "postinstall": "gulp tiny-files",
+    "postinstall": "gulp build",
     "build": "gulp build",
     "watch-client": "gulp watch-client",
     "watch": "gulp watch",

@@ -18,7 +18,9 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 export function getCategories( index: number = 0, limit?: number ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetCategoriesBusy.create( true ) );
-    const resp = await categories.getAll( { index: index, limit: limit } );
+    const resp = await categories.getAll( {
+      index: index, limit: limit, expanded: true, depth: -1, root: true
+    } );
     dispatch( ActionCreators.SetCategories.create( resp ) );
   }
 }

@@ -177,7 +177,7 @@ function initBrowserSync( callback ) {
   callback();
 }
 
-gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics ) ) );
-gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics ) ) );
+gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
+gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
 gulp.task( 'watch-client', gulp.series( initBrowserSync, startWatchClient ) );
 gulp.task( 'tiny-files', copyTinyFiles );

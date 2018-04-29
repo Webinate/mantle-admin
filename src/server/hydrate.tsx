@@ -37,7 +37,7 @@ export async function hydrate( req: IAuthReq ) {
     matches = matchPath( req.url, { path: '/dashboard/posts/edit/:id' } );
     if ( matches ) {
       const post = await controllers.posts.getPost( { id: matches.params.id } );
-      const categories = await controllers.categories.getAll( {} );
+      const categories = await controllers.categories.getAll( { expanded: true, depth: -1, root: true } );
       actions.push( PostActions.SetPost.create( post ) );
       actions.push( CategoryActions.SetCategories.create( categories ) );
     }
