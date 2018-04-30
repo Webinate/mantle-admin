@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { Checkbox, FlatButton, TextField, MenuItem, SelectField, RaisedButton } from 'material-ui';
+import { Checkbox, FlatButton, TextField, MenuItem, SelectField, RaisedButton, Dialog } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import RemoveIcon from 'material-ui/svg-icons/content/remove';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
@@ -10,10 +10,16 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import { IRootState } from '../store';
 import { createCategory, removeCategory, getCategories, ActionCreators } from '../store/categories/actions';
 
+export type ExternalProps = {
+  selected: string[];
+  onCategorySelected: ( category: ICategory ) => void;
+}
+
 // Map state to props
-const mapStateToProps = ( state: IRootState, ownProps: { selected: string[] } ) => ( {
+const mapStateToProps = ( state: IRootState, ownProps: ExternalProps ) => ( {
   categories: state.categories,
-  selected: ownProps.selected
+  selected: ownProps.selected,
+  onCategorySelected: ownProps.onCategorySelected
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -32,6 +38,7 @@ type State = {
   newCategory: Partial<ICategory>;
   autoSlug: string;
   pristineForm: boolean;
+  categoryToRemove: ICategory | null;
 }
 
 @connectWrapper( mapStateToProps, dispatchToProps )
@@ -44,7 +51,8 @@ export class CategoryEditor extends React.Component<Props, State> {
       deleteMode: false,
       newCategory: {},
       autoSlug: '',
-      pristineForm: true
+      pristineForm: true,
+      categoryToRemove: null
     }
   }
 
@@ -54,8 +62,17 @@ export class CategoryEditor extends React.Component<Props, State> {
     return cleanValue;
   }
 
-  renderNewCategoryForm( categories: ICategory[] ) {
+  private expandCategory( c: ICategory, flatCategories: ICategory[] ) {
+    flatCategories.push( c );
+    for ( const child of c.children )
+      this.expandCategory( child as ICategory, flatCategories );
+  }
+
+  private renderNewCategoryForm( categories: ICategory[] ) {
     const isLoading = this.props.categories.busy;
+    const flatCategories: ICategory[] = [];
+    for ( const c of categories )
+      this.expandCategory( c, flatCategories );
 
     return (
       <div>
@@ -103,7 +120,7 @@ export class CategoryEditor extends React.Component<Props, State> {
             value={''}
             primaryText={''}
           />
-          {categories.map( ( parent, parentIndex ) => {
+          {flatCategories.map( ( parent, parentIndex ) => {
             return <MenuItem
               key={`parent-${ parentIndex }`}
               value={parent._id}
@@ -154,27 +171,48 @@ export class CategoryEditor extends React.Component<Props, State> {
     );
   }
 
-  renderAllCategories( categories: ICategory[] ) {
+  private onConfirmDelete() {
+    this.props.removeCategory( this.state.categoryToRemove! );
+    this.setState( { categoryToRemove: null } );
+  }
+
+  private renderCategory( cat: ICategory, catIndex: number ): JSX.Element {
+    return (
+      <div key={`category-${ catIndex }`}>
+        <Checkbox
+          iconStyle={{ fill: this.state.deleteMode ? theme.primary200.background : theme.primary300.background }}
+          onClick={e => {
+            const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
+
+            if ( categories.length === 1 )
+              this.setState( { deleteMode: false } )
+
+            if ( this.state.deleteMode )
+              this.setState( { categoryToRemove: cat } );
+            else
+              this.props.onCategorySelected( cat );
+          }}
+          uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
+          checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
+          key={`category-${ catIndex }`}
+          label={cat.title}
+          checked={this.props.selected.find( i => i === cat._id ) ? true : false}
+        />
+        <CategoryChildren>
+          {cat.children.map( ( child, subIndex ) => this.renderCategory( child as ICategory, subIndex ) )}
+        </CategoryChildren>
+      </div>
+    );
+  }
+
+  private renderAllCategories( categories: ICategory[] ) {
     return (
       <div>
         <ActiveCategories>
-          {categories.map( ( c, catIndex ) => {
-            return <Checkbox
-              iconStyle={{ fill: this.state.deleteMode ? theme.primary200.background : theme.primary300.background }}
-              onClick={e => {
-                if ( categories.length === 1 )
-                  this.setState( { deleteMode: false } )
-
-                if ( this.state.deleteMode )
-                  this.props.removeCategory( c );
-              }}
-              uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
-              checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
-              key={`category-${ catIndex }`}
-              label={c.title}
-              checked={this.props.selected.find( i => i === c._id ) ? true : false}
-            />
-          } )}
+          {
+            categories.map( ( c, catIndex ) => {
+              return this.renderCategory( c, catIndex );
+            } )}
         </ActiveCategories>
 
 
@@ -227,6 +265,27 @@ export class CategoryEditor extends React.Component<Props, State> {
           {this.state.addCategoryMode ?
             this.renderNewCategoryForm( categories ) : this.renderAllCategories( categories )}
         </div>
+        {this.state.categoryToRemove ?
+          <Dialog
+            open={true}
+            actions={[
+              <FlatButton
+                label="Cancel"
+                style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
+                className="mt-cancel-delcat"
+                onClick={e => this.setState( { categoryToRemove: null } )}
+              />,
+              <RaisedButton
+                label="Yes"
+                primary={true}
+                style={{ verticalAlign: 'middle' }}
+                className="mt-confirm-delcat"
+                onClick={e => this.onConfirmDelete()}
+              />
+            ]}
+          >
+            Are you sure you want to delete the category '{this.state.categoryToRemove.title}'
+        </Dialog> : undefined}
       </Container>
     );
   }
@@ -245,6 +304,10 @@ const Container = styled.div`
     margin: 6px 0;
     color: ${theme.error.background }
   }
+`;
+
+const CategoryChildren = styled.div`
+padding: 0 0 0 5px;
 `;
 
 const ActiveCategories = styled.div`

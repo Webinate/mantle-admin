@@ -221,7 +221,21 @@ export class PostForm extends React.Component<Props, State> {
 
         <RightPanel>
           <CategoryEditor
-            {...{ selected: this.state.editable.categories || [] } as any}
+            onCategorySelected={category => {
+              let newIds: string[] = [];
+              const index = this.state.editable.categories!.indexOf( category._id );
+
+              if ( index === -1 )
+                newIds = this.state.editable.categories!.concat( category._id );
+              else
+                newIds = this.state.editable.categories!.filter( f => f !== category._id );
+
+              this.setState( { editable: { ...this.state.editable, categories: newIds } } )
+            }}
+            {...{
+              selected: this.state.editable.categories || [],
+
+            } as any}
           />
         </RightPanel>
       </div>
