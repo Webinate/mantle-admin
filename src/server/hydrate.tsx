@@ -17,6 +17,7 @@ const args = yargs.argv;
  */
 export async function hydrate( req: IAuthReq ) {
   const actions: Action[] = [];
+  const isAdmin = req._user && req._user.privileges < 2 ? true : false;
   let matches: match<any> | null;
 
   // Get the user
@@ -42,7 +43,7 @@ export async function hydrate( req: IAuthReq ) {
       actions.push( CategoryActions.SetCategories.create( categories ) );
     }
     else {
-      const posts = await controllers.posts.getPosts();
+      let posts = await controllers.posts.getPosts( { public: isAdmin ? undefined : true } );
       actions.push( PostActions.SetPosts.create( posts ) );
     }
   }
