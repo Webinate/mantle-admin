@@ -91,14 +91,16 @@ export class Posts extends React.Component<Props, State> {
                     onKeyDown={e => {
                     }}
                     onChange={( e, text ) => this.setState( { searchFilter: text } )}
-                  />,
+                  />
                   <IconButton
                     style={{ verticalAlign: 'top' }}
                     iconStyle={{ color: theme.primary200.background }}
                     iconClassName="icon icon-search"
-                  />,
+                  />
                   <RaisedButton
                     onClick={e => this.props.push( '/dashboard/posts/new' )}
+                    className="mt-new-post"
+                    disabled={isAdmin ? false : true}
                     primary={true}
                     icon={<FontIcon
                       className="icon icon-add"

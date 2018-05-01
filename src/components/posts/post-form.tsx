@@ -22,6 +22,7 @@ export type Props = {
 export type State = {
   editable: Partial<IPost>;
   currentTagText: string;
+  slugWasEdited: boolean;
 }
 
 export class PostForm extends React.Component<Props, State> {
@@ -29,7 +30,8 @@ export class PostForm extends React.Component<Props, State> {
     super( props );
     this.state = {
       editable: props.post ? { ...props.post } : this.createEmptyPost(),
-      currentTagText: ''
+      currentTagText: '',
+      slugWasEdited: false
     };
   }
 
@@ -78,13 +80,22 @@ export class PostForm extends React.Component<Props, State> {
     } )
   }
 
-  private getSlug() {
-    if ( this.state.editable.slug )
+  private getSlug( title: string ) {
+    if ( this.state.slugWasEdited )
       return this.state.editable.slug;
 
-    let toRet = this.state.editable.title!.toLowerCase().replace( /\s+/g, '-' );
+    let toRet = title.toLowerCase().replace( /\s+/g, '-' );
     toRet = toRet.replace( /[^a-zA-Z0-9 -]/g, '' );
     return toRet;
+  }
+
+  private isPostValid() {
+    if ( !this.state.editable.title || this.state.editable.title.trim() === '' )
+      return false;
+    if ( !this.state.editable.slug || this.state.editable.slug.trim() === '' )
+      return false;
+
+    return true;
   }
 
   render() {
@@ -95,13 +106,26 @@ export class PostForm extends React.Component<Props, State> {
             id="mt-post-title"
             value={this.state.editable.title}
             placeholder="Enter Post Title"
-            onChange={( e ) => this.setState( { editable: { ...this.state.editable, title: e.currentTarget.value } } )}
+            onChange={( e ) => {
+              this.setState( {
+                editable: {
+                  ...this.state.editable,
+                  title: e.currentTarget.value,
+                  slug: this.getSlug( e.currentTarget.value )
+                }
+              } )
+            }}
           />
           <SlugContainer>
             <div>
               <SlugEditor
-                value={this.getSlug()}
-                onChange={( value ) => this.setState( { editable: { ...this.state.editable, slug: value } } )}
+                value={this.state.editable.slug}
+                onChange={( value ) => {
+                  this.setState( {
+                    slugWasEdited: true,
+                    editable: { ...this.state.editable, slug: value }
+                  } );
+                }}
               />
             </div>
             {this.state.editable.author ? <div>
@@ -126,6 +150,7 @@ export class PostForm extends React.Component<Props, State> {
       <div>
         <RightPanel>
           <RaisedButton
+            className="mt-post-confirm"
             onClick={e => {
               if ( this.props.post && this.props.onUpdate )
                 this.props.onUpdate( this.state.editable );
@@ -134,6 +159,7 @@ export class PostForm extends React.Component<Props, State> {
             }}
             primary={true}
             fullWidth={true}
+            disabled={!this.isPostValid()}
             label={this.props.post ? 'Update' : 'Publish'}
           />
           <Toggle

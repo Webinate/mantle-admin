@@ -43,6 +43,7 @@
         "--config=../../config.json",
         "--logging=false",
         "--runningTests=true",
+        "--debug=true",
         "--clientsFolder=../../clients/",
         "--remotes.local.url=http://localhost:8001",
         "--remotes.local.path=../../clients/modepress-admin/test/media-uploads"

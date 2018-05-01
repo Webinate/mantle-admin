@@ -1,5 +1,6 @@
 import Page from './page';
 import Agent from '../utils/agent';
+import * as assert from 'assert';
 
 export type PostProfile = {
   name: string;
@@ -14,9 +15,20 @@ export default class PostsPage extends Page {
 
   async load( agent: Agent ) {
     await super.load();
+
     if ( agent )
       await this.setAgent( agent );
-    return super.to( '/dashboard/posts' );
+
+    await super.to( '/dashboard/posts' );
+
+    assert( await this.$( '.mt-posts' ) );
+  }
+
+  async clickNewPost() {
+    await this.page.click( '.mt-new-post button' );
+    await this.page.waitFor( '#mt-post-title' );
+    const path = await this.page.evaluate( () => window.location.pathname )
+    assert.deepEqual( path, '/dashboard/posts/new' );
   }
 
   /**

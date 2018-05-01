@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
-
+import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
@@ -20,22 +20,14 @@ describe( '1. View post created by backend', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    try {
-      post = await controller.getPost( { slug: 'test-post' } );
-      if ( post )
-        await controller.removePost( post._id.toString() );
-    }
-    catch { }
-
     post = await controller.create( {
       title: 'Test Post',
-      slug: 'test-post',
+      slug: randomId(),
       public: false,
       content: 'This is a post\'s content'
     } )
 
     await postPage.load( admin );
-    assert( await postPage.$( '.mt-posts' ) );
   } )
 
   it( 'Post is available in post dashboard & visible to admin', async () => {
