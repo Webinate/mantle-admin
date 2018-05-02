@@ -35,7 +35,7 @@ describe( '1. View post created by backend', function() {
     assert( posts.length > 0 );
     assert.equal( posts[ 0 ].name, 'Test Post' );
     assert.equal( posts[ 0 ].image, '/images/avatar-1.svg' );
-    assert.equal( posts[ 0 ].content, 'This is a post\'s content' );
+    assert.equal( posts[ 0 ].featuredImage, '/images/post-feature.svg' );
   } )
 
   it( 'Post is private & not visible to regular user in dashboard', async () => {

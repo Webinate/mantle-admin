@@ -33,16 +33,16 @@ describe( 'Initialize Server', function() {
   } );
 } );
 
-require( './tests/login/1-login-validation' );
-require( './tests/login/2-register-validation' );
-require( './tests/login/3-login-failures' );
-require( './tests/login/4-reset-failures' );
-require( './tests/login/5-register-failures' );
-require( './tests/login/6-successful-login-logout' );
-require( './tests/users/1-find-user' );
-require( './tests/users/2-activate-user' );
-require( './tests/users/3-delete-user' );
-require( './tests/users/4-resend-activation' );
-require( './tests/users/5-request-password-reset' );
+// require( './tests/login/1-login-validation' );
+// require( './tests/login/2-register-validation' );
+// require( './tests/login/3-login-failures' );
+// require( './tests/login/4-reset-failures' );
+// require( './tests/login/5-register-failures' );
+// require( './tests/login/6-successful-login-logout' );
+// require( './tests/users/1-find-user' );
+// require( './tests/users/2-activate-user' );
+// require( './tests/users/3-delete-user' );
+// require( './tests/users/4-resend-activation' );
+// require( './tests/users/5-request-password-reset' );
 require( './tests/posts/1-view-post' );
 require( './tests/posts/2-create' );
