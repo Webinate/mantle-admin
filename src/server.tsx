@@ -21,6 +21,7 @@ import { ServerStyleSheet } from 'styled-components';
 // Needed for onTouchTap
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
 import { Action } from 'redux';
+import { RedirectError } from './server/errors';
 injectTapEventPlugin();
 
 /**
@@ -82,6 +83,9 @@ export default class MainController extends Controller {
       actions = await hydrate( req );
     }
     catch ( err ) {
+      if ( err instanceof RedirectError )
+        return res.redirect( err.redirect );
+
       return this.renderError( res, err );
     }
 
