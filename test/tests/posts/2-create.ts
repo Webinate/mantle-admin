@@ -31,6 +31,11 @@ describe( '2. Testing the creation of posts: ', function() {
     await postPage.waitFor( '.mt-new-post button[disabled]' )
   } )
 
+  it( 'does let admin users go to the new post page directly', async () => {
+    await postPage.load( admin, '/dashboard/posts/new' );
+    await postPage.waitFor( '#mt-post-title' );
+  } )
+
   it( 'does let admin click new post', async () => {
     await postPage.load( admin );
     await postPage.clickNewPost();

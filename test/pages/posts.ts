@@ -21,7 +21,7 @@ export default class PostsPage extends Page {
 
     await super.to( path );
 
-    assert( await this.$( '.mt-posts' ) );
+    assert( await this.$( '.mt-post-container' ) );
   }
 
   /**

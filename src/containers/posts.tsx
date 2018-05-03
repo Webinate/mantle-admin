@@ -65,7 +65,7 @@ export class Posts extends React.Component<Props, State> {
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
 
     return (
-      <div style={{ height: '100%' }}>
+      <div style={{ height: '100%' }} className="mt-post-container">
         <ContentHeader
           title="Posts"
           busy={isBusy}
