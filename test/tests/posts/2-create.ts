@@ -3,14 +3,15 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
+import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let post: IPost;
 let controller: PostsController;
+let postSlug = randomId();
 
 describe( '2. Testing the creation of posts: ', function() {
 
@@ -71,6 +72,35 @@ describe( '2. Testing the creation of posts: ', function() {
     assert.equal( await postPage.getSlug(), 'custom-slug' );
   } )
 
+  it( 'did add and remove tags', async () => {
+    await postPage.addTag( 'tag 1' );
+    await postPage.addTag( 'tag 2' );
+    assert.equal( await postPage.hasTag( 'tag 1' ), true );
+    assert.equal( await postPage.hasTag( 'tag 2' ), true );
+
+    await postPage.removeTag( 'tag 1' );
+    await postPage.removeTag( 'tag 2' );
+    assert.equal( await postPage.hasTag( 'tag 1' ), false );
+    assert.equal( await postPage.hasTag( 'tag 2' ), false );
+  } )
+
+  it( 'did edit content in the tiny editor', async () => {
+    await postPage.content( 'Simple content babes' );
+    assert.equal( await postPage.content(), 'Simple content babes' );
+  } )
+
+  it( 'has created a post with valid data', async () => {
+    await postPage.title( postSlug );
+    await postPage.setSlug( postSlug );
+    await postPage.content( 'This is a post bruv' );
+    await postPage.clickConfirm();
+    assert.equal( await postPage.inEditMode(), false );
+    const posts = await postPage.getPosts();
+    assert.equal( posts[ 0 ].name, postSlug );
+  } )
+
   after( async () => {
+    const post = await controller.getPost( { slug: postSlug } );
+    await controller.removePost( post._id.toString() );
   } )
 } );

@@ -207,6 +207,7 @@ export class PostForm extends React.Component<Props, State> {
             </div>
             <div>
               <IconButton
+                id="mt-add-tag"
                 onClick={e => this.addTag()}
                 iconStyle={{ width: 26, height: 26 }}
                 style={{ padding: 0, width: 30, height: 30 }}><AddIcon />
@@ -217,6 +218,7 @@ export class PostForm extends React.Component<Props, State> {
             {this.state.editable.tags!.map( ( tag, tagIndex ) => {
               return <Chip
                 key={`tag-${ tagIndex }`}
+                className="mt-tag-chip"
                 style={{ margin: '4px 4px 0 0' }}
                 onRequestDelete={e => {
                   this.setState( {

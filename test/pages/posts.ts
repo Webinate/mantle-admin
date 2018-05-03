@@ -22,6 +22,7 @@ export default class PostsPage extends Page {
     await super.to( path );
 
     assert( await this.$( '.mt-post-container' ) );
+    await this.doneLoading();
   }
 
   /**
@@ -32,6 +33,43 @@ export default class PostsPage extends Page {
     await this.page.waitFor( '#mt-post-title' );
     const path = await this.page.evaluate( () => window.location.pathname )
     assert.deepEqual( path, '/dashboard/posts/new' );
+  }
+
+  async inEditMode() {
+    const result = await this.page.$( '.mt-post-confirm' );
+    if ( result )
+      return true;
+    else
+      return false;
+  }
+
+  /**
+   * Clicks the confirm btn to save or update
+   */
+  async clickConfirm() {
+    await this.page.click( '.mt-post-confirm' );
+    await this.page.waitFor( '.mt-new-post button' );
+    await this.doneLoading()
+  }
+
+  /**
+   * Gets or sets the content of the tiny editor
+   */
+  async content( val?: string ) {
+    const frames = await this.page.frames();
+
+    if ( val === undefined ) {
+      return frames[ 1 ].$eval( '#tinymce', ( tiny: HTMLElement ) => tiny.textContent )
+    }
+    else {
+      await frames[ 1 ].$eval( '#tinymce', ( tiny: HTMLElement ) => {
+        tiny.textContent = '';
+        tiny.focus();
+      } );
+
+      const handle = await frames[ 1 ].$( '#tinymce' );
+      await handle.type( val, { delay: 10 } );
+    }
   }
 
   /**
@@ -64,6 +102,9 @@ export default class PostsPage extends Page {
     } );
   }
 
+  /**
+   * Sets the slug of the post
+   */
   async setSlug( val: string ) {
     const slugInput = 'input[name=mt-slug]';
     await this.click( '.mt-slug-btn.mt-edit-slug' );
@@ -71,6 +112,44 @@ export default class PostsPage extends Page {
     await this.page.type( slugInput, val, { delay: 10 } )
     await this.click( '.mt-slug-btn.mt-slug-save' );
     await this.waitFor( '.mt-slug-btn.mt-edit-slug' );
+  }
+
+  /**
+   * Adds a new tag
+   */
+  async addTag( val: string ) {
+    const inputSelector = '#mt-add-new-tag';
+    await this.page.$eval( inputSelector, ( elm: HTMLInputElement ) => {
+      elm.value = '';
+      elm.focus();
+    } );
+    await this.page.type( inputSelector, val, { delay: 10 } )
+    await this.page.click( '#mt-add-tag' );
+  }
+
+  /**
+   * Removes a tag by name
+   */
+  async removeTag( val: string ) {
+    const tags: string[] = await this.page.$$eval( '.mt-tag-chip span', list => {
+      return Array.from( list ).map( ( item: HTMLElement ) => item.textContent )
+    } );
+
+    if ( tags.indexOf( val ) === -1 )
+      throw new Error( 'Tag does not exist' );
+
+    await this.page.click( `.mt-tag-chip:nth-child(${ tags.indexOf( val ) + 1 }) svg` );
+  }
+
+  /**
+   * Checks if the post has a tag
+   */
+  async hasTag( val: string ) {
+    const tags: string[] = await this.page.$$eval( '.mt-tag-chip span', list => {
+      return Array.from( list ).map( ( item: HTMLElement ) => item.textContent )
+    } );
+
+    return tags.includes( val );
   }
 
   /**
