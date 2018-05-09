@@ -1,6 +1,7 @@
 import Page from './page';
 import Agent from '../utils/agent';
 import * as assert from 'assert';
+import CategoryModule from './modules/categories';
 
 export type PostProfile = {
   name: string;
@@ -9,6 +10,9 @@ export type PostProfile = {
 }
 
 export default class PostsPage extends Page {
+
+  public categories: CategoryModule;
+
   constructor() {
     super();
   }
@@ -23,6 +27,8 @@ export default class PostsPage extends Page {
 
     assert( await this.$( '.mt-post-container' ) );
     await this.doneLoading();
+
+    this.categories = new CategoryModule( this.page );
   }
 
   /**
@@ -75,22 +81,7 @@ export default class PostsPage extends Page {
   /**
    * Gets or sets the post title
    */
-  async title( val?: string ): Promise<string | void> {
-    const titleSelector = '#mt-post-title';
-
-    if ( val === undefined )
-      return await this.page.$eval( titleSelector, ( elm: HTMLInputElement ) => {
-        return elm.value;
-      } )
-    else {
-      await this.page.focus( titleSelector );
-      await this.page.evaluate( ( data ) => {
-        document.querySelector( data ).value = '';
-      }, titleSelector );
-
-      return this.page.type( titleSelector, val, { delay: 10 } );
-    }
-  }
+  title( val?: string ) { return this.input( '#mt-post-title', val ) }
 
   /**
    * Gets the static slug
@@ -119,11 +110,7 @@ export default class PostsPage extends Page {
    */
   async addTag( val: string ) {
     const inputSelector = '#mt-add-new-tag';
-    await this.page.$eval( inputSelector, ( elm: HTMLInputElement ) => {
-      elm.value = '';
-      elm.focus();
-    } );
-    await this.page.type( inputSelector, val, { delay: 10 } )
+    await this.input( inputSelector, val );
     await this.page.click( '#mt-add-tag' );
   }
 
@@ -155,8 +142,9 @@ export default class PostsPage extends Page {
   /**
    * Waits for the auth page to not be in a busy state
    */
-  doneLoading() {
-    return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' );
+  async doneLoading() {
+    await this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' );
+    await this.page.waitForFunction( 'document.querySelector(".mt-cat-loading") == null' );
   }
 
   /**

@@ -75,15 +75,6 @@ export default class UsersPage extends Page {
     return null;
   }
 
-  async getSnackMessage() {
-    await this.page.waitFor( '.mt-response-message[open]' );
-    return this.$eval( '.mt-response-message > div > div > span', elm => elm.textContent );
-  }
-
-  closeSnackMessage() {
-    return this.click( '.mt-response-message button' );
-  }
-
   getModalMessage() {
     return this.$eval( '.mt-modal-message', elm => elm.textContent );
   }

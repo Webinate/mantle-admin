@@ -44,5 +44,6 @@ describe( 'Initialize Server', function() {
 // require( './tests/users/3-delete-user' );
 // require( './tests/users/4-resend-activation' );
 // require( './tests/users/5-request-password-reset' );
-require( './tests/posts/1-view-post' );
-require( './tests/posts/2-create' );
+// require( './tests/posts/1-view-post' );
+// require( './tests/posts/2-create' );
+require( './tests/posts/3-categories' );

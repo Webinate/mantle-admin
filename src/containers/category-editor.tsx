@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { Checkbox, FlatButton, TextField, MenuItem, SelectField, RaisedButton, Dialog } from 'material-ui';
+import { Checkbox, FlatButton, TextField, MenuItem, SelectField, RaisedButton, Dialog, CircularProgress, IconButton } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
 import RemoveIcon from 'material-ui/svg-icons/content/remove';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import EditIcon from 'material-ui/svg-icons/image/edit';
 import theme from '../theme/mui-theme';
 import { ICategory } from 'modepress';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { IRootState } from '../store';
-import { createCategory, removeCategory, getCategories, ActionCreators } from '../store/categories/actions';
+import { createCategory, editCategory, removeCategory, getCategories, ActionCreators } from '../store/categories/actions';
 
 export type ExternalProps = {
   selected: string[];
@@ -19,12 +20,14 @@ export type ExternalProps = {
 const mapStateToProps = ( state: IRootState, ownProps: ExternalProps ) => ( {
   categories: state.categories,
   selected: ownProps.selected,
-  onCategorySelected: ownProps.onCategorySelected
+  onCategorySelected: ownProps.onCategorySelected,
+  app: state.app
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   createCategory,
+  editCategory,
   removeCategory,
   getCategories,
   setError: ActionCreators.SetCategoryErr.create
@@ -35,10 +38,11 @@ type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   addCategoryMode: boolean;
   deleteMode: boolean;
+  editMode: boolean;
   newCategory: Partial<ICategory>;
   autoSlug: string;
   pristineForm: boolean;
-  categoryToRemove: ICategory | null;
+  selectedCategory: ICategory | null;
 }
 
 @connectWrapper( mapStateToProps, dispatchToProps )
@@ -49,10 +53,11 @@ export class CategoryEditor extends React.Component<Props, State> {
     this.state = {
       addCategoryMode: false,
       deleteMode: false,
+      editMode: false,
       newCategory: {},
       autoSlug: '',
       pristineForm: true,
-      categoryToRemove: null
+      selectedCategory: null
     }
   }
 
@@ -75,7 +80,7 @@ export class CategoryEditor extends React.Component<Props, State> {
       this.expandCategory( c, flatCategories );
 
     return (
-      <div>
+      <div className="mt-category-form">
         <TextField
           id="mt-new-cat-name"
           autoFocus={true}
@@ -110,6 +115,9 @@ export class CategoryEditor extends React.Component<Props, State> {
           id="mt-new-cat-parent"
           floatingLabelText="Optional parent category"
           value={this.state.newCategory.parent || ''}
+          dropDownMenuProps={{
+            animated: this.props.app.debugMode ? false : true
+          }}
           fullWidth={true}
           onChange={( e, index, value ) => {
             this.setState( { newCategory: { ...this.state.newCategory, parent: value } }
@@ -135,6 +143,7 @@ export class CategoryEditor extends React.Component<Props, State> {
         <div style={{ display: 'flex', margin: '20px 0 0 0' }}>
           <FlatButton
             disabled={isLoading}
+            className="mt-cancel-category-form"
             style={{
               verticalAlign: 'middle',
               margin: '0 4px 0 0',
@@ -148,6 +157,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           />
           <RaisedButton
             disabled={isLoading}
+            className="mt-approve-category-form"
             primary={true}
             style={{
               verticalAlign: 'middle',
@@ -155,16 +165,28 @@ export class CategoryEditor extends React.Component<Props, State> {
             }}
             icon={<AddIcon />}
             onClick={e => {
-              this.props.createCategory( {
-                ...this.state.newCategory,
-                slug: this.state.newCategory.slug || this.state.autoSlug
-              }, () => {
-                this.setState( {
-                  addCategoryMode: false
+              if ( this.state.newCategory._id ) {
+                this.props.editCategory( {
+                  ...this.state.newCategory,
+                  slug: this.state.newCategory.slug || this.state.autoSlug
+                }, () => {
+                  this.setState( {
+                    addCategoryMode: false
+                  } )
                 } )
-              } )
+              }
+              else {
+                this.props.createCategory( {
+                  ...this.state.newCategory,
+                  slug: this.state.newCategory.slug || this.state.autoSlug
+                }, () => {
+                  this.setState( {
+                    addCategoryMode: false
+                  } )
+                } )
+              }
             }}
-            label="Add"
+            label={this.state.newCategory._id ? 'Edit' : 'Add'}
           />
         </div>
       </div>
@@ -172,31 +194,44 @@ export class CategoryEditor extends React.Component<Props, State> {
   }
 
   private onConfirmDelete() {
-    this.props.removeCategory( this.state.categoryToRemove! );
-    this.setState( { categoryToRemove: null } );
+    this.props.removeCategory( this.state.selectedCategory! );
+    this.setState( { selectedCategory: null } );
   }
 
   private renderCategory( cat: ICategory, catIndex: number ): JSX.Element {
+    const selected = this.props.selected.find( i => i === cat._id ) ? true : false;
+
     return (
-      <div key={`category-${ catIndex }`}>
+      <div key={`category-${ catIndex }`} className="mt-category-item-container">
         <Checkbox
-          iconStyle={{ fill: this.state.deleteMode ? theme.primary200.background : theme.primary300.background }}
+          className={`mt-category-checkbox ${ selected ? 'selected' : '' }`}
+          id={`mt-cat-${ cat._id }`}
+          iconStyle={{
+            fill: this.state.deleteMode || this.state.editMode ? theme.primary200.background : theme.primary300.background
+          }}
           onClick={e => {
             const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
 
-            if ( categories.length === 1 )
+            if ( categories.length === 1 && this.state.deleteMode )
               this.setState( { deleteMode: false } )
 
             if ( this.state.deleteMode )
-              this.setState( { categoryToRemove: cat } );
+              this.setState( { selectedCategory: cat } );
+            else if ( this.state.editMode )
+              this.setState( {
+                selectedCategory: cat,
+                editMode: false,
+                addCategoryMode: true,
+                newCategory: { ...cat }
+              } );
             else
               this.props.onCategorySelected( cat );
           }}
-          uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
-          checkedIcon={this.state.deleteMode ? <DeleteIcon /> : undefined}
+          uncheckedIcon={this.state.deleteMode ? <DeleteIcon /> : this.state.editMode ? <EditIcon /> : undefined}
+          checkedIcon={this.state.deleteMode ? <DeleteIcon /> : this.state.editMode ? <EditIcon /> : undefined}
           key={`category-${ catIndex }`}
           label={cat.title}
-          checked={this.props.selected.find( i => i === cat._id ) ? true : false}
+          checked={selected}
         />
         <CategoryChildren>
           {cat.children.map( ( child, subIndex ) => this.renderCategory( child as ICategory, subIndex ) )}
@@ -216,12 +251,13 @@ export class CategoryEditor extends React.Component<Props, State> {
         </ActiveCategories>
 
 
-        {this.state.deleteMode ?
+        {this.state.deleteMode || this.state.editMode ?
           <CategoryButtons>
             <FlatButton
               primary={true}
+              className="mt-cancel-category-delete"
               onClick={e => {
-                this.setState( { deleteMode: false } );
+                this.setState( { deleteMode: false, editMode: false } );
               }}
               style={{ display: 'block' }}
               label="Cancel"
@@ -230,11 +266,13 @@ export class CategoryEditor extends React.Component<Props, State> {
           <CategoryButtons>
             <FlatButton
               primary={true}
+              className="mt-new-category-btn"
               icon={<AddIcon />}
               onClick={e => this.setState( {
                 addCategoryMode: true,
                 pristineForm: true,
-                newCategory: {}
+                newCategory: {},
+                autoSlug: '',
               } )}
               style={{ display: 'block' }}
               label="Add Category"
@@ -242,6 +280,7 @@ export class CategoryEditor extends React.Component<Props, State> {
 
             {categories.length > 0 ?
               <FlatButton
+                className="mt-remove-category-btn"
                 primary={true}
                 icon={<RemoveIcon />}
                 onClick={e => this.setState( {
@@ -259,45 +298,84 @@ export class CategoryEditor extends React.Component<Props, State> {
   render() {
     const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
     return (
-      <Container>
-        <h3>{this.state.addCategoryMode ? 'New Category' : 'Categories'}</h3>
+      <Container className="mt-category-container">
+        <CategoriesHeader>
+          <div>
+            <h3>{this.state.addCategoryMode ? this.state.newCategory._id ? 'Edit Category' : 'New Category' : 'Categories'}</h3>
+          </div>
+          <div>
+            {this.props.categories.busy ? <span
+              className="mt-cat-loading"
+            >
+              <CircularProgress size={20} />
+            </span> :
+              <IconButton
+                className="mt-edit-cat-btn"
+                onClick={e => this.setState( { editMode: true } )}
+                style={{ padding: 0, height: 25, width: 25 }}
+                iconStyle={{ padding: 0, height: 25, width: 25 }}
+              >
+                <EditIcon />
+              </IconButton>
+            }
+          </div>
+
+        </CategoriesHeader>
+
         <div>
           {this.state.addCategoryMode ?
             this.renderNewCategoryForm( categories ) : this.renderAllCategories( categories )}
         </div>
-        {this.state.categoryToRemove ?
-          <Dialog
-            open={true}
-            actions={[
-              <FlatButton
-                label="Cancel"
-                style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
-                className="mt-cancel-delcat"
-                onClick={e => this.setState( { categoryToRemove: null } )}
-              />,
-              <RaisedButton
-                label="Yes"
-                primary={true}
-                style={{ verticalAlign: 'middle' }}
-                className="mt-confirm-delcat"
-                onClick={e => this.onConfirmDelete()}
-              />
-            ]}
-          >
-            Are you sure you want to delete the category '{this.state.categoryToRemove.title}'
-        </Dialog> : undefined}
-      </Container>
+        {
+          this.state.selectedCategory && this.state.deleteMode ?
+            <Dialog
+              contentClassName="mt-category-del-container"
+              open={true}
+              actions={[
+                <FlatButton
+                  label="Cancel"
+                  style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
+                  className="mt-cancel-delcat"
+                  onClick={e => this.setState( {
+                    selectedCategory: null,
+                    deleteMode: false
+                  } )}
+                />,
+                <RaisedButton
+                  label="Yes"
+                  primary={true}
+                  style={{ verticalAlign: 'middle' }}
+                  className="mt-confirm-delcat"
+                  onClick={e => this.onConfirmDelete()}
+                />
+              ]}
+            >
+              Are you sure you want to delete the category '{this.state.selectedCategory.title}'
+        </Dialog> : undefined
+        }
+      </Container >
     );
   }
 }
 
+const CategoriesHeader = styled.div`
+  display: flex;
+  > div {
+    flex: 1;
+  }
+
+  > div:last-child {
+    text-align: right;
+  }
+
+  h3 {
+    margin: 0;
+  }
+`;
+
 const Container = styled.div`
   > h3 {
     margin: 0;
-  }
-
-  > div {
-    margin: 8px 0 0 0;
   }
 
   .mt-newcat-error {

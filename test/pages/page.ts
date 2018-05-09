@@ -1,6 +1,7 @@
 import utils from '../utils';
 import { Browser, Page as PuppeteerPage } from 'puppeteer';
 import Agent from '../utils/agent';
+import { IConfig } from 'modepress/src';
 
 /**
  * Base class for all page tests
@@ -9,7 +10,7 @@ export default class Page {
 
   public page: PuppeteerPage;
   public browser: Browser;
-  public config: any;
+  public config: IConfig;
 
   constructor() {
   }
@@ -40,6 +41,15 @@ export default class Page {
     await this.sleep( 50 );
     await handle.executionContext().evaluate( elm => elm.scrollIntoView(), handle );
     return this.page.click( selector );
+  }
+
+  async getSnackMessage() {
+    await this.page.waitFor( '.mt-response-message[open]' );
+    return this.$eval( '.mt-response-message > div > div > span', elm => elm.textContent );
+  }
+
+  closeSnackMessage() {
+    return this.click( '.mt-response-message button' );
   }
 
   /**
@@ -79,6 +89,23 @@ export default class Page {
   async pathname() {
     let location = await this.page.evaluate( async () => window.location );
     return location.pathname;
+  }
+
+  /**
+   * Gets or sets an input element's value
+   */
+  async input( selector: string, val?: string ) {
+    if ( val === undefined ) {
+      return this.page.$eval( selector, ( elm: HTMLInputElement ) => elm.value );
+    }
+    else {
+      await this.page.$eval( selector, ( elm: HTMLInputElement ) => {
+        elm.value = '';
+        elm.focus();
+      } );
+
+      await this.page.type( selector, val, { delay: 10 } );
+    }
   }
 
   /**

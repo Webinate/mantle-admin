@@ -25,6 +25,23 @@ export function getCategories( index: number = 0, limit?: number ) {
   }
 }
 
+export function editCategory( category: Partial<ICategory>, callback?: () => void ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetCategoriesBusy.create( true ) );
+      const resp = await categories.edit( category._id.toString(), category );
+      dispatch( AppActions.serverResponse.create( `Category '${ resp.title }' updated` ) );
+      dispatch( getCategories() );
+
+      if ( callback )
+        callback();
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.SetCategoryErr.create( `Error: ${ err.message }` ) );
+    }
+  }
+}
+
 export function createCategory( category: Partial<ICategory>, callback?: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
