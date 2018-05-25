@@ -7,7 +7,7 @@ import { ActionCreators as AppActionCreators } from '../app/actions';
 // Action Creators
 export const ActionCreators = {
   SetUsersBusy: new ActionCreator<'users-busy', boolean>( 'users-busy' ),
-  SetUsers: new ActionCreator<'users-set-users', Page<IUserEntry> | null>( 'users-set-users' ),
+  SetUsers: new ActionCreator<'users-set-users', Page<IUserEntry<'client'>> | null>( 'users-set-users' ),
   RemoveUser: new ActionCreator<'users-remove-user', string>( 'users-remove-user' )
 };
 

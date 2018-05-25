@@ -3,8 +3,8 @@ import { Page, ICategory } from 'modepress';
 
 // State
 export type State = {
-  readonly categoryPage: Page<ICategory> | null;
-  readonly category: ICategory | null;
+  readonly categoryPage: Page<ICategory<'client'>> | null;
+  readonly category: ICategory<'client'> | null;
   readonly busy: boolean;
   readonly error: string | null;
 };

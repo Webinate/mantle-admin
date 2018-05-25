@@ -7,7 +7,7 @@ import { generateAvatarPic } from '../utils/component-utils';
 import { IUserEntry } from 'modepress';
 
 type Props = {
-  activeUser: IUserEntry;
+  activeUser: IUserEntry<'client'>;
   title: string;
   onHome: () => void;
   onLogOut: () => void;

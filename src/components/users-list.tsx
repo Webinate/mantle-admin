@@ -7,9 +7,9 @@ import * as moment from 'moment';
 import { generateAvatarPic } from '../utils/component-utils';
 
 type Props = {
-  users: IUserEntry[];
-  selected: IUserEntry[];
-  onUserSelected: ( user: IUserEntry, e: React.MouseEvent<HTMLDivElement> ) => void;
+  users: IUserEntry<'client'>[];
+  selected: IUserEntry<'client'>[];
+  onUserSelected: ( user: IUserEntry<'client'>, e: React.MouseEvent<HTMLDivElement> ) => void;
 };
 
 interface SCompProps extends React.HTMLProps<HTMLDivElement> {

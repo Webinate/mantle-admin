@@ -32,7 +32,7 @@ const dispatchToProps = {
 const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
-  selectedUsers: IUserEntry[];
+  selectedUsers: IUserEntry<'client'>[];
   userFilter: string;
   dialogue: null | string;
   dialogueHeader: string;
@@ -65,7 +65,7 @@ export class Users extends React.Component<Props, State> {
       this.setState( { selectedUsers: [] } );
   }
 
-  private onUserSelected( user: IUserEntry, e: React.MouseEvent<HTMLDivElement> ) {
+  private onUserSelected( user: IUserEntry<'client'>, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();
 

@@ -6,7 +6,7 @@ export type State = {
   readonly busy: boolean;
   readonly authenticated: boolean;
   readonly error?: string | null;
-  readonly user: IUserEntry | null;
+  readonly user: IUserEntry<'client'> | null;
 };
 
 export const initialState: State = {

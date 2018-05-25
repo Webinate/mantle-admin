@@ -7,8 +7,8 @@ import { ActionCreators as AppActions } from '../app/actions';
 // Action Creators
 export const ActionCreators = {
   SetCategoriesBusy: new ActionCreator<'categories-busy', boolean>( 'categories-busy' ),
-  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory>>( 'categories-set-categories' ),
-  SetCategory: new ActionCreator<'categories-set-category', ICategory>( 'categories-set-category' ),
+  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory<'client'>>>( 'categories-set-categories' ),
+  SetCategory: new ActionCreator<'categories-set-category', ICategory<'client'>>( 'categories-set-category' ),
   SetCategoryErr: new ActionCreator<'categories-set-err', string | null>( 'categories-set-err' )
 };
 
@@ -25,11 +25,11 @@ export function getCategories( index: number = 0, limit?: number ) {
   }
 }
 
-export function editCategory( category: Partial<ICategory>, callback?: () => void ) {
+export function editCategory( category: Partial<ICategory<'client'>>, callback?: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetCategoriesBusy.create( true ) );
-      const resp = await categories.edit( category._id.toString(), category );
+      const resp = await categories.edit( category._id as string, category );
       dispatch( AppActions.serverResponse.create( `Category '${ resp.title }' updated` ) );
       dispatch( getCategories() );
 
@@ -42,7 +42,7 @@ export function editCategory( category: Partial<ICategory>, callback?: () => voi
   }
 }
 
-export function createCategory( category: Partial<ICategory>, callback?: () => void ) {
+export function createCategory( category: Partial<ICategory<'client'>>, callback?: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetCategoriesBusy.create( true ) );
@@ -59,7 +59,7 @@ export function createCategory( category: Partial<ICategory>, callback?: () => v
   }
 }
 
-export function removeCategory( category: ICategory ) {
+export function removeCategory( category: ICategory<'client'> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetCategoriesBusy.create( true ) );

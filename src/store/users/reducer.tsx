@@ -4,7 +4,7 @@ import { IUserEntry, Page } from 'modepress';
 
 // State
 export type State = {
-  readonly userPage: Page<IUserEntry> | null;
+  readonly userPage: Page<IUserEntry<'client'>> | null;
   readonly busy: boolean;
 };
 

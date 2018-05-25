@@ -6,16 +6,16 @@ import { generateAvatarPic } from '../utils/component-utils';
 import { users } from 'modepress/src/lib-frontend';
 
 type Props = {
-  user: IUserEntry;
+  user: IUserEntry<'client'>;
   canEdit?: boolean;
-  onChange: ( user: IUserEntry ) => void;
+  onChange: ( user: IUserEntry<'client'> ) => void;
   labelStyle?: React.CSSProperties;
 };
 
 type State = {
   elm: Element | null;
   open: boolean;
-  users: IUserEntry[];
+  users: IUserEntry<'client'>[];
 };
 
 export class UserPicker extends React.Component<Props, State> {

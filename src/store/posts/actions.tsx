@@ -8,8 +8,8 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost>>( 'posts-set-posts' ),
-  SetPost: new ActionCreator<'posts-set-post', IPost>( 'posts-set-post' )
+  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost<'client'>>>( 'posts-set-posts' ),
+  SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' )
 };
 
 // Action Types
@@ -34,7 +34,7 @@ export function getPost( id: string ) {
   }
 }
 
-export function createPost( post: Partial<IPost> ) {
+export function createPost( post: Partial<IPost<'client'>> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
@@ -50,11 +50,11 @@ export function createPost( post: Partial<IPost> ) {
   }
 }
 
-export function editPost( post: Partial<IPost> ) {
+export function editPost( post: Partial<IPost<'client'>> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
-      const resp = await posts.update( post._id, post );
+      const resp = await posts.update( post._id as string, post );
       dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
       dispatch( ActionCreators.SetPostsBusy.create( false ) );
     }

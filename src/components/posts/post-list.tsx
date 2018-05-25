@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { IconButton, Avatar } from 'material-ui';
 import { Pager } from '../../components/pager';
-import { Page, IPost } from 'modepress';
+import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  posts: Page<IPost> | null;
+  posts: Page<IPost<'client'>> | null;
   getPosts: ( index: number ) => void;
-  onPostSelected: ( post: IPost[] ) => void
-  onEdit: ( post: IPost ) => void;
-  onDelete: ( post: IPost ) => void;
-  selected: IPost[];
+  onPostSelected: ( post: IPost<'client'>[] ) => void
+  onEdit: ( post: IPost<'client'> ) => void;
+  onDelete: ( post: IPost<'client'> ) => void;
+  selected: IPost<'client'>[];
 }
 
 export type State = {
@@ -30,7 +30,7 @@ export class PostList extends React.Component<Props, State> {
     this.props.getPosts( 0 );
   }
 
-  private onPostSelected( post: IPost, e: React.MouseEvent<HTMLDivElement> ) {
+  private onPostSelected( post: IPost<'client'>, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -95,7 +95,7 @@ export class PostList extends React.Component<Props, State> {
               </div>
               <div className="mt-post-info">
                 <Avatar
-                  src={generateAvatarPic( post.author ? post.author.avatar : '' )}
+                  src={generateAvatarPic( post.author ? ( post.author as IUserEntry<'client'> ).avatar : '' )}
                   size={60}
                   style={{ float: 'right' }}
                 />

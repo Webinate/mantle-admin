@@ -8,12 +8,12 @@ import { Drawer } from './drawer';
 import * as moment from 'moment';
 
 type Props = {
-  activeUser: IUserEntry;
-  selected: IUserEntry | null;
+  activeUser: IUserEntry<'client'>;
+  selected: IUserEntry<'client'> | null;
   animated: boolean;
   resetPasswordRequest( username: string ): void;
   activateAccount( username: string ): void;
-  onDeleteRequested( username: IUserEntry ): void;
+  onDeleteRequested( username: IUserEntry<'client'> ): void;
   resendActivation( username: string ): void;
 };
 
@@ -34,7 +34,7 @@ export class UserProperties extends React.Component<Props, State> {
     };
   }
 
-  userCanInteract( user: IUserEntry ) {
+  userCanInteract( user: IUserEntry<'client'> ) {
     const activeUser = this.props.activeUser;
 
     // If admin

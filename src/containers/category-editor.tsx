@@ -13,7 +13,7 @@ import { createCategory, editCategory, removeCategory, getCategories, ActionCrea
 
 export type ExternalProps = {
   selected: string[];
-  onCategorySelected: ( category: ICategory ) => void;
+  onCategorySelected: ( category: ICategory<'client'> ) => void;
 }
 
 // Map state to props
@@ -39,10 +39,10 @@ type State = {
   addCategoryMode: boolean;
   deleteMode: boolean;
   editMode: boolean;
-  newCategory: Partial<ICategory>;
+  newCategory: Partial<ICategory<'client'>>;
   autoSlug: string;
   pristineForm: boolean;
-  selectedCategory: ICategory | null;
+  selectedCategory: ICategory<'client'> | null;
 }
 
 @connectWrapper( mapStateToProps, dispatchToProps )
@@ -67,15 +67,15 @@ export class CategoryEditor extends React.Component<Props, State> {
     return cleanValue;
   }
 
-  private expandCategory( c: ICategory, flatCategories: ICategory[] ) {
+  private expandCategory( c: ICategory<'client'>, flatCategories: ICategory<'client'>[] ) {
     flatCategories.push( c );
     for ( const child of c.children )
-      this.expandCategory( child as ICategory, flatCategories );
+      this.expandCategory( child as ICategory<'client'>, flatCategories );
   }
 
-  private renderNewCategoryForm( categories: ICategory[] ) {
+  private renderNewCategoryForm( categories: ICategory<'client'>[] ) {
     const isLoading = this.props.categories.busy;
-    const flatCategories: ICategory[] = [];
+    const flatCategories: ICategory<'client'>[] = [];
     for ( const c of categories )
       this.expandCategory( c, flatCategories );
 
@@ -198,7 +198,7 @@ export class CategoryEditor extends React.Component<Props, State> {
     this.setState( { selectedCategory: null } );
   }
 
-  private renderCategory( cat: ICategory, catIndex: number ): JSX.Element {
+  private renderCategory( cat: ICategory<'client'>, catIndex: number ): JSX.Element {
     const selected = this.props.selected.find( i => i === cat._id ) ? true : false;
 
     return (
@@ -234,13 +234,13 @@ export class CategoryEditor extends React.Component<Props, State> {
           checked={selected}
         />
         <CategoryChildren>
-          {cat.children.map( ( child, subIndex ) => this.renderCategory( child as ICategory, subIndex ) )}
+          {cat.children.map( ( child, subIndex ) => this.renderCategory( child as ICategory<'client'>, subIndex ) )}
         </CategoryChildren>
       </div>
     );
   }
 
-  private renderAllCategories( categories: ICategory[] ) {
+  private renderAllCategories( categories: ICategory<'client'>[] ) {
     return (
       <div>
         <ActiveCategories>

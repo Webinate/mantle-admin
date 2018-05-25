@@ -40,7 +40,7 @@ const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   searchFilter: string;
-  selectedPosts: IPost[];
+  selectedPosts: IPost<'client'>[];
 };
 
 /**

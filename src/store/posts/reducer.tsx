@@ -3,8 +3,8 @@ import { Page, IPost } from 'modepress';
 
 // State
 export type State = {
-  readonly postPage: Page<IPost> | null;
-  readonly post: IPost | null;
+  readonly postPage: Page<IPost<'client'>> | null;
+  readonly post: IPost<'client'> | null;
   readonly busy: boolean;
 };
 

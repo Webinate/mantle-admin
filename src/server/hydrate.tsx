@@ -6,7 +6,7 @@ import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
 import { RedirectError } from './errors';
-import { IAuthReq } from 'modepress';
+import { IAuthReq, IUserEntry } from 'modepress';
 import { controllers } from 'modepress';
 const yargs = require( 'yargs' );
 const args = yargs.argv;
@@ -53,7 +53,7 @@ export async function hydrate( req: IAuthReq ) {
   const actions: Action[] = [];
 
   // Get the user
-  actions.push( ActionCreators.setUser.create( req._user ) );
+  actions.push( ActionCreators.setUser.create( req._user as any as IUserEntry<'client'> ) );
 
   // Get users if neccessary
   if ( matchPath( req.url, { path: '/dashboard/users' } ) )

@@ -7,7 +7,7 @@ import { push } from 'react-router-redux';
 
 // Action Creators
 export const ActionCreators = {
-  setUser: new ActionCreator<'setUser', IUserEntry | null>( 'setUser' ),
+  setUser: new ActionCreator<'setUser', IUserEntry<'client'> | null>( 'setUser' ),
   isAuthenticating: new ActionCreator<'isAuthenticating', boolean>( 'isAuthenticating' ),
   authenticationError: new ActionCreator<'authenticationError', string>( 'authenticationError' ),
   loggedOut: new ActionCreator<'loggedOut', boolean>( 'loggedOut' )

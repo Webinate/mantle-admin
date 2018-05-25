@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
 import AddIcon from 'material-ui/svg-icons/content/add';
-import { IPost } from 'modepress';
+import { IPost, IUserEntry } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
@@ -13,14 +13,14 @@ import { CategoryEditor } from '../../containers/category-editor';
 export type Props = {
   isAdmin: boolean;
   id?: string;
-  post?: Partial<IPost> | null;
+  post?: Partial<IPost<'client'>> | null;
   onFetch?: ( id: string ) => void;
-  onUpdate?: ( post: Partial<IPost> ) => void;
-  onCreate?: ( post: Partial<IPost> ) => void;
+  onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
+  onCreate?: ( post: Partial<IPost<'client'>> ) => void;
 }
 
 export type State = {
-  editable: Partial<IPost>;
+  editable: Partial<IPost<'client'>>;
   currentTagText: string;
   slugWasEdited: boolean;
 }
@@ -48,7 +48,7 @@ export class PostForm extends React.Component<Props, State> {
       } );
   }
 
-  private createEmptyPost(): IPost {
+  private createEmptyPost(): Partial<IPost<'client'>> {
     return {
       title: '',
       brief: '',
@@ -133,7 +133,7 @@ export class PostForm extends React.Component<Props, State> {
               <UserPicker
                 canEdit={this.props.isAdmin}
                 onChange={user => this.setState( { editable: { ...this.state.editable, author: user } } )}
-                user={this.state.editable.author}
+                user={this.state.editable.author as IUserEntry<'client'>}
               />
             </div> : undefined}
           </SlugContainer>
