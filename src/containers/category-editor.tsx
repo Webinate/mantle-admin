@@ -243,7 +243,7 @@ export class CategoryEditor extends React.Component<Props, State> {
   private renderAllCategories( categories: ICategory<'client'>[] ) {
     return (
       <div>
-        <ActiveCategories>
+        <ActiveCategories className="mt-category-root">
           {
             categories.map( ( c, catIndex ) => {
               return this.renderCategory( c, catIndex );

@@ -13,6 +13,7 @@ let admin: Agent;
 let controller: CategoriesController;
 let rootCat = randomId();
 let childCat = randomId();
+let childDeeperCat = randomId();
 
 describe( '3. Testing the interactions with categories in posts:', function() {
 
@@ -62,17 +63,36 @@ describe( '3. Testing the interactions with categories in posts:', function() {
   } )
 
   it( 'can create a child level category', async () => {
+    // Create a 1 deep child
     await postPage.categories.openCategoryForm();
     await postPage.categories.name( childCat );
     const parents = await postPage.categories.getParentCategories();
+
     assert( parents.includes( rootCat ) );
-    postPage.categories.selectParent( rootCat );
+
+    await postPage.categories.selectParent( rootCat );
     await postPage.categories.closeCategoryForm( true );
-    const categories = await postPage.categories.getCategories();
+    let categories = await postPage.categories.getCategories();
+
     assert( categories.includes( childCat ) );
+
+    // Create a child of the child
+    await postPage.categories.openCategoryForm();
+    await postPage.categories.name( childDeeperCat );
+    await postPage.categories.selectParent( childCat );
+    await postPage.categories.closeCategoryForm( true );
+    categories = await postPage.categories.getCategories();
+
+    assert( categories.includes( childDeeperCat ) );
+
+    // Assert the hierarchy
+    const hierarchy = await postPage.categories.getCategoryHierarchy( rootCat );
+    assert( hierarchy[ rootCat ] );
+    assert( hierarchy[ rootCat ][ childCat ] );
+    assert( hierarchy[ rootCat ][ childCat ][ childDeeperCat ] );
   } )
 
-  it( 'can delete a category', async () => {
+  it( 'can delete a category and its children', async () => {
     let categories = await postPage.categories.getCategories();
     assert( categories.includes( childCat ) );
     await postPage.categories.deleteMode( true );
@@ -82,11 +102,14 @@ describe( '3. Testing the interactions with categories in posts:', function() {
     await postPage.closeSnackMessage();
     await postPage.categories.deleteMode( false );
     categories = await postPage.categories.getCategories();
+
+    // Check it does not have root children
     assert.equal( categories.indexOf( childCat ), -1 );
+    assert.equal( categories.indexOf( childDeeperCat ), -1 );
   } )
 
   after( async () => {
     let category = await controller.getBySlug( rootCat.toLowerCase() )
-    await controller.remove( category._id.toString() );
+    await controller.remove( category._id );
   } )
 } );
