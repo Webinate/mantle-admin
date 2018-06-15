@@ -83,12 +83,14 @@ export default class CategoryModule extends Module {
   /**
    * Returns an array of category names
    */
-  async getCategories( type: 'all' | 'selected' = 'all' ) {
+  async getCategories( type: 'all' | 'selected' | 'root' = 'all' ) {
     await this.categoriesLoaded();
 
     let categoriesSelector = '';
     if ( type === 'all' )
       categoriesSelector = '.mt-category-checkbox';
+    else if ( type === 'root' )
+      categoriesSelector = '.mt-category-root > .mt-category-item-container > .mt-category-checkbox';
     else
       categoriesSelector = '.mt-category-checkbox.selected';
 
@@ -97,6 +99,29 @@ export default class CategoryModule extends Module {
     } );
 
     return items;
+  }
+
+  /**
+   * Returns an array of category names
+   */
+  async getCategoryHierarchy( rootLabel: string ) {
+    const cats = await this.getCategories( 'root' )
+    const index = cats.indexOf( rootLabel );
+
+    const hierarchy: any = await this.page.$eval( `.mt-category-root > .mt-category-item-container:nth-child(${ index + 1 })`, list => {
+
+      function getCheckboxLabel( container: Element, parent: any ) {
+        parent[ container.children[ 0 ].textContent ] = {};
+        if ( container.children[ 1 ].children.length > 0 )
+          getCheckboxLabel( container.children[ 1 ].children[ 0 ], parent[ container.children[ 0 ].textContent ] );
+
+        return parent;
+      }
+
+      return getCheckboxLabel( list, {} );
+    } );
+
+    return hierarchy;
   }
 
   /**
