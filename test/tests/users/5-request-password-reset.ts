@@ -19,6 +19,6 @@ describe( '5. Request Password Reset', function() {
     await users.clickDrawer( 'Account Settings' );
     await users.waitFor( '.mt-reset-password' );
     await users.click( '.mt-reset-password' );
-    assert.equal( await users.getSnackMessage(), 'Instructions have been sent to your email on how to change your password' );
+    assert.equal( await users.appModule.getSnackMessage(), 'Instructions have been sent to your email on how to change your password' );
   } );
 } );

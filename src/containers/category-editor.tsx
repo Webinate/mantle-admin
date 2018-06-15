@@ -308,7 +308,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               className="mt-cat-loading"
             >
               <CircularProgress size={20} />
-            </span> : this.state.addCategoryMode ?
+            </span> : !this.state.addCategoryMode || !this.state.deleteMode ?
                 <IconButton
                   className="mt-edit-cat-btn"
                   onClick={e => this.setState( { editMode: true } )}
@@ -318,7 +318,6 @@ export class CategoryEditor extends React.Component<Props, State> {
                   <EditIcon />
                 </IconButton>
                 : undefined}
-            }
           </div>
 
         </CategoriesHeader>

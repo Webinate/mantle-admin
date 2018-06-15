@@ -19,6 +19,6 @@ describe( '4. Resend Activation', function() {
     await users.clickDrawer( 'Account Settings' );
     await users.waitFor( '.mt-resend-activation' );
     await users.click( '.mt-resend-activation' );
-    assert.equal( await users.getSnackMessage(), 'An activation link has been sent, please check your email for further instructions' );
+    assert.equal( await users.appModule.getSnackMessage(), 'An activation link has been sent, please check your email for further instructions' );
   } );
 } );

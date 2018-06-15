@@ -36,6 +36,6 @@ describe( '3. Delete user', function() {
     await users.closeModal( false );
     assert.equal( await users.isModelClosed(), true );
 
-    assert.equal( await users.getSnackMessage(), `User 'TempUser1122' successfully removed` )
+    assert.equal( await users.appModule.getSnackMessage(), `User 'TempUser1122' successfully removed` )
   } );
 } );

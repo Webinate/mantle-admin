@@ -1,21 +1,28 @@
 import Page from './page';
 import Agent from '../utils/agent';
+import AppModule from './modules/app';
 
 export default class UsersPage extends Page {
+  public appModule: AppModule;
   private $filter: string;
   private $filterSearch: string;
 
   constructor() {
     super();
+
     this.$filter = '.users-filter';
     this.$filterSearch = '#mt-users-search-button';
   }
 
   async load( agent: Agent ) {
     await super.load();
+
     if ( agent )
       await this.setAgent( agent );
-    return super.to( '/dashboard/users' );
+
+    await super.to( '/dashboard/users' );
+
+    this.appModule = new AppModule( this.page );
   }
 
   async selectUser( email: string ) {

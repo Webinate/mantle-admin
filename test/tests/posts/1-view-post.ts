@@ -10,7 +10,7 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let post: IPost;
+let post: IPost<'client'>;
 let controller: PostsController;
 
 describe( '1. View post created by backend', function() {

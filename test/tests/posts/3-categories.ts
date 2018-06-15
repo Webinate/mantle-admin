@@ -99,11 +99,11 @@ describe( '3. Testing the interactions with categories in posts:', function() {
     await postPage.categories.selectCategories( childCat );
     await postPage.categories.confirmDeletion();
     await postPage.doneLoading();
-    await postPage.closeSnackMessage();
+    await postPage.appModule.closeSnackMessage();
     await postPage.categories.deleteMode( false );
     categories = await postPage.categories.getCategories();
 
-    // Check it does not have root children
+    // Check it does not have root's children
     assert.equal( categories.indexOf( childCat ), -1 );
     assert.equal( categories.indexOf( childDeeperCat ), -1 );
   } )

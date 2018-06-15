@@ -128,7 +128,7 @@ export class App extends React.Component<Props, State> {
         <Route path="/register" render={props => this.getAuthScreen( 'register' )} />
 
         <Snackbar
-          className="mt-response-message"
+          className={`mt-response-message ${ this.props.app.response ? 'mt-snack-open' : 'mt-snack-closed' }`}
           autoHideDuration={20000}
           open={this.props.app.response ? true : false}
           onRequestClose={() => {

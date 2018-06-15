@@ -43,15 +43,6 @@ export default class Page {
     return this.page.click( selector );
   }
 
-  async getSnackMessage() {
-    await this.page.waitFor( '.mt-response-message[open]' );
-    return this.$eval( '.mt-response-message > div > div > span', elm => elm.textContent );
-  }
-
-  closeSnackMessage() {
-    return this.click( '.mt-response-message button' );
-  }
-
   /**
    * Go to a given ulr
    * @param {string} path The url to direct the page to

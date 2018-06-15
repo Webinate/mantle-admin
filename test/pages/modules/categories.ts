@@ -1,12 +1,16 @@
 import Module from "./module";
+import App from "./app";
 import { Page } from 'puppeteer';
 
 /**
  * A module for interacting with a category container
  */
 export default class CategoryModule extends Module {
+  public appModule: App;
+
   constructor( page: Page ) {
     super( page );
+    this.appModule = new App( page );
   }
 
   /**
@@ -40,10 +44,8 @@ export default class CategoryModule extends Module {
     if ( approve ) {
       await this.page.click( '.mt-approve-category-form' );
       await this.page.waitFor( '.mt-new-category-btn' );
-      await this.categoriesLoaded()
-
-      // Close snackbar
-      await this.page.click( '.mt-response-message button' );
+      await this.categoriesLoaded();
+      await this.appModule.closeSnackMessage();
     }
     else {
       await this.page.click( '.mt-cancel-category-form' );

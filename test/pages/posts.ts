@@ -2,6 +2,7 @@ import Page from './page';
 import Agent from '../utils/agent';
 import * as assert from 'assert';
 import CategoryModule from './modules/categories';
+import AppModule from './modules/app';
 
 export type PostProfile = {
   name: string;
@@ -12,6 +13,7 @@ export type PostProfile = {
 export default class PostsPage extends Page {
 
   public categories: CategoryModule;
+  public appModule: AppModule;
 
   constructor() {
     super();
@@ -29,6 +31,7 @@ export default class PostsPage extends Page {
     await this.doneLoading();
 
     this.categories = new CategoryModule( this.page );
+    this.appModule = new AppModule( this.page );
   }
 
   /**

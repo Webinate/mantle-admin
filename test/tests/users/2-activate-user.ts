@@ -22,7 +22,7 @@ describe( '2. Activate user', function() {
     await users.page.hover( '.mt-activate-account' );
     await users.click( '.mt-activate-account' );
 
-    assert.equal( await users.getSnackMessage(), 'User successfully activated' );
+    assert.equal( await users.appModule.getSnackMessage(), 'User successfully activated' );
 
     // User should now be activated
     await users.selectUser( 'registered333@test.com' );
