@@ -57,6 +57,10 @@ export class Posts extends React.Component<Props, State> {
     }
   }
 
+  private onSearch() {
+    this.props.getPosts( 0, this.state.searchFilter );
+  }
+
   render() {
     let page = this.props.posts.postPage;
     let post = this.props.posts.post;
@@ -85,10 +89,12 @@ export class Posts extends React.Component<Props, State> {
                 <div>
                   <TextField
                     className="posts-filter"
-                    hintText="Filter username or email"
+                    hintText="Filter by title or content"
                     id="mt-posts-filter"
                     value={this.state.searchFilter}
                     onKeyDown={e => {
+                      if ( e.keyCode === 13 )
+                        this.onSearch();
                     }}
                     onChange={( e, text ) => this.setState( { searchFilter: text } )}
                   />
@@ -96,6 +102,7 @@ export class Posts extends React.Component<Props, State> {
                     style={{ verticalAlign: 'top' }}
                     iconStyle={{ color: theme.primary200.background }}
                     iconClassName="icon icon-search"
+                    onClick={e => this.onSearch()}
                   />
                   <RaisedButton
                     onClick={e => this.props.push( '/dashboard/posts/new' )}
@@ -134,7 +141,7 @@ export class Posts extends React.Component<Props, State> {
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
                 onDelete={post => { }}
                 onPostSelected={selected => this.setState( { selectedPosts: selected } )}
-                getPosts={( index ) => this.props.getPosts( index )}
+                getPosts={( index ) => this.props.getPosts( index, this.state.searchFilter )}
               />;
             }} />
           </Switch>
