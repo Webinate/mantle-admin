@@ -11,6 +11,7 @@ export default class AppModule extends Module {
 
   async closeSnackMessage() {
     await this.page.waitFor( '.mt-response-message[open]' );
+    await this.page.waitFor( 500 );
     await this.page.click( '.mt-response-message button' );
     await this.page.waitFor( '.mt-response-message.mt-snack-closed' )
   }
