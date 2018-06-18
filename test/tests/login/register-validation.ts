@@ -4,7 +4,7 @@ import { } from 'mocha';
 
 let auth = new AuthPage();
 
-describe( '2. Test register validation', function() {
+describe( 'Test register validation', function() {
 
   before( async () => {
     await auth.load( false );

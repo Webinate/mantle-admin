@@ -15,7 +15,7 @@ let rootCat = randomId();
 let childCat = randomId();
 let childDeeperCat = randomId();
 
-describe( '3. Testing the interactions with categories in posts:', function() {
+describe( 'Testing the interactions with categories in posts:', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'categories' );

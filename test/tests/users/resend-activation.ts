@@ -6,7 +6,7 @@ import Agent from '../../utils/agent';
 let users = new UsersPage();
 let registeredUser: Agent;
 
-describe( '4. Resend Activation', function() {
+describe( 'Resend Activation', function() {
   before( async () => {
     const agent = await utils.refreshAdminToken();
     registeredUser = await utils.createAgent( 'RegisteredUser', 'registered333@test.com', 'password', true );

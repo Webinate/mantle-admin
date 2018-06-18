@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import { } from 'mocha';
 let auth = new AuthPage();
 
-describe( '4. Reset failures', function() {
+describe( 'Reset failures', function() {
 
   before( async () => {
     await auth.load();

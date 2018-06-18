@@ -6,7 +6,7 @@ import Agent from '../../utils/agent';
 let users = new UsersPage();
 let tempUser: Agent;
 
-describe( '3. Delete user', function() {
+describe( 'Delete user', function() {
   before( async () => {
     const agent = await utils.refreshAdminToken();
     tempUser = await utils.createAgent( 'TempUser1122', 'tempuser1122@test.com', 'password', true );

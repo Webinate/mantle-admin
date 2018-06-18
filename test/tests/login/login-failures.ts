@@ -1,9 +1,10 @@
 import AuthPage from '../../pages/auth';
 import * as assert from 'assert';
 import { } from 'mocha';
+import { IUserEntry } from 'modepress/src';
 let auth = new AuthPage();
 
-describe( '3. Login failures', function() {
+describe( 'Login failures', function() {
 
   before( async () => {
     await auth.load();
@@ -31,7 +32,7 @@ describe( '3. Login failures', function() {
   } );
 
   it( 'it should not allow a wrong password', async () => {
-    await auth.username( auth.config.adminUser.username );
+    await auth.username( ( auth.config.adminUser as IUserEntry<'client'> ).username );
     await auth.password( 'THISISFAKE' );
     await auth.clickLogin();
     await auth.doneLoading();
@@ -39,7 +40,7 @@ describe( '3. Login failures', function() {
   } );
 
   it( 'it should not allow a wrong password - using an email for username', async () => {
-    await auth.username( auth.config.adminUser.email );
+    await auth.username( ( auth.config.adminUser as IUserEntry<'client'> ).email );
     await auth.password( 'THISISFAKE' );
     await auth.clickLogin();
     await auth.doneLoading();

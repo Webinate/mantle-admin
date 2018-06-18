@@ -13,7 +13,7 @@ let admin: Agent, joe: Agent;
 let controller: PostsController;
 let postSlug = randomId();
 
-describe( '2. Testing the creation of posts: ', function() {
+describe( 'Testing the creation of posts: ', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );

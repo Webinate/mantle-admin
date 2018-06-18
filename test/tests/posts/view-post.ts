@@ -13,7 +13,7 @@ let admin: Agent, joe: Agent;
 let post: IPost<'client'>;
 let controller: PostsController;
 
-describe( '1. View post created by backend', function() {
+describe( 'View post created by backend', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );
