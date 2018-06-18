@@ -196,6 +196,10 @@ export class CategoryEditor extends React.Component<Props, State> {
   private onConfirmDelete() {
     this.props.removeCategory( this.state.selectedCategory! );
     this.setState( { selectedCategory: null } );
+
+    const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
+    if ( categories.length === 1 && this.state.deleteMode )
+      this.setState( { deleteMode: false } )
   }
 
   private renderCategory( cat: ICategory<'client'>, catIndex: number ): JSX.Element {
@@ -210,11 +214,6 @@ export class CategoryEditor extends React.Component<Props, State> {
             fill: this.state.deleteMode || this.state.editMode ? theme.primary200.background : theme.primary300.background
           }}
           onClick={e => {
-            const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
-
-            if ( categories.length === 1 && this.state.deleteMode )
-              this.setState( { deleteMode: false } )
-
             if ( this.state.deleteMode )
               this.setState( { selectedCategory: cat } );
             else if ( this.state.editMode )
@@ -296,7 +295,7 @@ export class CategoryEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
+    const categories: ICategory<'client'>[] = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
     return (
       <Container className="mt-category-container">
         <CategoriesHeader>
@@ -308,7 +307,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               className="mt-cat-loading"
             >
               <CircularProgress size={20} />
-            </span> : !this.state.addCategoryMode || !this.state.deleteMode ?
+            </span> : !this.state.addCategoryMode && !this.state.deleteMode && categories.length > 0 && !this.state.editMode ?
                 <IconButton
                   className="mt-edit-cat-btn"
                   onClick={e => this.setState( { editMode: true } )}

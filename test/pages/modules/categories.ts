@@ -83,6 +83,21 @@ export default class CategoryModule extends Module {
   }
 
   /**
+   * Enables or disables the edit mode
+   */
+  async editMode( open: boolean ) {
+    if ( open ) {
+      await this.page.waitFor( '.mt-edit-cat-btn' );
+      await this.page.click( '.mt-edit-cat-btn' );
+      await this.page.waitFor( '.mt-cancel-category-delete' );
+    } else {
+      await this.page.waitFor( '.mt-cancel-category-delete' );
+      await this.page.click( '.mt-cancel-category-delete' );
+      await this.page.waitFor( '.mt-edit-cat-btn' );
+    }
+  }
+
+  /**
    * Returns an array of category names
    */
   async getCategories( type: 'all' | 'selected' | 'root' = 'all' ) {

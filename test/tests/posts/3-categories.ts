@@ -62,6 +62,30 @@ describe( '3. Testing the interactions with categories in posts:', function() {
     assert( categories.includes( rootCat ) );
   } )
 
+  it( 'can edit the root level category', async () => {
+    await postPage.categories.editMode( true );
+    await postPage.categories.selectCategories( rootCat );
+    await postPage.categories.name( 'I_AM_ROOT' );
+    await postPage.categories.description( 'I_AM_ROOT' );
+    await postPage.categories.closeCategoryForm( true );
+
+    // Make sure the edit is saved
+    let categories = await postPage.categories.getCategories();
+    assert( categories.includes( 'I_AM_ROOT' ) );
+
+    // Go back into edit mode and select the root
+    await postPage.categories.editMode( true );
+    await postPage.categories.selectCategories( 'I_AM_ROOT' );
+
+    // Make sure the name and description were saved
+    assert.equal( await postPage.categories.name(), 'I_AM_ROOT' );
+    assert.equal( await postPage.categories.description(), 'I_AM_ROOT' );
+
+    // Save it back to normal
+    await postPage.categories.name( rootCat );
+    await postPage.categories.closeCategoryForm( true );
+  } )
+
   it( 'can create a child level category', async () => {
     // Create a 1 deep child
     await postPage.categories.openCategoryForm();
