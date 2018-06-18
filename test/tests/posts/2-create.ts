@@ -93,10 +93,19 @@ describe( '2. Testing the creation of posts: ', function() {
     await postPage.title( postSlug );
     await postPage.setSlug( postSlug );
     await postPage.content( 'This is a post bruv' );
+    await postPage.addTag( 'Test Dino' );
+
     await postPage.clickConfirm();
     assert.equal( await postPage.inEditMode(), false );
     const posts = await postPage.getPosts();
     assert.equal( posts[ 0 ].name, postSlug );
+
+    // Confirm the post is saved as it was created
+    const post = await controller.getPost( { slug: postSlug } );
+    assert.equal( post.content, '<p>This is a post bruv</p>' );
+    assert.equal( post.title, postSlug );
+    assert.equal( post.slug, postSlug );
+    assert( post.tags.includes( 'Test Dino' ) );
   } )
 
   after( async () => {
