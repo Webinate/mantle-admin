@@ -61,6 +61,10 @@ export default class Page {
     return this.getElmText( `${ selector } > div:nth-child(4)` );
   }
 
+  async emptySelector( selector: string ) {
+    return this.page.waitForFunction( `document.querySelector("${ selector }") == null` );
+  }
+
   /**
    * Gets an elements text content or null
    * @param {string} selector
@@ -108,27 +112,28 @@ export default class Page {
    * the input is cleared
    * @returns {Promise<string>}
    */
-  async textfield( selector: string, val?: string ) {
+  async textfield( selector: string, val?: string, selectorIsInput: boolean = false ) {
+    let s = selectorIsInput ? selector : `${ selector } input`;
 
     // If nothing specified - then return the value
     if ( val === undefined )
-      return await this.page.$eval( `${ selector } input`, el => ( el as HTMLInputElement ).value );
+      return await this.page.$eval( s, el => ( el as HTMLInputElement ).value );
 
     // If a string, then type the value
     else if ( val !== '' ) {
 
-      await this.page.focus( `${ selector } input` );
+      await this.page.focus( s );
 
       await this.page.evaluate( async ( data ) => {
         document.querySelector( data ).value = '';
-      }, `${ selector } input` );
+      }, s );
 
-      await this.page.type( `${ selector } input`, val, { delay: 10 } );
+      await this.page.type( s, val, { delay: 10 } );
     }
     // Else clear the input
     else {
-      await this.page.focus( `${ selector } input` );
-      const curVal = await this.page.$eval( `${ selector } input`, el => ( el as HTMLInputElement ).value );
+      await this.page.focus( s );
+      const curVal = await this.page.$eval( s, el => ( el as HTMLInputElement ).value );
       const promises = [];
       for ( let i = 0, l = curVal.length; i < l; i++ )
         promises.push( this.page.keyboard.press( 'Backspace' ) );

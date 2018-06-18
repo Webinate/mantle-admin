@@ -46,4 +46,5 @@ require( './tests/users/resend-activation' );
 require( './tests/users/request-password-reset' );
 require( './tests/posts/view-post' );
 require( './tests/posts/create' );
+require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );

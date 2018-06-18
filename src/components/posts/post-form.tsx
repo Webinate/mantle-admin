@@ -128,14 +128,14 @@ export class PostForm extends React.Component<Props, State> {
                 }}
               />
             </div>
-            {this.state.editable.author ? <div>
+            <div>
               <i>Author: </i>
               <UserPicker
                 canEdit={this.props.isAdmin}
                 onChange={user => this.setState( { editable: { ...this.state.editable, author: user } } )}
-                user={this.state.editable.author as IUserEntry<'client'>}
+                user={this.state.editable.author ? this.state.editable.author as IUserEntry<'client'> : null}
               />
-            </div> : undefined}
+            </div>
           </SlugContainer>
         </div>
 
@@ -163,6 +163,7 @@ export class PostForm extends React.Component<Props, State> {
             label={this.props.post ? 'Update' : 'Publish'}
           />
           <Toggle
+            className="mt-visibility-toggle"
             style={{ margin: '20px 0' }}
             label={this.state.editable.public ? 'Post is Public' : 'Post is Private'}
             labelPosition="right"

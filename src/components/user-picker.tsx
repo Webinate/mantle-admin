@@ -6,7 +6,7 @@ import { generateAvatarPic } from '../utils/component-utils';
 import { users } from 'modepress/src/lib-frontend';
 
 type Props = {
-  user: IUserEntry<'client'>;
+  user: IUserEntry<'client'> | null;
   canEdit?: boolean;
   onChange: ( user: IUserEntry<'client'> ) => void;
   labelStyle?: React.CSSProperties;
@@ -47,6 +47,7 @@ export class UserPicker extends React.Component<Props, State> {
         value: (
           <MenuItem
             key={`user-${ index }`}
+            className="mt-user-drop-item"
             primaryText={user.username}
             rightAvatar={<Avatar
               backgroundColor={theme.light400.background}
@@ -59,6 +60,7 @@ export class UserPicker extends React.Component<Props, State> {
 
     return <div
       ref={e => this.elm = e}
+      className="my-user-picker-btn"
       style={{
         display: 'inline-block',
         padding: '0 0 0 5px',
@@ -71,15 +73,16 @@ export class UserPicker extends React.Component<Props, State> {
       } : undefined}
     >
       <span
+        className="my-user-picker-label"
         style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
-      >{this.props.user.username}</span>
+      >{this.props.user ? this.props.user.username : 'NOT SET'}</span>
       <Avatar
         style={{
           verticalAlign: 'middle',
           margin: '0 0 0 5px'
         }}
         backgroundColor={theme.light400.background}
-        src={generateAvatarPic( this.props.user.avatar )}
+        src={generateAvatarPic( this.props.user ? this.props.user.avatar : '' )}
       />
       {this.state.open ? <Popover
         style={{ padding: 5 }}
@@ -93,6 +96,7 @@ export class UserPicker extends React.Component<Props, State> {
               setTimeout( () => { e.refs.searchTextField && e.focus() }, 100 );
             }
           }}
+          className="mt-user-autocomplete"
           style={{ padding: 5 }}
           hintText="Type user name"
           openOnFocus={true}

@@ -61,6 +61,11 @@ export default class PostsPage extends Page {
     await this.doneLoading()
   }
 
+  async clickUpdate() {
+    await this.page.click( '.mt-post-confirm' );
+    await this.doneLoading()
+  }
+
   /**
    * Gets or sets the content of the tiny editor
    */
@@ -81,10 +86,50 @@ export default class PostsPage extends Page {
     }
   }
 
+  async user( val?: string ) {
+    if ( val === undefined ) {
+      return this.page.$eval( '.my-user-picker-label', elm => elm.textContent )
+    }
+    else {
+      await this.page.waitFor( '.my-user-picker-btn' );
+      await this.page.click( '.my-user-picker-btn' );
+      await this.page.waitFor( '.mt-user-autocomplete input' );
+      await this.textfield( '.mt-user-autocomplete', val );
+      await this.page.waitFor( '.mt-user-drop-item:first-child' );
+      await this.page.click( '.mt-user-drop-item:first-child' );
+      await this.emptySelector( '.mt-user-autocomplete input' )
+    }
+  }
+
   /**
    * Gets or sets the post title
    */
   title( val?: string ) { return this.input( '#mt-post-title', val ) }
+
+  /**
+   * Gets or sets the post brief
+   */
+  brief( val?: string ) { return this.textfield( '#mt-post-desc', val, true ) }
+
+  /**
+   * Gets or sets the post brief
+   */
+  async isPublic( val?: boolean ) {
+    const label = await this.page.$eval( '.mt-visibility-toggle label', elm => elm.textContent );
+    let isPublic = false;
+
+    if ( label === 'Post is Public' )
+      isPublic = true;
+
+    if ( val === undefined ) {
+      return isPublic;
+    } else {
+      if ( val && !isPublic )
+        await this.page.click( '.mt-visibility-toggle input' );
+      else if ( !val && isPublic )
+        await this.page.click( '.mt-visibility-toggle input' );
+    }
+  }
 
   /**
    * Gets the static slug
@@ -146,8 +191,8 @@ export default class PostsPage extends Page {
    * Waits for the auth page to not be in a busy state
    */
   async doneLoading() {
-    await this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' );
-    await this.page.waitForFunction( 'document.querySelector(".mt-cat-loading") == null' );
+    await this.emptySelector( '.mt-loading' )
+    await this.emptySelector( '.mt-cat-loading' )
   }
 
   /**
