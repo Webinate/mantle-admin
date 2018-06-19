@@ -10,7 +10,7 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let post: IPost<'client'>;
+let singlePost: IPost<'client'>, multiPost1: IPost<'client'>, multiPost2: IPost<'client'>;
 let controller: PostsController;
 
 describe( 'Testing the Deletion of posts', function() {
@@ -20,25 +20,35 @@ describe( 'Testing the Deletion of posts', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    post = await controller.create( {
-      title: 'Test Post',
+    multiPost1 = await controller.create( {
+      title: randomId(),
       slug: randomId()
-    } )
+    } );
+
+    multiPost2 = await controller.create( {
+      title: randomId(),
+      slug: randomId()
+    } );
+
+    singlePost = await controller.create( {
+      title: randomId(),
+      slug: randomId()
+    } );
   } )
 
   it( 'Post is available in post dashboard & visible to admin', async () => {
     await postPage.load( admin );
     const posts = await postPage.getPosts();
     assert( posts.length > 0 );
-    assert.equal( posts[ 0 ].name, 'Test Post' );
+    assert.equal( posts[ 0 ].name, singlePost.title );
   } )
 
   it( 'Can delete the post from the post list', async () => {
-    await postPage.selectPost( post.title );
+    await postPage.selectPost( singlePost.title );
 
     // Ensure we have the post selected
     let posts = await postPage.getPosts( true );
-    assert.equal( posts[ 0 ].name, post.title );
+    assert.equal( posts[ 0 ].name, singlePost.title );
 
     // Now delete
     await postPage.deleteSelectedPost();
@@ -49,6 +59,28 @@ describe( 'Testing the Deletion of posts', function() {
 
     // Make sure its there in any form
     posts = await postPage.getPosts();
-    assert( !posts.find( p => p.name === post.title ) );
+    assert( !posts.find( p => p.name === singlePost.title ) );
+  } )
+
+  it( 'Can delete multiple posts', async () => {
+    await postPage.selectPost( multiPost2.title );
+    await postPage.selectPost( multiPost1.title, true );
+
+    // Ensure we have the post selected
+    let posts = await postPage.getPosts( true );
+    assert.equal( posts[ 0 ].name, multiPost2.title );
+    assert.equal( posts[ 1 ].name, multiPost1.title );
+
+    // Now delete
+    await postPage.deleteMultiplePosts();
+
+    // Make sure its not selected
+    posts = await postPage.getPosts( true );
+    assert( posts.length === 0 );
+
+    // Make sure its there in any form
+    posts = await postPage.getPosts();
+    assert( !posts.find( p => p.name === multiPost1.title ) );
+    assert( !posts.find( p => p.name === multiPost2.title ) );
   } )
 } );

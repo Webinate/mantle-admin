@@ -3,9 +3,9 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
-import { getPosts, getPost, createPost, deletePost, editPost } from '../store/posts/actions';
+import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
-import { TextField, IconButton, FontIcon, RaisedButton, FlatButton } from 'material-ui';
+import { TextField, IconButton, FontIcon, RaisedButton, FlatButton, Dialog } from 'material-ui';
 import FontCancel from 'material-ui/svg-icons/navigation/arrow-back';
 import { IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
@@ -13,6 +13,9 @@ import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import { PostList } from '../components/posts/post-list';
 import { PostForm } from '../components/posts/post-form';
+import FilterIcon from 'material-ui/svg-icons/content/filter-list';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import SearchIcon from 'material-ui/svg-icons/action/search';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -30,7 +33,7 @@ const dispatchToProps = {
   getCategories: getCategories,
   getPost: getPost,
   createPost: createPost,
-  removePost: deletePost,
+  removePost: deletePosts,
   createCategory: createCategory,
   removeCategory: removeCategory,
   editPost: editPost,
@@ -42,6 +45,7 @@ type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   searchFilter: string;
   selectedPosts: IPost<'client'>[];
+  showDeleteModal: boolean;
 };
 
 /**
@@ -50,12 +54,30 @@ type State = {
 @connectWrapper( mapStateToProps, dispatchToProps )
 export class Posts extends React.Component<Props, State> {
 
+  private _selectedPost: IPost<'client'> | null;
+
   constructor( props: Props ) {
     super( props );
+    this._selectedPost = null;
     this.state = {
       searchFilter: '',
-      selectedPosts: []
+      selectedPosts: [],
+      showDeleteModal: false
     }
+  }
+
+  private onDelete( post: IPost<'client'> ) {
+    this._selectedPost = post;
+    this.setState( {
+      showDeleteModal: true
+    } );
+  }
+
+  private onDeleteMultiple() {
+    this._selectedPost = null;
+    this.setState( {
+      showDeleteModal: true
+    } );
   }
 
   private onSearch() {
@@ -68,6 +90,7 @@ export class Posts extends React.Component<Props, State> {
     const isBusy = this.props.posts.busy;
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
+    const headerIconStyle: React.CSSProperties = { verticalAlign: 'top', padding: 0 };
 
     return (
       <div style={{ height: '100%' }} className="mt-post-container">
@@ -100,11 +123,29 @@ export class Posts extends React.Component<Props, State> {
                     onChange={( e, text ) => this.setState( { searchFilter: text } )}
                   />
                   <IconButton
-                    style={{ verticalAlign: 'top' }}
+                    style={headerIconStyle}
+                    className="mt-posts-search"
                     iconStyle={{ color: theme.primary200.background }}
-                    iconClassName="icon icon-search"
                     onClick={e => this.onSearch()}
-                  />
+                  >
+                    <SearchIcon />
+                  </IconButton>
+                  <IconButton
+                    style={headerIconStyle}
+                    className="mt-posts-filter"
+                    iconStyle={{ color: theme.primary200.background }}
+                  >
+                    <FilterIcon />
+                  </IconButton>
+                  <IconButton
+                    style={headerIconStyle}
+                    className="mt-posts-delete-multi"
+                    iconStyle={{ color: theme.primary200.background }}
+                    disabled={this.state.selectedPosts.length > 1 ? false : true}
+                    onClick={e => this.onDeleteMultiple()}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                   <RaisedButton
                     onClick={e => this.props.push( '/dashboard/posts/new' )}
                     className="mt-new-post"
@@ -141,13 +182,51 @@ export class Posts extends React.Component<Props, State> {
                 animated={!this.props.app.debugMode}
                 selected={this.state.selectedPosts}
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
-                onDelete={post => this.props.removePost( post )}
+                onDelete={post => this.onDelete( post )}
                 onPostSelected={selected => this.setState( { selectedPosts: selected } )}
                 getPosts={( index ) => this.props.getPosts( { index: index, keyword: this.state.searchFilter } )}
               />;
             }} />
           </Switch>
         </PostsContainer>
+
+        {this.state.showDeleteModal ? <Dialog
+          contentClassName="mt-post-del-dialog"
+          bodyClassName="mt-post-del-dialog-body"
+          open={true}
+          actions={[
+            <FlatButton
+              label="Cancel"
+              style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
+              className="mt-cancel-delpost"
+              onClick={e => {
+                this._selectedPost = null;
+                this.setState( {
+                  showDeleteModal: false
+                } )
+              }}
+            />,
+            <RaisedButton
+              label="Yes"
+              primary={true}
+              style={{ verticalAlign: 'middle' }}
+              className="mt-confirm-delpost"
+              onClick={e => {
+                if ( this._selectedPost )
+                  this.props.removePost( [ this._selectedPost ] );
+                else
+                  this.props.removePost( this.state.selectedPosts );
+
+                this.setState( { showDeleteModal: false } )
+                this._selectedPost = null;
+              }}
+            />
+          ]}
+        >
+          {this._selectedPost ?
+            `Are you sure you want to delete the post '${ this._selectedPost.title }'?` :
+            `Are you sure you want to delete these [${ this.state.selectedPosts.length }] posts?`}
+        </Dialog> : undefined}
       </div >
     );
   }

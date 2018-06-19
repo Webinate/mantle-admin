@@ -11,6 +11,7 @@ import { Pager } from '../components/pager';
 import { UserProperties } from '../components/users-properties';
 import { SplitPanel } from '../components/split-panel';
 import { TextField, IconButton, LinearProgress, Dialog, FlatButton, RaisedButton } from 'material-ui';
+import SearchIcon from 'material-ui/svg-icons/action/search';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -151,8 +152,9 @@ export class Users extends React.Component<Props, State> {
                 onClick={e => this.props.getUsers( 0, this.state.userFilter )}
                 style={{ verticalAlign: 'top' }}
                 iconStyle={{ color: theme.primary200.background }}
-                iconClassName="icon icon-search"
-              />
+              >
+                <SearchIcon />
+              </IconButton>
             </div>
           }}>
         </ContentHeader>

@@ -72,6 +72,7 @@ export class Pager extends React.Component<Props, State> {
 
 const Container = styled.div`
   height: 100%;
+  position: relative;
 `;
 
 const Footer = styled.div`

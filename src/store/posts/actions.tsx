@@ -50,12 +50,14 @@ export function createPost( post: Partial<IPost<'client'>> ) {
   }
 }
 
-export function deletePost( post: Partial<IPost<'client'>> ) {
+export function deletePosts( toDelete: Partial<IPost<'client'>>[] ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
-      await posts.remove( post._id! );
-      dispatch( AppActions.serverResponse.create( `Post '${ post.title }' deleted` ) );
+      const promises = toDelete.map( p => posts.remove( p._id! ) );
+      await Promise.all( promises );
+
+      dispatch( AppActions.serverResponse.create( toDelete.length > 1 ? `Deleted [${ toDelete.length }] posts` : `Post '${ toDelete[ 0 ].title }' deleted` ) );
       const state = getState();
       const filters = state.posts.postFilters || { index: 0, keyword: '' };
       const resp = await posts.getAll( filters );

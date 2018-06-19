@@ -210,13 +210,23 @@ export default class PostsPage extends Page {
     } );
   }
 
-  async selectPost( title: string ) {
+  async selectPost( title: string, multiple: boolean = false ) {
     const index = await this.page.$$eval( `.mt-post`, ( nodes, title: string ) => {
       const index = Array.from( nodes ).findIndex( elm => elm.querySelector( '.mt-post-name' ).textContent === title )
       return index;
     }, title );
 
+    if ( multiple )
+      await this.page.keyboard.down( 'Shift' );
     await this.page.click( `.mt-post:nth-child(${ index + 1 })` );
+    if ( multiple )
+      await this.page.keyboard.up( 'Shift' );
+  }
+
+  async confirmDelete() {
+    await this.page.waitFor( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.page.click( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.emptySelector( `.mt-post-del-dialog .mt-confirm-delpost` );
   }
 
   /**
@@ -226,9 +236,17 @@ export default class PostsPage extends Page {
     await this.page.hover( `.mt-post.selected` );
     await this.page.waitFor( `.mt-post.selected .mt-post-delete` );
     await this.page.click( `.mt-post.selected .mt-post-delete` );
-    await this.page.waitFor( `.mt-post-del-dialog .mt-confirm-delpost` );
-    await this.page.click( `.mt-post-del-dialog .mt-confirm-delpost` );
-    await this.emptySelector( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.confirmDelete();
+    await this.doneLoading();
+  }
+
+  /**
+   * Deletes all the selected posts
+   */
+  async deleteMultiplePosts() {
+    await this.emptySelector( '.mt-posts-delete-multi[disabled]' );
+    await this.page.click( `.mt-posts-delete-multi` );
+    await this.confirmDelete();
     await this.doneLoading();
   }
 }

@@ -13,6 +13,9 @@ import { Posts } from './posts';
 import theme from '../theme/mui-theme';
 import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
 import { matchPath } from 'react-router';
+import GroupIcon from 'material-ui/svg-icons/social/group';
+import HomeIcon from 'material-ui/svg-icons/action/home';
+import PostsIcon from 'material-ui/svg-icons/action/description';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -72,9 +75,9 @@ export class App extends React.Component<Props, State> {
   render() {
 
     const items = [
-      { label: 'Home', icon: 'icon icon-home', exact: true, path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
-      { label: 'Posts', icon: 'icon icon-posts', exact: false, path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
-      { label: 'Users', icon: 'icon icon-people', exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
+      { label: 'Home', icon: <HomeIcon style={{ color: 'inherit' }} />, exact: true, path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
+      { label: 'Posts', icon: <PostsIcon style={{ color: 'inherit' }} />, exact: false, path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
+      { label: 'Users', icon: <GroupIcon style={{ color: 'inherit' }} />, exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
     ];
 
     return (
@@ -98,8 +101,12 @@ export class App extends React.Component<Props, State> {
                         key={`menu-item-${ index }`}
                         onClick={e => i.onClick()}
                         primaryText={i.label}
-                        leftIcon={<FontIcon style={{ color: selected ? 'inherit' : theme.primary200.background, transition: '' }} className={i.icon}
-                        />} />
+                        leftIcon={<FontIcon
+                          style={{
+                            color: selected ? 'white' : theme.primary200.background,
+                            transition: '',
+                          }}
+                        >{i.icon}</FontIcon>} />
                     } )
                     }
                   </List>

@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { IconButton, Avatar, Dialog, FlatButton, RaisedButton } from 'material-ui';
+import { IconButton, Avatar } from 'material-ui';
 import { Pager } from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import EditIcon from 'material-ui/svg-icons/content/create';
 
 export type Props = {
   animated: boolean;
@@ -22,11 +24,9 @@ export type State = {
 }
 
 export class PostList extends React.Component<Props, State> {
-  private _selectedPost: IPost<'client'> | null;
 
   constructor( props: Props ) {
     super( props );
-    this._selectedPost = null;
     this.state = {
       showDeleteModal: false
     };
@@ -34,6 +34,11 @@ export class PostList extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.getPosts( 0 );
+  }
+
+  componentWillReceiveProps( next: Props ) {
+    if ( next.posts !== this.props.posts )
+      this.props.onPostSelected( [] );
   }
 
   private onPostSelected( post: IPost<'client'>, e: React.MouseEvent<HTMLDivElement> ) {
@@ -61,15 +66,9 @@ export class PostList extends React.Component<Props, State> {
     }
   }
 
-  private onDelete( post: IPost<'client'> ) {
-    this._selectedPost = post;
-    this.setState( {
-      showDeleteModal: true
-    } );
-  }
-
   render() {
     const posts = this.props.posts;
+    const multipleSelected = this.props.selected.length > 1;
 
     return <div>
       {posts ? <Pager
@@ -77,6 +76,9 @@ export class PostList extends React.Component<Props, State> {
         limit={posts!.limit}
         offset={posts!.index}
         onPage={index => this.props.getPosts( index )}
+        contentProps={{
+          onMouseDown: e => this.props.onPostSelected( [] )
+        }}
       >
         <PostsInnerContent className="mt-posts">
           {posts.data.map( ( post, postIndex ) => {
@@ -88,20 +90,21 @@ export class PostList extends React.Component<Props, State> {
               className={`mt-post ${ selected ? 'selected' : '' }`}
               onClick={e => { this.onPostSelected( post, e ) }}
             >
-              <IconButton
+              {!multipleSelected ? <IconButton
                 style={{ top: 0, right: '30px', position: 'absolute' }}
                 iconStyle={{ color: theme.primary200.background }}
                 className="mt-post-button mt-post-edit"
-                iconClassName="icon icon-edit"
                 onClick={e => this.props.onEdit( post )}
-              />
-              <IconButton
-                style={{ top: 0, right: 0, position: 'absolute' }}
-                iconStyle={{ color: theme.primary200.background }}
-                className="mt-post-button mt-post-delete"
-                iconClassName="icon icon-delete"
-                onClick={e => this.onDelete( post )}
-              />
+              ><EditIcon /></IconButton> : undefined
+              }
+              {!multipleSelected ?
+                <IconButton
+                  style={{ top: 0, right: 0, position: 'absolute' }}
+                  iconStyle={{ color: theme.primary200.background }}
+                  className="mt-post-button mt-post-delete"
+                  onClick={e => this.props.onDelete( post )}
+                ><DeleteIcon /></IconButton> : undefined
+              }
               <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={post.featuredImage} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
                 <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
@@ -111,7 +114,7 @@ export class PostList extends React.Component<Props, State> {
                 <Avatar
                   src={generateAvatarPic( post.author ? ( post.author as IUserEntry<'client'> ).avatar : '' )}
                   size={60}
-                  style={{ float: 'right' }}
+                  style={{ float: 'right', margin: '5px 0 0 0' }}
                 />
                 <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
               </div>
@@ -119,36 +122,6 @@ export class PostList extends React.Component<Props, State> {
           } )}
         </PostsInnerContent>
       </Pager> : undefined}
-      {this.state.showDeleteModal && this._selectedPost ? <Dialog
-        contentClassName="mt-post-del-dialog"
-        open={true}
-        actions={[
-          <FlatButton
-            label="Cancel"
-            style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
-            className="mt-cancel-delpost"
-            onClick={e => {
-              this._selectedPost = null;
-              this.setState( {
-                showDeleteModal: false
-              } )
-            }}
-          />,
-          <RaisedButton
-            label="Yes"
-            primary={true}
-            style={{ verticalAlign: 'middle' }}
-            className="mt-confirm-delpost"
-            onClick={e => {
-              this.props.onDelete( this._selectedPost! );
-              this.setState( { showDeleteModal: false } )
-              this._selectedPost = null;
-            }}
-          />
-        ]}
-      >
-        Are you sure you want to delete the post '{this._selectedPost.title}'
-        </Dialog> : undefined}
     </div>
   }
 }
@@ -189,6 +162,7 @@ const Post = styled.div`
     clear: both;
     > h3 {
       display: inline-block;
+      width: 70%;
     }
   }
 
