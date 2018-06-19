@@ -40,7 +40,7 @@ async function handlePostScreen( req: IAuthReq, actions: Action[] ) {
   }
   else {
     let posts = await controllers.posts.getPosts( { public: isAdmin ? undefined : true } );
-    actions.push( PostActions.SetPosts.create( posts ) );
+    actions.push( PostActions.SetPosts.create( { page: posts, filters: { index: 0, keyword: '' } } ) );
   }
 }
 

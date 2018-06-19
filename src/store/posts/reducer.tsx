@@ -1,14 +1,17 @@
 import { ActionCreators, Action } from './actions';
+import { posts } from 'modepress/src/lib-frontend';
 import { Page, IPost } from 'modepress';
 
 // State
 export type State = {
+  readonly postFilters: Partial<posts.GetAllOptions> | null;
   readonly postPage: Page<IPost<'client'>> | null;
   readonly post: IPost<'client'> | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
+  postFilters: null,
   postPage: null,
   post: null,
   busy: false
@@ -21,7 +24,8 @@ export default function reducer( state: State = initialState, action: Action ): 
   switch ( action.type ) {
     case ActionCreators.SetPosts.type:
       partialState = {
-        postPage: action.payload,
+        postPage: action.payload.page,
+        postFilters: action.payload.filters,
         busy: false
       };
       break;

@@ -198,9 +198,9 @@ export default class PostsPage extends Page {
   /**
    * Gets all of the current posts as an array
    */
-  getPosts(): Promise<PostProfile[]> {
-    return this.page.$eval( `.mt-posts`, elm => {
-      return Array.from( elm.children ).map( child => {
+  getPosts( onlySelectedPosts: boolean = false ): Promise<PostProfile[]> {
+    return this.page.$$eval( `.mt-post${ onlySelectedPosts ? '.selected' : '' }`, nodes => {
+      return Array.from( nodes ).map( child => {
         return {
           name: child.querySelector( '.mt-post-name' ).textContent,
           image: child.querySelector( '.mt-post-info img' ).getAttribute( 'src' ),
@@ -208,5 +208,27 @@ export default class PostsPage extends Page {
         }
       } )
     } );
+  }
+
+  async selectPost( title: string ) {
+    const index = await this.page.$$eval( `.mt-post`, ( nodes, title: string ) => {
+      const index = Array.from( nodes ).findIndex( elm => elm.querySelector( '.mt-post-name' ).textContent === title )
+      return index;
+    }, title );
+
+    await this.page.click( `.mt-post:nth-child(${ index + 1 })` );
+  }
+
+  /**
+   * Deletes the select post
+   */
+  async deleteSelectedPost() {
+    await this.page.hover( `.mt-post.selected` );
+    await this.page.waitFor( `.mt-post.selected .mt-post-delete` );
+    await this.page.click( `.mt-post.selected .mt-post-delete` );
+    await this.page.waitFor( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.page.click( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.emptySelector( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.doneLoading();
   }
 }

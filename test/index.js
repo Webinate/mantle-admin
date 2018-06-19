@@ -48,3 +48,4 @@ require( './tests/posts/view-post' );
 require( './tests/posts/create' );
 require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );
+require( './tests/posts/delete-posts' );

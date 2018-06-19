@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, Avatar } from 'material-ui';
+import { IconButton, Avatar, Dialog, FlatButton, RaisedButton } from 'material-ui';
 import { Pager } from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
@@ -8,6 +8,7 @@ import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
+  animated: boolean;
   posts: Page<IPost<'client'>> | null;
   getPosts: ( index: number ) => void;
   onPostSelected: ( post: IPost<'client'>[] ) => void
@@ -17,12 +18,17 @@ export type Props = {
 }
 
 export type State = {
+  showDeleteModal: boolean;
 }
 
 export class PostList extends React.Component<Props, State> {
+  private _selectedPost: IPost<'client'> | null;
+
   constructor( props: Props ) {
     super( props );
+    this._selectedPost = null;
     this.state = {
+      showDeleteModal: false
     };
   }
 
@@ -55,6 +61,13 @@ export class PostList extends React.Component<Props, State> {
     }
   }
 
+  private onDelete( post: IPost<'client'> ) {
+    this._selectedPost = post;
+    this.setState( {
+      showDeleteModal: true
+    } );
+  }
+
   render() {
     const posts = this.props.posts;
 
@@ -71,22 +84,23 @@ export class PostList extends React.Component<Props, State> {
             return <Post
               key={'post-' + postIndex}
               selected={selected}
-              className="mt-post"
+              style={this.props.animated ? { transition: 'none' } : undefined}
+              className={`mt-post ${ selected ? 'selected' : '' }`}
               onClick={e => { this.onPostSelected( post, e ) }}
             >
               <IconButton
                 style={{ top: 0, right: '30px', position: 'absolute' }}
                 iconStyle={{ color: theme.primary200.background }}
-                className="mt-post-button"
+                className="mt-post-button mt-post-edit"
                 iconClassName="icon icon-edit"
                 onClick={e => this.props.onEdit( post )}
               />
               <IconButton
                 style={{ top: 0, right: 0, position: 'absolute' }}
                 iconStyle={{ color: theme.primary200.background }}
-                className="mt-post-button"
+                className="mt-post-button mt-post-delete"
                 iconClassName="icon icon-delete"
-                onClick={e => this.props.onDelete( post )}
+                onClick={e => this.onDelete( post )}
               />
               <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={post.featuredImage} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
@@ -105,6 +119,36 @@ export class PostList extends React.Component<Props, State> {
           } )}
         </PostsInnerContent>
       </Pager> : undefined}
+      {this.state.showDeleteModal && this._selectedPost ? <Dialog
+        contentClassName="mt-post-del-dialog"
+        open={true}
+        actions={[
+          <FlatButton
+            label="Cancel"
+            style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
+            className="mt-cancel-delpost"
+            onClick={e => {
+              this._selectedPost = null;
+              this.setState( {
+                showDeleteModal: false
+              } )
+            }}
+          />,
+          <RaisedButton
+            label="Yes"
+            primary={true}
+            style={{ verticalAlign: 'middle' }}
+            className="mt-confirm-delpost"
+            onClick={e => {
+              this.props.onDelete( this._selectedPost! );
+              this.setState( { showDeleteModal: false } )
+              this._selectedPost = null;
+            }}
+          />
+        ]}
+      >
+        Are you sure you want to delete the post '{this._selectedPost.title}'
+        </Dialog> : undefined}
     </div>
   }
 }

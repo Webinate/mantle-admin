@@ -3,7 +3,7 @@ import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
-import { getPosts, getPost, createPost, editPost } from '../store/posts/actions';
+import { getPosts, getPost, createPost, deletePost, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { TextField, IconButton, FontIcon, RaisedButton, FlatButton } from 'material-ui';
 import FontCancel from 'material-ui/svg-icons/navigation/arrow-back';
@@ -30,6 +30,7 @@ const dispatchToProps = {
   getCategories: getCategories,
   getPost: getPost,
   createPost: createPost,
+  removePost: deletePost,
   createCategory: createCategory,
   removeCategory: removeCategory,
   editPost: editPost,
@@ -58,7 +59,7 @@ export class Posts extends React.Component<Props, State> {
   }
 
   private onSearch() {
-    this.props.getPosts( 0, this.state.searchFilter );
+    this.props.getPosts( { index: 0, keyword: this.state.searchFilter } );
   }
 
   render() {
@@ -137,11 +138,12 @@ export class Posts extends React.Component<Props, State> {
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
                 posts={page}
+                animated={!this.props.app.debugMode}
                 selected={this.state.selectedPosts}
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
-                onDelete={post => { }}
+                onDelete={post => this.props.removePost( post )}
                 onPostSelected={selected => this.setState( { selectedPosts: selected } )}
-                getPosts={( index ) => this.props.getPosts( index, this.state.searchFilter )}
+                getPosts={( index ) => this.props.getPosts( { index: index, keyword: this.state.searchFilter } )}
               />;
             }} />
           </Switch>

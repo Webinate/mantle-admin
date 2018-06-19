@@ -8,7 +8,7 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  SetPosts: new ActionCreator<'posts-set-posts', Page<IPost<'client'>>>( 'posts-set-posts' ),
+  SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<posts.GetAllOptions> }>( 'posts-set-posts' ),
   SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' )
 };
 
@@ -18,11 +18,11 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 /**
  * Refreshes the user state
  */
-export function getPosts( index: number = 0, search?: string ) {
+export function getPosts( options: Partial<posts.GetAllOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
-    const resp = await posts.getAll( { index: index, keyword: search } );
-    dispatch( ActionCreators.SetPosts.create( resp ) );
+    const resp = await posts.getAll( { index: options.index, keyword: options.keyword } );
+    dispatch( ActionCreators.SetPosts.create( { page: resp, filters: options } ) );
   }
 }
 
@@ -42,6 +42,24 @@ export function createPost( post: Partial<IPost<'client'>> ) {
       dispatch( AppActions.serverResponse.create( `New Post '${ resp.title }' created` ) );
       dispatch( ActionCreators.SetPostsBusy.create( false ) );
       dispatch( push( '/dashboard/posts' ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+  }
+}
+
+export function deletePost( post: Partial<IPost<'client'>> ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      await posts.remove( post._id! );
+      dispatch( AppActions.serverResponse.create( `Post '${ post.title }' deleted` ) );
+      const state = getState();
+      const filters = state.posts.postFilters || { index: 0, keyword: '' };
+      const resp = await posts.getAll( filters );
+      dispatch( ActionCreators.SetPosts.create( { page: resp, filters: filters } ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
