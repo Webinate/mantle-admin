@@ -13,7 +13,7 @@ let admin: Agent, joe: Agent;
 let post: IPost<'client'>;
 let controller: PostsController;
 
-describe( 'View post created by backend', function() {
+describe( 'View and filter posts created by backend', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );
@@ -21,7 +21,7 @@ describe( 'View post created by backend', function() {
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
     post = await controller.create( {
-      title: 'Test Post',
+      title: randomId(),
       slug: randomId(),
       public: false,
       content: 'This is a post\'s content'
@@ -33,16 +33,26 @@ describe( 'View post created by backend', function() {
   it( 'Post is available in post dashboard & visible to admin', async () => {
     const posts = await postPage.getPosts();
     assert( posts.length > 0 );
-    assert.equal( posts[ 0 ].name, 'Test Post' );
+    assert.equal( posts[ 0 ].name, post.title );
     assert.equal( posts[ 0 ].image, '/images/avatar-1.svg' );
     assert.equal( posts[ 0 ].featuredImage, '/images/post-feature.svg' );
+  } )
+
+  it( 'Post is available in post dashboard & visible to admin', async () => {
+    await postPage.filter( 'Something_I_AM_NOT' );
+    let posts = await postPage.getPosts();
+    assert( posts.length === 0 );
+
+    await postPage.filter( post.title );
+    posts = await postPage.getPosts();
+    assert.equal( posts[ 0 ].name, post.title );
   } )
 
   it( 'Post is private & not visible to regular user in dashboard', async () => {
     await postPage.load( joe );
     const posts = await postPage.getPosts();
     if ( posts.length > 0 )
-      assert.notEqual( posts[ 0 ].name, 'Test Post' );
+      assert.notEqual( posts[ 0 ].name, post.title );
   } )
 
   after( async () => {

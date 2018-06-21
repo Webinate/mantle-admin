@@ -44,7 +44,7 @@ require( './tests/users/activate-user' );
 require( './tests/users/delete-user' );
 require( './tests/users/resend-activation' );
 require( './tests/users/request-password-reset' );
-require( './tests/posts/view-post' );
+require( './tests/posts/view-and-filter-post' );
 require( './tests/posts/create' );
 require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );

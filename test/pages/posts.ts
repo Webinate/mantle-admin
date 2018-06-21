@@ -210,6 +210,19 @@ export default class PostsPage extends Page {
     } );
   }
 
+  async filter( search: string ) {
+    await this.page.click( '#mt-posts-filter' );
+    await this.page.$eval( '#mt-posts-filter', ( elm: HTMLInputElement ) => elm.value = '' );
+    await this.page.type( '#mt-posts-filter', search );
+    await this.page.click( '.mt-posts-search' );
+    await this.doneLoading();
+  }
+
+  /**
+   * Selects by title
+   * @param title The title of the post to select
+   * @param multiple If true, its the same as holding down shift
+   */
   async selectPost( title: string, multiple: boolean = false ) {
     const index = await this.page.$$eval( `.mt-post`, ( nodes, title: string ) => {
       const index = Array.from( nodes ).findIndex( elm => elm.querySelector( '.mt-post-name' ).textContent === title )
