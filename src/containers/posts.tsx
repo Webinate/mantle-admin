@@ -16,6 +16,7 @@ import { PostForm } from '../components/posts/post-form';
 import FilterIcon from 'material-ui/svg-icons/content/filter-list';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import SearchIcon from 'material-ui/svg-icons/action/search';
+import { GetAllOptions } from '../../../../src/lib-frontend/posts';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -46,6 +47,7 @@ type State = {
   searchFilter: string;
   selectedPosts: IPost<'client'>[];
   showDeleteModal: boolean;
+  filtersOpen: boolean;
 };
 
 /**
@@ -62,7 +64,8 @@ export class Posts extends React.Component<Props, State> {
     this.state = {
       searchFilter: '',
       selectedPosts: [],
-      showDeleteModal: false
+      showDeleteModal: false,
+      filtersOpen: false
     }
   }
 
@@ -133,6 +136,7 @@ export class Posts extends React.Component<Props, State> {
                   <IconButton
                     style={headerIconStyle}
                     className="mt-posts-filter"
+                    onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
                     iconStyle={{ color: theme.primary200.background }}
                   >
                     <FilterIcon />
@@ -178,13 +182,14 @@ export class Posts extends React.Component<Props, State> {
             />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
+                filtersOpen={this.state.filtersOpen}
                 posts={page}
                 animated={!this.props.app.debugMode}
                 selected={this.state.selectedPosts}
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
                 onDelete={post => this.onDelete( post )}
                 onPostSelected={selected => this.setState( { selectedPosts: selected } )}
-                getPosts={( index ) => this.props.getPosts( { index: index, keyword: this.state.searchFilter } )}
+                getPosts={( options: Partial<GetAllOptions> ) => this.props.getPosts( options )}
               />;
             }} />
           </Switch>

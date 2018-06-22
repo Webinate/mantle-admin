@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, Avatar } from 'material-ui';
+import { IconButton, Avatar, SelectField, MenuItem, Toggle } from 'material-ui';
 import { Pager } from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
@@ -8,19 +8,27 @@ import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import EditIcon from 'material-ui/svg-icons/content/create';
+import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
+import { UserPicker } from '../user-picker';
 
 export type Props = {
   animated: boolean;
   posts: Page<IPost<'client'>> | null;
-  getPosts: ( index: number ) => void;
+  getPosts: ( options: Partial<GetAllOptions> ) => void;
   onPostSelected: ( post: IPost<'client'>[] ) => void
   onEdit: ( post: IPost<'client'> ) => void;
   onDelete: ( post: IPost<'client'> ) => void;
   selected: IPost<'client'>[];
+  filtersOpen: boolean;
 }
+
+type VisibilityType = 'all' | 'public' | 'private';
 
 export type State = {
   showDeleteModal: boolean;
+  sortAscending: boolean;
+  user: IUserEntry<'client'> | null;
+  visibility: VisibilityType;
 }
 
 export class PostList extends React.Component<Props, State> {
@@ -28,12 +36,20 @@ export class PostList extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      showDeleteModal: false
+      showDeleteModal: false,
+      sortAscending: false,
+      visibility: 'all',
+      user: null
     };
   }
 
   componentDidMount() {
-    this.props.getPosts( 0 );
+    this.props.getPosts( {
+      index: 0,
+      sortOrder: this.state.sortAscending ? 'asc' : 'desc',
+      visibility: this.state.visibility,
+      author: ''
+    } );
   }
 
   componentWillReceiveProps( next: Props ) {
@@ -66,21 +82,67 @@ export class PostList extends React.Component<Props, State> {
     }
   }
 
+  private onAscChange() {
+    const val = !this.state.sortAscending;
+    this.setState( { sortAscending: val }, () => {
+      this.props.getPosts( { sortOrder: val ? 'asc' : 'desc' } );
+    } )
+  }
+
+  private onVisibilityChange( visibility: VisibilityType ) {
+    this.setState( { visibility: visibility }, () => {
+      this.props.getPosts( { visibility: visibility } );
+    } )
+  }
+
+  private onUserChange( user: IUserEntry<'client'> | null ) {
+    this.setState( { user: user }, () => {
+      this.props.getPosts( { author: user ? user.username : '' } );
+    } )
+  }
+
   render() {
     const posts = this.props.posts;
     const multipleSelected = this.props.selected.length > 1;
 
-    return <div>
+    return <div style={{ position: 'relative' }}>
       {posts ? <Pager
         total={posts!.count}
         limit={posts!.limit}
         offset={posts!.index}
-        onPage={index => this.props.getPosts( index )}
+        onPage={index => this.props.getPosts( { index: index } )}
         contentProps={{
           onMouseDown: e => this.props.onPostSelected( [] )
         }}
       >
-        <PostsInnerContent className="mt-posts">
+        <Filter filtersOpen={this.props.filtersOpen}>
+          <div>
+            <Toggle
+              label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
+              labelPosition="right"
+              toggled={this.state.sortAscending}
+              onClick={e => this.onAscChange()}
+            />
+            <SelectField
+              floatingLabelText="Visibility"
+              value={this.state.visibility}
+              onChange={( event, index, value: VisibilityType ) => this.onVisibilityChange( value )}
+            >
+              <MenuItem value={'all'} primaryText="All" />
+              <MenuItem value={'private'} primaryText="Private" />
+              <MenuItem value={'public'} primaryText="Public" />
+            </SelectField>
+          </div>
+          <div>
+            <UserPicker
+              user={this.state.user}
+              labelPosition="right"
+              onChange={user => this.onUserChange( user )}
+            />
+          </div>
+        </Filter>
+
+        <PostsInnerContent filtersOpen={this.props.filtersOpen} className="mt-posts">
           {posts.data.map( ( post, postIndex ) => {
             const selected = this.props.selected.indexOf( post ) === -1 ? false : true;
             return <Post
@@ -129,8 +191,31 @@ export class PostList extends React.Component<Props, State> {
 interface PostProps extends React.HTMLProps<HTMLDivElement> {
 }
 
+interface FilterProps extends React.HTMLProps<HTMLDivElement> {
+  filtersOpen: boolean;
+}
+
+const filterSize = 100;
+
 const PostsInnerContent = styled.div`
-  height: 100%;
+  height: ${ ( props: FilterProps ) => props.filtersOpen ? `calc( 100% - ${ filterSize }px )` : '100%' };
+  transition: 1s height;
+`;
+
+const Filter = styled.div`
+  background: ${ theme.light100.background };
+  color: ${ theme.light100.color };
+  overflow: hidden;
+  transition: 1s height;
+  height: ${ ( props: FilterProps ) => props.filtersOpen ? `${ filterSize }px` : '0' };
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+
+  > div {
+    padding: 5px;
+    flex: 1;
+  }
 `;
 
 const Post = styled.div`

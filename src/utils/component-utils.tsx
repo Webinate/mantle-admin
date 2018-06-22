@@ -1,7 +1,10 @@
 /**
  * Picks a random user avatar based on the given index
  */
-export function generateAvatarPic( avatar: string ) {
+export function generateAvatarPic( avatar: string | null ) {
+  if ( avatar === null )
+    return '/images/avatar-blank.svg';
+
   if ( !avatar )
     return `/images/avatar-1.svg`;
 

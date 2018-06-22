@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, Popover, AutoComplete, MenuItem } from 'material-ui';
+import { Avatar, Popover, AutoComplete, MenuItem, IconButton } from 'material-ui';
+import CloseIcon from 'material-ui/svg-icons/navigation/close';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
 import { users } from 'modepress/src/lib-frontend';
@@ -8,8 +9,9 @@ import { users } from 'modepress/src/lib-frontend';
 type Props = {
   user: IUserEntry<'client'> | null;
   canEdit?: boolean;
-  onChange: ( user: IUserEntry<'client'> ) => void;
+  onChange: ( user: IUserEntry<'client'> | null ) => void;
   labelStyle?: React.CSSProperties;
+  labelPosition?: 'right' | 'left';
 };
 
 type State = {
@@ -20,7 +22,8 @@ type State = {
 
 export class UserPicker extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    canEdit: true
+    canEdit: true,
+    labelPosition: 'left'
   };
 
 
@@ -72,18 +75,28 @@ export class UserPicker extends React.Component<Props, State> {
         } );
       } : undefined}
     >
-      <span
+      {this.props.labelPosition === 'left' ? <span
         className="my-user-picker-label"
         style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
-      >{this.props.user ? this.props.user.username : 'NOT SET'}</span>
+      >
+        {this.props.user ? this.props.user.username : 'NOT SET '}
+      </span> : undefined}
       <Avatar
         style={{
           verticalAlign: 'middle',
-          margin: '0 0 0 5px'
+          margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px'
         }}
         backgroundColor={theme.light400.background}
-        src={generateAvatarPic( this.props.user ? this.props.user.avatar : '' )}
+        src={generateAvatarPic( this.props.user ? this.props.user.avatar : null )}
       />
+      {this.props.labelPosition === 'right' ? <span
+        className="my-user-picker-label"
+        style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
+      >
+        {this.props.user ? this.props.user.username : ' NOT SET'}
+      </span> : undefined}
+
+
       {this.state.open ? <Popover
         style={{ padding: 5 }}
         anchorEl={this.elm!}
@@ -107,11 +120,17 @@ export class UserPicker extends React.Component<Props, State> {
               this.props.onChange( user );
             }
 
-            this.setState( { open: false, users: [] } )
+            this.setState( { open: false, users: [] } );
           }}
           filter={AutoComplete.noFilter}
           onUpdateInput={e => this.onUpdateInput( e )}
         />
+        <IconButton onClick={e => {
+          this.props.onChange( null );
+          this.setState( { open: false, users: [] } );
+        }}>
+          <CloseIcon />
+        </IconButton>
       </Popover> : undefined}
     </div>;
   }

@@ -20,9 +20,13 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
  */
 export function getPosts( options: Partial<posts.GetAllOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
+    const state = getState();
+    const newFilters: Partial<posts.GetAllOptions> = state.posts.postFilters ?
+      { ...state.posts.postFilters, ...options } : options;
+
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
-    const resp = await posts.getAll( { index: options.index, keyword: options.keyword } );
-    dispatch( ActionCreators.SetPosts.create( { page: resp, filters: options } ) );
+    const resp = await posts.getAll( newFilters );
+    dispatch( ActionCreators.SetPosts.create( { page: resp, filters: newFilters } ) );
   }
 }
 
