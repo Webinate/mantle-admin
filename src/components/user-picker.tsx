@@ -12,6 +12,7 @@ type Props = {
   onChange: ( user: IUserEntry<'client'> | null ) => void;
   labelStyle?: React.CSSProperties;
   labelPosition?: 'right' | 'left';
+  imageSize?: number;
 };
 
 type State = {
@@ -23,7 +24,8 @@ type State = {
 export class UserPicker extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
     canEdit: true,
-    labelPosition: 'left'
+    labelPosition: 'left',
+    imageSize: 40
   };
 
 
@@ -86,6 +88,7 @@ export class UserPicker extends React.Component<Props, State> {
           verticalAlign: 'middle',
           margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px'
         }}
+        size={this.props.imageSize}
         backgroundColor={theme.light400.background}
         src={generateAvatarPic( this.props.user ? this.props.user.avatar : null )}
       />

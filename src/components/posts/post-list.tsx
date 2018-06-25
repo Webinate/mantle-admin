@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, Avatar, SelectField, MenuItem, Toggle } from 'material-ui';
+import { IconButton, Avatar, MenuItem, Toggle, IconMenu } from 'material-ui';
 import { Pager } from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
@@ -10,6 +10,7 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import EditIcon from 'material-ui/svg-icons/content/create';
 import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
 import { UserPicker } from '../user-picker';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 export type Props = {
   animated: boolean;
@@ -117,25 +118,32 @@ export class PostList extends React.Component<Props, State> {
       >
         <Filter filtersOpen={this.props.filtersOpen}>
           <div>
+            <h3>Sort Order:</h3>
             <Toggle
               label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
               labelPosition="right"
               toggled={this.state.sortAscending}
               onClick={e => this.onAscChange()}
             />
-            <SelectField
-              floatingLabelText="Visibility"
-              value={this.state.visibility}
-              onChange={( event, index, value: VisibilityType ) => this.onVisibilityChange( value )}
-            >
-              <MenuItem value={'all'} primaryText="All" />
-              <MenuItem value={'private'} primaryText="Private" />
-              <MenuItem value={'public'} primaryText="Public" />
-            </SelectField>
           </div>
           <div>
+            <h3>Sort by Visibility:</h3>
+            <div className="mt-filter-visibility">{this.state.visibility}</div>
+            <IconMenu
+              className="mt-filter-visibility-drop"
+              iconButtonElement={<MoreVertIcon />}
+              style={{ cursor: 'pointer', verticalAlign: 'middle' }}
+            >
+              <MenuItem onClick={e => this.onVisibilityChange( 'all' )} primaryText="All" />
+              <MenuItem onClick={e => this.onVisibilityChange( 'private' )} primaryText="Private" />
+              <MenuItem onClick={e => this.onVisibilityChange( 'public' )} primaryText="Public" />
+            </IconMenu>
+          </div>
+          <div>
+            <h3>Sort by User:</h3>
             <UserPicker
               user={this.state.user}
+              imageSize={26}
               labelPosition="right"
               onChange={user => this.onUserChange( user )}
             />
@@ -195,7 +203,7 @@ interface FilterProps extends React.HTMLProps<HTMLDivElement> {
   filtersOpen: boolean;
 }
 
-const filterSize = 100;
+const filterSize = 85;
 
 const PostsInnerContent = styled.div`
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `calc( 100% - ${ filterSize }px )` : '100%' };
@@ -208,13 +216,20 @@ const Filter = styled.div`
   overflow: hidden;
   transition: 1s height;
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `${ filterSize }px` : '0' };
-  border-radius: 5px;
+  border-radius: 10px;
   box-sizing: border-box;
   display: flex;
 
   > div {
     padding: 5px;
     flex: 1;
+  }
+
+  .mt-filter-visibility {
+    text-transform: capitalize;
+    margin: 0 5px 0 0;
+    display: inline-block;
+    vertical-align: middle;
   }
 `;
 
