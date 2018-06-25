@@ -10,8 +10,10 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let post: IPost<'client'>;
+let posts: IPost<'client'>[];
 let controller: PostsController;
+let postNames = [ 'aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff', 'ggg', 'hhh', 'iii',
+  'jjj', 'kkk', 'lll', 'mmm' ];
 
 describe( 'View and filter posts created by backend', function() {
 
@@ -20,43 +22,49 @@ describe( 'View and filter posts created by backend', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    post = await controller.create( {
-      title: randomId(),
-      slug: randomId(),
-      public: false,
-      content: 'This is a post\'s content'
-    } )
+    const promises: Promise<IPost<'client'>>[] = [];
+    for ( let i = 0, l = postNames.length; i < l; i++ )
+      promises.push( controller.create( {
+        title: postNames[ i ],
+        slug: randomId(),
+        public: ( i % 2 ) ? false : true,
+        content: 'This is a post\'s content'
+      } ) );
 
+    posts = await Promise.all( promises );
     await postPage.load( admin );
   } )
 
   it( 'Post is available in post dashboard & visible to admin', async () => {
-    const posts = await postPage.getPosts();
-    assert( posts.length > 0 );
-    assert.equal( posts[ 0 ].name, post.title );
-    assert.equal( posts[ 0 ].image, '/images/avatar-1.svg' );
-    assert.equal( posts[ 0 ].featuredImage, '/images/post-feature.svg' );
+    const postsOnPage = await postPage.getPosts();
+    assert( postsOnPage.length > 0 );
+    assert.equal( postsOnPage[ 0 ].name, posts[ posts.length - 1 ].title );
+    assert.equal( postsOnPage[ 0 ].image, '/images/avatar-1.svg' );
+    assert.equal( postsOnPage[ 0 ].featuredImage, '/images/post-feature.svg' );
   } )
 
   it( 'Post is available in post dashboard & visible to admin', async () => {
     await postPage.filter( 'Something_I_AM_NOT' );
-    let posts = await postPage.getPosts();
-    assert( posts.length === 0 );
+    let postsOnPage = await postPage.getPosts();
+    assert( postsOnPage.length === 0 );
 
-    await postPage.filter( post.title );
-    posts = await postPage.getPosts();
-    assert.equal( posts[ 0 ].name, post.title );
+    await postPage.filter( postNames[ 0 ] );
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, posts[ 0 ].title );
   } )
 
   it( 'Post is private & not visible to regular user in dashboard', async () => {
     await postPage.load( joe );
-    const posts = await postPage.getPosts();
-    if ( posts.length > 0 )
-      assert.notEqual( posts[ 0 ].name, post.title );
+    const postsOnPage = await postPage.getPosts();
+    if ( postsOnPage.length > 0 )
+      assert.notEqual( postsOnPage[ 0 ].name, posts[ posts.length - 1 ].title );
   } )
 
   after( async () => {
-    if ( post )
-      await controller.removePost( post._id.toString() );
+    const promises: Promise<any>[] = [];
+    for ( let i = 0, l = posts.length; i < l; i++ )
+      promises.push( controller.removePost( posts[ i ]._id.toString() ) );
+
+    Promise.all( promises );
   } )
 } );

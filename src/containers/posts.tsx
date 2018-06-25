@@ -135,6 +135,7 @@ export class Posts extends React.Component<Props, State> {
                   </IconButton>
                   <IconButton
                     style={headerIconStyle}
+                    tooltip={this.state.filtersOpen ? "Close filter options" : "Open filter options"}
                     className="mt-posts-filter"
                     onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
                     iconStyle={{ color: theme.primary200.background }}
@@ -143,9 +144,10 @@ export class Posts extends React.Component<Props, State> {
                   </IconButton>
                   <IconButton
                     style={headerIconStyle}
+                    tooltip="Delete selected posts"
                     className="mt-posts-delete-multi"
                     iconStyle={{ color: theme.primary200.background }}
-                    disabled={this.state.selectedPosts.length > 1 ? false : true}
+                    disabled={this.state.selectedPosts.length > 0 ? false : true}
                     onClick={e => this.onDeleteMultiple()}
                   >
                     <DeleteIcon />
@@ -239,7 +241,7 @@ export class Posts extends React.Component<Props, State> {
 
 const PostsContainer = styled.div`
   overflow: auto;
-  padding: 10px;
+  padding: 0;
   height: calc(100% - 50px);
   box-sizing: border-box;
 `;

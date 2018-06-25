@@ -48,16 +48,15 @@ export class ContentHeader extends React.Component<Props, any> {
 const Container = styled.div`
   box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.3);
   box-sizing: border-box;
-  overflow: hidden;
   position: relative;
   background: #fff;
   height: 50px;
   position: relative;
   z-index: 1;
+  white-space: nowrap;
 `;
 
 const Header = styled.div`
-  overflow: hidden;
   padding: 0 20px;
   display: flex;
   width: 100%;

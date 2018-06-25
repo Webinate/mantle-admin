@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { IconButton, FontIcon } from 'material-ui';
+import { IconButton } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
+import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
+import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 
 export type Props = {
   offset: number;
@@ -49,17 +51,21 @@ export class Pager extends React.Component<Props, State> {
               <NavBtn>
                 <IconButton
                   disabled={offset === 0}
-                  onClick={e => this.props.onPage( this.props.offset - 1 )}
+                  onClick={e => {
+                    this.props.onPage( this.props.offset - 1 )
+                  }}
                 >
-                  <FontIcon className="icon-keyboard_arrow_left" />
+                  <LeftIcon />
                 </IconButton>
               </NavBtn>
               <NavBtn>
                 <IconButton
                   disabled={offset + limit >= total}
-                  onClick={e => this.props.onPage( this.props.offset + 1 )}
+                  onClick={e => {
+                    this.props.onPage( this.props.offset + 1 )
+                  }}
                 >
-                  <FontIcon className="icon-keyboard_arrow_right" />
+                  <RightIcon />
                 </IconButton>
               </NavBtn>
             </Buttons>

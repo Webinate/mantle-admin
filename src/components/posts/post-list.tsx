@@ -10,7 +10,7 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import EditIcon from 'material-ui/svg-icons/content/create';
 import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
 import { UserPicker } from '../user-picker';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ArrowDownIcon from 'material-ui/svg-icons/navigation/arrow-drop-down';
 
 export type Props = {
   animated: boolean;
@@ -30,9 +30,11 @@ export type State = {
   sortAscending: boolean;
   user: IUserEntry<'client'> | null;
   visibility: VisibilityType;
+  visibilityOpen: boolean;
 }
 
 export class PostList extends React.Component<Props, State> {
+  private _container: HTMLElement | null;
 
   constructor( props: Props ) {
     super( props );
@@ -40,7 +42,8 @@ export class PostList extends React.Component<Props, State> {
       showDeleteModal: false,
       sortAscending: false,
       visibility: 'all',
-      user: null
+      user: null,
+      visibilityOpen: false
     };
   }
 
@@ -111,7 +114,11 @@ export class PostList extends React.Component<Props, State> {
         total={posts!.count}
         limit={posts!.limit}
         offset={posts!.index}
-        onPage={index => this.props.getPosts( { index: index } )}
+        onPage={index => {
+          if ( this._container )
+            this._container.scrollTop = 0;
+          this.props.getPosts( { index: index } )
+        }}
         contentProps={{
           onMouseDown: e => this.props.onPostSelected( [] )
         }}
@@ -128,16 +135,29 @@ export class PostList extends React.Component<Props, State> {
           </div>
           <div>
             <h3>Sort by Visibility:</h3>
-            <div className="mt-filter-visibility">{this.state.visibility}</div>
             <IconMenu
+              open={this.state.visibilityOpen}
+              onRequestChange={( e ) => this.setState( { visibilityOpen: e } )}
               className="mt-filter-visibility-drop"
-              iconButtonElement={<MoreVertIcon />}
+              iconButtonElement={<IconButton style={{ padding: 0, height: '20px', width: '20px' }}><ArrowDownIcon /></IconButton>}
               style={{ cursor: 'pointer', verticalAlign: 'middle' }}
             >
-              <MenuItem onClick={e => this.onVisibilityChange( 'all' )} primaryText="All" />
-              <MenuItem onClick={e => this.onVisibilityChange( 'private' )} primaryText="Private" />
-              <MenuItem onClick={e => this.onVisibilityChange( 'public' )} primaryText="Public" />
+              <MenuItem
+                className="mt-filter-visibility-all"
+                onClick={e => this.onVisibilityChange( 'all' )}
+                primaryText="All" />
+              <MenuItem
+                className="mt-filter-visibility-private"
+                onClick={e => this.onVisibilityChange( 'private' )}
+                primaryText="Private" />
+              <MenuItem
+                className="mt-filter-visibility-public"
+                onClick={e => this.onVisibilityChange( 'public' )}
+                primaryText="Public" />
             </IconMenu>
+            <div
+              onClick={e => this.setState( { visibilityOpen: true } )}
+              className="mt-filter-visibility">{this.state.visibility}</div>
           </div>
           <div>
             <h3>Sort by User:</h3>
@@ -150,7 +170,11 @@ export class PostList extends React.Component<Props, State> {
           </div>
         </Filter>
 
-        <PostsInnerContent filtersOpen={this.props.filtersOpen} className="mt-posts">
+        <PostsInnerContent
+          filtersOpen={this.props.filtersOpen}
+          className="mt-posts"
+          innerRef={elm => this._container = elm}
+        >
           {posts.data.map( ( post, postIndex ) => {
             const selected = this.props.selected.indexOf( post ) === -1 ? false : true;
             return <Post
@@ -203,11 +227,12 @@ interface FilterProps extends React.HTMLProps<HTMLDivElement> {
   filtersOpen: boolean;
 }
 
-const filterSize = 85;
+const filterSize = 90;
 
 const PostsInnerContent = styled.div`
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `calc( 100% - ${ filterSize }px )` : '100%' };
   transition: 1s height;
+  overflow: auto;
 `;
 
 const Filter = styled.div`
@@ -216,20 +241,21 @@ const Filter = styled.div`
   overflow: hidden;
   transition: 1s height;
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `${ filterSize }px` : '0' };
-  border-radius: 10px;
   box-sizing: border-box;
   display: flex;
 
   > div {
-    padding: 5px;
+    padding: 5px 10px;
     flex: 1;
+    border-bottom: 1px solid ${theme.light100.border };
   }
 
   .mt-filter-visibility {
     text-transform: capitalize;
-    margin: 0 5px 0 0;
+    margin: 0 0 0 5px;
     display: inline-block;
     vertical-align: middle;
+    cursor: pointer;
   }
 `;
 
