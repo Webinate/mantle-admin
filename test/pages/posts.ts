@@ -210,12 +210,49 @@ export default class PostsPage extends Page {
     } );
   }
 
+  /**
+   * Filters the posts by title and content
+   * @param search The filter text
+   */
   async filter( search: string ) {
     await this.page.click( '#mt-posts-filter' );
     await this.page.$eval( '#mt-posts-filter', ( elm: HTMLInputElement ) => elm.value = '' );
     await this.page.type( '#mt-posts-filter', search );
     await this.page.click( '.mt-posts-search' );
     await this.doneLoading();
+  }
+
+  async toggleFilterOptionsPanel( open: boolean ) {
+    await this.page.click( '.mt-posts-filter' );
+    if ( open )
+      await this.page.waitFor( '.mt-filters-panel.open' );
+    else
+      await this.page.waitFor( '.mt-filters-panel.closed' );
+  }
+
+  async clickSortOrder() {
+    await this.page.click( '.mt-sort-order' );
+    await this.doneLoading();
+  }
+
+  async selectSortType( type: 'created' | 'modified' | 'title' ) {
+    await this.page.click( '.mt-filter-sortby' );
+    await this.page.waitFor( '.mt-filter-sortby-modified' );
+    await this.page.click( `.mt-filter-sortby-${ type }` );
+    await this.emptySelector( '.mt-filter-sortby-modified' );
+    await this.doneLoading();
+  }
+
+  async selectVisibility( type: 'all' | 'public' | 'private' ) {
+    await this.page.click( '.mt-filter-visibility' );
+    await this.page.waitFor( '.mt-filter-visibility-public' );
+    await this.page.click( `.mt-filter-visibility-${ type }` );
+    await this.emptySelector( '.mt-filter-visibility-public' );
+    await this.doneLoading();
+  }
+
+  selectUserFilter( val?: string ) {
+    return this.user( val );
   }
 
   /**

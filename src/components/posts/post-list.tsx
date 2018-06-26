@@ -137,11 +137,14 @@ export class PostList extends React.Component<Props, State> {
           onMouseDown: e => this.props.onPostSelected( [] )
         }}
       >
-        <Filter filtersOpen={this.props.filtersOpen}>
+        <Filter
+          animated={this.props.animated}
+          className={`mt-filters-panel ${ this.props.filtersOpen ? 'open' : 'closed' }`} filtersOpen={this.props.filtersOpen}>
           <div>
             <h3>Sort Order:</h3>
             <IconMenu
               open={this.state.sortByOpen}
+              animated={this.props.animated}
               onRequestChange={( e ) => this.setState( { sortByOpen: e } )}
               className="mt-filter-sortby-drop"
               iconButtonElement={<IconButton style={{ padding: 0, height: '20px', width: '20px' }}><ArrowDownIcon /></IconButton>}
@@ -167,6 +170,7 @@ export class PostList extends React.Component<Props, State> {
             </div>
 
             <Toggle
+              className="mt-sort-order"
               style={{ margin: '10px 0 0 0' }}
               label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
               labelPosition="right"
@@ -178,6 +182,7 @@ export class PostList extends React.Component<Props, State> {
             <h3>Filter Visibility:</h3>
             <IconMenu
               open={this.state.visibilityOpen}
+              animated={this.props.animated}
               onRequestChange={( e ) => this.setState( { visibilityOpen: e } )}
               className="mt-filter-visibility-drop"
               iconButtonElement={<IconButton style={{ padding: 0, height: '20px', width: '20px' }}><ArrowDownIcon /></IconButton>}
@@ -213,6 +218,7 @@ export class PostList extends React.Component<Props, State> {
 
         <PostsInnerContent
           filtersOpen={this.props.filtersOpen}
+          animated={this.props.animated}
           className="mt-posts"
           innerRef={elm => this._container = elm}
         >
@@ -266,6 +272,7 @@ interface PostProps extends React.HTMLProps<HTMLDivElement> {
 
 interface FilterProps extends React.HTMLProps<HTMLDivElement> {
   filtersOpen: boolean;
+  animated: boolean;
 }
 
 const filterSize = 120;
@@ -280,7 +287,7 @@ const Filter = styled.div`
   background: ${ theme.light100.background };
   color: ${ theme.light100.color };
   overflow: hidden;
-  transition: 1s height;
+  transition: ${ ( props: FilterProps ) => props.animated ? '1' : '0' }s height;
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `${ filterSize }px` : '0' };
   box-sizing: border-box;
   display: flex;

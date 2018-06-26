@@ -38,11 +38,9 @@ describe( 'View and filter posts created by backend', function() {
     const postsOnPage = await postPage.getPosts();
     assert( postsOnPage.length > 0 );
     assert.equal( postsOnPage[ 0 ].name, posts[ posts.length - 1 ].title );
-    assert.equal( postsOnPage[ 0 ].image, '/images/avatar-1.svg' );
-    assert.equal( postsOnPage[ 0 ].featuredImage, '/images/post-feature.svg' );
   } )
 
-  it( 'Post is available in post dashboard & visible to admin', async () => {
+  it( 'Posts can filter by title', async () => {
     await postPage.filter( 'Something_I_AM_NOT' );
     let postsOnPage = await postPage.getPosts();
     assert( postsOnPage.length === 0 );
