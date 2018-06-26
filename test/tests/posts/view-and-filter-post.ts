@@ -10,7 +10,7 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let posts: IPost<'client'>[];
+let posts: IPost<'client'>[] = [];
 let controller: PostsController;
 let postNames = [ 'aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff', 'ggg', 'hhh', 'iii',
   'jjj', 'kkk', 'lll', 'mmm' ];
@@ -22,16 +22,15 @@ describe( 'View and filter posts created by backend', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    const promises: Promise<IPost<'client'>>[] = [];
-    for ( let i = 0, l = postNames.length; i < l; i++ )
-      promises.push( controller.create( {
-        title: postNames[ i ],
+    for ( let postName of postNames ) {
+      posts.push( await controller.create( {
+        title: postName,
         slug: randomId(),
-        public: ( i % 2 ) ? false : true,
+        public: false,
         content: 'This is a post\'s content'
       } ) );
+    }
 
-    posts = await Promise.all( promises );
     await postPage.load( admin );
   } )
 
@@ -61,10 +60,8 @@ describe( 'View and filter posts created by backend', function() {
   } )
 
   after( async () => {
-    const promises: Promise<any>[] = [];
-    for ( let i = 0, l = posts.length; i < l; i++ )
-      promises.push( controller.removePost( posts[ i ]._id.toString() ) );
-
-    Promise.all( promises );
+    for ( const post of posts ) {
+      await controller.removePost( post._id.toString() );
+    }
   } )
 } );

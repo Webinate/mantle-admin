@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { IconButton } from 'material-ui';
+import { IconButton, FlatButton } from 'material-ui';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
 import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
 
 export type Props = {
-  offset: number;
+  index: number;
   total: number;
   limit: number;
+  loading: boolean;
   onPage: ( offset: number ) => void;
   contentProps?: React.HTMLProps<HTMLDivElement>;
 }
@@ -28,12 +29,10 @@ export class Pager extends React.Component<Props, State> {
   }
 
   render() {
-    const offset = this.props.offset * this.props.limit;
+    const index = this.props.index;
     const total = this.props.total;
     const limit = this.props.limit;
-    const isOverflowing = !( ( offset === 0 ) && ( offset + limit >= total ) );
-
-
+    const isOverflowing = !( ( index === 0 ) && ( index + limit >= total ) );
 
     return (
       <Container>
@@ -45,24 +44,49 @@ export class Pager extends React.Component<Props, State> {
         {isOverflowing ? (
           <Footer>
             <Text>
-              {Math.min( ( offset + 1 ), total ) + '-' + Math.min( ( offset + limit ), total ) + ' of ' + total}
+              {Math.min( ( index + 1 ), total ) + '-' + Math.min( ( index + limit ), total ) + ' of ' + total}
             </Text>
             <Buttons>
               <NavBtn>
-                <IconButton
-                  disabled={offset === 0}
+                <FlatButton
+                  className="mt-pager-first"
+                  style={{ minWidth: '54px' }}
+                  disabled={this.props.loading || index === 0}
                   onClick={e => {
-                    this.props.onPage( this.props.offset - 1 )
+                    this.props.onPage( 0 )
+                  }}
+                >First</FlatButton>
+              </NavBtn>
+
+              <NavBtn>
+                <FlatButton
+                  className="mt-pager-last"
+                  style={{ minWidth: '54px' }}
+                  disabled={this.props.loading || index + limit >= total}
+                  onClick={e => {
+                    this.props.onPage( total - ( total % limit ) )
+                  }}
+                >Last</FlatButton>
+              </NavBtn>
+
+              <NavBtn>
+                <IconButton
+                  className="mt-pager-prev"
+                  disabled={this.props.loading || index === 0}
+                  onClick={e => {
+                    this.props.onPage( index - limit )
                   }}
                 >
                   <LeftIcon />
                 </IconButton>
               </NavBtn>
+
               <NavBtn>
                 <IconButton
-                  disabled={offset + limit >= total}
+                  className="mt-pager-next"
+                  disabled={this.props.loading || index + limit >= total}
                   onClick={e => {
-                    this.props.onPage( this.props.offset + 1 )
+                    this.props.onPage( index + limit )
                   }}
                 >
                   <RightIcon />
@@ -86,6 +110,8 @@ const Footer = styled.div`
   background: ${theme.light100.background };
   border-top: 1px solid ${theme.light100.border };
   box-sizing: border-box;
+  padding: 0 10px;
+  box-sizing: border-box;
 `;
 
 const Buttons = styled.div`
@@ -100,4 +126,8 @@ const Text = styled.div`
 const NavBtn = styled.div`
   margin: 0 0 0 5px;
   display: inline-block;
+
+  > button {
+    vertical-align: middle;
+  }
 `;

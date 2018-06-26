@@ -186,11 +186,14 @@ export class Posts extends React.Component<Props, State> {
               return <PostList
                 filtersOpen={this.state.filtersOpen}
                 posts={page}
-                animated={!this.props.app.debugMode}
+                loading={isBusy}
+                animated={this.props.app.debugMode ? false : true}
                 selected={this.state.selectedPosts}
                 onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
                 onDelete={post => this.onDelete( post )}
-                onPostSelected={selected => this.setState( { selectedPosts: selected } )}
+                onPostSelected={selected => {
+                  this.setState( { selectedPosts: selected } )
+                }}
                 getPosts={( options: Partial<GetAllOptions> ) => this.props.getPosts( options )}
               />;
             }} />

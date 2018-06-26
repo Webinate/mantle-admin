@@ -14,6 +14,7 @@ import ArrowDownIcon from 'material-ui/svg-icons/navigation/arrow-drop-down';
 
 export type Props = {
   animated: boolean;
+  loading: boolean;
   posts: Page<IPost<'client'>> | null;
   getPosts: ( options: Partial<GetAllOptions> ) => void;
   onPostSelected: ( post: IPost<'client'>[] ) => void
@@ -24,13 +25,16 @@ export type Props = {
 }
 
 type VisibilityType = 'all' | 'public' | 'private';
+type SortType = 'title' | 'created' | 'modified';
 
 export type State = {
   showDeleteModal: boolean;
   sortAscending: boolean;
   user: IUserEntry<'client'> | null;
   visibility: VisibilityType;
+  sortBy: SortType;
   visibilityOpen: boolean;
+  sortByOpen: boolean;
 }
 
 export class PostList extends React.Component<Props, State> {
@@ -42,8 +46,10 @@ export class PostList extends React.Component<Props, State> {
       showDeleteModal: false,
       sortAscending: false,
       visibility: 'all',
+      sortBy: 'created',
       user: null,
-      visibilityOpen: false
+      visibilityOpen: false,
+      sortByOpen: false
     };
   }
 
@@ -52,7 +58,8 @@ export class PostList extends React.Component<Props, State> {
       index: 0,
       sortOrder: this.state.sortAscending ? 'asc' : 'desc',
       visibility: this.state.visibility,
-      author: ''
+      author: '',
+      sort: this.state.sortBy
     } );
   }
 
@@ -99,6 +106,12 @@ export class PostList extends React.Component<Props, State> {
     } )
   }
 
+  private onSortByChange( sort: SortType ) {
+    this.setState( { sortBy: sort }, () => {
+      this.props.getPosts( { sort: sort } );
+    } )
+  }
+
   private onUserChange( user: IUserEntry<'client'> | null ) {
     this.setState( { user: user }, () => {
       this.props.getPosts( { author: user ? user.username : '' } );
@@ -111,9 +124,10 @@ export class PostList extends React.Component<Props, State> {
 
     return <div style={{ position: 'relative' }}>
       {posts ? <Pager
+        loading={this.props.loading}
         total={posts!.count}
         limit={posts!.limit}
-        offset={posts!.index}
+        index={posts!.index}
         onPage={index => {
           if ( this._container )
             this._container.scrollTop = 0;
@@ -126,6 +140,32 @@ export class PostList extends React.Component<Props, State> {
         <Filter filtersOpen={this.props.filtersOpen}>
           <div>
             <h3>Sort Order:</h3>
+            <IconMenu
+              open={this.state.sortByOpen}
+              onRequestChange={( e ) => this.setState( { sortByOpen: e } )}
+              className="mt-filter-sortby-drop"
+              iconButtonElement={<IconButton style={{ padding: 0, height: '20px', width: '20px' }}><ArrowDownIcon /></IconButton>}
+              style={{ cursor: 'pointer', verticalAlign: 'middle' }}
+            >
+              <MenuItem
+                className="mt-filter-sortby-title"
+                onClick={e => this.onSortByChange( 'title' )}
+                primaryText="Title" />
+              <MenuItem
+                className="mt-filter-sortby-created"
+                onClick={e => this.onSortByChange( 'created' )}
+                primaryText="Created" />
+              <MenuItem
+                className="mt-filter-sortby-modified"
+                onClick={e => this.onSortByChange( 'modified' )}
+                primaryText="Modified" />
+            </IconMenu>
+            <div
+              onClick={e => this.setState( { sortByOpen: true } )}
+              className="mt-filter-sortby">
+              {this.state.sortBy}
+            </div>
+
             <Toggle
               label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
               labelPosition="right"
@@ -180,9 +220,9 @@ export class PostList extends React.Component<Props, State> {
             return <Post
               key={'post-' + postIndex}
               selected={selected}
-              style={this.props.animated ? { transition: 'none' } : undefined}
+              style={!this.props.animated ? { transition: 'none' } : undefined}
               className={`mt-post ${ selected ? 'selected' : '' }`}
-              onClick={e => { this.onPostSelected( post, e ) }}
+              onMouseDown={e => { this.onPostSelected( post, e ) }}
             >
               {!multipleSelected ? <IconButton
                 style={{ top: 0, right: '30px', position: 'absolute' }}
@@ -227,7 +267,7 @@ interface FilterProps extends React.HTMLProps<HTMLDivElement> {
   filtersOpen: boolean;
 }
 
-const filterSize = 90;
+const filterSize = 120;
 
 const PostsInnerContent = styled.div`
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `calc( 100% - ${ filterSize }px )` : '100%' };

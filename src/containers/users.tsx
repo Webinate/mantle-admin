@@ -167,8 +167,9 @@ export class Users extends React.Component<Props, State> {
             return page ?
               <Pager
                 limit={page.limit}
+                loading={isBusy}
                 onPage={index => this.props.getUsers( index )}
-                offset={page.index}
+                index={page.index}
                 total={page.count}
                 contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
                 }
