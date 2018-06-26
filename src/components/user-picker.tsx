@@ -81,7 +81,7 @@ export class UserPicker extends React.Component<Props, State> {
         className="my-user-picker-label"
         style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
       >
-        {this.props.user ? this.props.user.username : 'NOT SET '}
+        {this.props.user ? this.props.user.username : 'Not set '}
       </span> : undefined}
       <Avatar
         style={{
@@ -96,7 +96,7 @@ export class UserPicker extends React.Component<Props, State> {
         className="my-user-picker-label"
         style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
       >
-        {this.props.user ? this.props.user.username : ' NOT SET'}
+        {this.props.user ? this.props.user.username : ' Not Set'}
       </span> : undefined}
 
 

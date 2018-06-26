@@ -135,7 +135,7 @@ export class Posts extends React.Component<Props, State> {
                   </IconButton>
                   <IconButton
                     style={headerIconStyle}
-                    tooltip={this.state.filtersOpen ? "Close filter options" : "Open filter options"}
+                    tooltip={this.state.filtersOpen ? 'Close filter options' : 'Open filter options'}
                     className="mt-posts-filter"
                     onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
                     iconStyle={{ color: theme.primary200.background }}

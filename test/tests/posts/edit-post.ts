@@ -50,7 +50,7 @@ describe( 'View & edit post created by backend', function() {
     assert( await postPage.hasTag( 'Tag 2' ) );
     assert.deepEqual( await postPage.getSlug(), post.slug );
     assert.deepEqual( await postPage.isPublic(), false );
-    assert.deepEqual( await postPage.user(), 'NOT SET' );
+    assert.deepEqual( await postPage.user(), 'Not set ' );
   } )
 
   it( 'can update post details', async () => {

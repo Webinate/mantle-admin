@@ -132,7 +132,11 @@ export class PostForm extends React.Component<Props, State> {
               <i>Author: </i>
               <UserPicker
                 canEdit={this.props.isAdmin}
-                onChange={user => this.setState( { editable: { ...this.state.editable, author: user ? user.username : '' } } )}
+                onChange={user => {
+                  this.setState( {
+                    editable: { ...this.state.editable, author: user ? user : '' }
+                  } );
+                }}
                 user={this.state.editable.author ? this.state.editable.author as IUserEntry<'client'> : null}
               />
             </div>
