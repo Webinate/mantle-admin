@@ -11,6 +11,7 @@ import { UserPicker } from '../user-picker';
 import { CategoryEditor } from '../../containers/category-editor';
 
 export type Props = {
+  activeUser: IUserEntry<'client'>;
   isAdmin: boolean;
   id?: string;
   post?: Partial<IPost<'client'>> | null;
@@ -59,7 +60,8 @@ export class PostForm extends React.Component<Props, State> {
       slug: '',
       featuredImage: '',
       createdOn: Date.now(),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
+      author: this.props.activeUser
     }
   }
 

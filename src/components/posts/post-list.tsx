@@ -167,6 +167,7 @@ export class PostList extends React.Component<Props, State> {
             </div>
 
             <Toggle
+              style={{ margin: '10px 0 0 0' }}
               label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
               labelPosition="right"
               toggled={this.state.sortAscending}
@@ -174,7 +175,7 @@ export class PostList extends React.Component<Props, State> {
             />
           </div>
           <div>
-            <h3>Sort by Visibility:</h3>
+            <h3>Filter Visibility:</h3>
             <IconMenu
               open={this.state.visibilityOpen}
               onRequestChange={( e ) => this.setState( { visibilityOpen: e } )}
@@ -200,7 +201,7 @@ export class PostList extends React.Component<Props, State> {
               className="mt-filter-visibility">{this.state.visibility}</div>
           </div>
           <div>
-            <h3>Sort by User:</h3>
+            <h3>Filter User:</h3>
             <UserPicker
               user={this.state.user}
               imageSize={26}
@@ -290,7 +291,7 @@ const Filter = styled.div`
     border-bottom: 1px solid ${theme.light100.border };
   }
 
-  .mt-filter-visibility {
+  .mt-filter-visibility, .mt-filter-sortby {
     text-transform: capitalize;
     margin: 0 0 0 5px;
     display: inline-block;

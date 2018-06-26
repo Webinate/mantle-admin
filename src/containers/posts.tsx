@@ -169,10 +169,12 @@ export class Posts extends React.Component<Props, State> {
             <Route path="/dashboard/posts/new" render={props => <PostForm
               onCreate={post => this.props.createPost( post )}
               isAdmin={isAdmin}
+              activeUser={this.props.user!}
             />}
             />
             <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm
               id={props.match.params.postId}
+              activeUser={this.props.user!}
               onFetch={id => {
                 this.props.getPost( id );
                 this.props.getCategories();
