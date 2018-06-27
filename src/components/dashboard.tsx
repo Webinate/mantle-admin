@@ -32,7 +32,10 @@ export class Dashboard extends React.Component<Props, State> {
 
   render() {
     const headerHeight = 60;
-    const menuItemStyle: React.CSSProperties = { color: theme.light200.softColor };
+    const menuItemStyle: React.CSSProperties = {
+      color: theme.primary100.background,
+      fontSize: '20px'
+    };
 
     return (
       <DashboardOuter className="mt-dashboard">
