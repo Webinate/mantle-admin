@@ -222,6 +222,9 @@ export default class PostsPage extends Page {
     await this.doneLoading();
   }
 
+  /**
+   * Open or close the filter options
+   */
   async toggleFilterOptionsPanel( open: boolean ) {
     await this.page.click( '.mt-posts-filter' );
     if ( open )
@@ -230,11 +233,17 @@ export default class PostsPage extends Page {
       await this.page.waitFor( '.mt-filters-panel.closed' );
   }
 
+  /**
+   * Click the sort order toggle
+   */
   async clickSortOrder() {
     await this.page.click( '.mt-sort-order' );
     await this.doneLoading();
   }
 
+  /**
+   * Select what to sort by
+   */
   async selectSortType( type: 'created' | 'modified' | 'title' ) {
     await this.page.click( '.mt-filter-sortby' );
     await this.page.waitFor( '.mt-filter-sortby-modified' );
@@ -243,6 +252,9 @@ export default class PostsPage extends Page {
     await this.doneLoading();
   }
 
+  /**
+   * Select the visibility filter
+   */
   async selectVisibility( type: 'all' | 'public' | 'private' ) {
     await this.page.click( '.mt-filter-visibility' );
     await this.page.waitFor( '.mt-filter-visibility-public' );
@@ -251,8 +263,12 @@ export default class PostsPage extends Page {
     await this.doneLoading();
   }
 
-  selectUserFilter( val?: string ) {
-    return this.user( val );
+  /**
+   * Select the user filter
+   */
+  async selectUserFilter( val?: string ) {
+    await this.user( val );
+    await this.doneLoading();
   }
 
   /**

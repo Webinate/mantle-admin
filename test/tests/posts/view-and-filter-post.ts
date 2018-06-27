@@ -7,29 +7,42 @@ import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
+import { UsersController } from '../../../../../src/controllers/users';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let posts: IPost<'client'>[] = [];
+let postA: IPost<'client'>;
+let postB: IPost<'client'>;
 let controller: PostsController;
-let postNames = [ 'aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff', 'ggg', 'hhh', 'iii',
-  'jjj', 'kkk', 'lll', 'mmm' ];
 
 describe( 'View and filter posts created by backend', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );
+    const users = ControllerFactory.get( 'users' );
+
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    for ( let postName of postNames ) {
-      posts.push( await controller.create( {
-        title: postName,
-        slug: randomId(),
-        public: false,
-        content: 'This is a post\'s content'
-      } ) );
-    }
+    const joeUser = await users.getUser( joe.username );
+    const adminUser = await users.getUser( admin.username );
+
+    postA = await controller.create( {
+      title: 'AAAA',
+      slug: randomId(),
+      public: false,
+      author: joeUser.dbEntry._id.toString(),
+      content: 'This is a post\'s content'
+    } );
+
+    postB = await controller.create( {
+      title: 'zzzz',
+      slug: randomId(),
+      public: true,
+      author: adminUser.dbEntry._id.toString(),
+      content: 'This is a post\'s content'
+    } );
+
 
     await postPage.load( admin );
   } )
@@ -37,7 +50,7 @@ describe( 'View and filter posts created by backend', function() {
   it( 'Post is available in post dashboard & visible to admin', async () => {
     const postsOnPage = await postPage.getPosts();
     assert( postsOnPage.length > 0 );
-    assert.equal( postsOnPage[ 0 ].name, posts[ posts.length - 1 ].title );
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
   } )
 
   it( 'Posts can filter by title', async () => {
@@ -45,21 +58,79 @@ describe( 'View and filter posts created by backend', function() {
     let postsOnPage = await postPage.getPosts();
     assert( postsOnPage.length === 0 );
 
-    await postPage.filter( postNames[ 0 ] );
+    await postPage.filter( postA.title );
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, posts[ 0 ].title );
+    assert.equal( postsOnPage[ 0 ].name, postA.title );
+  } )
+
+  it( 'Can sort by title, creation date, modified date', async () => {
+    await postPage.load( admin );
+    await postPage.toggleFilterOptionsPanel( true );
+    await postPage.selectSortType( 'title' );
+
+    // Check the name sorting (desc to begin with)
+    let postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
+
+    // Reverse (now asc)
+    await postPage.clickSortOrder();
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postA.title );
+
+    // Check the creation date sorting (desc)
+    await postPage.selectSortType( 'created' );
+    await postPage.clickSortOrder();
+
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
+    assert.equal( postsOnPage[ 1 ].name, postA.title );
+
+    // Check the modified date sorting (desc)
+    await postPage.selectSortType( 'modified' );
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
+    assert.equal( postsOnPage[ 1 ].name, postA.title );
+  } )
+
+  it( 'Posts can filter by visibility', async () => {
+    await postPage.load( admin );
+    await postPage.toggleFilterOptionsPanel( true );
+
+    await postPage.selectVisibility( 'public' );
+    let postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
+
+    await postPage.selectVisibility( 'private' );
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postA.title );
+
+    await postPage.selectVisibility( 'all' );
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
+  } )
+
+  it( 'Posts can filter by user', async () => {
+    await postPage.load( admin );
+    await postPage.toggleFilterOptionsPanel( true );
+
+    await postPage.selectUserFilter( joe.email );
+    let postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postA.title );
+
+    await postPage.selectUserFilter( admin.email );
+    postsOnPage = await postPage.getPosts();
+    assert.equal( postsOnPage[ 0 ].name, postB.title );
   } )
 
   it( 'Post is private & not visible to regular user in dashboard', async () => {
     await postPage.load( joe );
     const postsOnPage = await postPage.getPosts();
     if ( postsOnPage.length > 0 )
-      assert.notEqual( postsOnPage[ 0 ].name, posts[ posts.length - 1 ].title );
+      assert.notEqual( postsOnPage[ 0 ].name, postA.title );
   } )
 
   after( async () => {
-    for ( const post of posts ) {
-      await controller.removePost( post._id.toString() );
-    }
+    await controller.removePost( postA._id.toString() );
+    await controller.removePost( postB._id.toString() );
   } )
 } );
