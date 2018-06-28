@@ -13,7 +13,7 @@ let admin: Agent, joe: Agent;
 let singlePost: IPost<'client'>, multiPost1: IPost<'client'>, multiPost2: IPost<'client'>;
 let controller: PostsController;
 
-describe( 'Testing the Deletion of posts', function() {
+describe( 'Testing the Deletion of posts: ', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );

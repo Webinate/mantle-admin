@@ -4,7 +4,7 @@ import { } from 'mocha';
 import { IUserEntry } from 'modepress/src';
 let auth = new AuthPage();
 
-describe( 'Register failures', function() {
+describe( 'Register failures: ', function() {
 
   before( async () => {
     await auth.load( false );

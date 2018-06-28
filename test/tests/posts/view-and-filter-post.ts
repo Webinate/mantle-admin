@@ -15,7 +15,7 @@ let postA: IPost<'client'>;
 let postB: IPost<'client'>;
 let controller: PostsController;
 
-describe( 'View and filter posts created by backend', function() {
+describe( 'View and filter posts created by backend: ', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );

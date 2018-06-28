@@ -6,7 +6,7 @@ import Agent from '../../utils/agent';
 let users = new UsersPage();
 let joe: Agent, joey: Agent, mary: Agent, unActivatedUser: Agent;
 
-describe( 'Finds users by username and email', function() {
+describe( 'Finds users by username and email: ', function() {
 
   before( async () => {
     const agent = await utils.refreshAdminToken();

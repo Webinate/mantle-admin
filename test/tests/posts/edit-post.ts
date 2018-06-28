@@ -14,7 +14,7 @@ let post: IPost<'client'>;
 let controller: PostsController;
 let newSlug = randomId();
 
-describe( 'View & edit post created by backend', function() {
+describe( 'View & edit post created by backend: ', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );

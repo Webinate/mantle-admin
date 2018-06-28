@@ -4,7 +4,7 @@ import { } from 'mocha';
 import { IUserEntry } from 'modepress/src';
 let auth = new AuthPage();
 
-describe( 'Successful login/logout', function() {
+describe( 'Successful login/logout: ', function() {
 
   before( async () => {
     await auth.load();
