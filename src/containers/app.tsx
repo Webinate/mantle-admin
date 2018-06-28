@@ -14,8 +14,10 @@ import theme from '../theme/mui-theme';
 import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
 import { matchPath } from 'react-router';
 import GroupIcon from 'material-ui/svg-icons/social/group';
+import MediaLibIcon from 'material-ui/svg-icons/image/photo-library';
 import HomeIcon from 'material-ui/svg-icons/action/home';
 import PostsIcon from 'material-ui/svg-icons/action/description';
+import { Media } from './media';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -73,11 +75,12 @@ export class App extends React.Component<Props, State> {
   }
 
   render() {
-
+    const iconStyle: React.CSSProperties = { color: 'inherit' };
     const items = [
-      { label: 'Home', icon: <HomeIcon style={{ color: 'inherit' }} />, exact: true, path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
-      { label: 'Posts', icon: <PostsIcon style={{ color: 'inherit' }} />, exact: false, path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
-      { label: 'Users', icon: <GroupIcon style={{ color: 'inherit' }} />, exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) }
+      { label: 'Home', icon: <HomeIcon style={iconStyle} />, exact: true, path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
+      { label: 'Posts', icon: <PostsIcon style={iconStyle} />, exact: false, path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
+      { label: 'Users', icon: <GroupIcon style={iconStyle} />, exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) },
+      { label: 'Media', icon: <MediaLibIcon style={iconStyle} />, exact: false, path: '/dashboard/media', onClick: () => this.goTo( '/dashboard/media' ) }
     ];
 
     return (
@@ -125,6 +128,9 @@ export class App extends React.Component<Props, State> {
                 }} />
                 <Route path="/dashboard/users" render={props => {
                   return <Users {...{} as any} />
+                }} />
+                <Route path="/dashboard/media" render={props => {
+                  return <Media {...{ location: props.location } as any} />
                 }} />
                 <Route render={props => <h1>Not Found</h1>} />
               </Switch>
