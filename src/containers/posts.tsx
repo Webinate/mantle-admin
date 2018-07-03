@@ -5,17 +5,17 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import { ContentHeader } from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
-import { TextField, IconButton, FontIcon, RaisedButton, FlatButton, Dialog } from 'material-ui';
-import FontCancel from 'material-ui/svg-icons/navigation/arrow-back';
+import { TextField, IconButton, Icon, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Tooltip } from '@material-ui/core';
+import FontCancel from '@material-ui/icons/ArrowBack';
 import { IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import { PostList } from '../components/posts/post-list';
 import { PostForm } from '../components/posts/post-form';
-import FilterIcon from 'material-ui/svg-icons/content/filter-list';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import SearchIcon from 'material-ui/svg-icons/action/search';
+import FilterIcon from '@material-ui/icons/FilterList';
+import DeleteIcon from '@material-ui/icons/Delete';
+import SearchIcon from '@material-ui/icons/Search';
 import { GetAllOptions } from '../../../../src/lib-frontend/posts';
 
 // Map state to props
@@ -103,12 +103,13 @@ export class Posts extends React.Component<Props, State> {
           renderFilters={() => {
             if ( !inPostsRoot ) {
               return (
-                <FlatButton
+                <Button
                   style={{ margin: '5px 0 0 0' }}
                   onClick={e => this.props.push( '/dashboard/posts' )}
-                  icon={<FontCancel />}
-                  label="Back"
-                />
+                >
+                  <FontCancel />
+                  Back
+                </Button>
               );
             }
             else
@@ -116,50 +117,51 @@ export class Posts extends React.Component<Props, State> {
                 <div>
                   <TextField
                     className="posts-filter"
-                    hintText="Filter by title or content"
+                    helperText="Filter by title or content"
                     id="mt-posts-filter"
                     value={this.state.searchFilter}
                     onKeyDown={e => {
                       if ( e.keyCode === 13 )
                         this.onSearch();
                     }}
-                    onChange={( e, text ) => this.setState( { searchFilter: text } )}
+                    onChange={( e ) => this.setState( { searchFilter: e.currentTarget.value } )}
                   />
                   <IconButton
                     style={headerIconStyle}
                     className="mt-posts-search"
-                    iconStyle={{ color: theme.primary200.background }}
                     onClick={e => this.onSearch()}
                   >
-                    <SearchIcon />
+                    <SearchIcon style={{ color: theme.primary200.background }} />
                   </IconButton>
-                  <IconButton
-                    style={headerIconStyle}
-                    tooltip={this.state.filtersOpen ? 'Close filter options' : 'Open filter options'}
-                    className="mt-posts-filter"
-                    onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
-                    iconStyle={{ color: theme.primary200.background }}
-                  >
-                    <FilterIcon />
-                  </IconButton>
-                  <IconButton
-                    style={headerIconStyle}
-                    tooltip="Delete selected posts"
-                    className="mt-posts-delete-multi"
-                    iconStyle={{ color: theme.primary200.background }}
-                    disabled={this.state.selectedPosts.length > 0 ? false : true}
-                    onClick={e => this.onDeleteMultiple()}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                  <RaisedButton
+                  <Tooltip title={this.state.filtersOpen ? 'Close filter options' : 'Open filter options'}>
+                    <IconButton
+                      style={headerIconStyle}
+                      className="mt-posts-filter"
+                      onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
+                    >
+                      <FilterIcon style={{ color: theme.primary200.background }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete selected posts">
+                    <IconButton
+                      style={headerIconStyle}
+                      className="mt-posts-delete-multi"
+                      disabled={this.state.selectedPosts.length > 0 ? false : true}
+                      onClick={e => this.onDeleteMultiple()}
+                    >
+                      <DeleteIcon style={{ color: theme.primary200.background }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Button
+                    variant="contained"
                     onClick={e => this.props.push( '/dashboard/posts/new' )}
                     className="mt-new-post"
                     disabled={isAdmin ? false : true}
-                    primary={true}
-                    icon={<FontIcon
-                      className="icon icon-add"
-                    />} label="New Post" />
+                    color="primary"
+                  >
+                    <Icon className="icon icon-add" />
+                    New Post
+                    </Button>
                 </div>
               )
           }}>
@@ -203,12 +205,25 @@ export class Posts extends React.Component<Props, State> {
         </PostsContainer>
 
         {this.state.showDeleteModal ? <Dialog
-          contentClassName="mt-post-del-dialog"
-          bodyClassName="mt-post-del-dialog-body"
           open={true}
-          actions={[
-            <FlatButton
-              label="Cancel"
+        >
+          <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+          <DialogContent className="mt-post-del-dialog">
+            <DialogContentText className="mt-post-del-dialog-body">
+              To subscribe to this website, please enter your email address here. We will send
+              updates occasionally.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Email Address"
+              type="email"
+              fullWidth
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
               style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
               className="mt-cancel-delpost"
               onClick={e => {
@@ -217,10 +232,11 @@ export class Posts extends React.Component<Props, State> {
                   showDeleteModal: false
                 } )
               }}
-            />,
-            <RaisedButton
-              label="Yes"
-              primary={true}
+            >Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
               style={{ verticalAlign: 'middle' }}
               className="mt-confirm-delpost"
               onClick={e => {
@@ -232,9 +248,8 @@ export class Posts extends React.Component<Props, State> {
                 this.setState( { showDeleteModal: false } )
                 this._selectedPost = null;
               }}
-            />
-          ]}
-        >
+            >Yes</Button>
+          </DialogActions>
           {this._selectedPost ?
             `Are you sure you want to delete the post '${ this._selectedPost.title }'?` :
             `Are you sure you want to delete these [${ this.state.selectedPosts.length }] posts?`}

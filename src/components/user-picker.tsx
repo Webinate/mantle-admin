@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, Popover, AutoComplete, MenuItem, IconButton } from 'material-ui';
-import CloseIcon from 'material-ui/svg-icons/navigation/close';
+import { Avatar, Popover, MenuItem, IconButton, ListItemText, ListItemIcon, Input, Menu } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
 import { users } from 'modepress/src/lib-frontend';
@@ -19,6 +19,7 @@ type State = {
   elm: Element | null;
   open: boolean;
   users: IUserEntry<'client'>[];
+  username: string;
 };
 
 export class UserPicker extends React.Component<Props, State> {
@@ -34,34 +35,38 @@ export class UserPicker extends React.Component<Props, State> {
     this.state = {
       elm: null,
       open: false,
-      users: []
+      users: [],
+      username: ''
     }
   }
 
   async onUpdateInput( user: string ) {
     const page = await users.getAll( { search: user } );
-    this.setState( { users: page.data } );
+    this.setState( { username: user, users: page.data } );
   }
 
   private elm: HTMLElement | null;
 
   render() {
-    const suggestions = this.state.users.map( ( user, index ) => {
-      return {
-        text: user.username,
-        value: (
-          <MenuItem
-            key={`user-${ index }`}
-            className="mt-user-drop-item"
-            primaryText={user.username}
-            rightAvatar={<Avatar
-              backgroundColor={theme.light400.background}
-              src={generateAvatarPic( user.avatar )}
-            />}
-          />
-        ),
-      }
-    } );
+    // const suggestions = this.state.users.map( ( user, index ) => {
+    //   return {
+    //     text: user.username,
+    //     value: (
+    //       <MenuItem
+    //         key={`user-${ index }`}
+    //         className="mt-user-drop-item"
+    //       >
+    //       <ListItemIcon>
+    //       <Avatar
+    //           style={{background: theme.light400.background}}
+    //           src={generateAvatarPic( user.avatar )}
+    //         />
+    //       </ListItemIcon>
+    //       <ListItemText  primary={user.username}/>
+    //       </MenuItem>
+    //     ),
+    //   }
+    // } );
 
     return <div
       ref={e => this.elm = e}
@@ -86,10 +91,11 @@ export class UserPicker extends React.Component<Props, State> {
       <Avatar
         style={{
           verticalAlign: 'middle',
-          margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px'
+          margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px',
+          background: theme.light400.background,
+          height: this.props.imageSize,
+          width: this.props.imageSize
         }}
-        size={this.props.imageSize}
-        backgroundColor={theme.light400.background}
         src={generateAvatarPic( this.props.user ? this.props.user.avatar : null )}
       />
       {this.props.labelPosition === 'right' ? <span
@@ -104,18 +110,48 @@ export class UserPicker extends React.Component<Props, State> {
         style={{ padding: 5 }}
         anchorEl={this.elm!}
         open={true}
-        onRequestClose={e => this.setState( { open: false } )}
+        onClose={e => this.setState( { open: false } )}
       >
-        <AutoComplete
+        <Input
+          autoFocus={true}
+          placeholder="Type user name"
+          style={{ padding: 5 }}
+          className="mt-user-autocomplete"
+          value={this.state.username}
+          onChange={e => this.onUpdateInput( e.currentTarget.value )}
+        />
+        <Menu
+          open={this.state.users.length > 0 && this.state.open}
+
+        >
+          {this.state.users.map( ( user, index ) => {
+            return (
+              <MenuItem
+                key={`user-${ index }`}
+                onClick={e => {
+                  this.props.onChange( user );
+                  this.setState( { open: false, users: [] } );
+                }}
+              >
+                <ListItemIcon>
+                  <Avatar
+                    style={{ background: theme.light400.background }}
+                    src={generateAvatarPic( user.avatar )}
+                  />
+                </ListItemIcon>
+                <ListItemText primary={user.username} />
+              </MenuItem>
+            )
+          } )}
+        </Menu>
+
+        {/* <AutoComplete
           ref={( e: any ) => {
             if ( e ) {
               setTimeout( () => { e.refs.searchTextField && e.focus() }, 100 );
             }
           }}
-          className="mt-user-autocomplete"
-          style={{ padding: 5 }}
-          hintText="Type user name"
-          openOnFocus={true}
+
           dataSource={suggestions}
           onNewRequest={( item, index ) => {
             const user = this.state.users.find( e => e.username === item.text );
@@ -127,7 +163,8 @@ export class UserPicker extends React.Component<Props, State> {
           }}
           filter={AutoComplete.noFilter}
           onUpdateInput={e => this.onUpdateInput( e )}
-        />
+        /> */}
+
         <IconButton onClick={e => {
           this.props.onChange( null );
           this.setState( { open: false, users: [] } );

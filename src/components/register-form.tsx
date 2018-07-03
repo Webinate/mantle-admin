@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { RaisedButton, TextField, FontIcon } from 'material-ui';
+import { Button, Icon, InputLabel, FormControl, Input, FormHelperText } from '@material-ui/core';
 import { default as styled } from '../theme/styled';
 
 type Props = {
@@ -39,54 +39,73 @@ export class RegisterForm extends React.Component<Props, State> {
   render() {
     return (
       <form className="register-form" action="" name="register">
-        <TextField
-          className="mt-username"
-          value={this.state.user}
-          onChange={( e, text ) => this.setState( { user: text } )}
+        <FormControl
+          aria-describedby="mt-username-text"
           fullWidth={true}
-          floatingLabelText="Username"
-          type="text"
-          name="username"
-          errorText={this.state.formSubmitted && !this.state.user ? 'Please specify a username' : ''}
-          id="user" />
-        <TextField
-          className="mt-email"
-          value={this.state.email}
-          onChange={( e, text ) => this.setState( { email: text } )}
+        >
+          <InputLabel htmlFor="user">Username</InputLabel>
+          <Input
+            id="user"
+            name="username"
+            value={this.state.user}
+            onChange={( e ) => this.setState( { user: e.currentTarget.value } )}
+          />
+          {this.state.formSubmitted && !this.state.user ? <FormHelperText id="mt-username-text">Please specify a username</FormHelperText> : undefined}
+        </FormControl>
+
+        <FormControl
+          aria-describedby="mt-email-text"
           fullWidth={true}
-          floatingLabelText="Email"
-          type="text"
-          name="username"
-          errorText={this.state.formSubmitted && !this.state.email ? 'Please specify an email' : ''}
-          id="email" />
-        <TextField
-          className="mt-password"
-          value={this.state.pass}
-          onChange={( e, text ) => this.setState( { pass: text } )}
+        >
+          <InputLabel htmlFor="user">Email</InputLabel>
+          <Input
+            id="email"
+            name="email"
+            value={this.state.email}
+            onChange={( e ) => this.setState( { email: e.currentTarget.value } )}
+          />
+          {this.state.formSubmitted && !this.state.email ? <FormHelperText id="mt-email-text">Please specify an email</FormHelperText> : undefined}
+        </FormControl>
+
+        <FormControl
+          aria-describedby="mt-password-text"
           fullWidth={true}
-          errorText={this.state.formSubmitted && !this.state.pass ? 'Please specify a password' : ''}
-          floatingLabelText="Password"
-          type="password"
-          name="password"
-          id="pass" />
-        <TextField
-          className="mt-password2"
-          value={this.state.pass2}
-          onChange={( e, text ) => this.setState( { pass2: text } )}
+        >
+          <InputLabel htmlFor="user">Password</InputLabel>
+          <Input
+            id="pass"
+            name="password"
+            type="password"
+            value={this.state.pass}
+            onChange={( e ) => this.setState( { pass: e.currentTarget.value } )}
+          />
+          {this.state.formSubmitted && !this.state.pass ? <FormHelperText id="mt-password-text">Please specify a password</FormHelperText> : undefined}
+        </FormControl>
+
+        <FormControl
+          aria-describedby="mt-password2-text"
           fullWidth={true}
-          floatingLabelText="Repeat Password"
-          type="password" name="password2"
-          errorText={this.state.pass !== this.state.pass2 ? 'Passwords do not match' : ''}
-          id="pass2" />
+        >
+          <InputLabel htmlFor="user">Repeat Password</InputLabel>
+          <Input
+            id="pass2"
+            name="password2"
+            type="password"
+            value={this.state.pass2}
+            onChange={( e ) => this.setState( { pass2: e.currentTarget.value } )}
+          />
+          {this.state.pass !== this.state.pass2 ? <FormHelperText id="mt-password-text">Passwords do not match</FormHelperText> : undefined}
+        </FormControl>
+
         <ButtonsDiv>
-          <RaisedButton
+          <Button
+            variant="contained"
             className="mt-register-btn"
             disabled={this.props.loading}
-            label="Create Account"
             fullWidth={true}
             onClick={e => this.onRegister()}
-            icon={<FontIcon className="icon icon-group-add" />}
-            primary={true} />
+            color="primary"
+          ><Icon className="icon icon-group-add" />Create Account</Button>
           <AnchorBtnsDiv>
             <Link
               to="/login"

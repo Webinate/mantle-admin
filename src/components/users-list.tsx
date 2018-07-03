@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar } from 'material-ui';
+import { Avatar } from '@material-ui/core';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import * as moment from 'moment';
@@ -33,7 +33,7 @@ export class UsersList extends React.Component<Props, any> {
           >
             <Avatar
               src={generateAvatarPic( user.avatar )}
-              size={80}
+              style={{ height: 80, width: 80 }}
             />
             <Details selected={selected}>
               <div><strong className="mt-user-name">{user.username}</strong></div>

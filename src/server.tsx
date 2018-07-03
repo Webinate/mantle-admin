@@ -10,19 +10,17 @@ import createStore from './utils/createStore';
 import { HTML } from './components/html';
 import { apiUrl } from './utils/httpClients';
 import createHistory from 'history/createMemoryHistory';
-const ReactDOMServer = require( 'react-dom/server' );
+import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import { Controller } from 'modepress';
 import { IAuthReq, IClient } from 'modepress';
 import { authentication, serializers } from 'modepress';
-import { MuiThemeProvider, getMuiTheme } from 'material-ui/styles';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
 
 // Needed for onTouchTap
-import * as injectTapEventPlugin from 'react-tap-event-plugin';
 import { Action } from 'redux';
 import { RedirectError } from './server/errors';
-injectTapEventPlugin();
 
 /**
  * The default entry point for the admin server
@@ -76,7 +74,7 @@ export default class MainController extends Controller {
     let initialState: Partial<IRootState> = {}
     const muiAgent = req.headers[ 'user-agent' ];
     const store = createStore( initialState, history );
-    const theme = getMuiTheme( Theme, { userAgent: muiAgent } );
+    const theme = createMuiTheme( Theme );
 
     let actions: Action[];
     try {
@@ -94,9 +92,9 @@ export default class MainController extends Controller {
         store.dispatch( action );
 
       const sheet = new ServerStyleSheet();
-      let html = ReactDOMServer.renderToString( sheet.collectStyles(
+      let html = renderToString( sheet.collectStyles(
         <Provider store={store}>
-          <MuiThemeProvider muiTheme={theme}>
+          <MuiThemeProvider theme={theme}>
             <StaticRouter location={url} context={context}>
               <App {...{} as any} />
             </StaticRouter>
@@ -116,7 +114,7 @@ export default class MainController extends Controller {
       }
 
       initialState = store.getState();
-      html = ReactDOMServer.renderToStaticMarkup( <HTML html={html} styles={styleTags} intialData={initialState} agent={muiAgent} /> );
+      html = renderToStaticMarkup( <HTML html={html} styles={styleTags} intialData={initialState} agent={muiAgent} /> );
       res.send( html );
     }
     catch ( err ) {
@@ -126,7 +124,7 @@ export default class MainController extends Controller {
 
   private renderError( res: express.Response, err: Error ) {
     res.status( 500 );
-    res.send( ReactDOMServer.renderToStaticMarkup(
+    res.send( renderToStaticMarkup(
       <html>
         <body>
           <div>An Error occurred while rendering the application: {err.message}</div>

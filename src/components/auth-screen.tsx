@@ -2,7 +2,7 @@ import * as React from 'react';
 import { LoginForm } from './login-form';
 import { RegisterForm } from './register-form';
 import MantleDiv from './mantle-background';
-import { LinearProgress } from 'material-ui';
+import { LinearProgress } from '@material-ui/core';
 import { default as styled } from '../theme/styled';
 
 type Props = {

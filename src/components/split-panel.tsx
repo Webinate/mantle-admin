@@ -154,8 +154,8 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
           style={panel1Style}
           delay={this.props.delay!}
           isVertical={isVertical}
-          width={panel1Style.width}
-          height={panel1Style.height}
+          width={panel1Style.width as string}
+          height={panel1Style.height as string}
         >
           {this.state.dragging ? <PanelInput /> : null}
           {first}
@@ -182,8 +182,8 @@ export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelSta
           style={panel2Style}
           delay={this.props.delay!}
           isVertical={isVertical}
-          width={panel2Style.width}
-          height={panel2Style.height}
+          width={panel2Style.width as string}
+          height={panel2Style.height as string}
         >
           {this.state.dragging ? <PanelInput /> : null}
           {second}
@@ -305,7 +305,7 @@ background: transparent;
 
 const FirstPanel = styled.div`
 overflow: auto;
-transition: ${ ( props: PanelProps ) => props.delay ? `${ props.delay }s width, ${ props.delay }s height;` : '' }
+transition: ${ ( props: PanelProps ) => props.delay ? `${ props.delay }s width, ${ props.delay }s height;` : '' };
 width: ${ ( props: PanelProps ) => props.width };
 height: ${ ( props: PanelProps ) => props.height };
 ${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };
@@ -313,7 +313,7 @@ ${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };
 
 const SecondPanel = styled.div`
 overflow: auto;
-transition: ${ ( props: PanelProps ) => props.delay ? `${ props.delay }s width, ${ props.delay }s height;` : '' }
+transition: ${ ( props: PanelProps ) => props.delay ? `${ props.delay }s width, ${ props.delay }s height;` : '' };
 width: ${ ( props: PanelProps ) => props.width };
 height: ${ ( props: PanelProps ) => props.height };
 ${ ( props: PanelProps ) => props.isVertical ? 'display: inline-block;' : '' };

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IconButton, Popover, MenuItem, FontIcon, Avatar } from 'material-ui';
+import { IconButton, Popover, MenuItem, Avatar, Icon, ListItemIcon, ListItemText } from '@material-ui/core';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { Stage } from './stage';
@@ -52,7 +52,7 @@ export class Dashboard extends React.Component<Props, State> {
               }}
             >
               <Avatar
-                backgroundColor={theme.primary300.background}
+                style={{ background: theme.primary300.background }}
                 src={generateAvatarPic( this.props.activeUser.avatar )}
               />
             </div>
@@ -61,32 +61,43 @@ export class Dashboard extends React.Component<Props, State> {
               open={this.state.open}
               anchorEl={this.state.anchorEl}
               anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-              onRequestClose={() => this.setState( { open: false } )}
-              animated={this.props.animated}
+              transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+              transitionDuration={this.props.animated ? 'auto' : 0}
+              onClose={() => this.setState( { open: false } )}
             >
               <Menu>
                 <MenuItem
                   className="mt-settings"
-                  leftIcon={<FontIcon style={menuItemStyle} className="icon icon-settings" />}
-                  primaryText="Settings"
-                />
+                >
+                  <ListItemIcon>
+                    <Icon style={menuItemStyle} className="icon icon-settings" />
+                  </ListItemIcon>
+                  <ListItemText primary="Settings" />
+                </MenuItem>
+
                 <MenuItem
                   className="mt-logout"
-                  leftIcon={<FontIcon style={menuItemStyle} className="icon icon-exit" />}
                   onClick={e => this.props.onLogOut()}
-                  primaryText="Logout"
-                />
+                >
+                  <ListItemIcon>
+                    <Icon style={menuItemStyle} className="icon icon-exit" />
+                  </ListItemIcon>
+                  <ListItemText primary="Logout" />
+                </MenuItem>
+
               </Menu>
             </Popover>
           </div>
 
           <IconButton
             style={{ color: 'inherit' }}
-            iconStyle={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }}
             onClick={e => this.props.onHome()}
-            iconClassName="icon icon-mantle"
-          />
+          >
+            <Icon
+              style={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }}
+              className="icon icon-mantle"
+            />
+          </IconButton>
           <h1>{this.props.title}</h1>
         </Head>
         <Stage

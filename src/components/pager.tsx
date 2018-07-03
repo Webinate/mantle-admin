@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { IconButton, FlatButton } from 'material-ui';
+import { IconButton, Button } from '@material-ui/core';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import LeftIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
-import RightIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right';
+import LeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import RightIcon from '@material-ui/icons/KeyboardArrowRight';
 
 export type Props = {
   index: number;
@@ -48,25 +48,25 @@ export class Pager extends React.Component<Props, State> {
             </Text>
             <Buttons>
               <NavBtn>
-                <FlatButton
+                <Button
                   className="mt-pager-first"
                   style={{ minWidth: '54px' }}
                   disabled={this.props.loading || index === 0}
                   onClick={e => {
                     this.props.onPage( 0 )
                   }}
-                >First</FlatButton>
+                >First</Button>
               </NavBtn>
 
               <NavBtn>
-                <FlatButton
+                <Button
                   className="mt-pager-last"
                   style={{ minWidth: '54px' }}
                   disabled={this.props.loading || index + limit >= total}
                   onClick={e => {
                     this.props.onPage( total - ( total % limit ) )
                   }}
-                >Last</FlatButton>
+                >Last</Button>
               </NavBtn>
 
               <NavBtn>

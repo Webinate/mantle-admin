@@ -10,8 +10,8 @@ import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
 import { UserProperties } from '../components/users-properties';
 import { SplitPanel } from '../components/split-panel';
-import { TextField, IconButton, LinearProgress, Dialog, FlatButton, RaisedButton } from 'material-ui';
-import SearchIcon from 'material-ui/svg-icons/action/search';
+import { TextField, IconButton, LinearProgress, Dialog, Button, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -91,34 +91,35 @@ export class Users extends React.Component<Props, State> {
   }
 
   renderModal( onConfirm: () => void ) {
-    const actions = [
-      <FlatButton
-        className="mt-cancel"
-        label="Cancel"
-        primary={true}
-        onClick={e => this.setState( { dialogue: null } )}
-      />,
-      <RaisedButton
-        className="mt-confirm"
-        backgroundColor={theme.error.background}
-        labelColor={theme.error.color}
-        label={this.state.dialogueConfirmBtn}
-        onClick={e => {
-          this.setState( { dialogue: null } );
-          onConfirm();
-        }}
-      />,
-    ];
+
 
     return (
       <Dialog
         className="mt-users-modal"
-        title={this.state.dialogueHeader}
-        actions={actions}
-        modal={true}
         open={true}
       >
-        <span className="mt-modal-message">{this.state.dialogue}</span>
+        <DialogTitle>{this.state.dialogueHeader}</DialogTitle>
+        <DialogContent>
+          <DialogContentText className="mt-modal-message">
+            {this.state.dialogue}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            className="mt-cancel"
+            variant="contained" color="primary"
+            onClick={e => this.setState( { dialogue: null } )}
+          >Cancel</Button>
+          <Button
+            variant="contained"
+            className="mt-confirm"
+            style={{ background: theme.error.background, color: theme.error.color }}
+            onClick={e => {
+              this.setState( { dialogue: null } );
+              onConfirm();
+            }}
+          >{this.state.dialogueConfirmBtn}</Button>
+        </DialogActions>
       </Dialog>
     );
   }
@@ -138,22 +139,21 @@ export class Users extends React.Component<Props, State> {
             return <div>
               <TextField
                 className="users-filter"
-                hintText="Filter username or email"
+                helperText="Filter username or email"
                 id="mt-users-filter"
                 value={this.state.userFilter}
                 onKeyDown={e => {
                   if ( e.keyCode === 13 )
                     this.props.getUsers( 0, this.state.userFilter )
                 }}
-                onChange={( e, text ) => this.setState( { userFilter: text } )}
+                onChange={( e ) => this.setState( { userFilter: e.currentTarget.value } )}
               />
               <IconButton
                 id="mt-users-search-button"
                 onClick={e => this.props.getUsers( 0, this.state.userFilter )}
                 style={{ verticalAlign: 'top' }}
-                iconStyle={{ color: theme.primary200.background }}
               >
-                <SearchIcon />
+                <SearchIcon style={{ color: theme.primary200.background }} />
               </IconButton>
             </div>
           }}>

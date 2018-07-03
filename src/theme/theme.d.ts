@@ -1,4 +1,4 @@
-import { MuiTheme } from 'material-ui/styles';
+import { ThemeOptions } from '@material-ui/core/styles/createMuiTheme';
 
 export type ThemeValue = {
   color: string;
@@ -7,7 +7,7 @@ export type ThemeValue = {
   border: string;
 }
 
-export interface ThemeInterface extends MuiTheme {
+export interface ThemeInterface extends ThemeOptions {
   primaryColor: string;
   primaryColorInverted: string;
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import { TextField, Toggle, RaisedButton, IconButton, Chip } from 'material-ui';
-import AddIcon from 'material-ui/svg-icons/content/add';
+import { TextField, Button, IconButton, Chip, Switch, FormControlLabel } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 import { IPost, IUserEntry } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
@@ -155,7 +155,8 @@ export class PostForm extends React.Component<Props, State> {
       </div>
       <div>
         <RightPanel>
-          <RaisedButton
+          <Button
+            variant="contained"
             className="mt-post-confirm"
             onClick={e => {
               if ( this.props.post && this.props.onUpdate )
@@ -163,25 +164,28 @@ export class PostForm extends React.Component<Props, State> {
               else if ( this.props.onCreate )
                 this.props.onCreate( this.state.editable );
             }}
-            primary={true}
+            color="primary"
             fullWidth={true}
             disabled={!this.isPostValid()}
-            label={this.props.post ? 'Update' : 'Publish'}
-          />
-          <Toggle
-            className="mt-visibility-toggle"
-            style={{ margin: '20px 0' }}
+          >{this.props.post ? 'Update' : 'Publish'}</Button>
+
+          <FormControlLabel
+            control={
+              <Switch
+                className="mt-visibility-toggle"
+                style={{ margin: '20px 0' }}
+                checked={this.state.editable.public ? true : false}
+                onChange={e => {
+                  this.setState( {
+                    editable: {
+                      ...this.state.editable,
+                      public: this.state.editable.public ? false : true
+                    }
+                  } )
+                }}
+              />
+            }
             label={this.state.editable.public ? 'Post is Public' : 'Post is Private'}
-            labelPosition="right"
-            toggled={this.state.editable.public ? true : false}
-            onClick={e => {
-              this.setState( {
-                editable: {
-                  ...this.state.editable,
-                  public: this.state.editable.public ? false : true
-                }
-              } )
-            }}
           />
           {this.props.post ?
             <Dates>
@@ -202,22 +206,21 @@ export class PostForm extends React.Component<Props, State> {
             <div>
               <TextField
                 id="mt-add-new-tag"
-                floatingLabelText="Type a tag and hit enter"
+                helperText="Type a tag and hit enter"
                 value={this.state.currentTagText}
                 fullWidth={true}
                 onKeyUp={e => {
                   if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' )
                     this.addTag();
                 }}
-                onChange={( e, val ) => this.setState( { currentTagText: val } )}
+                onChange={( e ) => this.setState( { currentTagText: e.currentTarget.value } )}
               />
             </div>
             <div>
               <IconButton
                 id="mt-add-tag"
                 onClick={e => this.addTag()}
-                iconStyle={{ width: 26, height: 26 }}
-                style={{ padding: 0, width: 30, height: 30 }}><AddIcon />
+                style={{ padding: 0, width: 30, height: 30 }}><AddIcon style={{ width: 26, height: 26 }} />
               </IconButton>
             </div>
           </TagsInput>
@@ -227,7 +230,7 @@ export class PostForm extends React.Component<Props, State> {
                 key={`tag-${ tagIndex }`}
                 className="mt-tag-chip"
                 style={{ margin: '4px 4px 0 0' }}
-                onRequestDelete={e => {
+                onDelete={e => {
                   this.setState( {
                     editable: {
                       ...this.state.editable,
@@ -248,9 +251,9 @@ export class PostForm extends React.Component<Props, State> {
             id="mt-post-desc"
             value={this.state.editable.brief}
             fullWidth={true}
-            multiLine={true}
-            floatingLabelText="Post Brief Description"
-            onChange={( e, value ) => this.setState( { editable: { ...this.state.editable, brief: value } } )}
+            multiline={true}
+            helperText="Post Brief Description"
+            onChange={( e ) => this.setState( { editable: { ...this.state.editable, brief: e.currentTarget.value } } )}
           />
         </RightPanel>
 

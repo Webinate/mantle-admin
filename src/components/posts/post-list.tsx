@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { IconButton, Avatar, MenuItem, Toggle, IconMenu } from 'material-ui';
+import { IconButton, Avatar, MenuItem, FormControlLabel, Switch, Menu } from '@material-ui/core';
 import { Pager } from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-import EditIcon from 'material-ui/svg-icons/content/create';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Create';
 import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
 import { UserPicker } from '../user-picker';
-import ArrowDownIcon from 'material-ui/svg-icons/navigation/arrow-drop-down';
+import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 
 export type Props = {
   animated: boolean;
@@ -142,65 +142,79 @@ export class PostList extends React.Component<Props, State> {
           className={`mt-filters-panel ${ this.props.filtersOpen ? 'open' : 'closed' }`} filtersOpen={this.props.filtersOpen}>
           <div>
             <h3>Sort Order:</h3>
-            <IconMenu
-              open={this.state.sortByOpen}
-              animated={this.props.animated}
-              onRequestChange={( e ) => this.setState( { sortByOpen: e } )}
-              className="mt-filter-sortby-drop"
-              iconButtonElement={<IconButton style={{ padding: 0, height: '20px', width: '20px' }}><ArrowDownIcon /></IconButton>}
+            <IconButton
               style={{ cursor: 'pointer', verticalAlign: 'middle' }}
+              className="mt-filter-sortby-drop"
+              onClick={( e ) => this.setState( { sortByOpen: true } )}
+            >
+              <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
+            </IconButton>
+            <Menu
+              open={this.state.sortByOpen}
+              transitionDuration={this.props.animated ? 'auto' : 0}
+              onClose={( e ) => this.setState( { sortByOpen: false } )}
             >
               <MenuItem
                 className="mt-filter-sortby-title"
                 onClick={e => this.onSortByChange( 'title' )}
-                primaryText="Title" />
+              >Title</MenuItem>
               <MenuItem
                 className="mt-filter-sortby-created"
                 onClick={e => this.onSortByChange( 'created' )}
-                primaryText="Created" />
+              >Created</MenuItem>
               <MenuItem
                 className="mt-filter-sortby-modified"
                 onClick={e => this.onSortByChange( 'modified' )}
-                primaryText="Modified" />
-            </IconMenu>
+              >Modified</MenuItem>
+            </Menu>
             <div
               onClick={e => this.setState( { sortByOpen: true } )}
               className="mt-filter-sortby">
               {this.state.sortBy}
             </div>
 
-            <Toggle
-              className="mt-sort-order"
-              style={{ margin: '10px 0 0 0' }}
+            <FormControlLabel
+              control={
+                <Switch
+                  className="mt-sort-order"
+                  style={{ margin: '10px 0 0 0' }}
+                  checked={this.state.sortAscending}
+                  onChange={e => this.onAscChange()}
+                  value="gilad"
+                />
+              }
               label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
-              labelPosition="right"
-              toggled={this.state.sortAscending}
-              onClick={e => this.onAscChange()}
             />
+
           </div>
           <div>
             <h3>Filter Visibility:</h3>
-            <IconMenu
-              open={this.state.visibilityOpen}
-              animated={this.props.animated}
-              onRequestChange={( e ) => this.setState( { visibilityOpen: e } )}
+            <IconButton
               className="mt-filter-visibility-drop"
-              iconButtonElement={<IconButton style={{ padding: 0, height: '20px', width: '20px' }}><ArrowDownIcon /></IconButton>}
               style={{ cursor: 'pointer', verticalAlign: 'middle' }}
+              onClick={e => this.setState( { visibilityOpen: true } )}
+            >
+              <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
+            </IconButton>
+            <Menu
+              onClose={() => this.setState( { visibilityOpen: false } )}
+              transitionDuration={this.props.animated ? 'auto' : 0}
+              open={this.state.visibilityOpen}
             >
               <MenuItem
                 className="mt-filter-visibility-all"
                 onClick={e => this.onVisibilityChange( 'all' )}
-                primaryText="All" />
+              >All</MenuItem>
               <MenuItem
                 className="mt-filter-visibility-private"
                 onClick={e => this.onVisibilityChange( 'private' )}
-                primaryText="Private" />
+              >Private</MenuItem>
               <MenuItem
                 className="mt-filter-visibility-public"
                 onClick={e => this.onVisibilityChange( 'public' )}
-                primaryText="Public" />
-            </IconMenu>
+              >Public</MenuItem>
+
+            </Menu>
             <div
               onClick={e => this.setState( { visibilityOpen: true } )}
               className="mt-filter-visibility">{this.state.visibility}</div>
@@ -233,18 +247,16 @@ export class PostList extends React.Component<Props, State> {
             >
               {!multipleSelected ? <IconButton
                 style={{ top: 0, right: '30px', position: 'absolute' }}
-                iconStyle={{ color: theme.primary200.background }}
                 className="mt-post-button mt-post-edit"
                 onClick={e => this.props.onEdit( post )}
-              ><EditIcon /></IconButton> : undefined
+              ><EditIcon style={{ color: theme.primary200.background }} /></IconButton> : undefined
               }
               {!multipleSelected ?
                 <IconButton
                   style={{ top: 0, right: 0, position: 'absolute' }}
-                  iconStyle={{ color: theme.primary200.background }}
                   className="mt-post-button mt-post-delete"
                   onClick={e => this.props.onDelete( post )}
-                ><DeleteIcon /></IconButton> : undefined
+                ><DeleteIcon style={{ color: theme.primary200.background }} /></IconButton> : undefined
               }
               <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={post.featuredImage} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
@@ -254,8 +266,7 @@ export class PostList extends React.Component<Props, State> {
               <div className="mt-post-info">
                 <Avatar
                   src={generateAvatarPic( post.author ? ( post.author as IUserEntry<'client'> ).avatar : '' )}
-                  size={60}
-                  style={{ float: 'right', margin: '5px 0 0 0' }}
+                  style={{ width: 60, height: 60, float: 'right', margin: '5px 0 0 0' }}
                 />
                 <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
               </div>

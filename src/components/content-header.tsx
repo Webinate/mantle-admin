@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { LinearProgress } from 'material-ui';
+import { LinearProgress } from '@material-ui/core';
 
 type Props = {
   title: string;

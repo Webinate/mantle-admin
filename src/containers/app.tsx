@@ -11,12 +11,12 @@ import { ContentHeader } from '../components/content-header';
 import { Users } from './users';
 import { Posts } from './posts';
 import theme from '../theme/mui-theme';
-import { List, ListItem, FontIcon, Snackbar } from 'material-ui';
+import { List, ListItem, Icon, Snackbar, ListItemText, ListItemIcon } from '@material-ui/core';
 import { matchPath } from 'react-router';
-import GroupIcon from 'material-ui/svg-icons/social/group';
-import MediaLibIcon from 'material-ui/svg-icons/image/photo-library';
-import HomeIcon from 'material-ui/svg-icons/action/home';
-import PostsIcon from 'material-ui/svg-icons/action/description';
+import GroupIcon from '@material-ui/icons/Group';
+import MediaLibIcon from '@material-ui/icons/PhotoLibrary';
+import HomeIcon from '@material-ui/icons/Home';
+import PostsIcon from '@material-ui/icons/Description';
 import { Media } from './media';
 
 // Map state to props
@@ -95,21 +95,28 @@ export class App extends React.Component<Props, State> {
               renderRight={() => <h3>Properties</h3>}
               renderLeft={() => {
                 return (
-                  <List style={{ padding: '0' }}>
+                  <List
+                    component="nav"
+                    style={{ padding: '0' }}>
                     {items.map( ( i, index ) => {
                       const selected = matchPath( props.location.pathname, { path: i.path, exact: i.exact } );
 
                       return <ListItem
+                        button
                         className={selected ? 'selected' : ''}
                         key={`menu-item-${ index }`}
                         onClick={e => i.onClick()}
-                        primaryText={i.label}
-                        leftIcon={<FontIcon
-                          style={{
-                            color: selected ? 'white' : theme.primary200.background,
-                            transition: '',
-                          }}
-                        >{i.icon}</FontIcon>} />
+                      >
+                        <ListItemIcon>
+                          <Icon
+                            style={{
+                              color: selected ? 'white' : theme.primary200.background,
+                              transition: '',
+                            }}
+                          >{i.icon}</Icon>
+                        </ListItemIcon>
+                        <ListItemText primary={i.label} />
+                      </ListItem>
                     } )
                     }
                   </List>
@@ -144,14 +151,11 @@ export class App extends React.Component<Props, State> {
           className={`mt-response-message ${ this.props.app.response ? 'mt-snack-open' : 'mt-snack-closed' }`}
           autoHideDuration={20000}
           open={this.props.app.response ? true : false}
-          onRequestClose={() => {
+          onClose={() => {
             this.props.closeSnackbar( null )
           }}
-          onActionClick={() => {
-            this.props.closeSnackbar( null )
-          }}
-          action="close"
-          message={this.props.app.response || ''}
+          action={[ <span id="mt-close-snackbar-btn">close</span> ]}
+          message={<span id="mt-close-snackbar-btn">{this.props.app.response || ''}</span>}
         />
       </div>
     );

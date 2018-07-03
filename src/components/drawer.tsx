@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import { IconButton } from 'material-ui';
+import { IconButton, Icon } from '@material-ui/core';
 
 type Props = {
   title: string;
@@ -41,18 +41,21 @@ export class Drawer extends React.Component<Props, State> {
     return <div className={this.props.className}>
       <DrawerHeader className="mt-drawer-header" onClick={() => this.props.onHeaderClick()}>
         <IconButton
-          iconClassName={this.props.open ? 'icon icon-arrow-down' : 'icon icon-arrow-right'}
-          iconStyle={{
-            width: 30,
-            height: 30,
-            color: 'inherit'
-          }}
           style={{
             width: 30,
             height: 30,
             padding: 0,
           }}
-        />
+        >
+          <Icon
+            className={this.props.open ? 'icon icon-arrow-down' : 'icon icon-arrow-right'}
+            style={{
+              width: 30,
+              height: 30,
+              color: 'inherit'
+            }}
+          />
+        </IconButton>
         <h3>{this.props.title}</h3>
       </DrawerHeader>
       {this.props.open ?

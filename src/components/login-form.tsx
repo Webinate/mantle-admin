@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RaisedButton, TextField, FontIcon } from 'material-ui';
+import { Button, Icon, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { default as styled } from '../theme/styled';
 
@@ -71,33 +71,46 @@ export class LoginForm extends React.Component<Props, State> {
   render() {
     return (
       <form className="login-form" action="" name="login">
-        <TextField
+        <FormControl
+          aria-describedby="mt-username-error-text"
           className="mt-username"
-          value={this.state.user}
-          onChange={( e, text ) => this.setState( { user: text } )}
           fullWidth={true}
-          errorText={this.getUserError()}
-          floatingLabelText="Username"
-          type="text" name="username"
-          id="login-user" />
-        <TextField
+          error={this.getUserError() ? true : false}
+        >
+          <InputLabel htmlFor="login-user">Username</InputLabel>
+          <Input
+            id="login-user"
+            value={this.state.user}
+            onChange={( e ) => this.setState( { user: e.currentTarget.value } )}
+          />
+          {this.getUserError() ? <FormHelperText id="mt-username-error-text">{this.getUserError()}</FormHelperText> : undefined}
+        </FormControl>
+
+
+        <FormControl
+          aria-describedby="mt-password-error-text"
           className="mt-password"
-          value={this.state.pass}
-          onChange={( e, text ) => this.setState( { pass: text } )}
-          errorText={this.state.formSubmitted && !this.state.pass ? 'Please specify a password' : ''}
           fullWidth={true}
-          floatingLabelText="Password"
-          type="password" name="password"
-          id="login-pass" />
+        >
+          <InputLabel htmlFor="mt-password-error">Name</InputLabel>
+          <Input
+            id="mt-password-error"
+            value={this.state.pass}
+            onChange={( e ) => this.setState( { pass: e.currentTarget.value } )}
+          />
+          {this.state.formSubmitted && !this.state.pass ? <FormHelperText id="mt-password-error-text">Please specify a password</FormHelperText> : undefined}
+        </FormControl>
+
         <ButtonsDiv>
-          <RaisedButton
+          <Button
+            variant="contained"
+            color="primary"
             className="mt-login-btn"
             disabled={this.props.loading}
-            label="Login"
             fullWidth={true}
             onClick={e => this.onLogin()}
-            icon={<FontIcon className="icon icon-key" />}
-            primary={true} />
+          ><Icon className="icon icon-key" />Login
+          </Button>
           <AnchorBtnsDiv>
             <Link className="mt-create-account" to="/register">Create an Account</Link> |
             <AnchorBtns className="mt-retrieve-password" href="" onClick={e => {

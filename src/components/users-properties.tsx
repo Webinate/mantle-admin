@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, TextField, DatePicker, RaisedButton, IconButton, FloatingActionButton } from 'material-ui';
+import { Avatar, TextField, Button, IconButton, Tooltip, Icon } from '@material-ui/core';
+import { DatePicker } from 'material-ui-pickers';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
 import { Drawer } from './drawer';
-import * as moment from 'moment';
 
 type Props = {
   activeUser: IUserEntry<'client'>;
@@ -52,22 +52,20 @@ export class UserProperties extends React.Component<Props, State> {
     if ( !selected )
       return <Properties />;
 
-    const textStyle: React.CSSProperties = { color: '' };
-    const underlineStyle: React.CSSProperties = { bottom: '4px' };
-
-    return (
+      return (
       <Properties className="mt-user-properties">
 
         <ImgContainer>
-          <FloatingActionButton
-            iconClassName="icon icon-camera"
-            backgroundColor={theme.primary200.background}
-            style={{ bottom: '10px', right: '10px', position: 'absolute' }}
-          />
+          <Button
+            variant="fab"
+            color="primary"
+            style={{ background: theme.primary200.background, bottom: '10px', right: '10px', position: 'absolute' }}
+          ><Icon className="icon icon-camera" />
+          </Button>
           <Avatar
             className="mt-avatar-image"
             src={generateAvatarPic( selected.avatar )}
-            size={200}
+            style={{ width: 200, height: 200 }}
           />
         </ImgContainer>
         <DetailsContainer>
@@ -80,39 +78,33 @@ export class UserProperties extends React.Component<Props, State> {
             <Field>
               <TextField
                 className="mt-props-username"
-                floatingLabelStyle={textStyle}
                 value={selected.username}
-                floatingLabelText="Username"
-                underlineStyle={underlineStyle}
+                helperText="Username"
               />
             </Field>
             {this.userCanInteract( selected ) ? <Field>
               <TextField
                 className="mt-props-email"
-                floatingLabelText="Email"
-                floatingLabelStyle={textStyle}
+                helperText="Email"
                 value={selected.email}
-                underlineStyle={underlineStyle}
               />
             </Field> : undefined}
             <Field>
               <DatePicker
-                floatingLabelText="Joined On"
+                helperText="Joined On"
                 className="mt-joined-on"
-                floatingLabelStyle={textStyle}
-                mode="landscape"
                 value={new Date( selected.createdOn )}
-                formatDate={( date: Date ) => moment( date ).format( 'MMMM Do, YYYY' )}
+                onChange={e => {}}
+                format={'MMMM Do, YYYY'}
               />
             </Field>
             {this.userCanInteract( selected ) ? <Field>
               <DatePicker
-                floatingLabelText="Last Active"
+                helperText="Last Active"
                 className="mt-last-active"
-                floatingLabelStyle={textStyle}
-                mode="landscape"
                 value={new Date( selected.lastLoggedIn )}
-                formatDate={( date: Date ) => moment( date ).format( 'MMMM Do, YYYY' )}
+                onChange={e => {}}
+                format={'MMMM Do, YYYY'}
               />
             </Field> : undefined}
           </Drawer>
@@ -128,13 +120,13 @@ export class UserProperties extends React.Component<Props, State> {
               <InlineField>
                 <div className="mt-inline-label">Send password reset request</div>
                 <div className="mt-inline-input">
-                  <IconButton
-                    onClick={() => this.props.resetPasswordRequest( selected.username )}
-                    iconStyle={{ color: theme.primary200.background }}
-                    tooltipPosition="top-left"
-                    iconClassName="icon icon-mark-unread mt-reset-password"
-                    tooltip="Email user"
-                  />
+                  <Tooltip placement="top-start" title="Email user">
+                    <IconButton
+                      onClick={() => this.props.resetPasswordRequest( selected.username )}
+                    >
+                      <Icon style={{ color: theme.primary200.background }} className="icon icon-mark-unread mt-reset-password" />
+                    </IconButton>
+                  </Tooltip>
                 </div>
               </InlineField>
 
@@ -142,13 +134,15 @@ export class UserProperties extends React.Component<Props, State> {
                 <InlineField>
                   <div className="mt-inline-label">Resend activation email</div>
                   <div className="mt-inline-input">
-                    <IconButton
-                      iconStyle={{ color: theme.primary200.background }}
-                      tooltipPosition="top-left"
-                      iconClassName="icon icon-mark-unread mt-resend-activation"
-                      tooltip="Email user"
-                      onClick={e => this.props.resendActivation( this.props.selected!.username )}
-                    />
+                    <Tooltip placement="top-start" title="Resent activation code">
+                      <IconButton
+                        onClick={e => this.props.resendActivation( this.props.selected!.username )}
+                      >
+                        <Icon
+                          style={{ color: theme.primary200.background }}
+                          className="icon icon-mark-unread mt-resend-activation" />
+                      </IconButton>
+                    </Tooltip>
                   </div>
                 </InlineField> : undefined}
 
@@ -156,13 +150,17 @@ export class UserProperties extends React.Component<Props, State> {
                 <InlineField>
                   <div className="mt-inline-label">Activate Account</div>
                   <div className="mt-inline-input">
-                    <IconButton
-                      iconStyle={{ color: theme.primary200.background }}
-                      tooltipPosition="top-left"
-                      iconClassName="icon icon-done mt-activate-account"
-                      tooltip="Activates the user"
-                      onClick={e => this.props.activateAccount( this.props.selected!.username )}
-                    />
+
+                    <Tooltip placement="top-start" title="Activates the user">
+                      <IconButton
+                        onClick={e => this.props.activateAccount( this.props.selected!.username )}
+                      >
+                        <Icon
+                          style={{ color: theme.primary200.background }}
+                          className="icon icon-done mt-activate-account" />
+                      </IconButton>
+                    </Tooltip>
+
                   </div>
                 </InlineField> : undefined}
 
@@ -178,13 +176,12 @@ export class UserProperties extends React.Component<Props, State> {
             <div className="mt-warning-message">
               Are you absolutely sure you want to remove this account - this is irreversible?
               <br />
-              <RaisedButton
-                backgroundColor={theme.error.background}
-                labelColor={theme.error.color}
-                label="Delete Account"
+              <Button
+                variant="contained"
+                style={{ background: theme.error.background, color: theme.error.color }}
                 className="mt-remove-acc-btn"
                 onClick={e => this.props.onDeleteRequested( selected )}
-              />
+              >Delete Account</Button>
             </div>
           </Drawer> : undefined}
         </DetailsContainer>
