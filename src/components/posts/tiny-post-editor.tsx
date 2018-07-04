@@ -11,8 +11,8 @@ export type State = {
 }
 
 export default class TinyPostEditor extends React.Component<Props, State> {
-  constructor() {
-    super();
+  constructor( props: Props ) {
+    super( props );
     this.state = {
       renderTiny: false
     };
