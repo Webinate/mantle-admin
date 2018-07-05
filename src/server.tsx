@@ -5,7 +5,6 @@ import { hydrate } from './server/hydrate';
 import { Db } from 'mongodb';
 import { Provider } from 'react-redux';
 import { IRootState } from './store';
-import { App } from './containers/app';
 import createStore from './utils/createStore';
 import { HTML } from './components/html';
 import { apiUrl } from './utils/httpClients';
@@ -90,6 +89,9 @@ export default class MainController extends Controller {
     try {
       for ( const action of actions )
         store.dispatch( action );
+
+      // We use a require to support hot reloading
+      const App = require( './containers/app' ).App;
 
       const sheet = new ServerStyleSheet();
       let html = renderToString( sheet.collectStyles(

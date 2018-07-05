@@ -15,7 +15,7 @@
   "scripts": {
     "postinstall": "gulp build",
     "build": "gulp build",
-    "watch-client": "gulp watch-client",
+    "watch-server": "cd ../../ && node \"./clients/modepress-admin/watch-server.js\" --config=config.json --logging=true --inspect=true --runningTests=true",
     "watch": "gulp watch",
     "clean": "rimraf dist",
     "patch": "npm version patch --no-git-tag-version",

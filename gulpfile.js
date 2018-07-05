@@ -4,12 +4,9 @@ const tslint = require( 'gulp-tslint' );
 const webpack = require( 'webpack' );
 const ts = require( "gulp-typescript" );
 const tsProject = ts.createProject( 'tsconfig.json' );
-const browserSync = require( 'browser-sync' ).create();
 const fs = require( 'fs' );
 const spawn = require( 'child_process' );
 const webfontsGenerator = require( 'webfonts-generator' );
-
-const modepressJson = JSON.parse( fs.readFileSync( './modepress.json', { encoding: 'utf8' } ) );
 
 /**
  * Moves the static files to dist
@@ -58,36 +55,6 @@ function buildClient( callback ) {
       throw err;
 
     callback();
-  } );
-}
-
-/**
- * Watches the source files and reloads a browsersync page on successful compilation
- */
-function startWatchClient( callback ) {
-
-  // returns a Compiler instance
-  const compiler = webpack( require( './webpack.config.js' ) );
-
-  compiler.watch( { aggregateTimeout: 300, poll: true }, function( err, stats ) {
-
-    console.clear();
-    console.log( '[webpack:build]', stats.toString( {
-      chunks: false, // Makes the build much quieter
-      colors: true
-    } ) );
-
-    if ( err )
-      return;
-
-    var jsonStats = stats.toJson();
-
-    if ( jsonStats.errors.length > 0 || jsonStats.warnings.length > 0 )
-      return;
-    else {
-      console.info( 'Compiled successfully!' );
-      browserSync.reload();
-    }
   } );
 }
 
@@ -165,19 +132,7 @@ function quickCheck() {
     } );
 }
 
-/**
- * Initializes browsersync
- */
-function initBrowserSync( callback ) {
-  browserSync.init( {
-    proxy: 'localhost:' + modepressJson.server.port,
-    port: modepressJson.server.port
-  } );
-
-  callback();
-}
 
 gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
 gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
-gulp.task( 'watch-client', gulp.series( initBrowserSync, startWatchClient ) );
 gulp.task( 'tiny-files', copyTinyFiles );
