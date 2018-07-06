@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Icon, InputLabel, FormControl, Input, FormHelperText } from '@material-ui/core';
+import { Button, InputLabel, FormControl, Input, FormHelperText } from '@material-ui/core';
 import { default as styled } from '../theme/styled';
+import RegisterIcon from '@material-ui/icons/AccountBox';
 
 type Props = {
   loading: boolean;
@@ -36,12 +37,25 @@ export class RegisterForm extends React.Component<Props, State> {
       this.props.onRegister( this.state.user, this.state.email, this.state.pass );
   }
 
+  private showPasswordError() {
+    return this.state.formSubmitted && !this.state.pass;
+  }
+
+  private showEmailError() {
+    return this.state.formSubmitted && !this.state.email;
+  }
+
+  private showUsernameError() {
+    return this.state.formSubmitted && !this.state.user;
+  }
+
   render() {
     return (
       <form className="register-form" action="" name="register">
         <FormControl
           aria-describedby="mt-username-text"
           fullWidth={true}
+          error={this.showUsernameError()}
         >
           <InputLabel htmlFor="user">Username</InputLabel>
           <Input
@@ -50,12 +64,13 @@ export class RegisterForm extends React.Component<Props, State> {
             value={this.state.user}
             onChange={( e ) => this.setState( { user: e.currentTarget.value } )}
           />
-          {this.state.formSubmitted && !this.state.user ? <FormHelperText id="mt-username-text">Please specify a username</FormHelperText> : undefined}
+          {this.showUsernameError() ? <FormHelperText id="mt-username-text">Please specify a username</FormHelperText> : undefined}
         </FormControl>
 
         <FormControl
           aria-describedby="mt-email-text"
           fullWidth={true}
+          error={this.showEmailError()}
         >
           <InputLabel htmlFor="user">Email</InputLabel>
           <Input
@@ -70,6 +85,7 @@ export class RegisterForm extends React.Component<Props, State> {
         <FormControl
           aria-describedby="mt-password-text"
           fullWidth={true}
+          error={this.showPasswordError()}
         >
           <InputLabel htmlFor="user">Password</InputLabel>
           <Input
@@ -79,12 +95,13 @@ export class RegisterForm extends React.Component<Props, State> {
             value={this.state.pass}
             onChange={( e ) => this.setState( { pass: e.currentTarget.value } )}
           />
-          {this.state.formSubmitted && !this.state.pass ? <FormHelperText id="mt-password-text">Please specify a password</FormHelperText> : undefined}
+          {this.showPasswordError() ? <FormHelperText id="mt-password-text">Please specify a password</FormHelperText> : undefined}
         </FormControl>
 
         <FormControl
           aria-describedby="mt-password2-text"
           fullWidth={true}
+          error={this.state.pass !== this.state.pass2}
         >
           <InputLabel htmlFor="user">Repeat Password</InputLabel>
           <Input
@@ -105,7 +122,7 @@ export class RegisterForm extends React.Component<Props, State> {
             fullWidth={true}
             onClick={e => this.onRegister()}
             color="primary"
-          ><Icon className="icon icon-group-add" />Create Account</Button>
+          ><RegisterIcon style={{ margin: '0 5px 0 0' }} />Create Account</Button>
           <AnchorBtnsDiv>
             <Link
               to="/login"

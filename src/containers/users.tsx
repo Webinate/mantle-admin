@@ -10,7 +10,7 @@ import { ContentHeader } from '../components/content-header';
 import { Pager } from '../components/pager';
 import { UserProperties } from '../components/users-properties';
 import { SplitPanel } from '../components/split-panel';
-import { TextField, IconButton, LinearProgress, Dialog, Button, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import { TextField, IconButton, Dialog, Button, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 
 // Map state to props
@@ -131,7 +131,9 @@ export class Users extends React.Component<Props, State> {
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
 
     return (
-      <div style={{ height: '100%' }}>
+      <div style={{ height: '100%' }} className="GOGABLOG2">
+
+        GOGABLOG2
         <ContentHeader
           title="Users"
           busy={isBusy}
@@ -139,7 +141,8 @@ export class Users extends React.Component<Props, State> {
             return <div>
               <TextField
                 className="users-filter"
-                helperText="Filter username or email"
+                style={{ verticalAlign: 'middle' }}
+                placeholder="Filter username or email"
                 id="mt-users-filter"
                 value={this.state.userFilter}
                 onKeyDown={e => {
@@ -174,7 +177,6 @@ export class Users extends React.Component<Props, State> {
                 contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
                 }
               >
-                {isBusy ? <div className="mt-loading"><LinearProgress /></div> : undefined}
                 <UsersList
                   users={page.data}
                   selected={this.state.selectedUsers}

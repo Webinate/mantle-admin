@@ -159,12 +159,7 @@ const Menu = styled.div`
   overflow: auto;
   height: 100%;
 
-  > div > div .selected {
-    color: ${ theme.primary100.color } !important;
-    background: ${ theme.primary100.background } !important;
-  }
-
-  > div > div .selected::before {
+  > nav > div.selected::before {
     content: '';
     position: absolute;
     height: 100%;

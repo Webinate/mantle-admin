@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Button, Icon, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
+import { Button, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { default as styled } from '../theme/styled';
+import KeyIcon from '@material-ui/icons/VpnKey';
 
 type Props = {
   loading: boolean;
@@ -68,6 +69,10 @@ export class LoginForm extends React.Component<Props, State> {
     return null;
   }
 
+  private showPasswordError() {
+    return this.state.formSubmitted && !this.state.pass;
+  }
+
   render() {
     return (
       <form className="login-form" action="" name="login">
@@ -91,14 +96,16 @@ export class LoginForm extends React.Component<Props, State> {
           aria-describedby="mt-password-error-text"
           className="mt-password"
           fullWidth={true}
+          error={this.showPasswordError()}
         >
           <InputLabel htmlFor="mt-password-error">Name</InputLabel>
           <Input
             id="mt-password-error"
+            type="password"
             value={this.state.pass}
             onChange={( e ) => this.setState( { pass: e.currentTarget.value } )}
           />
-          {this.state.formSubmitted && !this.state.pass ? <FormHelperText id="mt-password-error-text">Please specify a password</FormHelperText> : undefined}
+          {this.showPasswordError() ? <FormHelperText id="mt-password-error-text">Please specify a password</FormHelperText> : undefined}
         </FormControl>
 
         <ButtonsDiv>
@@ -109,7 +116,7 @@ export class LoginForm extends React.Component<Props, State> {
             disabled={this.props.loading}
             fullWidth={true}
             onClick={e => this.onLogin()}
-          ><Icon className="icon icon-key" />Login
+          ><KeyIcon style={{ margin: '0 5px 0 0' }} />Login
           </Button>
           <AnchorBtnsDiv>
             <Link className="mt-create-account" to="/register">Create an Account</Link> |

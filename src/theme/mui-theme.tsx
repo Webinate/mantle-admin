@@ -18,6 +18,10 @@ const l200 = '#f3f3f3';
 const l300 = '#eee';
 const l400 = '#ddd';
 
+// Error
+const error = '#ce3131';
+const warning = '#fcbe7d';
+
 /**
  *  Light Theme is the default theme used in material-ui. It is guaranteed to
  *  have all theme variables needed for every component. Variables not defined
@@ -38,8 +42,8 @@ export default {
   secondary300: { color: '#fff', softColor: '#eee', background: s300, border: '#ccc' },
 
   // Warnings & Errors
-  error: { color: '#fff', softColor: '#fff', background: '#ce3131', border: '#ad2828' },
-  warning: { color: '#ca7f30', softColor: '#ca7f30', background: '#fcbe7d', border: '#dfa76d' },
+  error: { color: '#fff', softColor: '#fff', background: error, border: '#ad2828' },
+  warning: { color: '#ca7f30', softColor: '#ca7f30', background: warning, border: '#dfa76d' },
 
   // Light
   light100: { color: '#333', softColor: '#ccc', background: l100, border: '#ddd' },
@@ -69,6 +73,9 @@ export default {
   fontFamily: 'Roboto, sans-serif',
   borderRadius: 2,
   palette: {
+    primary: { main: p200 },
+    secondary: { main: s200},
+    error: {main: error},
     primary1Color: p200,
     primary2Color: '#0288D1',
     primary3Color: '#BDBDBD',

@@ -52,7 +52,7 @@ export class UserProperties extends React.Component<Props, State> {
     if ( !selected )
       return <Properties />;
 
-      return (
+    return (
       <Properties className="mt-user-properties">
 
         <ImgContainer>
@@ -94,7 +94,7 @@ export class UserProperties extends React.Component<Props, State> {
                 helperText="Joined On"
                 className="mt-joined-on"
                 value={new Date( selected.createdOn )}
-                onChange={e => {}}
+                onChange={e => { }}
                 format={'MMMM Do, YYYY'}
               />
             </Field>
@@ -103,7 +103,7 @@ export class UserProperties extends React.Component<Props, State> {
                 helperText="Last Active"
                 className="mt-last-active"
                 value={new Date( selected.lastLoggedIn )}
-                onChange={e => {}}
+                onChange={e => { }}
                 format={'MMMM Do, YYYY'}
               />
             </Field> : undefined}

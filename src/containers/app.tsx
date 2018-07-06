@@ -18,6 +18,7 @@ import MediaLibIcon from '@material-ui/icons/PhotoLibrary';
 import HomeIcon from '@material-ui/icons/Home';
 import PostsIcon from '@material-ui/icons/Description';
 import { Media } from './media';
+import { SimplePaletteColorOptions } from '@material-ui/core/styles/createPalette';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -62,6 +63,14 @@ export class App extends React.Component<Props, State> {
     this.props.push( path );
   }
 
+  // Remove the server-side injected CSS.
+  componentDidMount() {
+    const jssStyles = document.getElementById( 'material-styles-server-side' );
+    if ( jssStyles && jssStyles.parentNode ) {
+      jssStyles.parentNode.removeChild( jssStyles );
+    }
+  }
+
   getAuthScreen( formType: 'login' | 'register' ) {
     return <AuthScreen
       loading={this.props.auth.busy}
@@ -82,6 +91,8 @@ export class App extends React.Component<Props, State> {
       { label: 'Users', icon: <GroupIcon style={iconStyle} />, exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) },
       { label: 'Media', icon: <MediaLibIcon style={iconStyle} />, exact: false, path: '/dashboard/media', onClick: () => this.goTo( '/dashboard/media' ) }
     ];
+
+    const primary = theme.palette!.primary as SimplePaletteColorOptions;
 
     return (
       <div>
@@ -104,18 +115,27 @@ export class App extends React.Component<Props, State> {
                       return <ListItem
                         button
                         className={selected ? 'selected' : ''}
+                        style={{
+                          backgroundColor: selected ? primary.light : undefined
+                        }}
                         key={`menu-item-${ index }`}
                         onClick={e => i.onClick()}
                       >
                         <ListItemIcon>
                           <Icon
                             style={{
-                              color: selected ? 'white' : theme.primary200.background,
+                              color: selected ? primary.contrastText : primary.main,
                               transition: '',
                             }}
                           >{i.icon}</Icon>
                         </ListItemIcon>
-                        <ListItemText primary={i.label} />
+                        <ListItemText
+                          style={{
+                            color: selected ? primary.contrastText : primary.main,
+                            transition: '',
+                          }}
+                          primaryTypographyProps={{ color: 'inherit' }}
+                          primary={i.label} />
                       </ListItem>
                     } )
                     }

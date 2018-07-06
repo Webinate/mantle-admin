@@ -3,6 +3,7 @@ import * as React from 'react';
 type Props = {
   html: string;
   styles: any;
+  stylesMaterial: any;
   intialData: any;
   agent: string;
 }
@@ -33,6 +34,7 @@ export class HTML extends React.Component<Props, State> {
           <link rel="icon" type="image/png" href="/images/favicon.png" />
           <link href="/css/mantle.css" rel="stylesheet" />
           {this.props.styles}
+          <style id="material-styles-server-side">${this.props.stylesMaterial}</style>
         </head>
         <body>
           <div id="application"

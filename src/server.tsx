@@ -1,3 +1,5 @@
+/// <reference path="./t.d.ts" />
+
 import * as React from 'react';
 import { StaticRouter } from 'react-router';
 import * as express from 'express';
@@ -14,9 +16,13 @@ import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import { Controller } from 'modepress';
 import { IAuthReq, IClient } from 'modepress';
 import { authentication, serializers } from 'modepress';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
+import { SheetsRegistry } from 'react-jss/lib/jss';
+import JssProvider from 'react-jss/lib/JssProvider';
+import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import DateUtils from 'material-ui-pickers/utils/moment-utils';
 
 // Needed for onTouchTap
 import { Action } from 'redux';
@@ -91,18 +97,32 @@ export default class MainController extends Controller {
       for ( const action of actions )
         store.dispatch( action );
 
+      // For styled components
       const sheet = new ServerStyleSheet();
+
+      // For material ui
+      const materialSheets = new SheetsRegistry();
+      const generateClassName = createGenerateClassName();
+
       let html = renderToString( sheet.collectStyles(
         <Provider store={store}>
-          <MuiThemeProvider theme={theme}>
-            <StaticRouter location={url} context={context}>
-              <App {...{} as any} />
-            </StaticRouter>
-          </MuiThemeProvider>
+          <JssProvider registry={materialSheets} generateClassName={generateClassName}>
+            <MuiThemeProvider theme={theme}>
+              <StaticRouter location={url} context={context}>
+                <MuiPickersUtilsProvider utils={DateUtils}>
+                <App {...{} as any} />
+                </MuiPickersUtilsProvider>
+              </StaticRouter>
+            </MuiThemeProvider>
+          </JssProvider>
         </Provider>
       ) );
 
       const styleTags = sheet.getStyleElement();
+
+      // Get the style sheet for material
+      const styleTagsMaterial = materialSheets.toString()
+
 
       // Check the context if there needs to be a redirect
       if ( context.url ) {
@@ -114,7 +134,7 @@ export default class MainController extends Controller {
       }
 
       initialState = store.getState();
-      html = renderToStaticMarkup( <HTML html={html} styles={styleTags} intialData={initialState} agent={muiAgent} /> );
+      html = renderToStaticMarkup( <HTML html={html} styles={styleTags} stylesMaterial={styleTagsMaterial} intialData={initialState} agent={muiAgent} /> );
       res.send( html );
     }
     catch ( err ) {

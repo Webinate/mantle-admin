@@ -33,7 +33,7 @@ export class UsersList extends React.Component<Props, any> {
           >
             <Avatar
               src={generateAvatarPic( user.avatar )}
-              style={{ height: 80, width: 80 }}
+              style={{ height: 80, width: 80, float: 'left' }}
             />
             <Details selected={selected}>
               <div><strong className="mt-user-name">{user.username}</strong></div>
