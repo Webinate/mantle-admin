@@ -4,7 +4,8 @@ require( "ts-node" ).register( {
     module: "commonjs",
     sourceMap: true,
     target: "es2017",
-    isolatedModules: true
+    isolatedModules: true,
+    noEmitOnError: false
   },
 } );
 
@@ -27,7 +28,7 @@ async function start() {
   await startup.initialize();
 
   // Set the directory to the client
-  process.chdir('./clients/modepress-admin');
+  process.chdir( './clients/modepress-admin' );
 
   // returns a Compiler instance
   const compiler = webpack( require( './webpack.config.js' ) );
@@ -53,11 +54,11 @@ async function start() {
       console.info( 'Refreshing server code...' );
 
       // Remove any cached files in the server
-      Object.keys( require.cache ).forEach(function(id) {
-        if (/modepress-admin[\\\/]*src/.test(id)) {
-          delete require.cache[id];
+      Object.keys( require.cache ).forEach( function( id ) {
+        if ( /modepress-admin[\\\/]*src/.test( id ) ) {
+          delete require.cache[ id ];
         }
-      })
+      } )
 
       browserSync.reload();
     }

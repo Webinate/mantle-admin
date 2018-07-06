@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, Popover, MenuItem, IconButton, ListItemText, ListItemIcon, Input, Menu } from '@material-ui/core';
+import Popover from '@material-ui/core/Popover';
+import Input from '@material-ui/core/Input';
+import Menu from '@material-ui/core/Menu';
+import IconButton from '@material-ui/core/IconButton';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Avatar from '@material-ui/core/Avatar';
 import CloseIcon from '@material-ui/icons/Close';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
@@ -22,7 +29,7 @@ type State = {
   username: string;
 };
 
-export class UserPicker extends React.Component<Props, State> {
+export default class UserPicker extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
     canEdit: true,
     labelPosition: 'left',

@@ -1,8 +1,14 @@
 import * as React from 'react';
-import { IconButton, Popover, MenuItem, Avatar, Icon, ListItemIcon, ListItemText } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import Icon from '@material-ui/core/Icon';
+import Popover from '@material-ui/core/Popover';
+import MenuItem from '@material-ui/core/MenuItem';
+import Avatar from '@material-ui/core/Avatar';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import { Stage } from './stage';
+import Stage from './stage';
 import { generateAvatarPic } from '../utils/component-utils';
 import { IUserEntry } from 'modepress';
 
@@ -21,7 +27,7 @@ type State = {
   anchorEl?: HTMLDivElement;
 }
 
-export class Dashboard extends React.Component<Props, State> {
+export default class Dashboard extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );

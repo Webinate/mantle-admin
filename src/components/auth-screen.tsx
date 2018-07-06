@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { LoginForm } from './login-form';
-import { RegisterForm } from './register-form';
+import LoginForm from './login-form';
+import RegisterForm from './register-form';
 import MantleDiv from './mantle-background';
-import { LinearProgress } from '@material-ui/core';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import { default as styled } from '../theme/styled';
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
   onRegister: ( user: string, email: string, password: string ) => void;
 }
 
-export class AuthScreen extends React.Component<Props, any> {
+export default class AuthScreen extends React.Component<Props, any> {
   constructor( props: Props ) {
     super( props );
   }

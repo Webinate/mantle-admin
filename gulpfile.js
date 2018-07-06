@@ -92,8 +92,10 @@ function buildSass() {
 }
 
 function copyTinyFiles() {
-  return gulp.src( './node_modules/tinymce/skins/**/*' )
-    .pipe( gulp.dest( './dist/client/skins' ) )
+  return gulp.src( [
+    './node_modules/tinymce/**/*'
+  ] )
+    .pipe( gulp.dest( './dist/client/tiny' ) )
 }
 
 /**

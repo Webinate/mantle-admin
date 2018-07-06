@@ -1,6 +1,11 @@
 import * as React from 'react';
-import { IconButton, Avatar, MenuItem, FormControlLabel, Switch, Menu } from '@material-ui/core';
-import { Pager } from '../../components/pager';
+import IconButton from '@material-ui/core/IconButton';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import MenuItem from '@material-ui/core/MenuItem';
+import Avatar from '@material-ui/core/Avatar';
+import Menu from '@material-ui/core/Menu';
+import Pager from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
 import * as moment from 'moment';
 import { default as styled } from '../../theme/styled';
@@ -9,7 +14,7 @@ import theme from '../../theme/mui-theme';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Create';
 import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
-import { UserPicker } from '../user-picker';
+import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 
 export type Props = {
@@ -37,7 +42,7 @@ export type State = {
   sortByOpen: boolean;
 }
 
-export class PostList extends React.Component<Props, State> {
+export default class PostList extends React.Component<Props, State> {
   private _container: HTMLElement | null;
 
   constructor( props: Props ) {

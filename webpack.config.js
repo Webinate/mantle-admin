@@ -1,10 +1,13 @@
 const path = require( 'path' );
 const webpack = require( 'webpack' );
+const BundleAnalyzerPlugin = require( 'webpack-bundle-analyzer' ).BundleAnalyzerPlugin;
 
 module.exports = {
-  entry: './src/client.tsx',
+  entry: {
+    bundle: './src/client.tsx'
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.join( __dirname, 'dist/client' )
   },
   plugins: [
@@ -14,7 +17,15 @@ module.exports = {
         NODE_ENV: JSON.stringify( process.env.NODE_ENV ),
         client: JSON.stringify( 'client' )
       }
-    } )
+    } ),
+    new BundleAnalyzerPlugin(),
+
+    // Ignore all locale files of moment.js
+    new webpack.IgnorePlugin( /^\.\/locale$/, /moment$/ ),
+
+    // new webpack.optimize.CommonsChunkPlugin( {
+    //   name: 'vendor', // Specify the common bundle's name.
+    // } )
   ],
   module: {
     rules: [

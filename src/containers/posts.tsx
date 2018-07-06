@@ -2,17 +2,26 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
-import { ContentHeader } from '../components/content-header';
+import ContentHeader from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
-import { TextField, IconButton, Icon, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Tooltip } from '@material-ui/core';
+import Icon from '@material-ui/core/Icon';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField';
 import FontCancel from '@material-ui/icons/ArrowBack';
 import { IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
-import { PostList } from '../components/posts/post-list';
-import { PostForm } from '../components/posts/post-form';
+import PostList from '../components/posts/post-list';
+import PostForm from '../components/posts/post-form';
 import FilterIcon from '@material-ui/icons/FilterList';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
@@ -117,7 +126,7 @@ export class Posts extends React.Component<Props, State> {
                 <div>
                   <TextField
                     className="posts-filter"
-                    helperText="Filter by title or content"
+                    placeholder="Filter by title or content"
                     id="mt-posts-filter"
                     value={this.state.searchFilter}
                     onKeyDown={e => {

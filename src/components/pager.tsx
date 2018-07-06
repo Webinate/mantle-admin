@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { IconButton, Button } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import LeftIcon from '@material-ui/icons/KeyboardArrowLeft';
@@ -20,7 +21,7 @@ type State = {
 /**
  * A component for paging through large datasets
  */
-export class Pager extends React.Component<Props, State> {
+export default class Pager extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );

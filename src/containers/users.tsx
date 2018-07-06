@@ -5,12 +5,19 @@ import theme from '../theme/mui-theme';
 import { getUsers, removeUser } from '../store/users/actions';
 import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
-import { UsersList } from '../components/users-list';
-import { ContentHeader } from '../components/content-header';
-import { Pager } from '../components/pager';
-import { UserProperties } from '../components/users-properties';
-import { SplitPanel } from '../components/split-panel';
-import { TextField, IconButton, Dialog, Button, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
+import UsersList from '../components/users-list';
+import ContentHeader from '../components/content-header';
+import Pager from '../components/pager';
+import UserProperties from '../components/users-properties';
+import SplitPanel from '../components/split-panel';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import TextField from '@material-ui/core/TextField';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import SearchIcon from '@material-ui/icons/Search';
 
 // Map state to props
@@ -131,9 +138,7 @@ export class Users extends React.Component<Props, State> {
       this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
 
     return (
-      <div style={{ height: '100%' }} className="GOGABLOG2">
-
-        GOGABLOG2
+      <div style={{ height: '100%' }}>
         <ContentHeader
           title="Users"
           busy={isBusy}

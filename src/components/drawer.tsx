@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import { IconButton, Icon } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import Icon from '@material-ui/core/Icon';
 
 type Props = {
   title: string;
@@ -17,7 +18,7 @@ type State = {
 /**
  * An html component that represents the entire html page to be rendered
  */
-export class Drawer extends React.Component<Props, State> {
+export default class Drawer extends React.Component<Props, State> {
 
   static defaultProps: Partial<Props> = {
     animate: false

@@ -15,7 +15,7 @@ type State = {
 /**
  * A form for entering user registration information
  */
-export class SlugEditor extends React.Component<Props, State> {
+export default class SlugEditor extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {

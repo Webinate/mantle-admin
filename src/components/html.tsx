@@ -13,13 +13,22 @@ type State = {
 /**
  * An html component that represents the entire html page to be rendered
  */
-export class HTML extends React.Component<Props, State> {
+export default class HTML extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );
   }
 
   render() {
+    const scripts = [
+      '/tiny/tinymce.min.js',
+      '/tiny/themes/modern/theme.js',
+      '/tiny/plugins/image/plugin.min.js',
+      '/tiny/plugins/paste/plugin.min.js',
+      '/tiny/plugins/link/plugin.min.js',
+      '/tiny/plugins/code/plugin.min.js'
+    ];
+
     const content = (
       <html>
         <head>
@@ -30,6 +39,9 @@ export class HTML extends React.Component<Props, State> {
           <meta name="MobileOptimized" content="320" />
           <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui" />
           <meta httpEquiv="cleartype" content="on" />
+
+          {scripts.map( s => <script type="text/javascript" src={s} /> )}
+
           <link rel="stylesheet" href="/css/main.css" />
           <link rel="icon" type="image/png" href="/images/favicon.png" />
           <link href="/css/mantle.css" rel="stylesheet" />

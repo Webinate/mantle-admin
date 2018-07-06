@@ -1,24 +1,10 @@
 import * as React from 'react';
 import { Settings, EditorManager, Editor } from 'tinymce';
-let tinymce: {
+declare let tinymce: {
   init: ( settings: Settings ) => void;
   remove: ( selector: Editor ) => Editor;
   EditorManager: EditorManager;
-} | null = null;
-
-if ( process.env.client === 'client' ) {
-
-  tinymce = require( 'tinymce/tinymce' );
-
-  // A theme is also required
-  require( 'tinymce/themes/modern/theme' );
-
-  // Any plugins you want to use has to be imported
-  require( 'tinymce/plugins/paste' );
-  require( 'tinymce/plugins/link' );
-  require( 'tinymce/plugins/code' );
-  require( 'tinymce/plugins/image' );
-}
+};
 
 export type Props = {
   id: string;

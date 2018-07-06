@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { Button, FormControl, InputLabel, Input, FormHelperText } from '@material-ui/core';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Input from '@material-ui/core/Input';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import { default as styled } from '../theme/styled';
 import KeyIcon from '@material-ui/icons/VpnKey';
@@ -21,7 +25,7 @@ type State = {
 /**
  * A form for entering user and password information
  */
-export class LoginForm extends React.Component<Props, State> {
+export default class LoginForm extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {

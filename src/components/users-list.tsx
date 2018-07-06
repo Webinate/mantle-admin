@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import * as moment from 'moment';
@@ -16,13 +16,14 @@ interface SCompProps extends React.HTMLProps<HTMLDivElement> {
   selected: boolean;
 }
 
-export class UsersList extends React.Component<Props, any> {
+export default class UsersList extends React.Component<Props, any> {
   render() {
     const selectedUsers = this.props.selected;
     let selected = false;
     const users = this.props.users;
     return (
       <div className="mt-user-list">
+        Gargablarg4
         {users.map( ( user, index ) => {
           selected = selectedUsers.indexOf( user ) === -1 ? false : true;
 

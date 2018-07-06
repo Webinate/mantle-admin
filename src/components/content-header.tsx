@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../theme/styled';
-import { LinearProgress } from '@material-ui/core';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 type Props = {
   title: string;
@@ -11,7 +11,7 @@ type Props = {
   showSub?: boolean;
 }
 
-export class ContentHeader extends React.Component<Props, any> {
+export default class ContentHeader extends React.Component<Props, any> {
   static defaultProps: Partial<Props> = {
     showSub: false
   }

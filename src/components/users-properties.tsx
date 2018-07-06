@@ -1,11 +1,16 @@
 import * as React from 'react';
 import { IUserEntry } from 'modepress';
-import { Avatar, TextField, Button, IconButton, Tooltip, Icon } from '@material-ui/core';
-import { DatePicker } from 'material-ui-pickers';
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Icon from '@material-ui/core/Icon';
+import Avatar from '@material-ui/core/Avatar';
+import DatePicker from 'material-ui-pickers/DatePicker';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
-import { Drawer } from './drawer';
+import Drawer from './drawer';
 
 type Props = {
   activeUser: IUserEntry<'client'>;
@@ -23,7 +28,7 @@ type State = {
   removeOpen: boolean;
 }
 
-export class UserProperties extends React.Component<Props, State> {
+export default class UserProperties extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );

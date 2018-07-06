@@ -32,7 +32,7 @@ interface CurtainProps extends React.HTMLProps<HTMLDivElement> {
 /**
  * A component that divides a div into 3 columns that can be dynamically opened and closed
  */
-export class Stage extends React.Component<Prop, State> {
+export default class Stage extends React.Component<Prop, State> {
 
   static defaultProps: Partial<Prop> = {
     rightOpen: true,

@@ -34,7 +34,7 @@ interface PanelProps extends React.HTMLProps<HTMLDivElement> {
 /**
 * A Component that holds 2 sub Components and a splitter to split between them.
 */
-export class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelState> {
+export default class SplitPanel extends React.Component<ISplitPanelProps, ISplitPanelState> {
 
   static defaultProps: Partial<ISplitPanelProps> = {
     orientation: 'vertical',

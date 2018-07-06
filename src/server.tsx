@@ -8,7 +8,7 @@ import { Db } from 'mongodb';
 import { Provider } from 'react-redux';
 import { IRootState } from './store';
 import createStore from './utils/createStore';
-import { HTML } from './components/html';
+import HTML from './components/html';
 import { apiUrl } from './utils/httpClients';
 import createHistory from 'history/createMemoryHistory';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';

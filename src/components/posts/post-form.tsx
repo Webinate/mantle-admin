@@ -1,13 +1,18 @@
 import * as React from 'react';
 import * as moment from 'moment';
-import { TextField, Button, IconButton, Chip, Switch, FormControlLabel } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import Chip from '@material-ui/core/Chip';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import { IPost, IUserEntry } from 'modepress';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
-import { SlugEditor } from '../slug-editor';
-import { UserPicker } from '../user-picker';
+import SlugEditor from '../slug-editor';
+import UserPicker from '../user-picker';
 import { CategoryEditor } from '../../containers/category-editor';
 
 export type Props = {
@@ -26,7 +31,7 @@ export type State = {
   slugWasEdited: boolean;
 }
 
-export class PostForm extends React.Component<Props, State> {
+export default class PostForm extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
