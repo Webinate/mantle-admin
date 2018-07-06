@@ -1,4 +1,4 @@
-/// <reference path="./t.d.ts" />
+/// <reference path="./material-v1-fixes.d.ts" />
 
 import * as React from 'react';
 import { StaticRouter } from 'react-router';
@@ -7,12 +7,11 @@ import { hydrate } from './server/hydrate';
 import { Db } from 'mongodb';
 import { Provider } from 'react-redux';
 import { IRootState } from './store';
-import { App } from './containers/app';
 import createStore from './utils/createStore';
 import { HTML } from './components/html';
 import { apiUrl } from './utils/httpClients';
 import createHistory from 'history/createMemoryHistory';
-import { renderToString, renderToStaticMarkup } from 'react-dom/server'
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { Controller } from 'modepress';
 import { IAuthReq, IClient } from 'modepress';
 import { authentication, serializers } from 'modepress';
@@ -104,13 +103,16 @@ export default class MainController extends Controller {
       const materialSheets = new SheetsRegistry();
       const generateClassName = createGenerateClassName();
 
+      // We use a require to support hot reloading
+      const App = require( './containers/app' ).App;
+
       let html = renderToString( sheet.collectStyles(
         <Provider store={store}>
           <JssProvider registry={materialSheets} generateClassName={generateClassName}>
             <MuiThemeProvider theme={theme}>
               <StaticRouter location={url} context={context}>
                 <MuiPickersUtilsProvider utils={DateUtils}>
-                <App {...{} as any} />
+                  <App {...{} as any} />
                 </MuiPickersUtilsProvider>
               </StaticRouter>
             </MuiThemeProvider>

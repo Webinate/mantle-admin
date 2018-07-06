@@ -27,6 +27,6 @@ export const app = hydrate(
         </MuiPickersUtilsProvider>
       </ConnectedRouter>
     </MuiThemeProvider>
-  </Provider>, mountNode
+  </Provider >, mountNode
 );
 
