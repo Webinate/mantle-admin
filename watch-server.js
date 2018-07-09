@@ -18,16 +18,17 @@ const webpack = require( 'webpack' );
 const modepressJson = JSON.parse( fs.readFileSync( './clients/modepress-admin/modepress.json', { encoding: 'utf8' } ) );
 
 async function start() {
+
+  // Initialize the server
+  await startup.initialize();
+
   browserSync.init( {
     proxy: 'localhost:' + modepressJson.server.port,
     port: modepressJson.server.port
   } );
 
-  // Initialize the server
-  await startup.initialize();
-
   // Set the directory to the client
-  process.chdir('./clients/modepress-admin');
+  process.chdir( './clients/modepress-admin' );
 
   // returns a Compiler instance
   const compiler = webpack( require( './webpack.config.js' ) );
@@ -53,11 +54,11 @@ async function start() {
       console.info( 'Refreshing server code...' );
 
       // Remove any cached files in the server
-      Object.keys( require.cache ).forEach(function(id) {
-        if (/modepress-admin[\\\/]*src/.test(id)) {
-          delete require.cache[id];
+      Object.keys( require.cache ).forEach( function( id ) {
+        if ( /modepress-admin[\\\/]*src/.test( id ) ) {
+          delete require.cache[ id ];
         }
-      })
+      } )
 
       browserSync.reload();
     }
