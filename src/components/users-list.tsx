@@ -23,7 +23,6 @@ export default class UsersList extends React.Component<Props, any> {
     const users = this.props.users;
     return (
       <div className="mt-user-list">
-        Gargablarg4
         {users.map( ( user, index ) => {
           selected = selectedUsers.indexOf( user ) === -1 ? false : true;
 

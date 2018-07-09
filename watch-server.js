@@ -19,13 +19,14 @@ const webpack = require( 'webpack' );
 const modepressJson = JSON.parse( fs.readFileSync( './clients/modepress-admin/modepress.json', { encoding: 'utf8' } ) );
 
 async function start() {
+
+  // Initialize the server
+  await startup.initialize();
+
   browserSync.init( {
     proxy: 'localhost:' + modepressJson.server.port,
     port: modepressJson.server.port
   } );
-
-  // Initialize the server
-  await startup.initialize();
 
   // Set the directory to the client
   process.chdir( './clients/modepress-admin' );

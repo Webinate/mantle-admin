@@ -11,7 +11,7 @@ import Avatar from '@material-ui/core/Avatar';
 import CloseIcon from '@material-ui/icons/Close';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
-import { users } from 'modepress/src/lib-frontend';
+import * as users from '../../../../src/lib-frontend/users';
 
 type Props = {
   user: IUserEntry<'client'> | null;

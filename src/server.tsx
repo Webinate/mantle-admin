@@ -109,7 +109,7 @@ export default class MainController extends Controller {
       let html = renderToString( sheet.collectStyles(
         <Provider store={store}>
           <JssProvider registry={materialSheets} generateClassName={generateClassName}>
-            <MuiThemeProvider theme={theme}>
+            <MuiThemeProvider theme={theme} sheetsManager={new Map()}>
               <StaticRouter location={url} context={context}>
                 <MuiPickersUtilsProvider utils={DateUtils}>
                   <App {...{} as any} />

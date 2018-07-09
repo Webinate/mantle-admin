@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, IUserEntry } from 'modepress';
-import { getAll, remove } from 'modepress/src/lib-frontend/users';
+import { getAll, remove } from '../../../../../src/lib-frontend/users';
 import { IRootState } from '../';
 import { ActionCreators as AppActionCreators } from '../app/actions';
 

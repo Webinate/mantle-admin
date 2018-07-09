@@ -2,7 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { ClientError } from '../../utils/httpClients';
 import { IUserEntry, ILoginToken, IRegisterToken } from 'modepress';
-import { login as loginApi, register as registerApi, logout as logoutApi } from 'modepress/src/lib-frontend/auth';
+import * as auth from '../../../../../src/lib-frontend/auth';
 import { push } from 'react-router-redux';
 
 // Action Creators
@@ -22,7 +22,7 @@ export function login( authToken: ILoginToken ) {
     dispatch( ActionCreators.isAuthenticating.create( true ) );
 
     try {
-      const resp = await loginApi( authToken );
+      const resp = await auth.login( authToken );
       dispatch( ActionCreators.setUser.create( resp.user ? resp.user : null ) );
       dispatch( push( '/' ) );
 
@@ -38,7 +38,7 @@ export function register( authToken: IRegisterToken ) {
     dispatch( ActionCreators.isAuthenticating.create( true ) );
 
     try {
-      const resp = await registerApi( authToken );
+      const resp = await auth.register( authToken );
       dispatch( ActionCreators.authenticationError.create( resp.message ) );
     }
     catch ( e ) {
@@ -50,7 +50,7 @@ export function register( authToken: IRegisterToken ) {
 export function logout() {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
-      await logoutApi();
+      await auth.logout();
       dispatch( ActionCreators.loggedOut.create( true ) );
       dispatch( push( '/login' ) );
 

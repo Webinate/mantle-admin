@@ -2,7 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { ClientError } from '../../utils/httpClients';
 import { ActionCreators as AppActionCreators } from '../app/actions';
-import * as auth from 'modepress/src/lib-frontend/auth';
+import * as auth from '../../../../../src/lib-frontend/auth';
 
 // Action Creators
 export const ActionCreators = {

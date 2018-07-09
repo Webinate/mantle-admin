@@ -40,7 +40,7 @@ export default class HTML extends React.Component<Props, State> {
           <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui" />
           <meta httpEquiv="cleartype" content="on" />
 
-          {scripts.map( s => <script type="text/javascript" src={s} /> )}
+          {scripts.map( ( s, i ) => <script key={`script-${ i }`} type="text/javascript" src={s} /> )}
 
           <link rel="stylesheet" href="/css/main.css" />
           <link rel="icon" type="image/png" href="/images/favicon.png" />

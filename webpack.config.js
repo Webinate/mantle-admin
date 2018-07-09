@@ -1,8 +1,21 @@
 const path = require( 'path' );
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const webpack = require( 'webpack' );
-const BundleAnalyzerPlugin = require( 'webpack-bundle-analyzer' ).BundleAnalyzerPlugin;
+const isProdBuild = process.env.NODE_ENV === 'production' ? true : false;
+
+const plugins = [
+  new webpack.DefinePlugin( {
+    'process.env': {
+      NODE_ENV: JSON.stringify( process.env.NODE_ENV ),
+      client: JSON.stringify( 'client' )
+    }
+  } )
+];
+
+console.log( "==== BUILDING: " + process.env.NODE_ENV + " ====" );
 
 module.exports = {
+  mode: isProdBuild ? 'production' : 'development',
   entry: {
     bundle: './src/client.tsx'
   },
@@ -10,23 +23,15 @@ module.exports = {
     filename: '[name].js',
     path: path.join( __dirname, 'dist/client' )
   },
-  plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new webpack.DefinePlugin( {
-      'process.env': {
-        NODE_ENV: JSON.stringify( process.env.NODE_ENV ),
-        client: JSON.stringify( 'client' )
-      }
-    } ),
-    new BundleAnalyzerPlugin(),
-
-    // Ignore all locale files of moment.js
-    new webpack.IgnorePlugin( /^\.\/locale$/, /moment$/ ),
-
-    // new webpack.optimize.CommonsChunkPlugin( {
-    //   name: 'vendor', // Specify the common bundle's name.
-    // } )
-  ],
+  plugins: plugins,
+  optimization: {
+      minimizer: isProdBuild ? [
+        new UglifyJsPlugin()
+      ] : [],
+      namedModules: true,
+      noEmitOnErrors: true,
+      concatenateModules: true
+  },
   module: {
     rules: [
       {
@@ -40,21 +45,24 @@ module.exports = {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
+        options: { allowTsInNodeModules: true }
       },
       {
         enforce: 'pre',
         test: /\.js$/,
-        loader: "source-map-loader"
+        loader: "source-map-loader",
+        exclude: /node_modules/
       },
       {
         enforce: 'pre',
         test: /\.tsx?$/,
-        use: "source-map-loader"
+        use: "source-map-loader",
+        exclude: /node_modules/
       }
     ]
   },
   resolve: {
     extensions: [ "*", ".tsx", ".ts", ".js" ]
   },
-  devtool: 'inline-source-map'
+  devtool: isProdBuild ? false : 'inline-source-map'
 };
