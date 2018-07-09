@@ -1,9 +1,9 @@
 const path = require( 'path' );
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const webpack = require( 'webpack' );
 const isProdBuild = process.env.NODE_ENV === 'production' ? true : false;
 
 const plugins = [
-  new webpack.optimize.ModuleConcatenationPlugin(),
   new webpack.DefinePlugin( {
     'process.env': {
       NODE_ENV: JSON.stringify( process.env.NODE_ENV ),
@@ -14,26 +14,22 @@ const plugins = [
 
 console.log( "==== BUILDING: " + process.env.NODE_ENV + " ====" );
 
-// if production
-if ( isProdBuild ) {
-  console.log( "Adding uglify..." );
-
-  plugins.push( new webpack.optimize.UglifyJsPlugin( {
-    sourceMap: false,
-    compressor: {
-      screw_ie8: true,
-      warnings: false
-    }
-  } ) );
-}
-
 module.exports = {
+  mode: isProdBuild ? 'production' : 'development',
   entry: './src/client.tsx',
   output: {
     filename: 'bundle.js',
     path: path.join( __dirname, 'dist/client' )
   },
   plugins: plugins,
+  optimization: {
+      minimizer: isProdBuild ? [
+        new UglifyJsPlugin()
+      ] : [],
+      namedModules: true,
+      noEmitOnErrors: true,
+      concatenateModules: true
+  },
   module: {
     rules: [
       {
@@ -47,6 +43,7 @@ module.exports = {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
+        options: { allowTsInNodeModules: true }
       },
       {
         enforce: 'pre',

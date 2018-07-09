@@ -4,7 +4,7 @@ import { Avatar, Popover, AutoComplete, MenuItem, IconButton } from 'material-ui
 import CloseIcon from 'material-ui/svg-icons/navigation/close';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
-import { users } from 'modepress/src/lib-frontend';
+import * as users from '../../../../src/lib-frontend/users';
 
 type Props = {
   user: IUserEntry<'client'> | null;

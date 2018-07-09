@@ -2,7 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { IRootState } from '../';
 import { ClientError } from '../../utils/httpClients';
 import { IUserEntry, ILoginToken, IRegisterToken } from 'modepress';
-import { auth } from 'modepress/src/lib-frontend';
+import * as auth from '../../../../../src/lib-frontend/auth';
 import { push } from 'react-router-redux';
 
 // Action Creators

@@ -51,6 +51,17 @@ function generateFonts( callback ) {
  */
 function buildClient( callback ) {
   webpack( require( './webpack.config.js' ), function( err, stats ) {
+
+    if (stats.hasWarnings()) {
+      const info = stats.toJson();
+      console.warn(info.warnings);
+    }
+
+    if (err || stats.hasErrors()) {
+      const info = stats.toJson();
+      throw info.errors;
+    }
+
     if ( err )
       throw err;
 
