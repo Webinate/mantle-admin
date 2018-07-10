@@ -20,23 +20,27 @@ async function handlePostScreen( req: IAuthReq, actions: Action[] ) {
 
   const isAdmin = req._user && req._user.privileges < 2 ? true : false;
 
+  const matchesNew = matchPath<any>( req.url, { path: '/dashboard/posts/new' } );
+  const matchesEdit = matchPath<any>( req.url, { path: '/dashboard/posts/edit/:id' } );
+
   if ( !isAdmin ) {
-    if (
-      matchPath( req.url, { path: '/dashboard/posts/new' } ) ||
-      matchPath( req.url, { path: '/dashboard/posts/edit/:id' } )
-    )
+    if ( matchesNew || matchesEdit )
       throw new RedirectError( '/dashboard/posts' );
   }
 
-  let matches = matchPath<any>( req.url, { path: '/dashboard/posts/edit/:id' } );
-  if ( matches ) {
+
+  if ( matchesEdit ) {
     const postReply = await Promise.all( [
-      controllers.posts.getPost( { id: matches.params.id } ),
+      controllers.posts.getPost( { id: matchesEdit.params.id } ),
       controllers.categories.getAll( { expanded: true, depth: -1, root: true } )
     ] );
 
     actions.push( PostActions.SetPost.create( postReply[ 0 ] ) );
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
+  }
+  else if ( matchesNew ) {
+    let categories = await controllers.categories.getAll( { expanded: true, depth: -1, root: true } );
+    actions.push( CategoryActions.SetCategories.create( categories ) );
   }
   else {
     let posts = await controllers.posts.getPosts( { public: isAdmin ? undefined : true } );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as moment from 'moment';
+import * as format from 'date-fns/format';
 import IconButton from '@material-ui/core/IconButton';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
@@ -14,6 +14,7 @@ import theme from '../../theme/mui-theme';
 import SlugEditor from '../slug-editor';
 import UserPicker from '../user-picker';
 import { CategoryEditor } from '../../containers/category-editor';
+import FormControl from '@material-ui/core/FormControl';
 
 export type Props = {
   activeUser: IUserEntry<'client'>;
@@ -174,33 +175,35 @@ export default class PostForm extends React.Component<Props, State> {
             disabled={!this.isPostValid()}
           >{this.props.post ? 'Update' : 'Publish'}</Button>
 
-          <FormControlLabel
-            control={
-              <Switch
-                className="mt-visibility-toggle"
-                style={{ margin: '20px 0' }}
-                checked={this.state.editable.public ? true : false}
-                onChange={e => {
-                  this.setState( {
-                    editable: {
-                      ...this.state.editable,
-                      public: this.state.editable.public ? false : true
-                    }
-                  } )
-                }}
-              />
-            }
-            label={this.state.editable.public ? 'Post is Public' : 'Post is Private'}
-          />
+          <FormControl>
+            <FormControlLabel
+              control={
+                <Switch
+                  color="primary"
+                  className="mt-visibility-toggle"
+                  checked={this.state.editable.public ? true : false}
+                  onChange={e => {
+                    this.setState( {
+                      editable: {
+                        ...this.state.editable,
+                        public: this.state.editable.public ? false : true
+                      }
+                    } )
+                  }}
+                />
+              }
+              label={this.state.editable.public ? 'Post is public' : 'Post is private'}
+            />
+          </FormControl>
           {this.props.post ?
             <Dates>
               <div>Created: </div>
               <div>
-                {moment( this.props.post.createdOn ).format( 'MMM Do, YYYY' )}
+                {format( new Date( this.props.post.createdOn! ), 'MMM Do, YYYY' )}
               </div>
               <div>Updated: </div>
               <div>
-                {moment( this.props.post.lastUpdated ).format( 'MMM Do, YYYY' )}
+                {format( new Date( this.props.post.lastUpdated! ), 'MMM Do, YYYY' )}
               </div>
             </Dates> : undefined}
         </RightPanel>
@@ -233,6 +236,7 @@ export default class PostForm extends React.Component<Props, State> {
             {this.state.editable.tags!.map( ( tag, tagIndex ) => {
               return <Chip
                 key={`tag-${ tagIndex }`}
+                label={tag}
                 className="mt-tag-chip"
                 style={{ margin: '4px 4px 0 0' }}
                 onDelete={e => {
@@ -243,9 +247,7 @@ export default class PostForm extends React.Component<Props, State> {
                     }
                   } )
                 }}
-              >
-                {tag}
-              </Chip>;
+              />;
             } )}
           </TagWrapper>
         </RightPanel>

@@ -22,6 +22,7 @@ import MediaLibIcon from '@material-ui/icons/PhotoLibrary';
 import HomeIcon from '@material-ui/icons/Home';
 import PostsIcon from '@material-ui/icons/Description';
 import { Media } from './media';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -97,6 +98,7 @@ export class App extends React.Component<Props, State> {
 
     return (
       <div>
+        <CssBaseline />
         <Route path="/" exact={true} render={props => <Redirect to="/dashboard" />} />
         <Route path="/dashboard" render={props => {
           return (

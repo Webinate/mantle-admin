@@ -97,6 +97,7 @@ export default class UserPicker extends React.Component<Props, State> {
       </span> : undefined}
       <Avatar
         style={{
+          display: 'inline-flex',
           verticalAlign: 'middle',
           margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px',
           background: theme.light400.background,

@@ -7,7 +7,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
 import Pager from '../../components/pager';
 import { Page, IPost, IUserEntry } from 'modepress';
-import * as moment from 'moment';
+import * as format from 'date-fns/format';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
@@ -265,8 +265,8 @@ export default class PostList extends React.Component<Props, State> {
               }
               <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={post.featuredImage} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
-                <i>{moment( post.lastUpdated ).format( 'MMM Do, YYYY' )}</i>
-                <i>{moment( post.createdOn ).format( 'MMM Do, YYYY' )}</i>
+                <i>{format( new Date( post.lastUpdated ), 'MMM Do, YYYY' )}</i>
+                <i>{format( new Date( post.createdOn ), 'MMM Do, YYYY' )}</i>
               </div>
               <div className="mt-post-info">
                 <Avatar

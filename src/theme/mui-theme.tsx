@@ -72,10 +72,14 @@ export default {
   },
   fontFamily: 'Roboto, sans-serif',
   borderRadius: 2,
+  typography: {
+    fontSize: 16,
+    fontWeightRegular: 'lighter'
+  },
   palette: {
     primary: { main: p200 },
-    secondary: { main: s200},
-    error: {main: error},
+    secondary: { main: s200 },
+    error: { main: error },
     primary1Color: p200,
     primary2Color: '#0288D1',
     primary3Color: '#BDBDBD',

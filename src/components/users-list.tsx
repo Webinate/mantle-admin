@@ -3,7 +3,7 @@ import { IUserEntry } from 'modepress';
 import Avatar from '@material-ui/core/Avatar';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import * as moment from 'moment';
+import * as format from 'date-fns/format';
 import { generateAvatarPic } from '../utils/component-utils';
 
 type Props = {
@@ -38,8 +38,8 @@ export default class UsersList extends React.Component<Props, any> {
             <Details selected={selected}>
               <div><strong className="mt-user-name">{user.username}</strong></div>
               <div className="mt-user-email">{user.email}</div>
-              <div><i>Joined: {moment( user.createdOn ).format( 'MMMM Do, YYYY' )}</i></div>
-              <div><i>Last Active: {moment( user.lastLoggedIn ).format( 'MMMM Do, YYYY' )}</i></div>
+              <div><i>Joined: {format( new Date( user.createdOn ), 'MMMM Do, YYYY' )}</i></div>
+              <div><i>Last Active: {format( new Date( user.lastLoggedIn ), 'MMMM Do, YYYY' )}</i></div>
             </Details>
           </User>
         } )}

@@ -3,7 +3,7 @@ import { hydrate } from 'react-dom';
 import { ConnectedRouter } from './utils/connectedRouter';
 import { App } from './containers/app';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-import DateUtils from 'material-ui-pickers/utils/moment-utils';
+import DateUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { Provider } from 'react-redux';
 import createStore from './utils/createStore';
 import { IRootState } from './store';

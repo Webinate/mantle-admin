@@ -64,7 +64,7 @@
     {
       "name": "Watch Mode",
       "type": "node",
-      "protocol": "auto",
+      "protocol": "inspector",
       "request": "launch",
       "stopOnEntry": false,
       "args": [

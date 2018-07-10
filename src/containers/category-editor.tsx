@@ -100,7 +100,7 @@ export class CategoryEditor extends React.Component<Props, State> {
         <TextField
           id="mt-new-cat-name"
           autoFocus={true}
-          helperText="Category name"
+          label="Category name"
           value={this.state.newCategory.title}
           fullWidth={true}
           onChange={( e ) => {
@@ -112,7 +112,7 @@ export class CategoryEditor extends React.Component<Props, State> {
         />
         <TextField
           id="mt-new-cat-slug"
-          helperText="Category short code"
+          label="Category short code"
           value={this.state.newCategory.slug || this.state.autoSlug}
           fullWidth={true}
           onChange={( e ) => {
@@ -122,7 +122,7 @@ export class CategoryEditor extends React.Component<Props, State> {
         />
         <TextField
           id="mt-new-cat-desc"
-          helperText="Optional category description"
+          label="Optional category description"
           value={this.state.newCategory.description}
           fullWidth={true}
           onChange={( e ) => { this.setState( { newCategory: { ...this.state.newCategory, description: e.currentTarget.value } } ) }}
@@ -140,7 +140,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           >
             <MenuItem
               value={''}
-            ></MenuItem>
+            >None</MenuItem>
             {flatCategories.map( ( parent, parentIndex ) => {
               return <MenuItem
                 key={`parent-${ parentIndex }`}
@@ -167,7 +167,9 @@ export class CategoryEditor extends React.Component<Props, State> {
               this.setState( { addCategoryMode: false } );
               this.props.setError( null );
             }}
-          >Cancel</Button>
+          >
+            Cancel
+          </Button>
           <Button
             variant="contained"
             disabled={isLoading}
@@ -199,7 +201,9 @@ export class CategoryEditor extends React.Component<Props, State> {
                 } )
               }
             }}
-          ><AddIcon />{this.state.newCategory._id ? 'Edit' : 'Add'}</Button>
+          > <AddIcon style={{ margin: '0 5px 0 0' }} />
+            {this.state.newCategory._id ? 'Edit' : 'Add'}
+          </Button>
         </div>
       </div>
     );
@@ -228,6 +232,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           control={
             <Checkbox
               checked={selected}
+              color="primary"
               className={`mt-category-checkbox ${ selected ? 'selected' : '' }`}
               id={`mt-cat-${ cat._id }`}
               onClick={e => {
@@ -245,7 +250,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               }}
               icon={this.state.deleteMode ? <DeleteIcon style={checkboxStyle} /> : this.state.editMode ? <EditIcon style={checkboxStyle} /> : undefined}
               checkedIcon={this.state.deleteMode ? <DeleteIcon style={checkboxStyle} /> : this.state.editMode ? <EditIcon style={checkboxStyle} /> : undefined}
-              value="checkedH"
+              value="checked"
             />
           }
           label={cat.title}
@@ -283,8 +288,6 @@ export class CategoryEditor extends React.Component<Props, State> {
           </CategoryButtons> :
           <CategoryButtons>
             <Button
-              variant="contained"
-              color="primary"
               className="mt-new-category-btn"
               onClick={e => this.setState( {
                 addCategoryMode: true,
@@ -292,19 +295,21 @@ export class CategoryEditor extends React.Component<Props, State> {
                 newCategory: {},
                 autoSlug: '',
               } )}
-              style={{ display: 'block' }}
-            ><AddIcon />Add Category</Button>
+            >
+              <AddIcon style={{ margin: '0 5px 0 0' }} />
+              Add Category
+            </Button>
 
             {categories.length > 0 ?
               <Button
                 className="mt-remove-category-btn"
-                variant="contained"
-                color="primary"
                 onClick={e => this.setState( {
                   deleteMode: true
                 } )}
-                style={{ display: 'block' }}
-              ><RemoveIcon />Remove Category</Button> : undefined}
+              >
+                <RemoveIcon style={{ margin: '0 5px 0 0' }} />
+                Remove Category
+              </Button> : undefined}
           </CategoryButtons>
         }
       </div>
@@ -328,9 +333,9 @@ export class CategoryEditor extends React.Component<Props, State> {
                 <IconButton
                   className="mt-edit-cat-btn"
                   onClick={e => this.setState( { editMode: true } )}
-                  style={{ padding: 0, height: 25, width: 25 }}
+                  style={{ padding: 0, position: 'absolute', top: '-5px', right: 0 }}
                 >
-                  <EditIcon style={{ padding: 0, height: 25, width: 25 }} />
+                  <EditIcon style={{ padding: 0 }} />
                 </IconButton>
                 : undefined}
           </div>
@@ -389,6 +394,7 @@ const CategoriesHeader = styled.div`
   display: flex;
   > div {
     flex: 1;
+    position: relative;
   }
 
   > div:last-child {
@@ -405,6 +411,10 @@ const Container = styled.div`
     margin: 0;
   }
 
+  .mt-category-form > div {
+    margin: 5px 0 5px 0;
+  }
+
   .mt-newcat-error {
     margin: 6px 0;
     color: ${theme.error.background }
@@ -412,7 +422,7 @@ const Container = styled.div`
 `;
 
 const CategoryChildren = styled.div`
-padding: 0 0 0 5px;
+  padding: 0 0 0 5px;
 `;
 
 const ActiveCategories = styled.div`

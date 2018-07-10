@@ -21,7 +21,7 @@ import { ServerStyleSheet } from 'styled-components';
 import { SheetsRegistry } from 'react-jss/lib/jss';
 import JssProvider from 'react-jss/lib/JssProvider';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-import DateUtils from 'material-ui-pickers/utils/moment-utils';
+import DateUtils from 'material-ui-pickers/utils/date-fns-utils';
 
 // Needed for onTouchTap
 import { Action } from 'redux';

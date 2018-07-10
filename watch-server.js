@@ -5,7 +5,8 @@ require( "ts-node" ).register( {
     sourceMap: true,
     target: "es2017",
     isolatedModules: true,
-    noEmitOnError: false
+    noEmitOnError: false,
+    inlineSources: true
   },
 } );
 

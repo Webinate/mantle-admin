@@ -5,7 +5,6 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
-import Icon from '@material-ui/core/Icon';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -23,6 +22,7 @@ import { push } from 'react-router-redux';
 import PostList from '../components/posts/post-list';
 import PostForm from '../components/posts/post-form';
 import FilterIcon from '@material-ui/icons/FilterList';
+import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
 import { GetAllOptions } from '../../../../src/lib-frontend/posts';
@@ -102,7 +102,7 @@ export class Posts extends React.Component<Props, State> {
     const isBusy = this.props.posts.busy;
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
-    const headerIconStyle: React.CSSProperties = { verticalAlign: 'top', padding: 0 };
+    const buttonIconStyle: React.CSSProperties = { margin: '0 5px 0 0' };
 
     return (
       <div style={{ height: '100%' }} className="mt-post-container">
@@ -116,7 +116,7 @@ export class Posts extends React.Component<Props, State> {
                   style={{ margin: '5px 0 0 0' }}
                   onClick={e => this.props.push( '/dashboard/posts' )}
                 >
-                  <FontCancel />
+                  <FontCancel style={buttonIconStyle} />
                   Back
                 </Button>
               );
@@ -136,7 +136,6 @@ export class Posts extends React.Component<Props, State> {
                     onChange={( e ) => this.setState( { searchFilter: e.currentTarget.value } )}
                   />
                   <IconButton
-                    style={headerIconStyle}
                     className="mt-posts-search"
                     onClick={e => this.onSearch()}
                   >
@@ -144,7 +143,6 @@ export class Posts extends React.Component<Props, State> {
                   </IconButton>
                   <Tooltip title={this.state.filtersOpen ? 'Close filter options' : 'Open filter options'}>
                     <IconButton
-                      style={headerIconStyle}
                       className="mt-posts-filter"
                       onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
                     >
@@ -153,7 +151,6 @@ export class Posts extends React.Component<Props, State> {
                   </Tooltip>
                   <Tooltip title="Delete selected posts">
                     <IconButton
-                      style={headerIconStyle}
                       className="mt-posts-delete-multi"
                       disabled={this.state.selectedPosts.length > 0 ? false : true}
                       onClick={e => this.onDeleteMultiple()}
@@ -168,7 +165,7 @@ export class Posts extends React.Component<Props, State> {
                     disabled={isAdmin ? false : true}
                     color="primary"
                   >
-                    <Icon className="icon icon-add" />
+                    <AddIcon style={buttonIconStyle} />
                     New Post
                     </Button>
                 </div>

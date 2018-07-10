@@ -14,7 +14,8 @@
     "noUnusedLocals": true,
     "strictNullChecks": true,
     "jsx": "react",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "inlineSources": true
   },
   "include": [
     "../../src/types/**/*",

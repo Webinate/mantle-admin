@@ -1,7 +1,9 @@
 const path = require( 'path' );
 const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' )
 const webpack = require( 'webpack' );
+const yargs = require( 'yargs' );
 const isProdBuild = process.env.NODE_ENV === 'production' ? true : false;
+const analyze = yargs.argv.analyze || false;
 
 const plugins = [
   new webpack.DefinePlugin( {
@@ -11,6 +13,19 @@ const plugins = [
     }
   } )
 ];
+
+if (isProdBuild) {
+  console.log("Adding ugligy plugin...");
+  plugins.push( new UglifyJsPlugin( {
+    sourceMap: true
+  } ) );
+}
+
+if ( analyze ) {
+  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  console.log("Adding analyzer plugin...");
+  plugins.push( new BundleAnalyzerPlugin() )
+}
 
 console.log( "==== BUILDING: " + process.env.NODE_ENV + " ====" );
 
@@ -25,11 +40,6 @@ module.exports = {
   },
   plugins: plugins,
   optimization: {
-    minimizer: [
-      new UglifyJsPlugin( {
-        sourceMap: true
-      } )
-    ],
     namedModules: true,
     noEmitOnErrors: true,
     concatenateModules: true
