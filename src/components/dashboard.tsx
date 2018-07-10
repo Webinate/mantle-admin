@@ -165,12 +165,18 @@ const Menu = styled.div`
   overflow: auto;
   height: 100%;
 
+  > nav .selected {
+    background: ${ theme.primary100.background };
+    color: ${ theme.primary100.color };
+  }
+
   > nav > div.selected::before {
     content: '';
     position: absolute;
     height: 100%;
     box-sizing: border-box;
     border-left: 8px solid ${ theme.primary200.background };
+    left: 0;
   }
 `;
 

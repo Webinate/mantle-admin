@@ -147,5 +147,6 @@ function quickCheck() {
 
 
 gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
+gulp.task( 'build-prod', gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) );
 gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
 gulp.task( 'tiny-files', copyTinyFiles );

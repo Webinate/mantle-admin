@@ -1,5 +1,5 @@
 const path = require( 'path' );
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' )
 const webpack = require( 'webpack' );
 const isProdBuild = process.env.NODE_ENV === 'production' ? true : false;
 
@@ -25,12 +25,14 @@ module.exports = {
   },
   plugins: plugins,
   optimization: {
-      minimizer: isProdBuild ? [
-        new UglifyJsPlugin()
-      ] : [],
-      namedModules: true,
-      noEmitOnErrors: true,
-      concatenateModules: true
+    minimizer: [
+      new UglifyJsPlugin( {
+        sourceMap: true
+      } )
+    ],
+    namedModules: true,
+    noEmitOnErrors: true,
+    concatenateModules: true
   },
   module: {
     rules: [
@@ -64,5 +66,5 @@ module.exports = {
   resolve: {
     extensions: [ "*", ".tsx", ".ts", ".js" ]
   },
-  devtool: isProdBuild ? false : 'inline-source-map'
+  devtool: isProdBuild ? 'source-map' : 'source-map'
 };

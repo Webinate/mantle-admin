@@ -10,7 +10,6 @@ import Dashboard from '../components/dashboard';
 import ContentHeader from '../components/content-header';
 import { Users } from './users';
 import { Posts } from './posts';
-import theme from '../theme/mui-theme';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -23,7 +22,6 @@ import MediaLibIcon from '@material-ui/icons/PhotoLibrary';
 import HomeIcon from '@material-ui/icons/Home';
 import PostsIcon from '@material-ui/icons/Description';
 import { Media } from './media';
-import { SimplePaletteColorOptions } from '@material-ui/core/styles/createPalette';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -97,8 +95,6 @@ export class App extends React.Component<Props, State> {
       { label: 'Media', icon: <MediaLibIcon style={iconStyle} />, exact: false, path: '/dashboard/media', onClick: () => this.goTo( '/dashboard/media' ) }
     ];
 
-    const primary = theme.palette!.primary as SimplePaletteColorOptions;
-
     return (
       <div>
         <Route path="/" exact={true} render={props => <Redirect to="/dashboard" />} />
@@ -120,25 +116,13 @@ export class App extends React.Component<Props, State> {
                       return <ListItem
                         button
                         className={selected ? 'selected' : ''}
-                        style={{
-                          backgroundColor: selected ? primary.light : undefined
-                        }}
                         key={`menu-item-${ index }`}
                         onClick={e => i.onClick()}
                       >
                         <ListItemIcon>
-                          <Icon
-                            style={{
-                              color: selected ? primary.contrastText : primary.main,
-                              transition: '',
-                            }}
-                          >{i.icon}</Icon>
+                          <Icon>{i.icon}</Icon>
                         </ListItemIcon>
                         <ListItemText
-                          style={{
-                            color: selected ? primary.contrastText : primary.main,
-                            transition: '',
-                          }}
                           primaryTypographyProps={{ color: 'inherit' }}
                           primary={i.label} />
                       </ListItem>
