@@ -45,8 +45,8 @@ export default class HTML extends React.Component<Props, State> {
           <link rel="stylesheet" href="/css/main.css" />
           <link rel="icon" type="image/png" href="/images/favicon.png" />
           <link href="/css/mantle.css" rel="stylesheet" />
-          {this.props.styles}
           <style id="material-styles-server-side">${this.props.stylesMaterial}</style>
+          {this.props.styles}
         </head>
         <body>
           <div id="application"
