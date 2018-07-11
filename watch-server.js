@@ -36,7 +36,7 @@ async function start() {
   const compiler = webpack( require( './webpack.config.js' ) );
 
   // Now watch the source
-  compiler.watch( { aggregateTimeout: 300, poll: true }, function( err, stats ) {
+  compiler.watch( { aggregateTimeout: 300, poll: true, ignored: /node_modules/ }, function( err, stats ) {
 
     console.clear();
     console.log( '[webpack:build]', stats.toString( {

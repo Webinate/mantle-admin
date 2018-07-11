@@ -210,7 +210,7 @@ const Properties = styled.div`
     color: ${theme.error.background };
     font-weight: bold;
 
-    > div {
+    > button {
       margin: 10px 0;
     }
   }

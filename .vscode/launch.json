@@ -2,20 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Server",
+      "name": "Modepress Admin Debug Server",
       "type": "node",
-      "protocol": "auto",
+      "protocol": "inspector",
       "request": "launch",
       "stopOnEntry": false,
       "args": [
-        "${workspaceRoot}/../../src/main.ts",
-        "--config=${workspaceRoot}/../../config.json",
+        "./clients/modepress-admin/watch-server.js",
+        "--config=./config.json",
         "--numThreads=1",
-        "--logging=true",
-        "--inspect=true"
+        "--runningTests=true",
+        "--logging=true"
       ],
-      "cwd": "${workspaceRoot}/../..",
-      "preLaunchTask": "",
+      "cwd": "${workspaceRoot}/../../",
+      "preLaunchTask": null,
       "runtimeExecutable": null,
       "runtimeArgs": [
         "-r",
@@ -29,7 +29,7 @@
       "outFiles": []
     },
     {
-      "name": "Debug Tests",
+      "name": "Modepress Admin Tests",
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
@@ -53,33 +53,6 @@
       "runtimeExecutable": null,
       "runtimeArgs": [
         "--nolazy"
-      ],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "console": "internalConsole",
-      "sourceMaps": true,
-      "outFiles": []
-    },
-    {
-      "name": "Watch Mode",
-      "type": "node",
-      "protocol": "inspector",
-      "request": "launch",
-      "stopOnEntry": false,
-      "args": [
-        "./clients/modepress-admin/watch-server.js",
-        "--config=./config.json",
-        "--numThreads=1",
-        "--runningTests=true",
-        "--logging=true"
-      ],
-      "cwd": "${workspaceRoot}/../../",
-      "preLaunchTask": null,
-      "runtimeExecutable": null,
-      "runtimeArgs": [
-        "-r",
-        "ts-node/register"
       ],
       "env": {
         "NODE_ENV": "development"

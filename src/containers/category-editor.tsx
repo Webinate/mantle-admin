@@ -131,7 +131,7 @@ export class CategoryEditor extends React.Component<Props, State> {
         <FormControl
           fullWidth={true}
         >
-          <InputLabel htmlFor="mt-new-cat-parent">Age</InputLabel>
+          <InputLabel htmlFor="mt-new-cat-parent">Parent Category</InputLabel>
           <Select
             MenuProps={{ transitionDuration: this.props.app.debugMode ? 0 : 'auto' }}
             value={this.state.newCategory.parent || ''}

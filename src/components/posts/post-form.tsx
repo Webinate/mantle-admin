@@ -228,7 +228,8 @@ export default class PostForm extends React.Component<Props, State> {
               <IconButton
                 id="mt-add-tag"
                 onClick={e => this.addTag()}
-                style={{ padding: 0, width: 30, height: 30 }}><AddIcon style={{ width: 26, height: 26 }} />
+                style={{ margin: '0 4px' }}>
+                <AddIcon />
               </IconButton>
             </div>
           </TagsInput>
@@ -372,7 +373,7 @@ align-items: center;
 }
 > div:nth-child(2) {
   flex: 1;
-  max-width: 30px;
+  max-width: 50px;
 }
 `;
 
