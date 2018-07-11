@@ -21,6 +21,9 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+
 import theme from '../theme/mui-theme';
 import { ICategory } from 'modepress';
 import { connectWrapper, returntypeof } from '../utils/decorators';
@@ -222,12 +225,20 @@ export class CategoryEditor extends React.Component<Props, State> {
     const selected = this.props.selected.find( i => i === cat._id ) ? true : false;
 
     const checkboxStyle: React.CSSProperties = {
-      fill: this.state.deleteMode || this.state.editMode ? theme.primary200.background : theme.primary300.background
+      height: '36px',
+      width: '36px'
+    };
+
+    const checkboxIconStyle: React.CSSProperties = {
+      fill: this.state.deleteMode || this.state.editMode ? theme.primary200.background : theme.primary300.background,
+      height: '26px',
+      width: '26px'
     };
 
     return (
       <div key={`category-${ catIndex }`} className="mt-category-item-container">
         <FormControlLabel
+          style={{ marginLeft: '-7px' }}
           key={`category-${ catIndex }`}
           control={
             <Checkbox
@@ -248,8 +259,9 @@ export class CategoryEditor extends React.Component<Props, State> {
                 else
                   this.props.onCategorySelected( cat );
               }}
-              icon={this.state.deleteMode ? <DeleteIcon style={checkboxStyle} /> : this.state.editMode ? <EditIcon style={checkboxStyle} /> : undefined}
-              checkedIcon={this.state.deleteMode ? <DeleteIcon style={checkboxStyle} /> : this.state.editMode ? <EditIcon style={checkboxStyle} /> : undefined}
+              style={checkboxStyle}
+              icon={this.state.deleteMode ? <DeleteIcon style={checkboxIconStyle} /> : this.state.editMode ? <EditIcon style={checkboxIconStyle} /> : <CheckBoxOutlineBlankIcon style={checkboxIconStyle} />}
+              checkedIcon={this.state.deleteMode ? <DeleteIcon style={checkboxIconStyle} /> : this.state.editMode ? <EditIcon style={checkboxIconStyle} /> : <CheckBoxIcon style={checkboxIconStyle} />}
               value="checked"
             />
           }
@@ -333,7 +345,7 @@ export class CategoryEditor extends React.Component<Props, State> {
                 <IconButton
                   className="mt-edit-cat-btn"
                   onClick={e => this.setState( { editMode: true } )}
-                  style={{ padding: 0, position: 'absolute', top: '-5px', right: 0 }}
+                  style={{ padding: 0, position: 'absolute', top: '-10px', right: 0 }}
                 >
                   <EditIcon style={{ padding: 0 }} />
                 </IconButton>

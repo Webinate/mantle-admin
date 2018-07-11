@@ -70,7 +70,7 @@ export default class UserProperties extends React.Component<Props, State> {
           <Avatar
             className="mt-avatar-image"
             src={generateAvatarPic( selected.avatar )}
-            style={{ width: 200, height: 200 }}
+            style={{ display: 'inline-flex', width: 200, height: 200 }}
           />
         </ImgContainer>
         <DetailsContainer>

@@ -38,10 +38,6 @@ export default class Dashboard extends React.Component<Props, State> {
 
   render() {
     const headerHeight = 60;
-    const menuItemStyle: React.CSSProperties = {
-      color: theme.primary100.background,
-      fontSize: '20px'
-    };
 
     return (
       <DashboardOuter className="mt-dashboard">
@@ -76,7 +72,7 @@ export default class Dashboard extends React.Component<Props, State> {
                   className="mt-settings"
                 >
                   <ListItemIcon>
-                    <Icon style={menuItemStyle} className="icon icon-settings" />
+                    <Icon className="icon icon-settings" />
                   </ListItemIcon>
                   <ListItemText primary="Settings" />
                 </MenuItem>
@@ -86,7 +82,7 @@ export default class Dashboard extends React.Component<Props, State> {
                   onClick={e => this.props.onLogOut()}
                 >
                   <ListItemIcon>
-                    <Icon style={menuItemStyle} className="icon icon-exit" />
+                    <Icon className="icon icon-exit" />
                   </ListItemIcon>
                   <ListItemText primary="Logout" />
                 </MenuItem>

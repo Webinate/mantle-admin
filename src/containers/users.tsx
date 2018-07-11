@@ -159,7 +159,7 @@ export class Users extends React.Component<Props, State> {
               <IconButton
                 id="mt-users-search-button"
                 onClick={e => this.props.getUsers( 0, this.state.userFilter )}
-                style={{ verticalAlign: 'top' }}
+                style={{ verticalAlign: 'middle' }}
               >
                 <SearchIcon style={{ color: theme.primary200.background }} />
               </IconButton>

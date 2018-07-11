@@ -137,25 +137,28 @@ export class Posts extends React.Component<Props, State> {
                   />
                   <IconButton
                     className="mt-posts-search"
+                    color="primary"
                     onClick={e => this.onSearch()}
                   >
-                    <SearchIcon style={{ color: theme.primary200.background }} />
+                    <SearchIcon />
                   </IconButton>
                   <Tooltip title={this.state.filtersOpen ? 'Close filter options' : 'Open filter options'}>
                     <IconButton
+                      color="primary"
                       className="mt-posts-filter"
                       onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
                     >
-                      <FilterIcon style={{ color: theme.primary200.background }} />
+                      <FilterIcon />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Delete selected posts">
                     <IconButton
+                      color="primary"
                       className="mt-posts-delete-multi"
                       disabled={this.state.selectedPosts.length > 0 ? false : true}
                       onClick={e => this.onDeleteMultiple()}
                     >
-                      <DeleteIcon style={{ color: theme.primary200.background }} />
+                      <DeleteIcon />
                     </IconButton>
                   </Tooltip>
                   <Button

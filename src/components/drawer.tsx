@@ -2,7 +2,8 @@ import * as React from 'react';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import IconButton from '@material-ui/core/IconButton';
-import Icon from '@material-ui/core/Icon';
+import DownIcon from '@material-ui/icons/KeyboardArrowDown';
+import UpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 type Props = {
   title: string;
@@ -41,23 +42,20 @@ export default class Drawer extends React.Component<Props, State> {
   render() {
     return <div className={this.props.className}>
       <DrawerHeader className="mt-drawer-header" onClick={() => this.props.onHeaderClick()}>
-        <IconButton
-          style={{
-            width: 30,
-            height: 30,
-            padding: 0,
-          }}
-        >
-          <Icon
-            className={this.props.open ? 'icon icon-arrow-down' : 'icon icon-arrow-right'}
-            style={{
-              width: 30,
-              height: 30,
-              color: 'inherit'
-            }}
-          />
-        </IconButton>
         <h3>{this.props.title}</h3>
+        <IconButton>
+          {this.props.open ?
+            <DownIcon
+              style={{
+                color: 'inherit'
+              }}
+            /> :
+            <UpIcon
+              style={{
+                color: 'inherit'
+              }}
+            />}
+        </IconButton>
       </DrawerHeader>
       {this.props.open ?
         <DrawerContent innerRef={
@@ -83,18 +81,21 @@ export default class Drawer extends React.Component<Props, State> {
 }
 
 const DrawerHeader = styled.div`
-  padding: 10px;
   cursor: pointer;
   user-select: none;
+  display: flex;
   background: ${theme.primary100.background };
   color: ${theme.primary100.color };
   border-top: 1px solid ${theme.primary100.border };
+
   h3 {
-    margin: 2px 0;
+    padding: 4px 10px;
+    flex: 1;
   }
   > button {
-    float: right;
     color: inherit;
+    flex: 1;
+    max-width: 50px;
   }
 `;
 
