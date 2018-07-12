@@ -54,11 +54,11 @@ export default class CategoryModule extends Module {
   }
 
   async confirmDeletion( cancel = false ) {
-    await this.page.waitFor( '.mt-confirm-delcat button' );
+    await this.page.waitFor( 'button.mt-confirm-delcat' );
     if ( cancel )
-      await this.page.click( '.mt-cancel-delcat button' );
+      await this.page.click( 'button.mt-cancel-delcat' );
     else
-      await this.page.click( '.mt-confirm-delcat button' );
+      await this.page.click( 'button.mt-confirm-delcat' );
 
     await this.page.waitForFunction( 'document.querySelector(".mt-category-del-container") == null' );
   }
@@ -67,17 +67,19 @@ export default class CategoryModule extends Module {
    * Returns the menu items of the parent drop down
    */
   async getParentCategories() {
-    const dropdownSelector = '#mt-new-cat-parent > div';
-    const menuItems = 'div[role=menu] div span[role=menuitem]';
+    const dropdownSelector = 'label[for=mt-new-cat-parent]';
+    const menuItems = '.mt-cat-parent-item';
     await this.page.waitFor( dropdownSelector );
     await this.page.click( dropdownSelector );
     await this.page.waitFor( 500 );
+    await this.page.waitFor( menuItems );
     const items: string[] = await this.page.$$eval( menuItems, list => {
       return Array.from( list ).map( elm => elm.textContent );
     } );
 
-    await this.page.waitFor( 'body div:last-child' );
-    await this.page.click( 'body div:last-child' );
+    await this.page.waitFor( '.mt-cat-parent-item:first-child' );
+    await this.page.click( '.mt-cat-parent-item:first-child' );
+    await this.emptySelector( '.mt-cat-parent-item:first-child' );
 
     return items;
   }
@@ -112,7 +114,7 @@ export default class CategoryModule extends Module {
       categoriesSelector = '.mt-category-checkbox.selected';
 
     const items: string[] = await this.page.$$eval( categoriesSelector, list => {
-      return Array.from( list ).map( elm => elm.textContent );
+      return Array.from( list ).map( elm => elm.querySelector( '.mt-category-checkbox-label' )!.textContent );
     } );
 
     return items;
@@ -166,12 +168,13 @@ export default class CategoryModule extends Module {
    * Selects a parent category by its label
    */
   async selectParent( p: string ) {
-    const dropdownSelector = '#mt-new-cat-parent button';
-    const menuItems = 'div[role=menu] div span[role=menuitem]';
+    const dropdownSelector = 'label[for=mt-new-cat-parent]';
+    const menuItems = '.mt-cat-parent-item';
 
-    await this.page.waitFor( 500 );
+    await this.page.waitFor( 2000 );
     await this.page.waitFor( dropdownSelector );
     await this.page.click( dropdownSelector );
+    await this.page.waitFor( '.mt-cat-parent-item:first-child' );
 
     const items: string[] = await this.page.$$eval( menuItems, list => {
       return Array.from( list ).map( elm => elm.textContent );
@@ -181,7 +184,8 @@ export default class CategoryModule extends Module {
     if ( index === -1 )
       throw new Error( 'No menu item exists with that label' );
 
-    await this.page.click( `div[role=menu] div:nth-child(${ index + 1 }) span[role=menuitem]` );
+    await this.page.click( `.mt-cat-parent-item:nth-child(${ index + 1 })` );
+    await this.emptySelector( '.mt-cat-parent-item:first-child' );
   }
 
   /**

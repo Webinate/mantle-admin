@@ -141,10 +141,12 @@ export class CategoryEditor extends React.Component<Props, State> {
             input={<Input id="mt-new-cat-parent" />}
           >
             <MenuItem
+              className="mt-cat-parent-item"
               value={''}
             >None</MenuItem>
             {flatCategories.map( ( parent, parentIndex ) => {
               return <MenuItem
+                className="mt-cat-parent-item"
                 key={`parent-${ parentIndex }`}
                 value={parent._id}
               >{parent.title}</MenuItem>
@@ -238,11 +240,11 @@ export class CategoryEditor extends React.Component<Props, State> {
         <FormControlLabel
           style={{ marginLeft: '-7px' }}
           key={`category-${ catIndex }`}
+          className={`mt-category-checkbox ${ selected ? 'selected' : '' }`}
           control={
             <Checkbox
               checked={selected}
               color="primary"
-              className={`mt-category-checkbox ${ selected ? 'selected' : '' }`}
               id={`mt-cat-${ cat._id }`}
               onClick={e => {
                 if ( this.state.deleteMode )
@@ -263,7 +265,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               value="checked"
             />
           }
-          label={cat.title}
+          label={<span className="mt-category-checkbox-label">{cat.title}</span>}
         />
 
         <CategoryChildren>

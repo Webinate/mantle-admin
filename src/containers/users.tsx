@@ -169,6 +169,7 @@ export class Users extends React.Component<Props, State> {
         <SplitPanel
           collapsed={selected ? 'none' : 'right'}
           ratio={0.7}
+          delay={this.props.app.debugMode ? 0 : 0.7}
           style={{ height: 'calc(100% - 50px)' }}
           rightStyle={{ boxShadow: '-3px 5px 10px 0px rgba(0,0,0,0.2)' }}
           first={() => {

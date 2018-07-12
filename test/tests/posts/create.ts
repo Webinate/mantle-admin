@@ -24,12 +24,12 @@ describe( 'Testing the creation of posts: ', function() {
 
   it( 'does not let regular users click new post', async () => {
     await postPage.load( joe );
-    await postPage.waitFor( '.mt-new-post button[disabled]' )
+    await postPage.waitFor( 'button[disabled].mt-new-post ' )
   } )
 
   it( 'does not let regular users go to the new post page directly', async () => {
     await postPage.load( joe, '/dashboard/posts/new' );
-    await postPage.waitFor( '.mt-new-post button[disabled]' )
+    await postPage.waitFor( 'button[disabled].mt-new-post' )
   } )
 
   it( 'does let admin users go to the new post page directly', async () => {
@@ -43,7 +43,7 @@ describe( 'Testing the creation of posts: ', function() {
   } )
 
   it( 'does not allow post creation without title and slug', async () => {
-    await postPage.waitFor( '.mt-post-confirm button[disabled]' );
+    await postPage.waitFor( 'button[disabled].mt-post-confirm' );
   } )
 
   it( 'did autofill a slug with only accepted characters', async () => {
@@ -55,7 +55,7 @@ describe( 'Testing the creation of posts: ', function() {
   } )
 
   it( 'has enabled the confirm button after post & title are filled', async () => {
-    assert.deepEqual( await postPage.$( '.mt-post-confirm button[disabled]' ), null );
+    assert.deepEqual( await postPage.$( 'button[disabled].mt-post-confirm' ), null );
   } )
 
   it( 'did allow the author to set a custom slug', async () => {

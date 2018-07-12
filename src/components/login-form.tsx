@@ -81,7 +81,6 @@ export default class LoginForm extends React.Component<Props, State> {
     return (
       <form className="login-form" action="" name="login">
         <FormControl
-          aria-describedby="mt-username-error-text"
           className="mt-username"
           fullWidth={true}
           error={this.getUserError() ? true : false}
@@ -92,24 +91,22 @@ export default class LoginForm extends React.Component<Props, State> {
             value={this.state.user}
             onChange={( e ) => this.setState( { user: e.currentTarget.value } )}
           />
-          {this.getUserError() ? <FormHelperText id="mt-username-error-text">{this.getUserError()}</FormHelperText> : undefined}
+          {this.getUserError() ? <FormHelperText id="mt-username-error">{this.getUserError()}</FormHelperText> : undefined}
         </FormControl>
 
-
         <FormControl
-          aria-describedby="mt-password-error-text"
           className="mt-password"
           fullWidth={true}
           error={this.showPasswordError()}
         >
           <InputLabel htmlFor="mt-password-error">Name</InputLabel>
           <Input
-            id="mt-password-error"
+            id="mt-password"
             type="password"
             value={this.state.pass}
             onChange={( e ) => this.setState( { pass: e.currentTarget.value } )}
           />
-          {this.showPasswordError() ? <FormHelperText id="mt-password-error-text">Please specify a password</FormHelperText> : undefined}
+          {this.showPasswordError() ? <FormHelperText id="mt-password-error">Please specify a password</FormHelperText> : undefined}
         </FormControl>
 
         <ButtonsDiv>

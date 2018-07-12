@@ -38,7 +38,7 @@ export default class PostsPage extends Page {
    * Clicks the new post button and waits for the components to be on the dom
    */
   async clickNewPost() {
-    await this.page.click( '.mt-new-post button' );
+    await this.page.click( 'button.mt-new-post' );
     await this.page.waitFor( '#mt-post-title' );
     const path = await this.page.evaluate( () => window.location.pathname )
     assert.deepEqual( path, '/dashboard/posts/new' );
@@ -57,7 +57,7 @@ export default class PostsPage extends Page {
    */
   async clickConfirm() {
     await this.page.click( '.mt-post-confirm' );
-    await this.page.waitFor( '.mt-new-post button' );
+    await this.page.waitFor( 'button.mt-new-post' );
     await this.doneLoading()
   }
 
@@ -94,7 +94,7 @@ export default class PostsPage extends Page {
       await this.page.waitFor( '.my-user-picker-btn' );
       await this.page.click( '.my-user-picker-btn' );
       await this.page.waitFor( '.mt-user-autocomplete input' );
-      await this.textfield( '.mt-user-autocomplete', val );
+      await this.page.type( '.mt-user-autocomplete input', val, { delay: 50 } );
       await this.page.waitFor( '.mt-user-drop-item:first-child' );
       await this.page.click( '.mt-user-drop-item:first-child' );
       await this.emptySelector( '.mt-user-autocomplete input' )
@@ -115,19 +115,19 @@ export default class PostsPage extends Page {
    * Gets or sets the post brief
    */
   async isPublic( val?: boolean ) {
-    const label = await this.page.$eval( '.mt-visibility-toggle label', elm => elm.textContent );
+    const label = await this.page.$eval( '.mt-visibility-toggle-label', elm => elm.textContent );
     let isPublic = false;
 
-    if ( label === 'Post is Public' )
+    if ( label === 'Post is public' )
       isPublic = true;
 
     if ( val === undefined ) {
       return isPublic;
     } else {
       if ( val && !isPublic )
-        await this.page.click( '.mt-visibility-toggle input' );
+        await this.page.click( '.mt-visibility-toggle-label' );
       else if ( !val && isPublic )
-        await this.page.click( '.mt-visibility-toggle input' );
+        await this.page.click( '.mt-visibility-toggle-label' );
     }
   }
 
@@ -290,9 +290,9 @@ export default class PostsPage extends Page {
   }
 
   async confirmDelete() {
-    await this.page.waitFor( `.mt-post-del-dialog .mt-confirm-delpost` );
-    await this.page.click( `.mt-post-del-dialog .mt-confirm-delpost` );
-    await this.emptySelector( `.mt-post-del-dialog .mt-confirm-delpost` );
+    await this.page.waitFor( `.mt-confirm-delpost` );
+    await this.page.click( `.mt-confirm-delpost` );
+    await this.emptySelector( `.mt-confirm-delpost` );
   }
 
   /**

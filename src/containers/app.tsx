@@ -165,8 +165,12 @@ export class App extends React.Component<Props, State> {
           onClose={() => {
             this.props.closeSnackbar( null )
           }}
-          action={[ <span id="mt-close-snackbar-btn">close</span> ]}
-          message={<span id="mt-close-snackbar-btn">{this.props.app.response || ''}</span>}
+          action={[ <span
+            key="close-1"
+            id="mt-close-snackbar-btn"
+            onClick={e => this.props.closeSnackbar( null )}
+          >close</span> ]}
+          message={<span id="mt-close-snackbar-msg">{this.props.app.response || ''}</span>}
         />
       </div>
     );

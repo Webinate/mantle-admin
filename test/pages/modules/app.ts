@@ -10,14 +10,14 @@ export default class AppModule extends Module {
   }
 
   async closeSnackMessage() {
-    await this.page.waitFor( '.mt-response-message[open]' );
+    await this.page.waitFor( '.mt-response-message.mt-snack-open' );
     await this.page.waitFor( 500 );
-    await this.page.click( '.mt-response-message button' );
+    await this.page.click( '#mt-close-snackbar-btn' );
     await this.page.waitFor( '.mt-response-message.mt-snack-closed' )
   }
 
   async getSnackMessage() {
-    await this.page.waitFor( '.mt-response-message[open]' );
-    return this.page.$eval( '.mt-response-message > div > div > span', elm => elm.textContent );
+    await this.page.waitFor( '.mt-response-message.mt-snack-open' );
+    return this.page.$eval( '#mt-close-snackbar-msg', elm => elm.textContent );
   }
 }

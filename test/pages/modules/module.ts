@@ -11,6 +11,10 @@ export default class Module {
     this.config = utils.config;
   }
 
+  async emptySelector( selector: string ) {
+    return this.page.waitForFunction( `document.querySelector("${ selector }") == null` );
+  }
+
   async input( selector: string, val?: string ) {
     if ( val === undefined ) {
       return this.page.$eval( selector, ( elm: HTMLInputElement ) => elm.value );
@@ -21,7 +25,7 @@ export default class Module {
         elm.value = '';
       } );
 
-      await this.page.type( selector, val, { delay: 10 } );
+      await this.page.type( selector, val, { delay: 50 } );
     }
   }
 }

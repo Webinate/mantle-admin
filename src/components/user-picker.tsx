@@ -92,8 +92,10 @@ export default class UserPicker extends React.Component<Props, State> {
             {this.state.users.map( ( user, index ) => {
               return (
                 <MenuItem
+                  className="mt-user-drop-item"
                   key={`user-${ index }`}
                   onClick={e => {
+                    e.stopPropagation();
                     this.props.onChange( user );
                     this.setState( { open: false, users: [] } );
                   }}

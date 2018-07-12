@@ -52,15 +52,6 @@ export default class Page {
     return this.page.goto( utils.host + path );
   }
 
-  /**
-   * Gets a textfield's error text if it exists
-   * @param {string} selector The selector for targetting the textfield. E.g. '.sometext' or '#sometext'
-   * @returns {Promise<string|null>}
-   */
-  async textfieldError( selector: string ) {
-    return this.getElmText( `${ selector } > div:nth-child(4)` );
-  }
-
   async emptySelector( selector: string ) {
     return this.page.waitForFunction( `document.querySelector("${ selector }") == null` );
   }
@@ -99,7 +90,7 @@ export default class Page {
         elm.focus();
       } );
 
-      await this.page.type( selector, val, { delay: 10 } );
+      await this.page.type( selector, val, { delay: 8 } );
     }
   }
 

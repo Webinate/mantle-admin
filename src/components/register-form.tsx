@@ -57,7 +57,7 @@ export default class RegisterForm extends React.Component<Props, State> {
     return (
       <form className="register-form" action="" name="register">
         <FormControl
-          aria-describedby="mt-username-text"
+          className="mt-username"
           fullWidth={true}
           error={this.showUsernameError()}
         >
@@ -68,11 +68,11 @@ export default class RegisterForm extends React.Component<Props, State> {
             value={this.state.user}
             onChange={( e ) => this.setState( { user: e.currentTarget.value } )}
           />
-          {this.showUsernameError() ? <FormHelperText id="mt-username-text">Please specify a username</FormHelperText> : undefined}
+          {this.showUsernameError() ? <FormHelperText id="mt-username-error">Please specify a username</FormHelperText> : undefined}
         </FormControl>
 
         <FormControl
-          aria-describedby="mt-email-text"
+          className="mt-email"
           fullWidth={true}
           error={this.showEmailError()}
         >
@@ -83,12 +83,12 @@ export default class RegisterForm extends React.Component<Props, State> {
             value={this.state.email}
             onChange={( e ) => this.setState( { email: e.currentTarget.value } )}
           />
-          {this.state.formSubmitted && !this.state.email ? <FormHelperText id="mt-email-text">Please specify an email</FormHelperText> : undefined}
+          {this.state.formSubmitted && !this.state.email ? <FormHelperText id="mt-email-error">Please specify an email</FormHelperText> : undefined}
         </FormControl>
 
         <FormControl
-          aria-describedby="mt-password-text"
           fullWidth={true}
+          className="mt-password"
           error={this.showPasswordError()}
         >
           <InputLabel htmlFor="user">Password</InputLabel>
@@ -99,12 +99,12 @@ export default class RegisterForm extends React.Component<Props, State> {
             value={this.state.pass}
             onChange={( e ) => this.setState( { pass: e.currentTarget.value } )}
           />
-          {this.showPasswordError() ? <FormHelperText id="mt-password-text">Please specify a password</FormHelperText> : undefined}
+          {this.showPasswordError() ? <FormHelperText id="mt-password-error">Please specify a password</FormHelperText> : undefined}
         </FormControl>
 
         <FormControl
-          aria-describedby="mt-password2-text"
           fullWidth={true}
+          className="mt-password2"
           error={this.state.pass !== this.state.pass2}
         >
           <InputLabel htmlFor="user">Repeat Password</InputLabel>
@@ -115,7 +115,7 @@ export default class RegisterForm extends React.Component<Props, State> {
             value={this.state.pass2}
             onChange={( e ) => this.setState( { pass2: e.currentTarget.value } )}
           />
-          {this.state.pass !== this.state.pass2 ? <FormHelperText id="mt-password-text">Passwords do not match</FormHelperText> : undefined}
+          {this.state.pass !== this.state.pass2 ? <FormHelperText id="mt-password2-error">Passwords do not match</FormHelperText> : undefined}
         </FormControl>
 
         <ButtonsDiv>

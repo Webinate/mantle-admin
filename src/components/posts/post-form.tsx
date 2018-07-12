@@ -175,12 +175,12 @@ export default class PostForm extends React.Component<Props, State> {
             disabled={!this.isPostValid()}
           >{this.props.post ? 'Update' : 'Publish'}</Button>
 
-          <FormControl>
+          <FormControl className="mt-visibility-toggle">
             <FormControlLabel
               control={
                 <Switch
                   color="primary"
-                  className="mt-visibility-toggle"
+
                   checked={this.state.editable.public ? true : false}
                   onChange={e => {
                     this.setState( {
@@ -192,7 +192,7 @@ export default class PostForm extends React.Component<Props, State> {
                   }}
                 />
               }
-              label={this.state.editable.public ? 'Post is public' : 'Post is private'}
+              label={<span className="mt-visibility-toggle-label">{this.state.editable.public ? 'Post is public' : 'Post is private'}</span>}
             />
           </FormControl>
           {this.props.post ?

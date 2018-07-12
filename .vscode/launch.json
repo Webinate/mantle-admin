@@ -38,7 +38,7 @@
       "args": [
         "--compilers ts:ts-node/register",
         "-t",
-        "100000",
+        "50000",
         "./test/index.js",
         "--config=../../config.json",
         "--logging=false",

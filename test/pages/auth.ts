@@ -63,8 +63,13 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string | null>}
    */
-  usernameError() {
-    return this.textfieldError( this.$username );
+  async usernameError() {
+    const selector = '#mt-username-error';
+    const result = await this.page.$( selector );
+    if ( !result )
+      return null;
+
+    return this.page.$eval( selector, e => e.textContent );
   }
 
   /**
@@ -72,8 +77,13 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string | null>}
    */
-  emailError() {
-    return this.textfieldError( this.$email );
+  async emailError() {
+    const selector = '#mt-email-error';
+    const result = await this.page.$( selector );
+    if ( !result )
+      return null;
+
+    return this.page.$eval( selector, e => e.textContent );
   }
 
   /**
@@ -81,8 +91,13 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string | null >}
    */
-  passwordError() {
-    return this.textfieldError( this.$password );
+  async passwordError() {
+    const selector = '#mt-password-error';
+    const result = await this.page.$( selector );
+    if ( !result )
+      return null;
+
+    return this.page.$eval( selector, e => e.textContent );
   }
 
   /**
@@ -90,8 +105,13 @@ export default class AuthPage extends Page {
    * @param {string } val
    * @returns {Promise<string | null >}
    */
-  password2Error() {
-    return this.textfieldError( this.$password2 );
+  async password2Error() {
+    const selector = '#mt-password2-error';
+    const result = await this.page.$( selector );
+    if ( !result )
+      return null;
+
+    return this.page.$eval( selector, e => e.textContent );
   }
 
   /**
@@ -105,8 +125,8 @@ export default class AuthPage extends Page {
    */
   doneLoading() { return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' ); }
 
-  clickLogin() { return this.page.click( '.mt-login-btn button' ); }
-  clickRegister() { return this.page.click( '.mt-register-btn button' ); }
+  clickLogin() { return this.page.click( 'button.mt-login-btn' ); }
+  clickRegister() { return this.page.click( 'button.mt-register-btn' ); }
   clickCreateAccount() { return this.page.click( '.mt-create-account' ); }
   clickToLogin() { return this.page.click( '.mt-to-login' ); }
   clickResendActivation() { return this.page.click( '.mt-resend-activation' ); }

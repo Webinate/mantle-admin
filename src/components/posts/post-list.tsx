@@ -109,7 +109,7 @@ export default class PostList extends React.Component<Props, State> {
   }
 
   private onVisibilityChange( visibility: VisibilityType ) {
-    this.setState( { visibility: visibility }, () => {
+    this.setState( { visibility: visibility, visibilityOpen: false }, () => {
       this.props.getPosts( { visibility: visibility } );
     } )
   }
