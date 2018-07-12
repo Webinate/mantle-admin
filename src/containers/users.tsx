@@ -114,7 +114,7 @@ export class Users extends React.Component<Props, State> {
         <DialogActions>
           <Button
             className="mt-cancel"
-            variant="contained" color="primary"
+            variant="contained"
             onClick={e => this.setState( { dialogue: null } )}
           >Cancel</Button>
           <Button

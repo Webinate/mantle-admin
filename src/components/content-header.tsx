@@ -57,7 +57,7 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  padding: 0 20px;
+  padding: 0 10px 0 20px;
   display: flex;
   width: 100%;
   height: 100%;

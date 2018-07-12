@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { IRootState } from '../store';
-import theme from '../theme/mui-theme';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
@@ -216,20 +215,13 @@ export class Posts extends React.Component<Props, State> {
         {this.state.showDeleteModal ? <Dialog
           open={true}
         >
-          <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+          <DialogTitle id="form-dialog-title">Delete Post?</DialogTitle>
           <DialogContent className="mt-post-del-dialog">
             <DialogContentText className="mt-post-del-dialog-body">
-              To subscribe to this website, please enter your email address here. We will send
-              updates occasionally.
+              {this._selectedPost ?
+                `Are you sure you want to delete the post '${ this._selectedPost.title }'?` :
+                `Are you sure you want to delete these [${ this.state.selectedPosts.length }] posts?`}
             </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Email Address"
-              type="email"
-              fullWidth
-            />
           </DialogContent>
           <DialogActions>
             <Button
@@ -259,9 +251,6 @@ export class Posts extends React.Component<Props, State> {
               }}
             >Yes</Button>
           </DialogActions>
-          {this._selectedPost ?
-            `Are you sure you want to delete the post '${ this._selectedPost.title }'?` :
-            `Are you sure you want to delete these [${ this.state.selectedPosts.length }] posts?`}
         </Dialog> : undefined}
       </div >
     );

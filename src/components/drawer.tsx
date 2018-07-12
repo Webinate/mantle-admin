@@ -45,12 +45,12 @@ export default class Drawer extends React.Component<Props, State> {
         <h3>{this.props.title}</h3>
         <IconButton>
           {this.props.open ?
-            <DownIcon
+            <UpIcon
               style={{
                 color: 'inherit'
               }}
             /> :
-            <UpIcon
+            <DownIcon
               style={{
                 color: 'inherit'
               }}

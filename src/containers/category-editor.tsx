@@ -15,7 +15,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -151,7 +150,6 @@ export class CategoryEditor extends React.Component<Props, State> {
               >{parent.title}</MenuItem>
             } )}
           </Select>
-          <FormHelperText>Optional parent category</FormHelperText>
         </FormControl>
 
         <div className="mt-newcat-error">
@@ -363,19 +361,11 @@ export class CategoryEditor extends React.Component<Props, State> {
             <Dialog
               open={true}
             >
-              <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+              <DialogTitle id="form-dialog-title">Delete Category?</DialogTitle>
               <DialogContent className="mt-category-del-container">
                 <DialogContentText>
                   Are you sure you want to delete the category '{this.state.selectedCategory.title}'
                 </DialogContentText>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Email Address"
-                  type="email"
-                  fullWidth
-                />
               </DialogContent>
               <DialogActions>
                 <Button

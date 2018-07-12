@@ -1,7 +1,5 @@
 import * as React from 'react';
 import IconButton from '@material-ui/core/IconButton';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
@@ -16,6 +14,7 @@ import EditIcon from '@material-ui/icons/Create';
 import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
 import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';
 
 export type Props = {
   animated: boolean;
@@ -44,6 +43,8 @@ export type State = {
 
 export default class PostList extends React.Component<Props, State> {
   private _container: HTMLElement | null;
+  private _sortElm?: HTMLElement | null;
+  private _visibilityElm?: HTMLElement | null;
 
   constructor( props: Props ) {
     super( props );
@@ -100,8 +101,10 @@ export default class PostList extends React.Component<Props, State> {
 
   private onAscChange() {
     const val = !this.state.sortAscending;
-    this.setState( { sortAscending: val }, () => {
-      this.props.getPosts( { sortOrder: val ? 'asc' : 'desc' } );
+    this.setState( { sortAscending: val, sortByOpen: false }, () => {
+      this.props.getPosts( {
+        sortOrder: val ? 'asc' : 'desc'
+      } );
     } )
   }
 
@@ -112,7 +115,7 @@ export default class PostList extends React.Component<Props, State> {
   }
 
   private onSortByChange( sort: SortType ) {
-    this.setState( { sortBy: sort }, () => {
+    this.setState( { sortBy: sort, sortByOpen: false }, () => {
       this.props.getPosts( { sort: sort } );
     } )
   }
@@ -147,14 +150,14 @@ export default class PostList extends React.Component<Props, State> {
           className={`mt-filters-panel ${ this.props.filtersOpen ? 'open' : 'closed' }`} filtersOpen={this.props.filtersOpen}>
           <div>
             <h3>Sort Order:</h3>
-            <IconButton
-              style={{ cursor: 'pointer', verticalAlign: 'middle' }}
-              className="mt-filter-sortby-drop"
-              onClick={( e ) => this.setState( { sortByOpen: true } )}
-            >
-              <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
-            </IconButton>
+            <div
+              ref={e => this._sortElm = e}
+              onClick={e => this.setState( { sortByOpen: true } )}
+              className="mt-filter-sortby">
+              {this.state.sortBy}
+            </div>
             <Menu
+              anchorEl={this._sortElm || undefined}
               open={this.state.sortByOpen}
               transitionDuration={this.props.animated ? 'auto' : 0}
               onClose={( e ) => this.setState( { sortByOpen: false } )}
@@ -172,39 +175,34 @@ export default class PostList extends React.Component<Props, State> {
                 onClick={e => this.onSortByChange( 'modified' )}
               >Modified</MenuItem>
             </Menu>
-            <div
-              onClick={e => this.setState( { sortByOpen: true } )}
-              className="mt-filter-sortby">
-              {this.state.sortBy}
-            </div>
-
-            <FormControlLabel
-              control={
-                <Switch
-                  className="mt-sort-order"
-                  style={{ margin: '10px 0 0 0' }}
-                  checked={this.state.sortAscending}
-                  onChange={e => this.onAscChange()}
-                  value="gilad"
-                />
+            <IconButton
+              style={{ cursor: 'pointer', margin: '0 0 0 5px', verticalAlign: 'middle', height: '20px', width: '20px' }}
+              className="mt-sort-order"
+              buttonRef={( e ) => this._sortElm = e}
+              onClick={( e ) => this.onAscChange()}
+            >
+              {
+                this.state.sortAscending ?
+                  <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} /> :
+                  <ArrowUpIcon style={{ padding: 0, height: '20px', width: '20px' }} />
               }
-              label={this.state.sortAscending ? 'Sort ascending' : 'Sort descending'}
-            />
 
+            </IconButton>
           </div>
           <div>
             <h3>Filter Visibility:</h3>
-            <IconButton
-              className="mt-filter-visibility-drop"
-              style={{ cursor: 'pointer', verticalAlign: 'middle' }}
+            <div
+              ref={e => this._visibilityElm = e}
               onClick={e => this.setState( { visibilityOpen: true } )}
+              className="mt-filter-visibility"
             >
-              <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
-            </IconButton>
+              {this.state.visibility}
+            </div>
             <Menu
               onClose={() => this.setState( { visibilityOpen: false } )}
               transitionDuration={this.props.animated ? 'auto' : 0}
               open={this.state.visibilityOpen}
+              anchorEl={this._visibilityElm!}
             >
               <MenuItem
                 className="mt-filter-visibility-all"
@@ -218,11 +216,7 @@ export default class PostList extends React.Component<Props, State> {
                 className="mt-filter-visibility-public"
                 onClick={e => this.onVisibilityChange( 'public' )}
               >Public</MenuItem>
-
             </Menu>
-            <div
-              onClick={e => this.setState( { visibilityOpen: true } )}
-              className="mt-filter-visibility">{this.state.visibility}</div>
           </div>
           <div>
             <h3>Filter User:</h3>
@@ -291,11 +285,11 @@ interface FilterProps extends React.HTMLProps<HTMLDivElement> {
   animated: boolean;
 }
 
-const filterSize = 120;
+const filterSize = 80;
 
 const PostsInnerContent = styled.div`
   height: ${ ( props: FilterProps ) => props.filtersOpen ? `calc( 100% - ${ filterSize }px )` : '100%' };
-  transition: 1s height;
+  transition: ${ ( props: FilterProps ) => props.animated ? '1' : '0' }s height;
   overflow: auto;
 `;
 
@@ -312,14 +306,20 @@ const Filter = styled.div`
     padding: 5px 10px;
     flex: 1;
     border-bottom: 1px solid ${theme.light100.border };
+    overflow: hidden;
   }
 
   .mt-filter-visibility, .mt-filter-sortby {
     text-transform: capitalize;
-    margin: 0 0 0 5px;
     display: inline-block;
     vertical-align: middle;
     cursor: pointer;
+    border-bottom: 1px solid transparent;
+    line-height: 26px;
+
+    &:hover {
+      border-bottom: 1px solid ${theme.light100.border };
+    }
   }
 `;
 
