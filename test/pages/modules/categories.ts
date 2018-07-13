@@ -67,7 +67,7 @@ export default class CategoryModule extends Module {
    * Returns the menu items of the parent drop down
    */
   async getParentCategories() {
-    const dropdownSelector = 'label[for=mt-new-cat-parent]';
+    const dropdownSelector = '.mt-new-cat-parent svg';
     const menuItems = '.mt-cat-parent-item';
     await this.page.waitFor( dropdownSelector );
     await this.page.click( dropdownSelector );
@@ -78,9 +78,9 @@ export default class CategoryModule extends Module {
     } );
 
     await this.page.waitFor( '.mt-cat-parent-item:first-child' );
-    await this.page.click( '.mt-cat-parent-item:first-child' );
-    await this.emptySelector( '.mt-cat-parent-item:first-child' );
 
+    await this.page.keyboard.press( 'Escape' );
+    await this.emptySelector( '.mt-cat-parent-item:first-child' );
     return items;
   }
 
@@ -168,7 +168,7 @@ export default class CategoryModule extends Module {
    * Selects a parent category by its label
    */
   async selectParent( p: string ) {
-    const dropdownSelector = 'label[for=mt-new-cat-parent]';
+    const dropdownSelector = '.mt-new-cat-parent svg';
     const menuItems = '.mt-cat-parent-item';
 
     await this.page.waitFor( 2000 );
