@@ -8,9 +8,6 @@ export type ThemeValue = {
 }
 
 export interface ThemeInterface extends ThemeOptions {
-  primaryColor: string;
-  primaryColorInverted: string;
-
   primary100: ThemeValue;
   primary200: ThemeValue;
   primary300: ThemeValue;
