@@ -6,6 +6,7 @@ import { default as categoriesReducer, State as ICategoryState } from './categor
 import { default as authReducer, State as IAuthState } from './authentication/reducer';
 import { default as adminReducer, State as IAdminState } from './admin-actions/reducer';
 import { default as appReducer, State as IAppResponseState } from './app/reducer';
+import { default as mediaReducer, State as IMediaResponseState } from './media/reducer';
 
 export type IRootState = {
   users: IUserState,
@@ -14,7 +15,8 @@ export type IRootState = {
   authentication: IAuthState,
   admin: IAdminState,
   router: any,
-  app: IAppResponseState
+  app: IAppResponseState,
+  media: IMediaResponseState
 };
 
 // Create the root reducer which creates our root state
@@ -25,7 +27,8 @@ const rootReducer = combineReducers<IRootState>( {
   authentication: authReducer,
   router: routerReducer,
   admin: adminReducer,
-  app: appReducer
+  app: appReducer,
+  media: mediaReducer
 } as ReducersMapObject );
 
 export default rootReducer;

@@ -12,6 +12,7 @@ import { MediaNavigator } from '../components/media/media-navigator';
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   user: state.authentication.user,
   app: state.app,
+  media: state.media,
   routing: state.router,
   location: ownProps.location as Location
 } );
@@ -48,7 +49,7 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media/new" render={props => <div>New Media</div>} />
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media" exact={true} render={props => {
-              return <MediaNavigator />;
+              return <MediaNavigator volumes={this.props.media.volumePage!.data} />;
             }} />
           </Switch>
         </Container>

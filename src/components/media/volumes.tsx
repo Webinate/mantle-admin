@@ -7,16 +7,21 @@ import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
 import Checkbox from '@material-ui/core/Checkbox';
-import Paper from '@material-ui/core/Paper';
 import { default as styled } from '../../theme/styled';
+import theme from '../../theme/mui-theme';
+import { IVolume } from '../../../../../src';
+import * as format from 'date-fns/format';
+
+export type SortTypes = 'name' | 'created' | 'memory';
+export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
-
+  volumes: Partial<IVolume<'client'>>[];
 }
 
 export type State = {
-  order: 'desc' | 'asc';
-  orderBy: 'name' | 'date';
+  order: SortOrder;
+  orderBy: SortTypes;
 }
 
 export class Volumes extends React.Component<Props, State> {
@@ -29,100 +34,115 @@ export class Volumes extends React.Component<Props, State> {
     };
   }
 
-  private changeOrder( sort: 'name' | 'date' ) {
-    this.setState( { orderBy: sort } );
+  private changeOrder( sort: SortTypes ) {
+    let order: SortOrder = 'desc';
+    if ( this.state.orderBy === sort && this.state.order === 'desc' )
+      order = 'asc';
+
+    this.setState( {
+      orderBy: sort,
+      order: order
+    } );
+  }
+
+  private formatBytes( bytes: number, decimals = 2 ) {
+    if ( bytes == 0 )
+      return '0 Bytes';
+
+    let k = 1024,
+      dm = decimals || 2,
+      sizes = [ 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ],
+      i = Math.floor( Math.log( bytes ) / Math.log( k ) );
+
+    return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
   }
 
   render() {
+
+    const headers: { label: string; property: SortTypes }[] = [
+      { label: 'Name', property: 'name' },
+      { label: 'Memory', property: 'memory' },
+      { label: 'Created', property: 'created' }
+    ];
+
     return <Container>
-      <Paper>
-        <Table>
-          <TableHeader>
-            <TableRow>
-
-              <TableCell
-                numeric={false}
-                padding="checkbox"
-                sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
-              >
-                <Checkbox
-                  onClick={e => { }}
-                />
-              </TableCell>
-              <TableCell
-                padding="checkbox"
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableCell
+              numeric={false}
+              padding="checkbox"
+              sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
+            >
+              <Checkbox
+                onClick={e => { }}
               />
-              <TableCell
-                numeric={false}
-                padding={'default'}
-                sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
-              >
-                <Tooltip
-                  title="Sort"
-                  placement="bottom-start"
-                  enterDelay={300}
-                >
-                  <TableSortLabel
-                    active={true}
-                    direction={this.state.order}
-                    onClick={( e ) => this.changeOrder( 'name' )}
+            </TableCell>
+            <TableCell
+              padding="checkbox"
+            />
+            {
+              headers.map( ( h, index ) => {
+                return (
+                  <TableCell
+                    key={`header-${ index }`}
+                    sortDirection={this.state.orderBy === h.property ? this.state.order : false}
                   >
-                    First Label
-              </TableSortLabel>
-                </Tooltip>
-              </TableCell>
+                    <TableSortLabel
+                      active={this.state.orderBy === h.property}
+                      direction={this.state.order}
+                      onClick={( e ) => this.changeOrder( h.property )}
+                    >
+                      {h.label}
+                    </TableSortLabel>
+                  </TableCell>
+                );
+              } )
+            }
+          </TableRow>
+        </TableHeader>
 
-              <TableCell
-                numeric={false}
-                padding={'default'}
-                sortDirection={this.state.orderBy === 'date' ? this.state.order : false}
-              >
-                <Tooltip
-                  title="Sort"
-                  placement="bottom-start"
-                  enterDelay={300}
-                >
-                  <TableSortLabel
-                    active={true}
-                    direction={this.state.order}
-                    onClick={( e ) => this.changeOrder( 'date' )}
+        <TableBody>
+          {
+            this.props.volumes.map( volume => {
+              return (
+                <TableRow hover role="checkbox">
+                  <TableCell
+                    padding="checkbox"
                   >
-                    Second Label
-              </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            <TableRow hover role="checkbox">
-              <TableCell
-                padding="checkbox"
-              >
-                <Checkbox />
-              </TableCell>
-              <TableCell
-                padding="checkbox"
-              >
-                <img src="/images/post-feature.svg" />
-              </TableCell>
-              <TableCell
-                scope="row"
-                component="th">
-                Hello This is a lot longer
-          </TableCell>
-              <TableCell>
-                World
-          </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Paper>
+                    <Checkbox />
+                  </TableCell>
+                  <TableCell
+                    padding="checkbox"
+                  >
+                    <Tooltip title="Google bucket">
+                      <img src="/images/post-feature.svg" />
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell
+                    scope="row"
+                    component="th">
+                    {volume.name}
+                  </TableCell>
+                  <TableCell>
+                    {this.formatBytes( volume.memoryUsed! )}
+                  </TableCell>
+                  <TableCell>
+                    {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
+                  </TableCell>
+                </TableRow>
+              );
+            } )
+          }
+        </TableBody>
+      </Table>
     </Container>
   }
 }
 
 const Container = styled.div`
+  background: ${theme.light100.background };
+
   img {
     height: 50px;
     width: 50px;

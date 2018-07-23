@@ -3,6 +3,7 @@ import { matchPath } from 'react-router';
 import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as UserActions } from '../store/users/actions';
 import { ActionCreators as PostActions } from '../store/posts/actions';
+import { ActionCreators as MediaActions } from '../store/media/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
 import { RedirectError } from './errors';
@@ -48,6 +49,12 @@ async function handlePostScreen( req: IAuthReq, actions: Action[] ) {
   }
 }
 
+async function handleMediaScreen( req: IAuthReq, actions: Action[] ) {
+  const isAdmin = req._user && req._user.privileges < 2 ? true : false;
+  let volumes = await controllers.volumes.getMany( { user: isAdmin ? undefined : req._user!.username as string } );
+  actions.push( MediaActions.SetVolumes.create( { page: volumes, filters: { index: 0, search: '' } } ) );
+}
+
 /**
  * This decorator populates the application state with data before the client loads.
  * Each RouteAction will execute their actions if the url of the client matches
@@ -66,6 +73,10 @@ export async function hydrate( req: IAuthReq ) {
   // Get posts if neccessary
   if ( matchPath( req.url, { path: '/dashboard/posts' } ) )
     await handlePostScreen( req, actions );
+
+  // Get media if neccessary
+  if ( matchPath( req.url, { path: '/dashboard/media' } ) )
+    await handleMediaScreen( req, actions );
 
   if ( args.runningTests )
     actions.push( AppActions.setDebugMode.create( true ) );

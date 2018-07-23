@@ -1,9 +1,10 @@
 import * as React from 'react';
 import Pager from '../pager';
 import { Volumes } from './volumes';
+import { IVolume } from '../../../../../src';
 
 export type Props = {
-
+  volumes: IVolume<'client'>[];
 }
 
 export type State = {
@@ -27,7 +28,7 @@ export class MediaNavigator extends React.Component<Props, State> {
 
         }}
       >
-        <Volumes />
+        <Volumes volumes={this.props.volumes} />
       </Pager>
     </div>
   }
