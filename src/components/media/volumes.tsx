@@ -6,6 +6,9 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
+import Checkbox from '@material-ui/core/Checkbox';
+import Paper from '@material-ui/core/Paper';
+import { default as styled } from '../../theme/styled';
 
 export type Props = {
 
@@ -31,60 +34,101 @@ export class Volumes extends React.Component<Props, State> {
   }
 
   render() {
-    return <Table>
-      <TableHeader>
-        <TableRow>
-          <TableCell
-            numeric={false}
-            padding={'default'}
-            sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
-          >
-            <Tooltip
-              title="Sort"
-              placement="bottom-start"
-              enterDelay={300}
-            >
-              <TableSortLabel
-                active={true}
-                direction={this.state.order}
-                onClick={( e ) => this.changeOrder( 'name' )}
-              >
-                First Label
-              </TableSortLabel>
-            </Tooltip>
-          </TableCell>
+    return <Container>
+      <Paper>
+        <Table>
+          <TableHeader>
+            <TableRow>
 
-          <TableCell
-            numeric={false}
-            padding={'default'}
-            sortDirection={this.state.orderBy === 'date' ? this.state.order : false}
-          >
-            <Tooltip
-              title="Sort"
-              placement="bottom-start"
-              enterDelay={300}
-            >
-              <TableSortLabel
-                active={true}
-                direction={this.state.order}
-                onClick={( e ) => this.changeOrder( 'date' )}
+              <TableCell
+                numeric={false}
+                padding="checkbox"
+                sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
               >
-                Second Label
+                <Checkbox
+                  onClick={e => { }}
+                />
+              </TableCell>
+              <TableCell
+                padding="checkbox"
+              />
+              <TableCell
+                numeric={false}
+                padding={'default'}
+                sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
+              >
+                <Tooltip
+                  title="Sort"
+                  placement="bottom-start"
+                  enterDelay={300}
+                >
+                  <TableSortLabel
+                    active={true}
+                    direction={this.state.order}
+                    onClick={( e ) => this.changeOrder( 'name' )}
+                  >
+                    First Label
               </TableSortLabel>
-            </Tooltip>
+                </Tooltip>
+              </TableCell>
+
+              <TableCell
+                numeric={false}
+                padding={'default'}
+                sortDirection={this.state.orderBy === 'date' ? this.state.order : false}
+              >
+                <Tooltip
+                  title="Sort"
+                  placement="bottom-start"
+                  enterDelay={300}
+                >
+                  <TableSortLabel
+                    active={true}
+                    direction={this.state.order}
+                    onClick={( e ) => this.changeOrder( 'date' )}
+                  >
+                    Second Label
+              </TableSortLabel>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            <TableRow hover role="checkbox">
+              <TableCell
+                padding="checkbox"
+              >
+                <Checkbox />
+              </TableCell>
+              <TableCell
+                padding="checkbox"
+              >
+                <img src="/images/post-feature.svg" />
+              </TableCell>
+              <TableCell
+                scope="row"
+                component="th">
+                Hello This is a lot longer
           </TableCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableCell>
-            Hello
+              <TableCell>
+                World
           </TableCell>
-          <TableCell>
-            World
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Paper>
+    </Container>
   }
 }
+
+const Container = styled.div`
+  img {
+    height: 50px;
+    width: 50px;
+  }
+
+  td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {
+    width: 50px;
+  }
+`;
