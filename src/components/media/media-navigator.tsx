@@ -1,10 +1,10 @@
 import * as React from 'react';
-import Pager from '../pager';
 import { Volumes } from './volumes';
-import { IVolume } from '../../../../../src';
+import { IVolume, Page } from '../../../../../src';
 
 export type Props = {
-  volumes: IVolume<'client'>[];
+  volumes: Page<IVolume<'client'>> | null;
+  loading: boolean;
 }
 
 export type State = {
@@ -18,18 +18,13 @@ export class MediaNavigator extends React.Component<Props, State> {
   }
 
   render() {
-    return <div style={{ position: 'relative' }}>
-      <Pager
-        index={0}
-        limit={10}
-        total={100}
-        loading={false}
-        onPage={() => {
+    const volumePage = this.props.volumes;
 
-        }}
-      >
-        <Volumes volumes={this.props.volumes} />
-      </Pager>
+    return <div style={{ position: 'relative' }}>
+      {volumePage ? <Volumes
+        loading={this.props.loading}
+        volumes={volumePage}
+      /> : undefined}
     </div>
   }
 }

@@ -9,14 +9,16 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Checkbox from '@material-ui/core/Checkbox';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
-import { IVolume } from '../../../../../src';
+import { IVolume, Page } from '../../../../../src';
 import * as format from 'date-fns/format';
+import Pager from '../pager';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
-  volumes: Partial<IVolume<'client'>>[];
+  volumes: Page<IVolume<'client'>>;
+  loading: boolean;
 }
 
 export type State = {
@@ -59,84 +61,98 @@ export class Volumes extends React.Component<Props, State> {
 
   render() {
 
+    const volumes = this.props.volumes;
+
     const headers: { label: string; property: SortTypes }[] = [
       { label: 'Name', property: 'name' },
       { label: 'Memory', property: 'memory' },
       { label: 'Created', property: 'created' }
     ];
 
-    return <Container>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableCell
-              numeric={false}
-              padding="checkbox"
-              sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
-            >
-              <Checkbox
-                onClick={e => { }}
-              />
-            </TableCell>
-            <TableCell
-              padding="checkbox"
-            />
-            {
-              headers.map( ( h, index ) => {
-                return (
-                  <TableCell
-                    key={`header-${ index }`}
-                    sortDirection={this.state.orderBy === h.property ? this.state.order : false}
-                  >
-                    <TableSortLabel
-                      active={this.state.orderBy === h.property}
-                      direction={this.state.order}
-                      onClick={( e ) => this.changeOrder( h.property )}
-                    >
-                      {h.label}
-                    </TableSortLabel>
-                  </TableCell>
-                );
-              } )
-            }
-          </TableRow>
-        </TableHeader>
+    return (
+      <Pager
+        index={volumes.index}
+        limit={volumes.limit}
+        total={volumes.count}
+        loading={this.props.loading}
+        onPage={() => {
 
-        <TableBody>
-          {
-            this.props.volumes.map( volume => {
-              return (
-                <TableRow hover role="checkbox">
-                  <TableCell
-                    padding="checkbox"
-                  >
-                    <Checkbox />
-                  </TableCell>
-                  <TableCell
-                    padding="checkbox"
-                  >
-                    <Tooltip title="Google bucket">
-                      <img src="/images/post-feature.svg" />
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell
-                    scope="row"
-                    component="th">
-                    {volume.name}
-                  </TableCell>
-                  <TableCell>
-                    {this.formatBytes( volume.memoryUsed! )}
-                  </TableCell>
-                  <TableCell>
-                    {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
-                  </TableCell>
-                </TableRow>
-              );
-            } )
-          }
-        </TableBody>
-      </Table>
-    </Container>
+        }}
+      >
+        <Container>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableCell
+                  numeric={false}
+                  padding="checkbox"
+                  sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
+                >
+                  <Checkbox
+                    onClick={e => { }}
+                  />
+                </TableCell>
+                <TableCell
+                  padding="checkbox"
+                />
+                {
+                  headers.map( ( h, index ) => {
+                    return (
+                      <TableCell
+                        key={`header-${ index }`}
+                        sortDirection={this.state.orderBy === h.property ? this.state.order : false}
+                      >
+                        <TableSortLabel
+                          active={this.state.orderBy === h.property}
+                          direction={this.state.order}
+                          onClick={( e ) => this.changeOrder( h.property )}
+                        >
+                          {h.label}
+                        </TableSortLabel>
+                      </TableCell>
+                    );
+                  } )
+                }
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {
+                volumes.data.map( volume => {
+                  return (
+                    <TableRow hover role="checkbox">
+                      <TableCell
+                        padding="checkbox"
+                      >
+                        <Checkbox />
+                      </TableCell>
+                      <TableCell
+                        padding="checkbox"
+                      >
+                        <Tooltip title="Google bucket">
+                          <img src="/images/post-feature.svg" />
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell
+                        scope="row"
+                        component="th">
+                        {volume.name}
+                      </TableCell>
+                      <TableCell>
+                        {this.formatBytes( volume.memoryUsed! )}
+                      </TableCell>
+                      <TableCell>
+                        {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                } )
+              }
+            </TableBody>
+          </Table>
+        </Container>
+      </Pager>
+    );
   }
 }
 
