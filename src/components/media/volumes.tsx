@@ -48,7 +48,7 @@ export class Volumes extends React.Component<Props, State> {
   }
 
   private formatBytes( bytes: number, decimals = 2 ) {
-    if ( bytes == 0 )
+    if ( bytes === 0 )
       return '0 Bytes';
 
     let k = 1024,
@@ -60,9 +60,7 @@ export class Volumes extends React.Component<Props, State> {
   }
 
   render() {
-
     const volumes = this.props.volumes;
-
     const headers: { label: string; property: SortTypes }[] = [
       { label: 'Name', property: 'name' },
       { label: 'Memory', property: 'memory' },
