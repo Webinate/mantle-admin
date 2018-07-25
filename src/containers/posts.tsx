@@ -10,21 +10,14 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import TextField from '@material-ui/core/TextField';
-import FontCancel from '@material-ui/icons/ArrowBack';
 import { IPost } from 'modepress';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import PostList from '../components/posts/post-list';
 import PostForm from '../components/posts/post-form';
-import FilterIcon from '@material-ui/icons/FilterList';
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import SearchIcon from '@material-ui/icons/Search';
 import { GetAllOptions } from '../../../../src/lib-frontend/posts';
+import PostFilterBar from '../components/posts/posts-filter-bar';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -52,7 +45,6 @@ const dispatchToProps = {
 const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
-  searchFilter: string;
   selectedPosts: IPost<'client'>[];
   showDeleteModal: boolean;
   filtersOpen: boolean;
@@ -70,7 +62,6 @@ export class Posts extends React.Component<Props, State> {
     super( props );
     this._selectedPost = null;
     this.state = {
-      searchFilter: '',
       selectedPosts: [],
       showDeleteModal: false,
       filtersOpen: false
@@ -91,8 +82,8 @@ export class Posts extends React.Component<Props, State> {
     } );
   }
 
-  private onSearch() {
-    this.props.getPosts( { index: 0, keyword: this.state.searchFilter } );
+  private onSearch( term: string ) {
+    this.props.getPosts( { index: 0, keyword: term } );
   }
 
   render() {
@@ -101,78 +92,23 @@ export class Posts extends React.Component<Props, State> {
     const isBusy = this.props.posts.busy;
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
-    const buttonIconStyle: React.CSSProperties = { margin: '0 5px 0 0' };
 
     return (
       <div style={{ height: '100%' }} className="mt-post-container">
         <ContentHeader
           title="Posts"
           busy={isBusy}
-          renderFilters={() => {
-            if ( !inPostsRoot ) {
-              return (
-                <Button
-                  style={{ margin: '5px 0 0 0' }}
-                  onClick={e => this.props.push( '/dashboard/posts' )}
-                >
-                  <FontCancel style={buttonIconStyle} />
-                  Back
-                </Button>
-              );
-            }
-            else
-              return (
-                <div>
-                  <TextField
-                    className="posts-filter"
-                    placeholder="Filter by title or content"
-                    id="mt-posts-filter"
-                    value={this.state.searchFilter}
-                    onKeyDown={e => {
-                      if ( e.keyCode === 13 )
-                        this.onSearch();
-                    }}
-                    onChange={( e ) => this.setState( { searchFilter: e.currentTarget.value } )}
-                  />
-                  <IconButton
-                    className="mt-posts-search"
-                    color="primary"
-                    onClick={e => this.onSearch()}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                  <Tooltip title={this.state.filtersOpen ? 'Close filter options' : 'Open filter options'}>
-                    <IconButton
-                      color="primary"
-                      className="mt-posts-filter"
-                      onClick={e => this.setState( { filtersOpen: !this.state.filtersOpen } )}
-                    >
-                      <FilterIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete selected posts">
-                    <IconButton
-                      color="primary"
-                      className="mt-posts-delete-multi"
-                      disabled={this.state.selectedPosts.length > 0 ? false : true}
-                      onClick={e => this.onDeleteMultiple()}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Button
-                    variant="contained"
-                    onClick={e => this.props.push( '/dashboard/posts/new' )}
-                    className="mt-new-post"
-                    disabled={isAdmin ? false : true}
-                    color="primary"
-                  >
-                    <AddIcon style={buttonIconStyle} />
-                    New Post
-                    </Button>
-                </div>
-              )
-          }}>
+          renderFilters={() => <PostFilterBar
+            onSearch={term => this.onSearch( term )}
+            postsSelected={this.state.selectedPosts.length > 0 ? false : true}
+            onNew={() => this.props.push( '/dashboard/posts/new' )}
+            onDelete={() => this.onDeleteMultiple()}
+            isAdminUser={isAdmin ? false : true}
+            onFilterToggle={val => this.setState( { filtersOpen: val } ) }
+            inPostsRoot={inPostsRoot ? true : false}
+            filtersOpen={this.state.filtersOpen}
+            onCancel={() => this.props.push( '/dashboard/posts' )}
+          />}>
         </ContentHeader>
         <PostsContainer>
           <Switch>
