@@ -25,10 +25,16 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
   }
 }
 
-export function getPost( id: string ) {
+export function getVolume( id: string ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
     const resp = await volumes.getOne( id );
     dispatch( ActionCreators.SelectedVolume.create( resp ) );
+  }
+}
+
+export function createVolume( token: Partial<IVolume<'client'>>, callback: () => void ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    callback();
   }
 }

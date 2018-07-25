@@ -5,43 +5,60 @@ import StepLabel from '@material-ui/core/StepLabel';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { default as styled } from '../../theme/styled';
+import { IVolume } from 'modepress/src';
 
 export type Props = {
+  onComplete: ( volume: Partial<IVolume<'client'>> ) => void;
 }
 
 export type State = {
   activeStep: number;
+  newVolume: Partial<IVolume<'client'>>;
 }
 
 export class NewVolumeForm extends React.Component<Props, State> {
 
+  private _steps: string[];
+
   constructor( props: Props ) {
     super( props );
+    this._steps = [
+      'Select Volume Type',
+      'Setup Volume Properties',
+      'Set User Permissions'
+    ];
+
     this.state = {
-      activeStep: 0
+      activeStep: 0,
+      newVolume: {
+        name: 'New Volume',
+        type: 'local'
+      }
     };
   }
 
   handleNext = () => {
     const { activeStep } = this.state;
-    this.setState( {
-      activeStep: activeStep + 1,
-    } );
+
+    if ( activeStep < this._steps.length - 1 )
+      this.setState( {
+        activeStep: activeStep + 1,
+      } );
+    else
+      this.props.onComplete( this.state.newVolume );
   };
 
   handleBack = () => {
     const { activeStep } = this.state;
-    this.setState( {
-      activeStep: activeStep - 1,
-    } );
+
+    if ( activeStep > 0 )
+      this.setState( {
+        activeStep: activeStep - 1,
+      } );
   }
 
   render() {
-    const steps = [
-      'Select Volume Type',
-      'Setup Volume Properties',
-      'Set User Permissions'
-    ];
+    const steps = this._steps;
 
     const activeStep = this.state.activeStep;
 

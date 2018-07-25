@@ -5,6 +5,7 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
+import { createVolume } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
@@ -20,7 +21,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  push: push
+  push: push,
+  createVolume
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -57,7 +59,9 @@ export class Media extends React.Component<Props, State> {
         </ContentHeader>
         <Container>
           <Switch>
-            <Route path="/dashboard/media/new" render={props => <NewVolumeForm />} />
+            <Route path="/dashboard/media/new" render={props => <NewVolumeForm
+              onComplete={newVolume => this.props.createVolume( newVolume, () => this.props.push( '/dashboard/media' ) )}
+            />} />
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
