@@ -5,8 +5,10 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import { IVolume } from '../../../../../src';
 import { default as styled } from '../../theme/styled';
+import { formatBytes } from '../../utils/component-utils';
 
 export type Props = {
+  isAdmin: boolean;
 }
 
 export type State = {
@@ -18,7 +20,8 @@ export default class NewVolumeForm extends React.Component<Props, State> {
     super( props );
     this.state = {
       volumeProps: {
-        name: 'New Volume'
+        name: '',
+        memoryAllocated: 500 * 1024 * 1024
       }
     };
   }
@@ -31,6 +34,7 @@ export default class NewVolumeForm extends React.Component<Props, State> {
             <InputLabel htmlFor="mt-volume-name">Volume Name</InputLabel>
             <Input
               id="mt-volume-name"
+              autoFocus={true}
               value={this.state.volumeProps.name}
               onChange={e => this.setState( { volumeProps: { ...this.state.volumeProps, name: e.currentTarget.value } } )}
             />
@@ -38,14 +42,15 @@ export default class NewVolumeForm extends React.Component<Props, State> {
           </FormControl>
         </div>
         <div>
-          <FormControl>
-            <InputLabel htmlFor="mt-volume-memory">Memory Used</InputLabel>
+          <FormControl disabled={!this.props.isAdmin}>
+            <InputLabel htmlFor="mt-volume-memory">Memory Allocated</InputLabel>
             <Input
               id="mt-volume-memory"
-              value={this.state.volumeProps.memoryUsed}
-              onChange={e => this.setState( { volumeProps: { ...this.state.volumeProps, memoryUsed: parseInt( e.currentTarget.value ) } } )}
+              type="number"
+              value={this.state.volumeProps.memoryAllocated}
+              onChange={e => this.setState( { volumeProps: { ...this.state.volumeProps, memoryAllocated: parseInt( e.currentTarget.value ) } } )}
             />
-            <FormHelperText id="mt-volume-name-error"></FormHelperText>
+            <FormHelperText id="mt-volume-memory-error">{formatBytes( this.state.volumeProps.memoryAllocated || 0 )}</FormHelperText>
           </FormControl>
         </div>
       </Container>

@@ -44,6 +44,7 @@ export class Media extends React.Component<Props, State> {
 
   render() {
     const isInNewMode = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/media/new' } );
+    const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
 
     return (
       <div style={{ height: '100%' }} className="mt-media-container">
@@ -60,6 +61,7 @@ export class Media extends React.Component<Props, State> {
         <Container>
           <Switch>
             <Route path="/dashboard/media/new" render={props => <NewVolumeForm
+              isAdmin={isAdmin}
               onComplete={newVolume => this.props.createVolume( newVolume, () => this.props.push( '/dashboard/media' ) )}
             />} />
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />

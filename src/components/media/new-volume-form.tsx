@@ -13,6 +13,7 @@ import CloudIcon from '@material-ui/icons/CloudCircle';
 
 export type Props = {
   onComplete: ( volume: Partial<IVolume<'client'>> ) => void;
+  isAdmin: boolean;
 }
 
 export type State = {
@@ -107,7 +108,7 @@ export class NewVolumeForm extends React.Component<Props, State> {
     if ( activeStep === 0 )
       activeElm = this.renderStage1();
     else if ( activeStep === 1 )
-      activeElm = <VolumeProperties />;
+      activeElm = <VolumeProperties isAdmin={this.props.isAdmin} />;
     else
       activeElm = <div></div>;
 

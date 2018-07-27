@@ -12,6 +12,7 @@ import theme from '../../theme/mui-theme';
 import { IVolume, Page } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
+import { formatBytes } from '../../utils/component-utils';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
@@ -45,18 +46,6 @@ export class Volumes extends React.Component<Props, State> {
       orderBy: sort,
       order: order
     } );
-  }
-
-  private formatBytes( bytes: number, decimals = 2 ) {
-    if ( bytes === 0 )
-      return '0 Bytes';
-
-    let k = 1024,
-      dm = decimals || 2,
-      sizes = [ 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ],
-      i = Math.floor( Math.log( bytes ) / Math.log( k ) );
-
-    return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
   }
 
   render() {
@@ -137,7 +126,7 @@ export class Volumes extends React.Component<Props, State> {
                         {volume.name}
                       </TableCell>
                       <TableCell>
-                        {this.formatBytes( volume.memoryUsed! )}
+                        {formatBytes( volume.memoryUsed! )}
                       </TableCell>
                       <TableCell>
                         {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
