@@ -26,6 +26,14 @@ export default class NewVolumeForm extends React.Component<Props, State> {
     };
   }
 
+  private formatMemory( val: string ) {
+    const toRet = parseInt( val );
+    if ( isNaN( toRet ) )
+      return 0;
+
+    return toRet;
+  }
+
   render() {
     return (
       <Container>
@@ -42,15 +50,19 @@ export default class NewVolumeForm extends React.Component<Props, State> {
           </FormControl>
         </div>
         <div>
-          <FormControl disabled={!this.props.isAdmin}>
+          <FormControl
+            disabled={!this.props.isAdmin}
+            error={this.state.volumeProps.memoryAllocated === 0 ? true : false}
+          >
             <InputLabel htmlFor="mt-volume-memory">Memory Allocated</InputLabel>
             <Input
               id="mt-volume-memory"
-              type="number"
               value={this.state.volumeProps.memoryAllocated}
-              onChange={e => this.setState( { volumeProps: { ...this.state.volumeProps, memoryAllocated: parseInt( e.currentTarget.value ) } } )}
+              onChange={e => this.setState( { volumeProps: { ...this.state.volumeProps, memoryAllocated: this.formatMemory( e.currentTarget.value ) } } )}
             />
-            <FormHelperText id="mt-volume-memory-error">{formatBytes( this.state.volumeProps.memoryAllocated || 0 )}</FormHelperText>
+            <FormHelperText id="mt-volume-memory-error">
+              {this.state.volumeProps.memoryAllocated === 0 ? 'Allocated memory cannot be 0' : formatBytes( this.state.volumeProps.memoryAllocated || 0 )}
+            </FormHelperText>
           </FormControl>
         </div>
       </Container>
