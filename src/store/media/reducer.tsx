@@ -1,6 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
-import { Page, IVolume } from 'modepress';
+import { Page, IVolume } from '../../../../../src';
 
 // State
 export type State = {

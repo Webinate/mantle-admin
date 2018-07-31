@@ -2,7 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { routerMiddleware } from 'react-router-redux';
 import { History } from 'history';
-import { default as rootReducer } from '../store/index';
+import { default as rootReducer } from '../store';
 
 export default function configureStore( initialState: any, history: History ) {
 

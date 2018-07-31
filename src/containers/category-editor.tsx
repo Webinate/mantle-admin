@@ -24,7 +24,7 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 import theme from '../theme/mui-theme';
-import { ICategory } from 'modepress';
+import { ICategory } from '../../../../src';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { IRootState } from '../store';
 import { createCategory, editCategory, removeCategory, getCategories, ActionCreators } from '../store/categories/actions';

@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { Page, ICategory } from 'modepress';
+import { Page, ICategory } from '../../../../../src';
 
 // State
 export type State = {

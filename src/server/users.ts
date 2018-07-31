@@ -1,6 +1,6 @@
 
 import { Action } from 'redux';
-import { controllers } from 'modepress';
+import { controllers } from '../../../../src';
 import { ActionCreators as UserActions } from '../store/users/actions';
 
 export default async function( actions: Action[] ) {

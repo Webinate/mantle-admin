@@ -1,6 +1,6 @@
-import { IAuthReq } from 'modepress';
+import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
-import { controllers } from 'modepress';
+import { controllers } from '../../../../src';
 import { ActionCreators as MediaActions } from '../store/media/actions';
 
 export default async function( req: IAuthReq, actions: Action[] ) {

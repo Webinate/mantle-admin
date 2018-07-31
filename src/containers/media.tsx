@@ -62,7 +62,9 @@ export class Media extends React.Component<Props, State> {
           <Switch>
             <Route path="/dashboard/media/new" render={props => <NewVolumeForm
               isAdmin={isAdmin}
-              onComplete={newVolume => this.props.createVolume( newVolume, () => this.props.push( '/dashboard/media' ) )}
+              onComplete={newVolume => {
+                this.props.createVolume( newVolume, () => this.props.push( '/dashboard/media' ) );
+              }}
             />} />
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media" exact={true} render={props => {

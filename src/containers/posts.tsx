@@ -10,7 +10,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
-import { IPost } from 'modepress';
+import { IPost } from '../../../../src';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
@@ -104,7 +104,7 @@ export class Posts extends React.Component<Props, State> {
             onNew={() => this.props.push( '/dashboard/posts/new' )}
             onDelete={() => this.onDeleteMultiple()}
             isAdminUser={isAdmin ? false : true}
-            onFilterToggle={val => this.setState( { filtersOpen: val } ) }
+            onFilterToggle={val => this.setState( { filtersOpen: val } )}
             inPostsRoot={inPostsRoot ? true : false}
             filtersOpen={this.state.filtersOpen}
             onCancel={() => this.props.push( '/dashboard/posts' )}

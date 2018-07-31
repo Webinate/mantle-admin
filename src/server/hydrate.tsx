@@ -2,7 +2,7 @@ import { Action } from 'redux';
 import { matchPath } from 'react-router';
 import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
-import { IAuthReq, IUserEntry } from 'modepress';
+import { IAuthReq, IUserEntry } from '../../../../src';
 import postHandler from './posts';
 import mediaHandler from './media';
 import userHandler from './users';

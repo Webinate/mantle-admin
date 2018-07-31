@@ -1,7 +1,7 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IVolume } from 'modepress';
+import { Page, IVolume } from '../../../../../src';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
-import { IRootState } from '../';
+import { IRootState } from '..';
 
 // Action Creators
 export const ActionCreators = {
@@ -35,6 +35,9 @@ export function getVolume( id: string ) {
 
 export function createVolume( token: Partial<IVolume<'client'>>, callback: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+    const resp = await volumes.create( token );
+    dispatch( ActionCreators.SelectedVolume.create( resp ) );
     callback();
   }
 }

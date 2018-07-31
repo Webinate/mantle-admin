@@ -1,10 +1,10 @@
 import { RedirectError } from './errors';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
-import { IAuthReq } from 'modepress';
+import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';
-import { controllers } from 'modepress';
+import { controllers } from '../../../../src';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
   const isAdmin = req._user && req._user.privileges < 2 ? true : false;

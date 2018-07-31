@@ -1,6 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import * as posts from '../../../../../src/lib-frontend/posts';
-import { Page, IPost } from 'modepress';
+import { Page, IPost } from '../../../../../src';
 
 // State
 export type State = {

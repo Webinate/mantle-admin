@@ -6,10 +6,9 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { default as styled } from '../../theme/styled';
 import { IVolume } from '../../../../../src';
-import VolumeProperties from './volume-properties';
+import VolumeProperties from './new-volume-stages/volume-properties';
 import StepContent from '@material-ui/core/StepContent';
-import StorageIcon from '@material-ui/icons/Storage';
-import CloudIcon from '@material-ui/icons/CloudCircle';
+import VolumeType from './new-volume-stages/volume-type';
 
 export type Props = {
   onComplete: ( volume: Partial<IVolume<'client'>> ) => void;
@@ -19,17 +18,14 @@ export type Props = {
 export type State = {
   activeStep: number;
   activeVolumeType: number;
+  nextEnabled: boolean;
   newVolume: Partial<IVolume<'client'>>;
 }
 
 export class NewVolumeForm extends React.Component<Props, State> {
 
   private _steps: string[];
-  private _volumeTypes: {
-    icon: JSX.Element;
-    heading: string;
-    description: string;
-  }[];
+  private static MAX = 1 * 1024 * 1024 * 1024; // 1 Gig
 
   constructor( props: Props ) {
     super( props );
@@ -39,17 +35,14 @@ export class NewVolumeForm extends React.Component<Props, State> {
       'Set User Permissions'
     ];
 
-    this._volumeTypes = [
-      { icon: <StorageIcon />, heading: 'Local Storage', description: 'This is local storage' },
-      { icon: <CloudIcon />, heading: 'Google Storage', description: 'This is google storage' }
-    ];
-
     this.state = {
       activeStep: 0,
       activeVolumeType: 0,
+      nextEnabled: true,
       newVolume: {
         name: 'New Volume',
-        type: 'local'
+        type: 'local',
+        memoryAllocated: 500 * 1024 * 1024
       }
     };
   }
@@ -74,30 +67,17 @@ export class NewVolumeForm extends React.Component<Props, State> {
       } );
   }
 
-  renderStage1() {
-    return (
-      <VolumeTypes>
-        {this._volumeTypes.map( ( type, index ) => {
-          return (
-            <div className="mt-volume-types" key={`type=${ index }`}>
-              <div>
-                <Button
-                  variant="fab"
-                  color={this.state.activeVolumeType === index ? 'primary' : undefined}
-                  onClick={e => this.setState( { activeVolumeType: index } )}
-                >
-                  {type.icon}
-                </Button>
-              </div>
-              <div>
-                <h2>{type.heading}</h2>
-                {type.description}
-              </div>
-            </div>
-          );
-        } )}
-      </VolumeTypes>
-    );
+  private onChange( newVolue: Partial<IVolume<'client'>> ) {
+    const updatedVolume = { ...this.state.newVolume, ...newVolue };
+    this.setState( { newVolume: updatedVolume } );
+
+    // Validation
+    if ( updatedVolume.name!.trim() === '' )
+      this.setState( { nextEnabled: false } );
+    else if ( updatedVolume.memoryAllocated! <= 0 || updatedVolume.memoryAllocated! >= NewVolumeForm.MAX )
+      this.setState( { nextEnabled: false } );
+    else
+      this.setState( { nextEnabled: true } );
   }
 
   render() {
@@ -106,9 +86,17 @@ export class NewVolumeForm extends React.Component<Props, State> {
 
     let activeElm: JSX.Element;
     if ( activeStep === 0 )
-      activeElm = this.renderStage1();
+      activeElm = <VolumeType
+        volume={this.state.newVolume}
+        onChange={v => this.onChange( v )}
+      />
     else if ( activeStep === 1 )
-      activeElm = <VolumeProperties isAdmin={this.props.isAdmin} />;
+      activeElm = <VolumeProperties
+        maxValue={NewVolumeForm.MAX}
+        volume={this.state.newVolume}
+        isAdmin={this.props.isAdmin}
+        onChange={v => this.onChange( v )}
+      />;
     else
       activeElm = <div></div>;
 
@@ -136,6 +124,7 @@ export class NewVolumeForm extends React.Component<Props, State> {
           </Button>
           <Button
             id="mt-vol-next"
+            disabled={!this.state.nextEnabled}
             variant="contained"
             color="primary"
             onClick={e => this.handleNext()}
@@ -152,24 +141,5 @@ const Buttons = styled.div`
   margin: 20px 0;
   button {
     margin: 0 5px 0 0;
-  }
-`;
-
-const VolumeTypes = styled.div`
-  .mt-volume-types {
-    display: flex;
-    padding: 20px;
-
-    & > div:nth-child(1) {
-      flex: 0;
-      align-self: center;
-      padding: 0 5px;
-    }
-
-    & > div:nth-child(2) {
-      flex: 1;
-      align-self: center;
-      padding: 0 5px;
-    }
   }
 `;

@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { IRootState } from '../';
+import { IRootState } from '..';
 import { ClientError } from '../../utils/httpClients';
 import { ActionCreators as AppActionCreators } from '../app/actions';
 import * as auth from '../../../../../src/lib-frontend/auth';

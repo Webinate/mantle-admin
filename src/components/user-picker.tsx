@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from 'modepress';
+import { IUserEntry } from '../../../../src';
 import Popover from '@material-ui/core/Popover';
 import Input from '@material-ui/core/Input';
 import IconButton from '@material-ui/core/IconButton';

@@ -1,6 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import { ActionCreators as AdminActionCreators, Action as AdminAction } from '../admin-actions/actions';
-import { IUserEntry, Page } from 'modepress';
+import { IUserEntry, Page } from '../../../../../src';
 
 // State
 export type State = {

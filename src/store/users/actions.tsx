@@ -1,7 +1,7 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IUserEntry } from 'modepress';
+import { Page, IUserEntry } from '../../../../../src';
 import { getAll, remove } from '../../../../../src/lib-frontend/users';
-import { IRootState } from '../';
+import { IRootState } from '..';
 import { ActionCreators as AppActionCreators } from '../app/actions';
 
 // Action Creators

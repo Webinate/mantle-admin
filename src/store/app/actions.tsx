@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { IRootState } from '../';
+import { IRootState } from '..';
 
 // Action Creators
 export const ActionCreators = {

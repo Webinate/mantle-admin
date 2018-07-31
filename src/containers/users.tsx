@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from 'modepress';
+import { IUserEntry } from '../../../../src';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { getUsers, removeUser } from '../store/users/actions';
