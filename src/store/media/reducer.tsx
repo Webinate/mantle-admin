@@ -8,13 +8,15 @@ export type State = {
   readonly volumeFilters: Partial<volumes.GetAllOptions> | null;
   readonly selected: IVolume<'client'> | null;
   readonly busy: boolean;
+  readonly volumeFormError: Error | null;
 };
 
 export const initialState: State = {
   volumePage: null,
   volumeFilters: null,
   selected: null,
-  busy: false
+  busy: false,
+  volumeFormError: null
 };
 
 // Reducer
@@ -32,6 +34,10 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.SetVolumesBusy.type:
       partialState = { busy: action.payload };
+      break;
+
+    case ActionCreators.VolumeFormError.type:
+      partialState = { volumeFormError: action.payload };
       break;
 
     case ActionCreators.SelectedVolume.type:

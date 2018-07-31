@@ -7,7 +7,8 @@ import { IRootState } from '..';
 export const ActionCreators = {
   SetVolumesBusy: new ActionCreator<'media-busy', boolean>( 'media-busy' ),
   SetVolumes: new ActionCreator<'media-set-volumes', { page: Page<IVolume<'client'>>, filters: Partial<volumes.GetAllOptions> }>( 'media-set-volumes' ),
-  SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client'>>( 'media-selected-volume' )
+  SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client'>>( 'media-selected-volume' ),
+  VolumeFormError: new ActionCreator<'media-volume-form-error', Error>( 'media-volume-form-error' ),
 };
 
 // Action Types
@@ -35,9 +36,19 @@ export function getVolume( id: string ) {
 
 export function createVolume( token: Partial<IVolume<'client'>>, callback: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
-    dispatch( ActionCreators.SetVolumesBusy.create( true ) );
-    const resp = await volumes.create( token );
-    dispatch( ActionCreators.SelectedVolume.create( resp ) );
-    callback();
+    try {
+      const newFilters: Partial<volumes.GetAllOptions> = {
+        index: 0
+      };
+
+      dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+      await volumes.create( token );
+      let resp = await volumes.getAll( newFilters );
+      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+      callback();
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.VolumeFormError.create( err ) );
+    }
   }
 }

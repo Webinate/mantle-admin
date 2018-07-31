@@ -4,15 +4,18 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
+import ErrorIcon from '@material-ui/icons/Error';
 import { default as styled } from '../../theme/styled';
 import { IVolume } from '../../../../../src';
 import VolumeProperties from './new-volume-stages/volume-properties';
 import StepContent from '@material-ui/core/StepContent';
 import VolumeType from './new-volume-stages/volume-type';
+import theme from '../../theme/mui-theme';
 
 export type Props = {
   onComplete: ( volume: Partial<IVolume<'client'>> ) => void;
   isAdmin: boolean;
+  error: Error | null;
 }
 
 export type State = {
@@ -114,6 +117,11 @@ export class NewVolumeForm extends React.Component<Props, State> {
             } )}
           </Stepper>
         </Paper>
+        {this.props.error ?
+          <Error>
+            <ErrorIcon />
+            {this.props.error.message}
+          </Error> : undefined}
         <Buttons>
           <Button
             id="mt-vol-back"
@@ -141,5 +149,14 @@ const Buttons = styled.div`
   margin: 20px 0;
   button {
     margin: 0 5px 0 0;
+  }
+`;
+
+const Error = styled.div`
+  color: ${theme.error.background };
+  margin: 20px 0;
+  svg {
+    vertical-align: middle;
+    margin: 0 10px 0 0;
   }
 `;

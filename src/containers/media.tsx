@@ -62,6 +62,7 @@ export class Media extends React.Component<Props, State> {
           <Switch>
             <Route path="/dashboard/media/new" render={props => <NewVolumeForm
               isAdmin={isAdmin}
+              error={this.props.media.volumeFormError}
               onComplete={newVolume => {
                 this.props.createVolume( newVolume, () => this.props.push( '/dashboard/media' ) );
               }}

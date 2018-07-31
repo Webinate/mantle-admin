@@ -53,6 +53,9 @@ export default class MainController extends Controller {
       } ).initialize( app, db ),
       new serializers.categories( {
         rootPath: apiUrl
+      } ).initialize( app, db ),
+      new serializers.volume( {
+        rootPath: apiUrl
       } ).initialize( app, db )
     ] );
 
