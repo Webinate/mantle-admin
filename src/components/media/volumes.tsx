@@ -163,7 +163,7 @@ export class Volumes extends React.Component<Props, State> {
                         className="mt-vol-type"
                       >
                         <Tooltip title="Google bucket">
-                          <img src="/images/post-feature.svg" />
+                          <img src="/images/harddrive.svg" />
                         </Tooltip>
                       </TableCell>
                       <TableCell
@@ -199,8 +199,7 @@ const Container = styled.div`
   background: ${theme.light100.background };
 
   img {
-    height: 50px;
-    width: 50px;
+    width: 70px;
   }
 
   td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {
