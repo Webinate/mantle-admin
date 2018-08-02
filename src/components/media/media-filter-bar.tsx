@@ -5,11 +5,15 @@ import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import SearchIcon from '@material-ui/icons/Search';
 import FontCancel from '@material-ui/icons/ArrowBack';
+import DeleteIcon from '@material-ui/icons/Delete';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export type Props = {
   mode: 'new-volume' | 'volumes';
+  mediaSelected: boolean;
   onNewVolume: () => void;
   onBack: () => void;
+  onDelete: () => void;
 }
 
 export type State = {
@@ -55,6 +59,16 @@ export class MediaFilterBar extends React.Component<Props, State> {
           >
             <SearchIcon />
           </IconButton>
+          <Tooltip title="Delete selected resources">
+            <IconButton
+              color="primary"
+              className="mt-volumes-delete-multi"
+              disabled={!this.props.mediaSelected}
+              onClick={e => this.props.onDelete()}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
           <Button
             variant="contained"
             onClick={e => this.props.onNewVolume()}

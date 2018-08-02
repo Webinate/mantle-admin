@@ -37,7 +37,10 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.VolumeFormError.type:
-      partialState = { volumeFormError: action.payload };
+      partialState = {
+        volumeFormError: action.payload,
+        busy: false
+      };
       break;
 
     case ActionCreators.SelectedVolume.type:

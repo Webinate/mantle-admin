@@ -2,6 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { Page, IVolume } from '../../../../../src';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
 import { IRootState } from '..';
+import { ActionCreators as AppActions } from '../app/actions';
 
 // Action Creators
 export const ActionCreators = {
@@ -23,6 +24,32 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
     const resp = await volumes.getAll( newFilters );
     dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+  }
+}
+
+export function deleteVolumes( ids: string[] ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+
+    try {
+      const promises: Promise<Response>[] = [];
+      for ( const id of ids )
+        promises.push( volumes.remove( id ) );
+
+      await Promise.all( promises );
+
+      const state = getState();
+      const newFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
+        { ...state.media.volumeFilters, ...{ index: 0 } } : { index: 0 };
+
+      const resp = await volumes.getAll( newFilters );
+
+      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.SetVolumesBusy.create( false ) );
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
   }
 }
 

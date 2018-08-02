@@ -13,6 +13,7 @@ import { IVolume, Page } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
+import { GetAllOptions } from '../../../../../src/lib-frontend/volumes';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
@@ -20,6 +21,9 @@ export type SortOrder = 'asc' | 'desc';
 export type Props = {
   volumes: Page<IVolume<'client'>>;
   loading: boolean;
+  onVolumesSelected: ( uids: string[] ) => void;
+  getVolumes: ( options: Partial<GetAllOptions> ) => void;
+  selectedUids: string[];
 }
 
 export type State = {
@@ -28,6 +32,7 @@ export type State = {
 }
 
 export class Volumes extends React.Component<Props, State> {
+  private _container: HTMLElement;
 
   constructor( props: Props ) {
     super( props );
@@ -35,6 +40,17 @@ export class Volumes extends React.Component<Props, State> {
       order: 'desc',
       orderBy: 'name'
     };
+  }
+
+  componentDidMount() {
+    this.props.getVolumes( {
+      index: 0
+    } );
+  }
+
+  componentWillReceiveProps( next: Props ) {
+    if ( next.volumes !== this.props.volumes )
+      this.props.onVolumesSelected( [] );
   }
 
   private changeOrder( sort: SortTypes ) {
@@ -48,8 +64,14 @@ export class Volumes extends React.Component<Props, State> {
     } );
   }
 
+  private onSelectionChange( volumes: string[] ) {
+    this.props.onVolumesSelected( volumes );
+  }
+
   render() {
+    const selected = this.props.selectedUids;
     const volumes = this.props.volumes;
+    const allSelected = this.props.selectedUids.length === volumes.data.length;
     const headers: { label: string; property: SortTypes }[] = [
       { label: 'Name', property: 'name' },
       { label: 'Memory', property: 'memory' },
@@ -62,11 +84,14 @@ export class Volumes extends React.Component<Props, State> {
         limit={volumes.limit}
         total={volumes.count}
         loading={this.props.loading}
-        onPage={() => {
+        onPage={( index ) => {
+          if ( this._container )
+            this._container.scrollTop = 0;
 
+          this.props.getVolumes( { index: index } )
         }}
       >
-        <Container>
+        <Container innerRef={elm => this._container = elm}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -76,7 +101,14 @@ export class Volumes extends React.Component<Props, State> {
                   sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
                 >
                   <Checkbox
-                    onClick={e => { }}
+                    id="mt-select-all"
+                    checked={allSelected}
+                    onClick={e => {
+                      if ( allSelected )
+                        this.onSelectionChange( [] );
+                      else
+                        this.onSelectionChange( volumes.data.map( v => v._id ) );
+                    }}
                   />
                 </TableCell>
                 <TableCell
@@ -105,16 +137,30 @@ export class Volumes extends React.Component<Props, State> {
 
             <TableBody>
               {
-                volumes.data.map( volume => {
+                volumes.data.map( ( volume, index ) => {
                   return (
-                    <TableRow hover role="checkbox">
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      key={`vol-row-${ index }`}
+                    >
                       <TableCell
                         padding="checkbox"
                       >
-                        <Checkbox />
+                        <Checkbox
+                          className="mt-vol-checkbox"
+                          checked={selected.indexOf( volume._id ) !== -1}
+                          onClick={e => {
+                            if ( selected.indexOf( volume._id ) !== -1 )
+                              this.onSelectionChange( selected.filter( v => v !== volume._id ) );
+                            else
+                              this.onSelectionChange( selected.concat( volume._id ) );
+                          }}
+                        />
                       </TableCell>
                       <TableCell
                         padding="checkbox"
+                        className="mt-vol-type"
                       >
                         <Tooltip title="Google bucket">
                           <img src="/images/post-feature.svg" />
@@ -122,13 +168,19 @@ export class Volumes extends React.Component<Props, State> {
                       </TableCell>
                       <TableCell
                         scope="row"
-                        component="th">
+                        component="th"
+                        className="mt-vol-name"
+                      >
                         {volume.name}
                       </TableCell>
-                      <TableCell>
-                        {formatBytes( volume.memoryUsed! )}
+                      <TableCell
+                        className="mt-vol-memoryaloc"
+                      >
+                        {formatBytes( volume.memoryUsed! )} / {formatBytes( volume.memoryAllocated! )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        className="mt-vol-created"
+                      >
                         {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
                       </TableCell>
                     </TableRow>

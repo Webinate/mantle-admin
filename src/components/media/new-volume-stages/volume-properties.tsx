@@ -35,7 +35,7 @@ export default class NewVolumeForm extends React.Component<Props, State> {
 
   render() {
 
-    let memElm: JSX.Element | null = null;;
+    let memElm: JSX.Element | null = null;
     let memError = false;
 
     if ( this.props.volume.memoryAllocated === 0 ) {

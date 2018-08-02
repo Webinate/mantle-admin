@@ -5,10 +5,11 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
-import { createVolume } from '../store/media/actions';
+import { createVolume, getVolumes, deleteVolumes } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
+import { GetAllOptions } from '../../../../src/lib-frontend/volumes';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -22,12 +23,15 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   push: push,
-  createVolume
+  createVolume,
+  getVolumes,
+  deleteVolumes
 }
 
 const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
+  selectedUids: string[];
 };
 
 /**
@@ -39,7 +43,12 @@ export class Media extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
+      selectedUids: []
     };
+  }
+
+  private onDelete() {
+    this.props.deleteVolumes( this.state.selectedUids );
   }
 
   render() {
@@ -50,11 +59,13 @@ export class Media extends React.Component<Props, State> {
       <div style={{ height: '100%' }} className="mt-media-container">
         <ContentHeader
           title="Media"
-          busy={false}
+          busy={this.props.media.busy}
           renderFilters={() => <MediaFilterBar
+            mediaSelected={this.state.selectedUids.length > 0 ? true : false}
             mode={isInNewMode ? 'new-volume' : 'volumes'}
             onNewVolume={() => this.props.push( '/dashboard/media/new' )}
             onBack={() => this.props.push( '/dashboard/media' )}
+            onDelete={() => this.onDelete()}
           />}
         >
         </ContentHeader>
@@ -70,8 +81,11 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
+                selectedVolumes={this.state.selectedUids}
+                onVolumesSelected={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}
                 volumes={this.props.media.volumePage}
+                getVolumes={( options: Partial<GetAllOptions> ) => this.props.getVolumes( options )}
               />;
             }} />
           </Switch>

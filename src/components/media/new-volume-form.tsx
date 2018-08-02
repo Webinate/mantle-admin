@@ -86,6 +86,7 @@ export class NewVolumeForm extends React.Component<Props, State> {
   render() {
     const steps = this._steps;
     const activeStep = this.state.activeStep;
+    const isLastStep = activeStep === steps.length - 1;
 
     let activeElm: JSX.Element;
     if ( activeStep === 0 )
@@ -137,7 +138,7 @@ export class NewVolumeForm extends React.Component<Props, State> {
             color="primary"
             onClick={e => this.handleNext()}
           >
-            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+            {isLastStep ? 'Add Volume' : 'Next'}
           </Button>
         </Buttons>
       </div>
