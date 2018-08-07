@@ -24,6 +24,7 @@ export type Props = {
   onVolumesSelected: ( uids: string[] ) => void;
   getVolumes: ( options: Partial<GetAllOptions> ) => void;
   selectedUids: string[];
+  openVolume: ( volume: IVolume<'client'> ) => void;
 }
 
 export type State = {
@@ -138,10 +139,9 @@ export class Volumes extends React.Component<Props, State> {
                       style={{ cursor: 'pointer' }}
                       role="checkbox"
                       key={`vol-row-${ index }`}
+                      onDoubleClick={e => this.props.openVolume( volume )}
                       onClick={e => {
-                        if ( selected.indexOf( volume._id ) !== -1 )
-                          this.onSelectionChange( selected.filter( v => v !== volume._id ) );
-                        else
+                        if ( selected.indexOf( volume._id ) === -1 )
                           this.onSelectionChange( selected.concat( volume._id ) );
                       }}
                     >
@@ -149,6 +149,14 @@ export class Volumes extends React.Component<Props, State> {
                         padding="checkbox"
                       >
                         <Checkbox
+                          onClick={e => {
+                            e.stopPropagation();
+
+                            if ( selected.indexOf( volume._id ) !== -1 )
+                              this.onSelectionChange( selected.filter( v => v !== volume._id ) );
+                            else
+                              this.onSelectionChange( selected.concat( volume._id ) );
+                          }}
                           className="mt-vol-checkbox"
                           checked={selected.indexOf( volume._id ) !== -1}
                         />

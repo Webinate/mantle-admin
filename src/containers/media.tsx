@@ -80,9 +80,11 @@ export class Media extends React.Component<Props, State> {
               }}
             />} />
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
+            <Route path="/dashboard/media/volume/:id" render={props => <div>Viewing the volume {props.match.params.postId}</div>} />
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
                 selectedVolumes={this.state.selectedUids}
+                openVolume={volume => this.props.push( `/dashboard/volume/${ volume._id }` )}
                 onVolumesSelected={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}
                 volumes={this.props.media.volumePage}

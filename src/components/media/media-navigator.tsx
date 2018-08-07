@@ -12,6 +12,7 @@ export type Props = {
   selectedVolumes: string[];
   getVolumes: ( options: Partial<GetAllOptions> ) => void;
   onVolumesSelected: ( uids: string[] ) => void;
+  openVolume: ( volume: IVolume<'client'> ) => void;
 }
 
 export type State = {
@@ -37,6 +38,7 @@ export class MediaNavigator extends React.Component<Props, State> {
 
     if ( volumePage ) {
       activeView = <Volumes
+        openVolume={this.props.openVolume}
         onVolumesSelected={this.props.onVolumesSelected}
         selectedUids={this.props.selectedVolumes}
         getVolumes={this.props.getVolumes}
