@@ -64,6 +64,7 @@ export class Media extends React.Component<Props, State> {
             mediaSelected={this.state.selectedUids.length > 0 ? true : false}
             mode={isInNewMode ? 'new-volume' : 'volumes'}
             onNewVolume={() => this.props.push( '/dashboard/media/new' )}
+            onSearch={term => this.props.getVolumes( { search: term } )}
             onBack={() => this.props.push( '/dashboard/media' )}
             onDelete={() => this.onDelete()}
           />}

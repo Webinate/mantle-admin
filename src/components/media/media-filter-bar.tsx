@@ -14,6 +14,7 @@ export type Props = {
   onNewVolume: () => void;
   onBack: () => void;
   onDelete: () => void;
+  onSearch: ( term: string ) => void;
 }
 
 export type State = {
@@ -46,7 +47,7 @@ export class MediaFilterBar extends React.Component<Props, State> {
             value={this.state.searchFilter}
             onKeyDown={e => {
               if ( e.keyCode === 13 )
-                this.onSearch();
+                this.props.onSearch( this.state.searchFilter );
             }}
             onChange={( e ) => this.setState( {
               searchFilter: e.currentTarget.value

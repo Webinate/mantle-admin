@@ -106,7 +106,7 @@ export default class Dashboard extends React.Component<Props, State> {
           rightOpen={false}
           style={{ height: `calc(100% - ${ headerHeight }px)` }}
           renderLeft={() => <Menu>{this.props.renderLeft && this.props.renderLeft()}</Menu>}
-          leftStyle={{ boxShadow: '0px 5px 10px 1px rgba(0,0,0,0.2)', position: 'relative' }}
+          leftStyle={{ boxShadow: '0px 5px 10px 1px rgba(0,0,0,0.2)', position: 'relative', zIndex: 1 }}
         >
           <Content>
             {this.props.children}

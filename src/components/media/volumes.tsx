@@ -42,12 +42,6 @@ export class Volumes extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    this.props.getVolumes( {
-      index: 0
-    } );
-  }
-
   componentWillReceiveProps( next: Props ) {
     if ( next.volumes !== this.props.volumes )
       this.props.onVolumesSelected( [] );
@@ -141,8 +135,15 @@ export class Volumes extends React.Component<Props, State> {
                   return (
                     <TableRow
                       hover
+                      style={{ cursor: 'pointer' }}
                       role="checkbox"
                       key={`vol-row-${ index }`}
+                      onClick={e => {
+                        if ( selected.indexOf( volume._id ) !== -1 )
+                          this.onSelectionChange( selected.filter( v => v !== volume._id ) );
+                        else
+                          this.onSelectionChange( selected.concat( volume._id ) );
+                      }}
                     >
                       <TableCell
                         padding="checkbox"
@@ -150,19 +151,13 @@ export class Volumes extends React.Component<Props, State> {
                         <Checkbox
                           className="mt-vol-checkbox"
                           checked={selected.indexOf( volume._id ) !== -1}
-                          onClick={e => {
-                            if ( selected.indexOf( volume._id ) !== -1 )
-                              this.onSelectionChange( selected.filter( v => v !== volume._id ) );
-                            else
-                              this.onSelectionChange( selected.concat( volume._id ) );
-                          }}
                         />
                       </TableCell>
                       <TableCell
                         padding="checkbox"
                         className="mt-vol-type"
                       >
-                        <Tooltip title="Google bucket">
+                        <Tooltip title="Local volume">
                           <img src="/images/harddrive.svg" />
                         </Tooltip>
                       </TableCell>
