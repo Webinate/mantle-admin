@@ -66,7 +66,6 @@ export class Media extends React.Component<Props, State> {
             onNewVolume={() => this.props.push( '/dashboard/media/new' )}
             onSearch={term => this.props.getVolumes( { search: term } )}
             onBack={() => this.props.push( '/dashboard/media' )}
-            onDelete={() => this.onDelete()}
           />}
         >
         </ContentHeader>
@@ -84,6 +83,7 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
                 selectedVolumes={this.state.selectedUids}
+                onDelete={() => this.onDelete()}
                 openVolume={volume => this.props.push( `/dashboard/volume/${ volume._id }` )}
                 onVolumesSelected={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}

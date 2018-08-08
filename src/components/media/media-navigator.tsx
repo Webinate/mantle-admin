@@ -10,6 +10,7 @@ export type Props = {
   volumes: Page<IVolume<'client'>> | null;
   loading: boolean;
   selectedVolumes: string[];
+  onDelete: () => void;
   getVolumes: ( options: Partial<GetAllOptions> ) => void;
   onVolumesSelected: ( uids: string[] ) => void;
   openVolume: ( volume: IVolume<'client'> ) => void;
@@ -55,7 +56,10 @@ export class MediaNavigator extends React.Component<Props, State> {
         second={() => {
           return <Paper
           >
-            <VolumeSidePanel />
+            <VolumeSidePanel
+              volumes={volumePage ? volumePage.data : []}
+              onDelete={() => this.props.onDelete()}
+            />
           </Paper>
         }}
       />

@@ -141,8 +141,14 @@ export class Volumes extends React.Component<Props, State> {
                       key={`vol-row-${ index }`}
                       onDoubleClick={e => this.props.openVolume( volume )}
                       onClick={e => {
-                        if ( selected.indexOf( volume._id ) === -1 )
-                          this.onSelectionChange( selected.concat( volume._id ) );
+                        if ( !e.ctrlKey )
+                          this.onSelectionChange( [ volume._id ] );
+                        else {
+                          if ( selected.indexOf( volume._id ) !== -1 )
+                            this.onSelectionChange( selected.filter( v => v !== volume._id ) );
+                          else
+                            this.onSelectionChange( selected.concat( volume._id ) );
+                        }
                       }}
                     >
                       <TableCell
