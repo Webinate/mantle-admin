@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IVolume } from '../../../../../src';
+import { Page, IVolume, IFileEntry } from '../../../../../src';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
@@ -8,7 +8,8 @@ import { ActionCreators as AppActions } from '../app/actions';
 export const ActionCreators = {
   SetVolumesBusy: new ActionCreator<'media-busy', boolean>( 'media-busy' ),
   SetVolumes: new ActionCreator<'media-set-volumes', { page: Page<IVolume<'client'>>, filters: Partial<volumes.GetAllOptions> }>( 'media-set-volumes' ),
-  SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client'>>( 'media-selected-volume' ),
+  SetFiles: new ActionCreator<'media-set-files', { page: Page<IFileEntry<'client'>>, filters: Partial<volumes.GetAllOptions> }>( 'media-set-files' ),
+  SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client'> | null>( 'media-selected-volume' ),
   VolumeFormError: new ActionCreator<'media-volume-form-error', Error>( 'media-volume-form-error' ),
 };
 
@@ -22,6 +23,7 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
       { ...state.media.volumeFilters, ...options } : options;
 
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+    dispatch( ActionCreators.SelectedVolume.create( null ) );
     const resp = await volumes.getAll( newFilters );
     dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
   }

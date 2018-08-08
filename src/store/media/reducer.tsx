@@ -1,11 +1,13 @@
 import { ActionCreators, Action } from './actions';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
-import { Page, IVolume } from '../../../../../src';
+import { Page, IVolume, IFileEntry } from '../../../../../src';
 
 // State
 export type State = {
   readonly volumePage: Page<IVolume<'client'>> | null;
   readonly volumeFilters: Partial<volumes.GetAllOptions> | null;
+  readonly filesPage: Page<IFileEntry<'client'>> | null;
+  readonly filesFilters: Partial<volumes.GetAllOptions> | null;
   readonly selected: IVolume<'client'> | null;
   readonly busy: boolean;
   readonly volumeFormError: Error | null;
@@ -14,6 +16,8 @@ export type State = {
 export const initialState: State = {
   volumePage: null,
   volumeFilters: null,
+  filesPage: null,
+  filesFilters: null,
   selected: null,
   busy: false,
   volumeFormError: null
@@ -28,6 +32,14 @@ export default function reducer( state: State = initialState, action: Action ): 
       partialState = {
         volumePage: action.payload.page,
         volumeFilters: action.payload.filters,
+        busy: false
+      };
+      break;
+
+    case ActionCreators.SetFiles.type:
+      partialState = {
+        filesPage: action.payload.page,
+        filesFilters: action.payload.filters,
         busy: false
       };
       break;

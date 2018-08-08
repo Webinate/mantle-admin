@@ -40,7 +40,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     if ( volumePage ) {
       activeView = <Volumes
         openVolume={this.props.openVolume}
-        onVolumesSelected={this.props.onVolumesSelected}
+        onSelectionChanged={this.props.onVolumesSelected}
         selectedUids={this.props.selectedVolumes}
         getVolumes={this.props.getVolumes}
         loading={this.props.loading}

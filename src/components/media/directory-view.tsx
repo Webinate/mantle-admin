@@ -5,26 +5,25 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Tooltip from '@material-ui/core/Tooltip';
 import Checkbox from '@material-ui/core/Checkbox';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
-import { IVolume, Page } from '../../../../../src';
+import { IVolume, Page, IFileEntry } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
-import { GetAllOptions } from '../../../../../src/lib-frontend/volumes';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
-  volumes: Page<IVolume<'client'>>;
+  volume: IVolume<'client'> | null;
+  files: Page<IFileEntry<'client'>> | null;
   loading: boolean;
-  onSelectionChanged: ( uids: string[] ) => void;
-  getVolumes: ( options: Partial<GetAllOptions> ) => void;
+  volumeId: string;
   selectedUids: string[];
-  openVolume: ( volume: IVolume<'client'> ) => void;
+  getDirectory: ( id: string ) => void;
+  onSelectionChanged: ( uids: string[] ) => void;
 }
 
 export type State = {
@@ -32,7 +31,7 @@ export type State = {
   orderBy: SortTypes;
 }
 
-export class Volumes extends React.Component<Props, State> {
+export class DirectoryView extends React.Component<Props, State> {
   private _container: HTMLElement;
 
   constructor( props: Props ) {
@@ -43,9 +42,8 @@ export class Volumes extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps( next: Props ) {
-    if ( next.volumes !== this.props.volumes )
-      this.props.onSelectionChanged( [] );
+  componentDidMount() {
+    this.props.getDirectory( this.props.volumeId )
   }
 
   private changeOrder( sort: SortTypes ) {
@@ -65,25 +63,29 @@ export class Volumes extends React.Component<Props, State> {
 
   render() {
     const selected = this.props.selectedUids;
-    const volumes = this.props.volumes;
-    const allSelected = this.props.selectedUids.length === volumes.data.length;
+    const files = this.props.files;
     const headers: { label: string; property: SortTypes }[] = [
       { label: 'Name', property: 'name' },
       { label: 'Memory', property: 'memory' },
       { label: 'Created', property: 'created' }
     ];
 
+    if ( !files )
+      return <div>No files</div>
+
+    const allSelected = this.props.selectedUids.length === files.data.length;
+
     return (
       <Pager
-        index={volumes.index}
-        limit={volumes.limit}
-        total={volumes.count}
+        index={files.index}
+        limit={files.limit}
+        total={files.count}
         loading={this.props.loading}
         onPage={( index ) => {
           if ( this._container )
             this._container.scrollTop = 0;
 
-          this.props.getVolumes( { index: index } )
+          // this.props.getVolumes( { index: index } )
         }}
       >
         <Container innerRef={elm => this._container = elm}>
@@ -102,7 +104,7 @@ export class Volumes extends React.Component<Props, State> {
                       if ( allSelected )
                         this.onSelectionChange( [] );
                       else
-                        this.onSelectionChange( volumes.data.map( v => v._id ) );
+                        this.onSelectionChange( files.data.map( v => v._id ) );
                     }}
                   />
                 </TableCell>
@@ -132,22 +134,21 @@ export class Volumes extends React.Component<Props, State> {
 
             <TableBody>
               {
-                volumes.data.map( ( volume, index ) => {
+                files.data.map( ( file, index ) => {
                   return (
                     <TableRow
                       hover
                       style={{ cursor: 'pointer' }}
                       role="checkbox"
                       key={`vol-row-${ index }`}
-                      onDoubleClick={e => this.props.openVolume( volume )}
                       onClick={e => {
                         if ( !e.ctrlKey )
-                          this.onSelectionChange( [ volume._id ] );
+                          this.onSelectionChange( [ file._id ] );
                         else {
-                          if ( selected.indexOf( volume._id ) !== -1 )
-                            this.onSelectionChange( selected.filter( v => v !== volume._id ) );
+                          if ( selected.indexOf( file._id ) !== -1 )
+                            this.onSelectionChange( selected.filter( v => v !== file._id ) );
                           else
-                            this.onSelectionChange( selected.concat( volume._id ) );
+                            this.onSelectionChange( selected.concat( file._id ) );
                         }
                       }}
                     >
@@ -158,39 +159,37 @@ export class Volumes extends React.Component<Props, State> {
                           onClick={e => {
                             e.stopPropagation();
 
-                            if ( selected.indexOf( volume._id ) !== -1 )
-                              this.onSelectionChange( selected.filter( v => v !== volume._id ) );
+                            if ( selected.indexOf( file._id ) !== -1 )
+                              this.onSelectionChange( selected.filter( v => v !== file._id ) );
                             else
-                              this.onSelectionChange( selected.concat( volume._id ) );
+                              this.onSelectionChange( selected.concat( file._id ) );
                           }}
                           className="mt-vol-checkbox"
-                          checked={selected.indexOf( volume._id ) !== -1}
+                          checked={selected.indexOf( file._id ) !== -1}
                         />
                       </TableCell>
                       <TableCell
                         padding="checkbox"
                         className="mt-vol-type"
                       >
-                        <Tooltip title="Local volume">
-                          <img src="/images/harddrive.svg" />
-                        </Tooltip>
+                        <img src="/images/harddrive.svg" />
                       </TableCell>
                       <TableCell
                         scope="row"
                         component="th"
                         className="mt-vol-name"
                       >
-                        {volume.name}
+                        {file.name}
                       </TableCell>
                       <TableCell
                         className="mt-vol-memoryaloc"
                       >
-                        {formatBytes( volume.memoryUsed! )} / {formatBytes( volume.memoryAllocated! )}
+                        {formatBytes( file.size! )}
                       </TableCell>
                       <TableCell
                         className="mt-vol-created"
                       >
-                        {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
+                        {format( new Date( file.created! ), 'MMM Do, YYYY' )}
                       </TableCell>
                     </TableRow>
                   );
