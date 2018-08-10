@@ -17,12 +17,11 @@ export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
-  volume: IVolume<'client'> | null;
+  volume: IVolume<'client'>;
   files: Page<IFileEntry<'client'>> | null;
   loading: boolean;
-  volumeId: string;
   selectedUids: string[];
-  getDirectory: ( id: string ) => void;
+  openDirectory: ( id: string ) => void;
   onSelectionChanged: ( uids: string[] ) => void;
 }
 
@@ -40,10 +39,6 @@ export class DirectoryView extends React.Component<Props, State> {
       order: 'desc',
       orderBy: 'name'
     };
-  }
-
-  componentDidMount() {
-    this.props.getDirectory( this.props.volumeId )
   }
 
   private changeOrder( sort: SortTypes ) {

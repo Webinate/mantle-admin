@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
-import { IVolume, IUserEntry } from '../../../../../src';
-import Avatar from '@material-ui/core/Avatar';
-import { generateAvatarPic } from '../../utils/component-utils';
+import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
@@ -13,32 +11,28 @@ import ListItemText from '@material-ui/core/ListItemText';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 export type Props = {
-  volumes: IVolume<'client'>[];
   onDelete: () => void;
 }
 
 export type State = {
 }
 
-export default class VolumeSidePanel extends React.Component<Props, State> {
+export default class FileSidePanel extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
   }
 
   render() {
-    const volumes = this.props.volumes;
-    const volume = volumes.length > 0 ? volumes[ volumes.length - 1 ] : null;
-
     return (
       <Container>
-        {volume ? <div>
-          <Tooltip title={( volume.user as IUserEntry<'client'> ).username}>
-            <Avatar
-              src={generateAvatarPic( ( volume.user as IUserEntry<'client'> ).avatar )}
-              style={{ height: 40, width: 40 }}
-            />
+        <div>
+          <Tooltip title="Upload a file">
+            <Button
+              color="primary"
+              variant="contained">Upload
+            </Button>
           </Tooltip>
-        </div> : null}
+        </div>
         <Divider style={{ margin: '10px auto 0 auto' }} />
         <List
           component="nav"

@@ -10,7 +10,6 @@ import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
 import { GetAllOptions } from '../../../../src/lib-frontend/volumes';
-import { DirectoryView } from '../components/media/directory-view';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -82,22 +81,23 @@ export class Media extends React.Component<Props, State> {
             />} />
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media/volume/:id" render={props => {
-              return <DirectoryView
+              return <MediaNavigator
+                selectedIds={this.state.selectedUids}
                 files={this.props.media.filesPage}
-                volume={this.props.media.selected}
+                onDelete={() => this.onDelete()}
+                activeVolume={this.props.media.selected}
+                activeVolumeId={props.match.params.id}
                 loading={this.props.media.busy}
                 onSelectionChanged={selection => this.setState( { selectedUids: selection } )}
-                volumeId={props.match.params.id}
-                selectedUids={this.state.selectedUids}
-                getDirectory={id => this.props.getVolume( id )}
+                openDirectory={id => this.props.getVolume( id )}
               />
             }} />
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
-                selectedVolumes={this.state.selectedUids}
+                selectedIds={this.state.selectedUids}
                 onDelete={() => this.onDelete()}
-                openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume._id }` )}
-                onVolumesSelected={volumes => this.setState( { selectedUids: volumes } )}
+                openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
+                onSelectionChanged={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}
                 volumes={this.props.media.volumePage}
                 getVolumes={( options: Partial<GetAllOptions> ) => this.props.getVolumes( options )}

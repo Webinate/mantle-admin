@@ -24,7 +24,7 @@ export type Props = {
   onSelectionChanged: ( uids: string[] ) => void;
   getVolumes: ( options: Partial<GetAllOptions> ) => void;
   selectedUids: string[];
-  openVolume: ( volume: IVolume<'client'> ) => void;
+  openVolume: ( volumeId: string ) => void;
 }
 
 export type State = {
@@ -139,7 +139,7 @@ export class Volumes extends React.Component<Props, State> {
                       style={{ cursor: 'pointer' }}
                       role="checkbox"
                       key={`vol-row-${ index }`}
-                      onDoubleClick={e => this.props.openVolume( volume )}
+                      onDoubleClick={e => this.props.openVolume( volume._id )}
                       onClick={e => {
                         if ( !e.ctrlKey )
                           this.onSelectionChange( [ volume._id ] );
