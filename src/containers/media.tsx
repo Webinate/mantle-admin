@@ -65,7 +65,7 @@ export class Media extends React.Component<Props, State> {
     return (
       <div style={{ height: '100%' }} className="mt-media-container">
         <ContentHeader
-          title={this.props.media.selected ? this.props.media.selected.name : "Media"}
+          title={this.props.media.selected ? this.props.media.selected.name : 'Media'}
           busy={this.props.media.busy}
           renderFilters={() => <MediaFilterBar
             mediaSelected={this.state.selectedUids.length > 0 ? true : false}

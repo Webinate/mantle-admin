@@ -56,6 +56,13 @@ export class DirectoryView extends React.Component<Props, State> {
     this.props.onSelectionChanged( volumes );
   }
 
+  private getPreview( file: IFileEntry<'client'> ) {
+    if ( file.mimeType === 'image/png' || file.mimeType === 'image/jpeg' || file.mimeType === 'image/jpg' || file.mimeType === 'image/gif' )
+      return file.publicURL;
+    else
+      return '/images/harddrive.svg';
+  }
+
   render() {
     const selected = this.props.selectedUids;
     const files = this.props.files;
@@ -167,7 +174,7 @@ export class DirectoryView extends React.Component<Props, State> {
                         padding="checkbox"
                         className="mt-vol-type"
                       >
-                        <img src="/images/harddrive.svg" />
+                        <img src={this.getPreview( file )} />
                       </TableCell>
                       <TableCell
                         scope="row"
@@ -202,7 +209,8 @@ const Container = styled.div`
   background: ${theme.light100.background };
 
   img {
-    width: 70px;
+    width: 110px;
+    margin: 5px;
   }
 
   td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {

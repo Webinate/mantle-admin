@@ -11,10 +11,12 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import DeleteIcon from '@material-ui/icons/Delete';
+import FolderOpen from '@material-ui/icons/FolderOpen';
 
 export type Props = {
   volumes: IVolume<'client'>[];
   onDelete: () => void;
+  onOpen: ( volumeId: string ) => void;
 }
 
 export type State = {
@@ -43,6 +45,13 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
         <List
           component="nav"
         >
+          {volume ? <ListItem button onClick={e => this.props.onOpen( volume._id )}>
+            <ListItemIcon>
+              <FolderOpen />
+            </ListItemIcon>
+            <ListItemText inset primary={`Open ${ volume.name }`} />
+          </ListItem> : undefined}
+
           <ListItem button onClick={e => this.props.onDelete()}>
             <ListItemIcon>
               <DeleteIcon />

@@ -93,6 +93,7 @@ export class MediaNavigator extends React.Component<Props, State> {
           }
           else {
             return <VolumeSidePanel
+              onOpen={this.props.openVolume!}
               volumes={volumePage ? volumePage.data : []}
               onDelete={() => this.props.onDelete()}
             />;

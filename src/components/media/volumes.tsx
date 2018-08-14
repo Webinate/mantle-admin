@@ -171,9 +171,15 @@ export class Volumes extends React.Component<Props, State> {
                         padding="checkbox"
                         className="mt-vol-type"
                       >
+                      { volume.type === 'google' ? (
+                        <Tooltip title="Google volume">
+                          <img src="/images/server.svg" />
+                        </Tooltip>
+                      ) : (
                         <Tooltip title="Local volume">
                           <img src="/images/harddrive.svg" />
                         </Tooltip>
+                      ) }
                       </TableCell>
                       <TableCell
                         scope="row"
