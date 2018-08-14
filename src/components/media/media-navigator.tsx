@@ -14,6 +14,7 @@ export type Props = {
   loading: boolean;
   selectedIds: string[];
   activeVolumeId?: string;
+  onUploadFiles: ( files: File[] ) => void;
   onDelete: () => void;
   getVolumes?: ( options: Partial<GetAllOptions> ) => void;
   openVolume?: ( volumeId: string ) => void;
@@ -85,6 +86,8 @@ export class MediaNavigator extends React.Component<Props, State> {
         second={() => {
           if ( this.props.activeVolumeId ) {
             return <FileSidePanel
+              selectedIds={this.props.selectedIds}
+              onUploadFiles={this.props.onUploadFiles}
               onDelete={() => this.props.onDelete()}
             />
           }

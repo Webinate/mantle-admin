@@ -23,6 +23,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import PostsIcon from '@material-ui/icons/Description';
 import { Media } from './media';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Button from '@material-ui/core/Button';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -165,11 +166,12 @@ export class App extends React.Component<Props, State> {
           onClose={() => {
             this.props.closeSnackbar( null )
           }}
-          action={[ <span
+          action={[ <Button
             key="close-1"
+            variant="contained"
             id="mt-close-snackbar-btn"
             onClick={e => this.props.closeSnackbar( null )}
-          >close</span> ]}
+          >close</Button> ]}
           message={<span id="mt-close-snackbar-msg">{this.props.app.response || ''}</span>}
         />
       </div>

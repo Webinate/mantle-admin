@@ -19,7 +19,7 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.serverResponse.type:
       partialState = {
-        response: action.payload
+        response: action.payload ? decodeURIComponent( action.payload ) : null
       };
       break;
 

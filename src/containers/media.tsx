@@ -5,7 +5,7 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
-import { createVolume, getVolumes, getVolume, deleteVolumes } from '../store/media/actions';
+import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirectory, deleteFiles } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
@@ -26,7 +26,10 @@ const dispatchToProps = {
   createVolume,
   getVolumes,
   getVolume,
-  deleteVolumes
+  openDirectory,
+  deleteVolumes,
+  upload,
+  deleteFiles
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -48,8 +51,11 @@ export class Media extends React.Component<Props, State> {
     };
   }
 
-  private onDelete() {
-    this.props.deleteVolumes( this.state.selectedUids );
+  private onDelete( volumeId?: string ) {
+    if ( volumeId )
+      this.props.deleteFiles( volumeId, this.state.selectedUids );
+    else
+      this.props.deleteVolumes( this.state.selectedUids );
   }
 
   render() {
@@ -82,20 +88,24 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media/volume/:id" render={props => {
               return <MediaNavigator
+                key="nav-directory"
                 selectedIds={this.state.selectedUids}
                 files={this.props.media.filesPage}
-                onDelete={() => this.onDelete()}
+                onDelete={() => this.onDelete( props.match.params.id )}
+                onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 activeVolume={this.props.media.selected}
                 activeVolumeId={props.match.params.id}
                 loading={this.props.media.busy}
                 onSelectionChanged={selection => this.setState( { selectedUids: selection } )}
-                openDirectory={id => this.props.getVolume( id )}
+                openDirectory={id => this.props.openDirectory( id )}
               />
             }} />
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
+                key="nav-volumes"
                 selectedIds={this.state.selectedUids}
                 onDelete={() => this.onDelete()}
+                onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
                 onSelectionChanged={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}

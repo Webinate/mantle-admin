@@ -1,6 +1,7 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
+import * as files from '../../../../../src/lib-frontend/files';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 
@@ -18,14 +19,66 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 
 export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
-    const state = getState();
-    const newFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
-      { ...state.media.volumeFilters, ...options } : options;
+    try {
+      const state = getState();
+      const newFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
+        { ...state.media.volumeFilters, ...options } : options;
 
+      dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+      dispatch( ActionCreators.SelectedVolume.create( null ) );
+      const resp = await volumes.getAll( newFilters );
+      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.SetVolumesBusy.create( false ) );
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
+  }
+}
+
+export function upload( volumeId: string, filesArr: File[] ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+      const promises = filesArr.map( file => files.create( volumeId, file ) );
+      await Promise.all( promises );
+
+      const state = getState();
+      const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
+        { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
+
+      const filePage = await files.getAll( volumeId, filesFilter );
+      dispatch( ActionCreators.SetFiles.create( { page: filePage, filters: filesFilter } ) );
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.SetVolumesBusy.create( false ) );
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
+  }
+}
+
+export function deleteFiles( volumeId: string, ids: string[] ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
-    dispatch( ActionCreators.SelectedVolume.create( null ) );
-    const resp = await volumes.getAll( newFilters );
-    dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+
+    try {
+      const promises: Promise<Response>[] = [];
+      for ( const id of ids )
+        promises.push( files.remove( id ) );
+
+      await Promise.all( promises );
+
+      const state = getState();
+      const newFilters: Partial<files.GetAllOptions> = state.media.filesFilters ?
+        { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
+
+      const resp = await files.getAll( volumeId, newFilters );
+      dispatch( ActionCreators.SetFiles.create( { page: resp, filters: newFilters } ) );
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.SetVolumesBusy.create( false ) );
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
   }
 }
 
@@ -60,6 +113,24 @@ export function getVolume( id: string ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
     const resp = await volumes.getOne( id );
     dispatch( ActionCreators.SelectedVolume.create( resp ) );
+  }
+}
+
+export function openDirectory( id: string ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+
+    const state = getState();
+    const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
+      { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
+
+    const responses = await Promise.all( [
+      volumes.getOne( id ),
+      files.getAll( id, filesFilter )
+    ] );
+
+    dispatch( ActionCreators.SelectedVolume.create( responses[ 0 ] ) );
+    dispatch( ActionCreators.SetFiles.create( { page: responses[ 1 ], filters: filesFilter } ) );
   }
 }
 
