@@ -174,7 +174,9 @@ export class DirectoryView extends React.Component<Props, State> {
                         padding="checkbox"
                         className="mt-vol-type"
                       >
-                        <img src={this.getPreview( file )} />
+                        <div>
+                          <img src={this.getPreview( file )} />
+                        </div>
                       </TableCell>
                       <TableCell
                         scope="row"
@@ -208,9 +210,18 @@ export class DirectoryView extends React.Component<Props, State> {
 const Container = styled.div`
   background: ${theme.light100.background };
 
-  img {
+  .mt-vol-type > div {
     width: 110px;
-    margin: 5px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .mt-vol-type img {
+    max-width: 100%;
+    max-height: 100%;
   }
 
   td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {

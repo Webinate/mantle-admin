@@ -61,6 +61,12 @@ export class Media extends React.Component<Props, State> {
   render() {
     const isInNewMode = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/media/new' } );
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
+    const isInDirectory = matchPath<any>( this.props.location.pathname, { path: '/dashboard/media/volume/:id' } );
+    let mode: 'new-volume' | 'volumes' | 'directory' = 'volumes';
+    if ( isInNewMode )
+      mode = 'new-volume';
+    else if ( isInDirectory )
+      mode = 'directory';
 
     return (
       <div style={{ height: '100%' }} className="mt-media-container">
@@ -69,9 +75,9 @@ export class Media extends React.Component<Props, State> {
           busy={this.props.media.busy}
           renderFilters={() => <MediaFilterBar
             mediaSelected={this.state.selectedUids.length > 0 ? true : false}
-            mode={isInNewMode ? 'new-volume' : 'volumes'}
+            mode={mode}
             onNewVolume={() => this.props.push( '/dashboard/media/new' )}
-            onSearch={term => this.props.getVolumes( { search: term } )}
+            onSearch={term => isInDirectory ? this.props.openDirectory( isInDirectory.params.id, { search: term } ) : this.props.getVolumes( { search: term } )}
             onBack={() => this.props.push( '/dashboard/media' )}
           />}
         >

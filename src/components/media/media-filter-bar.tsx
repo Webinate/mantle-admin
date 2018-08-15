@@ -7,7 +7,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import FontCancel from '@material-ui/icons/ArrowBack';
 
 export type Props = {
-  mode: 'new-volume' | 'volumes';
+  mode: 'new-volume' | 'volumes' | 'directory';
   mediaSelected: boolean;
   onNewVolume: () => void;
   onBack: () => void;

@@ -116,13 +116,13 @@ export function getVolume( id: string ) {
   }
 }
 
-export function openDirectory( id: string ) {
+export function openDirectory( id: string, options: Partial<files.GetAllOptions> = { index: 0 } ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
 
     const state = getState();
     const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
-      { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
+      { ...state.media.filesFilters, ...options } : options;
 
     const responses = await Promise.all( [
       volumes.getOne( id ),

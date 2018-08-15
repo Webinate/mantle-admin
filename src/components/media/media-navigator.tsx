@@ -49,6 +49,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     const activeVolume = this.props.activeVolume;
     const mediaSelected = this.props.selectedIds.length > 0;
     let activeView: JSX.Element | null = null;
+    let selectedFile: IFileEntry<'client'> | null = null;
 
     if ( volumePage ) {
       activeView = <Volumes
@@ -61,6 +62,10 @@ export class MediaNavigator extends React.Component<Props, State> {
       />
     }
     else if ( activeVolume ) {
+      if ( filesPage && this.props.selectedIds.length > 0 ) {
+        selectedFile = filesPage.data.find( f => f._id === this.props.selectedIds[ this.props.selectedIds.length - 1 ] ) || null;
+      }
+
       activeView = <DirectoryView
         volume={activeVolume}
         files={filesPage!}
@@ -86,9 +91,11 @@ export class MediaNavigator extends React.Component<Props, State> {
         second={() => {
           if ( this.props.activeVolumeId ) {
             return <FileSidePanel
+              selectedFile={selectedFile}
               selectedIds={this.props.selectedIds}
               onUploadFiles={this.props.onUploadFiles}
               onDelete={() => this.props.onDelete()}
+              onRename={() => { }}
             />
           }
           else {
@@ -96,6 +103,7 @@ export class MediaNavigator extends React.Component<Props, State> {
               onOpen={this.props.openVolume!}
               volumes={volumePage ? volumePage.data : []}
               onDelete={() => this.props.onDelete()}
+              onRename={() => { }}
             />;
           }
         }}
