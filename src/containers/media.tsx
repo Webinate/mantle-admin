@@ -103,7 +103,7 @@ export class Media extends React.Component<Props, State> {
                 activeVolumeId={props.match.params.id}
                 loading={this.props.media.busy}
                 onSelectionChanged={selection => this.setState( { selectedUids: selection } )}
-                openDirectory={id => this.props.openDirectory( id )}
+                openDirectory={( id, options ) => this.props.openDirectory( id, options )}
               />
             }} />
             <Route path="/dashboard/media" exact={true} render={props => {

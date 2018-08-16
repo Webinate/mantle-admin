@@ -6,6 +6,7 @@ import SplitPanel from '../split-panel';
 import VolumeSidePanel from './volume-sidepanel';
 import { DirectoryView } from './directory-view';
 import FileSidePanel from './file-sidepanel';
+import { GetOptions } from '../../../../../src/controllers/files';
 
 export type Props = {
   activeVolume?: IVolume<'client'> | null;
@@ -18,7 +19,7 @@ export type Props = {
   onDelete: () => void;
   getVolumes?: ( options: Partial<GetAllOptions> ) => void;
   openVolume?: ( volumeId: string ) => void;
-  openDirectory?: ( volumeId: string ) => void;
+  openDirectory?: ( volumeId: string, options: GetOptions ) => void;
   onSelectionChanged: ( uids: string[] ) => void;
 }
 
@@ -34,7 +35,7 @@ export class MediaNavigator extends React.Component<Props, State> {
 
   componentDidMount() {
     if ( this.props.activeVolumeId ) {
-      this.props.openDirectory!( this.props.activeVolumeId )
+      this.props.openDirectory!( this.props.activeVolumeId, { index: 0 } )
     }
     else {
       this.props.getVolumes!( {

@@ -12,6 +12,7 @@ import { IVolume, Page, IFileEntry } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
+import { GetOptions } from '../../../../../src/controllers/files';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
@@ -21,7 +22,7 @@ export type Props = {
   files: Page<IFileEntry<'client'>> | null;
   loading: boolean;
   selectedUids: string[];
-  openDirectory: ( id: string ) => void;
+  openDirectory: ( id: string, optons: GetOptions ) => void;
   onSelectionChanged: ( uids: string[] ) => void;
 }
 
@@ -87,7 +88,7 @@ export class DirectoryView extends React.Component<Props, State> {
           if ( this._container )
             this._container.scrollTop = 0;
 
-          // this.props.getVolumes( { index: index } )
+          this.props.openDirectory( this.props.volume._id, { index: index } )
         }}
       >
         <Container innerRef={elm => this._container = elm}>
