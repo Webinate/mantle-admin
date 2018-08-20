@@ -15,7 +15,7 @@ import FolderOpen from '@material-ui/icons/FolderOpen';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 
 export type Props = {
-  volumes: IVolume<'client'>[];
+  selectedVolume: IVolume<'client'> | null;
   onDelete: () => void;
   onOpen: ( volumeId: string ) => void;
   onRename: () => void;
@@ -30,8 +30,7 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
   }
 
   render() {
-    const volumes = this.props.volumes;
-    const volume = volumes.length > 0 ? volumes[ volumes.length - 1 ] : null;
+    const volume = this.props.selectedVolume;
 
     return (
       <Container>

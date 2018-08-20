@@ -5,9 +5,9 @@ import { Page, IVolume, IFileEntry } from '../../../../../src';
 // State
 export type State = {
   readonly volumePage: Page<IVolume<'client'>> | null;
-  readonly volumeFilters: Partial<volumes.GetAllOptions> | null;
+  readonly volumeFilters: Partial<volumes.GetAllOptions>;
   readonly filesPage: Page<IFileEntry<'client'>> | null;
-  readonly filesFilters: Partial<volumes.GetAllOptions> | null;
+  readonly filesFilters: Partial<volumes.GetAllOptions>;
   readonly selected: IVolume<'client'> | null;
   readonly busy: boolean;
   readonly volumeFormError: Error | null;
@@ -15,9 +15,9 @@ export type State = {
 
 export const initialState: State = {
   volumePage: null,
-  volumeFilters: null,
+  volumeFilters: { index: 0, sort: 'created', sortOrder: 'desc' },
   filesPage: null,
-  filesFilters: null,
+  filesFilters: { index: 0, search: '' },
   selected: null,
   busy: false,
   volumeFormError: null

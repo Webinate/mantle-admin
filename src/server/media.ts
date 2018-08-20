@@ -16,10 +16,10 @@ export default async function( req: IAuthReq, actions: Action[] ) {
 
     let files = await controllers.files.getFiles( { volumeId: volume._id.toString() } );
     actions.push( MediaActions.SelectedVolume.create( volume ) );
-    actions.push( MediaActions.SetFiles.create( { page: files, filters: { index: 0, search: '' } } ) );
+    actions.push( MediaActions.SetFiles.create( { page: files, filters: { index: 0, search: '', sort: 'created', sortOrder: 'desc' } } ) );
   }
   else {
     let volumes = await controllers.volumes.getMany( { user: isAdmin ? undefined : req._user!.username as string } );
-    actions.push( MediaActions.SetVolumes.create( { page: volumes, filters: { index: 0, search: '' } } ) );
+    actions.push( MediaActions.SetVolumes.create( { page: volumes, filters: { index: 0, search: '', sort: 'created', sortOrder: 'desc' } } ) );
   }
 }

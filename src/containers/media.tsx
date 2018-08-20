@@ -10,6 +10,8 @@ import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
 import { GetAllOptions } from '../../../../src/lib-frontend/volumes';
+import { SortTypes } from '../components/media/directory-view';
+import { SortOrder } from '../components/media/volumes';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -58,6 +60,13 @@ export class Media extends React.Component<Props, State> {
       this.props.deleteVolumes( this.state.selectedUids );
   }
 
+  private onSort( sort: SortTypes, direction: SortOrder, volumeId: string | null ) {
+    if ( volumeId )
+      this.props.openDirectory( volumeId, { sort: sort, sortOrder: direction } );
+    else
+      this.props.getVolumes( { sort: sort, sortOrder: direction } );
+  }
+
   render() {
     const isInNewMode = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/media/new' } );
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
@@ -95,9 +104,11 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media/volume/:id" render={props => {
               return <MediaNavigator
                 key="nav-directory"
+                filesFilters={this.props.media.filesFilters}
                 selectedIds={this.state.selectedUids}
                 files={this.props.media.filesPage}
                 onDelete={() => this.onDelete( props.match.params.id )}
+                onSort={( sort, dir ) => this.onSort( sort, dir, props.match.params.id )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 activeVolume={this.props.media.selected}
                 activeVolumeId={props.match.params.id}
@@ -109,8 +120,10 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
                 key="nav-volumes"
+                volumeFilters={this.props.media.volumeFilters}
                 selectedIds={this.state.selectedUids}
                 onDelete={() => this.onDelete()}
+                onSort={( sort, dir ) => this.onSort( sort, dir, null )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
                 onSelectionChanged={volumes => this.setState( { selectedUids: volumes } )}

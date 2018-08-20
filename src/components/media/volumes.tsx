@@ -21,15 +21,15 @@ export type SortOrder = 'asc' | 'desc';
 export type Props = {
   volumes: Page<IVolume<'client'>>;
   loading: boolean;
+  selectedUids: string[];
+  activeFilters: Partial<GetAllOptions>;
   onSelectionChanged: ( uids: string[] ) => void;
   getVolumes: ( options: Partial<GetAllOptions> ) => void;
-  selectedUids: string[];
+  onSort: ( sortBy: SortTypes, sortDir: SortOrder ) => void;
   openVolume: ( volumeId: string ) => void;
 }
 
 export type State = {
-  order: SortOrder;
-  orderBy: SortTypes;
 }
 
 export class Volumes extends React.Component<Props, State> {
@@ -38,8 +38,6 @@ export class Volumes extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      order: 'desc',
-      orderBy: 'name'
     };
   }
 
@@ -50,13 +48,10 @@ export class Volumes extends React.Component<Props, State> {
 
   private changeOrder( sort: SortTypes ) {
     let order: SortOrder = 'desc';
-    if ( this.state.orderBy === sort && this.state.order === 'desc' )
+    if ( this.props.activeFilters.sort === sort && this.props.activeFilters.sortOrder === 'desc' )
       order = 'asc';
 
-    this.setState( {
-      orderBy: sort,
-      order: order
-    } );
+    this.props.onSort( sort, order );
   }
 
   private onSelectionChange( volumes: string[] ) {
@@ -72,6 +67,7 @@ export class Volumes extends React.Component<Props, State> {
       { label: 'Memory', property: 'memory' },
       { label: 'Created', property: 'created' }
     ];
+    const filters = this.props.activeFilters;
 
     return (
       <Pager
@@ -93,7 +89,7 @@ export class Volumes extends React.Component<Props, State> {
                 <TableCell
                   numeric={false}
                   padding="checkbox"
-                  sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
+                  sortDirection={filters.sort === 'name' ? filters.sortOrder : false}
                 >
                   <Checkbox
                     id="mt-select-all"
@@ -114,11 +110,11 @@ export class Volumes extends React.Component<Props, State> {
                     return (
                       <TableCell
                         key={`header-${ index }`}
-                        sortDirection={this.state.orderBy === h.property ? this.state.order : false}
+                        sortDirection={filters.sort === h.property ? filters.sortOrder : false}
                       >
                         <TableSortLabel
-                          active={this.state.orderBy === h.property}
-                          direction={this.state.order}
+                          active={filters.sort === h.property}
+                          direction={filters.sortOrder}
                           onClick={( e ) => this.changeOrder( h.property )}
                         >
                           {h.label}
@@ -171,15 +167,15 @@ export class Volumes extends React.Component<Props, State> {
                         padding="checkbox"
                         className="mt-vol-type"
                       >
-                      { volume.type === 'google' ? (
-                        <Tooltip title="Google volume">
-                          <img src="/images/server.svg" />
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Local volume">
-                          <img src="/images/harddrive.svg" />
-                        </Tooltip>
-                      ) }
+                        {volume.type === 'google' ? (
+                          <Tooltip title="Google volume">
+                            <img src="/images/server.svg" />
+                          </Tooltip>
+                        ) : (
+                            <Tooltip title="Local volume">
+                              <img src="/images/harddrive.svg" />
+                            </Tooltip>
+                          )}
                       </TableCell>
                       <TableCell
                         scope="row"

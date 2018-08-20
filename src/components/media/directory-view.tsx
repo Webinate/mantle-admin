@@ -22,13 +22,13 @@ export type Props = {
   files: Page<IFileEntry<'client'>> | null;
   loading: boolean;
   selectedUids: string[];
+  activeFilters: Partial<GetOptions>;
   openDirectory: ( id: string, optons: GetOptions ) => void;
   onSelectionChanged: ( uids: string[] ) => void;
+  onSort: ( sortBy: SortTypes, sortDir: SortOrder ) => void;
 }
 
 export type State = {
-  order: SortOrder;
-  orderBy: SortTypes;
 }
 
 export class DirectoryView extends React.Component<Props, State> {
@@ -37,20 +37,15 @@ export class DirectoryView extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      order: 'desc',
-      orderBy: 'name'
     };
   }
 
   private changeOrder( sort: SortTypes ) {
     let order: SortOrder = 'desc';
-    if ( this.state.orderBy === sort && this.state.order === 'desc' )
+    if ( this.props.activeFilters.sort === sort && this.props.activeFilters.sortOrder === 'desc' )
       order = 'asc';
 
-    this.setState( {
-      orderBy: sort,
-      order: order
-    } );
+    this.props.onSort( sort, order );
   }
 
   private onSelectionChange( volumes: string[] ) {
@@ -77,6 +72,7 @@ export class DirectoryView extends React.Component<Props, State> {
       return <div>No files</div>
 
     const allSelected = this.props.selectedUids.length === files.data.length;
+    const filters = this.props.activeFilters;
 
     return (
       <Pager
@@ -98,7 +94,7 @@ export class DirectoryView extends React.Component<Props, State> {
                 <TableCell
                   numeric={false}
                   padding="checkbox"
-                  sortDirection={this.state.orderBy === 'name' ? this.state.order : false}
+                  sortDirection={filters.sort === 'name' ? filters.sortOrder : false}
                 >
                   <Checkbox
                     id="mt-select-all"
@@ -119,11 +115,11 @@ export class DirectoryView extends React.Component<Props, State> {
                     return (
                       <TableCell
                         key={`header-${ index }`}
-                        sortDirection={this.state.orderBy === h.property ? this.state.order : false}
+                        sortDirection={filters.sort === h.property ? filters.sortOrder : false}
                       >
                         <TableSortLabel
-                          active={this.state.orderBy === h.property}
-                          direction={this.state.order}
+                          active={filters.sort === h.property}
+                          direction={filters.sortOrder}
                           onClick={( e ) => this.changeOrder( h.property )}
                         >
                           {h.label}

@@ -24,8 +24,8 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
       const newFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
         { ...state.media.volumeFilters, ...options } : options;
 
-      dispatch( ActionCreators.SetVolumesBusy.create( true ) );
       dispatch( ActionCreators.SelectedVolume.create( null ) );
+      dispatch( ActionCreators.SetVolumesBusy.create( true ) );
       const resp = await volumes.getAll( newFilters );
       dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
     }
@@ -137,14 +137,14 @@ export function openDirectory( id: string, options: Partial<files.GetAllOptions>
 export function createVolume( token: Partial<IVolume<'client'>>, callback: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
-      const newFilters: Partial<volumes.GetAllOptions> = {
-        index: 0
-      };
+      const state = getState();
+      const volumeFilters: Partial<files.GetAllOptions> = state.media.volumeFilters ?
+        { ...state.media.volumeFilters, ...{ index: 0 } } : { index: 0 };
 
       dispatch( ActionCreators.SetVolumesBusy.create( true ) );
       await volumes.create( token );
-      let resp = await volumes.getAll( newFilters );
-      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+      let resp = await volumes.getAll( volumeFilters );
+      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: volumeFilters } ) );
       callback();
     }
     catch ( err ) {
