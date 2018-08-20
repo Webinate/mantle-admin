@@ -9,6 +9,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import UploadIcon from '@material-ui/icons/FileUpload';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { IFileEntry } from '../../../../../src';
+import { formatBytes } from '../../utils/component-utils';
 
 export type Props = {
   selectedFile: IFileEntry<'client'> | null;
@@ -52,8 +53,10 @@ export default class FileSidePanel extends React.Component<Props, State> {
 
     return (
       <Container>
+        {selectedFile ? <h2>{selectedFile.name}</h2> : undefined}
         <input
           ref={e => this._fileInput = e}
+          multiple={true}
           style={{ visibility: 'hidden', height: '0px' }}
           type="file"
           onChange={e => this.onFilesChanged( e )}
@@ -61,6 +64,22 @@ export default class FileSidePanel extends React.Component<Props, State> {
         {selectedFile ? <Preview>
           <img src={this.getPreview( selectedFile )} />
         </Preview> : null}
+        {selectedFile ? <Info>
+          <div>
+            <div>Size</div>
+            <div className="mt-file-size">{formatBytes( selectedFile.size )}</div>
+          </div>
+
+          <div>
+            <div>URL</div>
+            <div className="mt-file-url">{selectedFile.publicURL}</div>
+          </div>
+
+          <div>
+            <div>Type</div>
+            <div className="mt-file-type">{selectedFile.mimeType}</div>
+          </div>
+        </Info> : null}
         <List
           component="nav"
         >
@@ -106,8 +125,42 @@ const Container = styled.div`
   box-sizing: border-box;
   overflow: auto;
 
+  > h2 {
+    margin: 20px 24px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
   > div:first-child {
     padding: 10px 24px 0 24px;
+  }
+`;
+
+const Info = styled.div`
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  > div > div:first-child {
+    width: 60px;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  > div {
+    display: table-row;
+  }
+
+  > div > div {
+    display: table-cell;
+    padding: 5px;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `;
 
@@ -118,7 +171,7 @@ const Preview = styled.div`
   overflow: hidden;
   width: 100%;
   height: 250px;
-  padding: 6px;
+  padding: 0 24px;
 
   img {
     max-width: 100%;

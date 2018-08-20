@@ -38,19 +38,21 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
 
 export function upload( volumeId: string, filesArr: File[] ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
+    const state = getState();
+    const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
+      { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
+
     try {
       dispatch( ActionCreators.SetVolumesBusy.create( true ) );
       const promises = filesArr.map( file => files.create( volumeId, file ) );
       await Promise.all( promises );
 
-      const state = getState();
-      const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
-        { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
-
       const filePage = await files.getAll( volumeId, filesFilter );
       dispatch( ActionCreators.SetFiles.create( { page: filePage, filters: filesFilter } ) );
     }
     catch ( err ) {
+      const filePage = await files.getAll( volumeId, filesFilter );
+      dispatch( ActionCreators.SetFiles.create( { page: filePage, filters: filesFilter } ) );
       dispatch( ActionCreators.SetVolumesBusy.create( false ) );
       dispatch( AppActions.serverResponse.create( err.message ) );
     }
