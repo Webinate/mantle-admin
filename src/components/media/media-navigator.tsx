@@ -24,7 +24,7 @@ export type Props = {
   activeVolumeId?: string;
   filesFilters?: Partial<FileGetOptions>;
   volumeFilters?: Partial<GetAllOptions>;
-  onRename: ( name: string ) => void;
+  onRename: ( name: string, id: string ) => void;
   onUploadFiles: ( files: File[] ) => void;
   onDelete: () => void;
   getVolumes?: ( options: Partial<GetAllOptions> ) => void;
@@ -86,7 +86,7 @@ export class MediaNavigator extends React.Component<Props, State> {
         <Button
           variant="contained"
           onClick={() => {
-            this.props.onRename( this.state.newName );
+            this.props.onRename( this.state.newName, this.props.selectedIds[ this.props.selectedIds.length - 1 ] );
             this.setState( { showRenameForm: false } );
           }}
           color="primary"
@@ -224,7 +224,7 @@ export class MediaNavigator extends React.Component<Props, State> {
               selectedIds={this.props.selectedIds}
               onUploadFiles={this.props.onUploadFiles}
               onDelete={() => this.onDelete()}
-              onRename={() => this.setState( { showRenameForm: true } )}
+              onRename={() => this.setState( { newName: '', showRenameForm: true } )}
             />
           }
           else {
@@ -232,7 +232,7 @@ export class MediaNavigator extends React.Component<Props, State> {
               selectedVolume={selectedVolume}
               onOpen={this.props.openVolume!}
               onDelete={() => this.onDelete()}
-              onRename={() => this.setState( { showRenameForm: true } )}
+              onRename={() => this.setState( { newName: '', showRenameForm: true } )}
             />;
           }
         }}

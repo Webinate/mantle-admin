@@ -136,6 +136,38 @@ export function openDirectory( id: string, options: Partial<files.GetAllOptions>
   }
 }
 
+export function editVolume( id: string, token: Partial<IVolume<'client'>> ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+    try {
+      await volumes.update( id, token );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
+
+    const state = getState();
+    const responses = await volumes.getAll( state.media.volumeFilters );
+    dispatch( ActionCreators.SetVolumes.create( { page: responses, filters: state.media.volumeFilters } ) );
+  }
+}
+
+export function editFile( volumeId: string, id: string, token: Partial<IFileEntry<'client'>> ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+    try {
+      await files.update( id, token );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
+
+    const state = getState();
+    const responses = await files.getAll( volumeId, state.media.filesFilters );
+    dispatch( ActionCreators.SetFiles.create( { page: responses, filters: state.media.filesFilters } ) );
+  }
+}
+
 export function createVolume( token: Partial<IVolume<'client'>>, callback: () => void ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {

@@ -5,7 +5,7 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
-import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirectory, deleteFiles } from '../store/media/actions';
+import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
@@ -31,7 +31,9 @@ const dispatchToProps = {
   openDirectory,
   deleteVolumes,
   upload,
-  deleteFiles
+  deleteFiles,
+  editFile,
+  editVolume
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -107,7 +109,7 @@ export class Media extends React.Component<Props, State> {
                 filesFilters={this.props.media.filesFilters}
                 selectedIds={this.state.selectedUids}
                 files={this.props.media.filesPage}
-                onRename={newName => { }}
+                onRename={( newName, id ) => this.props.editFile( props.match.params.id, id, { name: newName } )}
                 onDelete={() => this.onDelete( props.match.params.id )}
                 onSort={( sort, dir ) => this.onSort( sort, dir, props.match.params.id )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
@@ -124,7 +126,7 @@ export class Media extends React.Component<Props, State> {
                 volumeFilters={this.props.media.volumeFilters}
                 selectedIds={this.state.selectedUids}
                 onDelete={() => this.onDelete()}
-                onRename={newName => { }}
+                onRename={( newName, id ) => this.props.editVolume( id, { name: newName } )}
                 onSort={( sort, dir ) => this.onSort( sort, dir, null )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
