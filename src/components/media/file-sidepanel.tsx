@@ -72,7 +72,12 @@ export default class FileSidePanel extends React.Component<Props, State> {
 
           <div>
             <div>URL</div>
-            <div className="mt-file-url">{selectedFile.publicURL}</div>
+            <div className="mt-file-url">
+              <input
+                value={selectedFile.publicURL}
+                onClick={e => e.currentTarget.setSelectionRange( 0, e.currentTarget.value.length )}
+              />
+            </div>
           </div>
 
           <div>
@@ -141,8 +146,16 @@ const Info = styled.div`
   display: table;
   width: 100%;
   table-layout: fixed;
-  padding: 0 20px;
+  padding: 0px 24px;
   box-sizing: border-box;
+  margin: 10px 0 0 0;
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+  }
 
   > div > div:first-child {
     width: 60px;

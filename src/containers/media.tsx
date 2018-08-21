@@ -107,6 +107,7 @@ export class Media extends React.Component<Props, State> {
                 filesFilters={this.props.media.filesFilters}
                 selectedIds={this.state.selectedUids}
                 files={this.props.media.filesPage}
+                onRename={newName => { }}
                 onDelete={() => this.onDelete( props.match.params.id )}
                 onSort={( sort, dir ) => this.onSort( sort, dir, props.match.params.id )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
@@ -123,6 +124,7 @@ export class Media extends React.Component<Props, State> {
                 volumeFilters={this.props.media.volumeFilters}
                 selectedIds={this.state.selectedUids}
                 onDelete={() => this.onDelete()}
+                onRename={newName => { }}
                 onSort={( sort, dir ) => this.onSort( sort, dir, null )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
