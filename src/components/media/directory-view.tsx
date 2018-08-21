@@ -59,6 +59,29 @@ export class DirectoryView extends React.Component<Props, State> {
       return '/images/harddrive.svg';
   }
 
+  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IFileEntry<'client'> ) {
+    const selected = this.props.selectedUids;
+
+    if ( !e.ctrlKey && !e.shiftKey ) {
+      this.onSelectionChange( [ volume._id ] );
+    }
+    else if ( e.ctrlKey ) {
+      if ( selected.indexOf( volume._id ) === -1 )
+        this.onSelectionChange( selected.concat( volume._id ) );
+      else
+        this.onSelectionChange( selected.filter( i => i !== volume._id ) );
+    }
+    else {
+      const filesPage = this.props.files!;
+      const allIds = filesPage.data.map( v => v._id );
+
+      let firstIndex = Math.min( allIds.indexOf( volume._id ), selected.length > 0 ? allIds.indexOf( selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( allIds.indexOf( volume._id ), selected.length > 0 ? allIds.indexOf( selected[ 0 ] ) : 0 );
+
+      this.onSelectionChange( allIds.slice( firstIndex, lastIndex + 1 ) );
+    }
+  }
+
   render() {
     const selected = this.props.selectedUids;
     const files = this.props.files;
@@ -141,14 +164,7 @@ export class DirectoryView extends React.Component<Props, State> {
                       role="checkbox"
                       key={`vol-row-${ index }`}
                       onClick={e => {
-                        if ( !e.ctrlKey )
-                          this.onSelectionChange( [ file._id ] );
-                        else {
-                          if ( selected.indexOf( file._id ) !== -1 )
-                            this.onSelectionChange( selected.filter( v => v !== file._id ) );
-                          else
-                            this.onSelectionChange( selected.concat( file._id ) );
-                        }
+                        this.onSelection( e, file )
                       }}
                     >
                       <TableCell
@@ -176,8 +192,6 @@ export class DirectoryView extends React.Component<Props, State> {
                         </div>
                       </TableCell>
                       <TableCell
-                        scope="row"
-                        component="th"
                         className="mt-vol-name"
                       >
                         {file.name}
@@ -205,7 +219,10 @@ export class DirectoryView extends React.Component<Props, State> {
 }
 
 const Container = styled.div`
-  background: ${theme.light100.background };
+  table {
+    background: ${theme.light100.background };
+    user-select: none;
+  }
 
   .mt-vol-type > div {
     width: 110px;

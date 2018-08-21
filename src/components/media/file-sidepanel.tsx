@@ -132,9 +132,10 @@ const Container = styled.div`
 
   > h2 {
     margin: 20px 24px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: initial;
     overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 
   > div:first-child {

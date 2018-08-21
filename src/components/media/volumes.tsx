@@ -58,6 +58,29 @@ export class Volumes extends React.Component<Props, State> {
     this.props.onSelectionChanged( volumes );
   }
 
+  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IVolume<'client'> ) {
+    const selected = this.props.selectedUids;
+
+    if ( !e.ctrlKey && !e.shiftKey ) {
+      this.onSelectionChange( [ volume._id ] );
+    }
+    else if ( e.ctrlKey ) {
+      if ( selected.indexOf( volume._id ) === -1 )
+        this.onSelectionChange( selected.concat( volume._id ) );
+      else
+        this.onSelectionChange( selected.filter( i => i !== volume._id ) );
+    }
+    else {
+      const volumePage = this.props.volumes!;
+      const allIds = volumePage.data.map( v => v._id );
+
+      let firstIndex = Math.min( allIds.indexOf( volume._id ), selected.length > 0 ? allIds.indexOf( selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( allIds.indexOf( volume._id ), selected.length > 0 ? allIds.indexOf( selected[ 0 ] ) : 0 );
+
+      this.onSelectionChange( allIds.slice( firstIndex, lastIndex + 1 ) );
+    }
+  }
+
   render() {
     const selected = this.props.selectedUids;
     const volumes = this.props.volumes;
@@ -137,14 +160,7 @@ export class Volumes extends React.Component<Props, State> {
                       key={`vol-row-${ index }`}
                       onDoubleClick={e => this.props.openVolume( volume._id )}
                       onClick={e => {
-                        if ( !e.ctrlKey )
-                          this.onSelectionChange( [ volume._id ] );
-                        else {
-                          if ( selected.indexOf( volume._id ) !== -1 )
-                            this.onSelectionChange( selected.filter( v => v !== volume._id ) );
-                          else
-                            this.onSelectionChange( selected.concat( volume._id ) );
-                        }
+                        this.onSelection( e, volume )
                       }}
                     >
                       <TableCell
@@ -207,7 +223,10 @@ export class Volumes extends React.Component<Props, State> {
 }
 
 const Container = styled.div`
-  background: ${theme.light100.background };
+  table {
+    background: ${theme.light100.background };
+    user-select: none;
+  }
 
   img {
     width: 70px;
