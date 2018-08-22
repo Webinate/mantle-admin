@@ -42,7 +42,7 @@ export default function reducer( state: State = initialState, action: Action ): 
       partialState = {
         busy: false,
         authenticated: false,
-        error: action.payload
+        error: decodeURIComponent( action.payload )
       };
       break;
 

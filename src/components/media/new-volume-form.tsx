@@ -13,6 +13,7 @@ import VolumeType from './new-volume-stages/volume-type';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
+  animated: boolean;
   onComplete: ( volume: Partial<IVolume<'client'>> ) => void;
   isAdmin: boolean;
   error: Error | null;
@@ -106,13 +107,14 @@ export class NewVolumeForm extends React.Component<Props, State> {
 
     return (
       <div style={{ margin: '30px' }}>
-        <Paper style={{ overflow: 'auto' }}>
+        <Paper style={{ overflow: 'auto' }} id="mt-new-volume-form">
           <Stepper activeStep={activeStep} orientation="vertical">
             {steps.map( ( label, index ) => {
               return (
                 <Step key={label} completed={index < activeStep}>
                   <StepLabel className="mt-vol-step-label">{label}</StepLabel>
-                  <StepContent>{activeElm}</StepContent>
+                  <StepContent
+                    transitionDuration={this.props.animated ? undefined : 0}>{activeElm}</StepContent>
                 </Step>
               );
             } )}

@@ -49,3 +49,4 @@ require( './tests/posts/create' );
 require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );
 require( './tests/posts/delete-posts' );
+require( './tests/media/create-volumes' );

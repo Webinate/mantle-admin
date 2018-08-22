@@ -1,5 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
+import * as files from '../../../../../src/lib-frontend/files';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
 
 // State
@@ -7,7 +8,7 @@ export type State = {
   readonly volumePage: Page<IVolume<'client'>> | null;
   readonly volumeFilters: Partial<volumes.GetAllOptions>;
   readonly filesPage: Page<IFileEntry<'client'>> | null;
-  readonly filesFilters: Partial<volumes.GetAllOptions>;
+  readonly filesFilters: Partial<files.GetAllOptions>;
   readonly selected: IVolume<'client'> | null;
   readonly busy: boolean;
   readonly volumeFormError: Error | null;

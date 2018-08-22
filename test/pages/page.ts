@@ -39,7 +39,7 @@ export default class Page {
   async click( selector: string ) {
     const handle = await this.page.$( selector );
     await this.sleep( 50 );
-    await handle.executionContext().evaluate( elm => elm.scrollIntoView(), handle );
+    await handle!.executionContext().evaluate( elm => elm.scrollIntoView(), handle );
     return this.page.click( selector );
   }
 
@@ -85,12 +85,15 @@ export default class Page {
       return this.page.$eval( selector, ( elm: HTMLInputElement ) => elm.value );
     }
     else {
+      await this.page.click( selector )
       await this.page.$eval( selector, ( elm: HTMLInputElement ) => {
         elm.value = '';
         elm.focus();
       } );
 
       await this.page.type( selector, val, { delay: 8 } );
+      await this.page.keyboard.press( 'Digit0' )
+      await this.page.keyboard.press( 'Backspace' )
     }
   }
 

@@ -53,7 +53,7 @@ export class Utils {
    * @param email The user email
    * @param password The user password
    */
-  async createAgent( user: string | undefined, email: string, password: string, register: boolean = false ) {
+  async createAgent( user: string, email: string, password: string, register: boolean = false ) {
 
     if ( user === undefined )
       return new Agent( this.getHost(), null, user, password, email );

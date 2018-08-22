@@ -130,9 +130,9 @@ export default class CategoryModule extends Module {
     const hierarchy: any = await this.page.$eval( `.mt-category-root > .mt-category-item-container:nth-child(${ index + 1 })`, list => {
 
       function getCheckboxLabel( container: Element, parent: any ) {
-        parent[ container.children[ 0 ].textContent ] = {};
+        parent[ container.children[ 0 ].textContent! ] = {};
         if ( container.children[ 1 ].children.length > 0 )
-          getCheckboxLabel( container.children[ 1 ].children[ 0 ], parent[ container.children[ 0 ].textContent ] );
+          getCheckboxLabel( container.children[ 1 ].children[ 0 ], parent[ container.children[ 0 ].textContent! ] );
 
         return parent;
       }

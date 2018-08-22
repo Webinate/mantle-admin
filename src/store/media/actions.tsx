@@ -172,7 +172,7 @@ export function createVolume( token: Partial<IVolume<'client'>>, callback: () =>
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       const state = getState();
-      const volumeFilters: Partial<files.GetAllOptions> = state.media.volumeFilters ?
+      const volumeFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
         { ...state.media.volumeFilters, ...{ index: 0 } } : { index: 0 };
 
       dispatch( ActionCreators.SetVolumesBusy.create( true ) );
