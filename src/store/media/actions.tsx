@@ -4,6 +4,7 @@ import * as volumes from '../../../../../src/lib-frontend/volumes';
 import * as files from '../../../../../src/lib-frontend/files';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
+import { isAdminUser } from '../../utils/component-utils';
 
 // Action Creators
 export const ActionCreators = {
@@ -176,7 +177,15 @@ export function createVolume( token: Partial<IVolume<'client'>>, callback: () =>
         { ...state.media.volumeFilters, ...{ index: 0 } } : { index: 0 };
 
       dispatch( ActionCreators.SetVolumesBusy.create( true ) );
-      await volumes.create( token );
+
+
+      const toSend = { ...token };
+      if ( !isAdminUser( state.authentication.user ) ) {
+        delete toSend.memoryAllocated;
+        delete toSend.memoryUsed;
+      }
+
+      await volumes.create( toSend );
       let resp = await volumes.getAll( volumeFilters );
       dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: volumeFilters } ) );
       callback();

@@ -51,5 +51,32 @@ describe( 'Testing the creation of volumes: ', function() {
     assert.deepEqual( await page.volumeMemoryError(), '48.83 KB' );
   } )
 
-  // Check for max size
+  it( 'does not allow for greater than 1 gig', async () => {
+    await page.load( admin );
+    await page.clickNewVolume();
+    await page.clickNext();
+    await page.volumeMemory( '5000000000' );
+    assert.equal( await page.volumeMemoryError(), '4.66 GB - Allocated memory cannot be greater than 1 GB' );
+  } )
+
+  it( 'does create a local volume', async () => {
+    await page.load( joe );
+    await page.clickNewVolume();
+    await page.clickNext();
+    await page.volumeName( 'TEST' );
+    await page.clickNext();
+    await page.clickNext();
+    await page.doneLoading();
+
+    const path = await page.page.evaluate( () => window.location.pathname );
+    assert.deepEqual( path, '/dashboard/media' );
+
+    await page.doneLoading();
+    const volumes = await page.getVolumes();
+
+    assert.equal( volumes.length, 1 );
+    assert.equal( volumes[ 0 ].name, 'TEST' );
+    assert.equal( volumes[ 0 ].type, 'local' );
+    assert.equal( volumes[ 0 ].memory, '0 Bytes / 476.84 MB' );
+  } )
 } );

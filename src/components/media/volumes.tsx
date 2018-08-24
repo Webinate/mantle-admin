@@ -106,7 +106,7 @@ export class Volumes extends React.Component<Props, State> {
         }}
       >
         <Container innerRef={elm => this._container = elm}>
-          <Table>
+          <Table className="mt-volume-table">
             <TableHeader>
               <TableRow>
                 <TableCell
@@ -138,6 +138,7 @@ export class Volumes extends React.Component<Props, State> {
                         <TableSortLabel
                           active={filters.sort === h.property}
                           direction={filters.sortOrder}
+                          className={`mt-volume-header-${ h.property }`}
                           onClick={( e ) => this.changeOrder( h.property )}
                         >
                           {h.label}
@@ -154,6 +155,7 @@ export class Volumes extends React.Component<Props, State> {
                 volumes.data.map( ( volume, index ) => {
                   return (
                     <TableRow
+                      className="mt-volume-row"
                       hover
                       style={{ cursor: 'pointer' }}
                       role="checkbox"
@@ -181,7 +183,7 @@ export class Volumes extends React.Component<Props, State> {
                       </TableCell>
                       <TableCell
                         padding="checkbox"
-                        className="mt-vol-type"
+                        className={`mt-vol-type mt-volume-type-${ volume.type }`}
                       >
                         {volume.type === 'google' ? (
                           <Tooltip title="Google volume">
@@ -196,17 +198,17 @@ export class Volumes extends React.Component<Props, State> {
                       <TableCell
                         scope="row"
                         component="th"
-                        className="mt-vol-name"
+                        className="mt-volume-name"
                       >
                         {volume.name}
                       </TableCell>
                       <TableCell
-                        className="mt-vol-memoryaloc"
+                        className="mt-volume-memoryaloc"
                       >
                         {formatBytes( volume.memoryUsed! )} / {formatBytes( volume.memoryAllocated! )}
                       </TableCell>
                       <TableCell
-                        className="mt-vol-created"
+                        className="mt-volume-created"
                       >
                         {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
                       </TableCell>

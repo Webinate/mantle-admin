@@ -1,3 +1,5 @@
+import { IUserEntry } from '../../../../src';
+
 /**
  * Picks a random user avatar based on the given index
  */
@@ -29,4 +31,11 @@ export function formatBytes( bytes: number, decimals = 2 ) {
     i = Math.floor( Math.log( bytes ) / Math.log( k ) );
 
   return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ' ' + sizes[ i ];
+}
+
+/**
+ * Gets if the current user is an admin
+ */
+export function isAdminUser( user: IUserEntry<'client'> | null ) {
+  return user && user.privileges < 2 ? true : false;
 }

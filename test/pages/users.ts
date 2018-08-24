@@ -126,7 +126,7 @@ export default class UsersPage extends Page {
           email: child.querySelector( '.mt-user-email' ).textContent
         }
       } )
-    } );
+    } ) as Promise<{ username: string; email: string; }[]>;
   }
 
   clickFilterBtn() { return this.page.click( this.$filterSearch ); }

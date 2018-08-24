@@ -76,6 +76,29 @@ export default class PostsPage extends Page {
     return this.click( '#mt-vol-back' );
   }
 
+  getVolumes() {
+    return this.page.$$eval( `.mt-volume-row`, elm => {
+      return Array.from( elm ).map( row => {
+        return {
+          type: row.querySelector( '.mt-volume-type-local' ) ? 'local' : 'google',
+          name: row.querySelector( '.mt-volume-name' ).textContent,
+          memory: row.querySelector( '.mt-volume-memoryaloc' ).textContent,
+          date: row.querySelector( '.mt-volume-created' ).textContent
+        }
+      } )
+    } ) as Promise<{
+      type: 'google' | 'local';
+      name: string;
+      memory: string;
+      date: string;
+    }[]>;
+  }
+
+  async clickVolumeFilter( type: 'name' | 'created' | 'memory' ) {
+    await this.page.click( `.mt-volume-header-${ type }` );
+    await this.doneLoading();
+  }
+
   /**
    * Waits for the page to not be in a busy state
    */

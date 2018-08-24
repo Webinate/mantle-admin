@@ -12,6 +12,7 @@ import { NewVolumeForm } from '../components/media/new-volume-form';
 import { GetAllOptions } from '../../../../src/lib-frontend/volumes';
 import { SortTypes } from '../components/media/directory-view';
 import { SortOrder } from '../components/media/volumes';
+import { isAdminUser } from '../utils/component-utils';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -71,7 +72,7 @@ export class Media extends React.Component<Props, State> {
 
   render() {
     const isInNewMode = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/media/new' } );
-    const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
+    const isAdmin = isAdminUser( this.props.user );
     const isInDirectory = matchPath<any>( this.props.location.pathname, { path: '/dashboard/media/volume/:id' } );
     let mode: 'new-volume' | 'volumes' | 'directory' = 'volumes';
     if ( isInNewMode )
