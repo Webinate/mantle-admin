@@ -51,4 +51,4 @@ require( './tests/posts/categories' );
 require( './tests/posts/delete-posts' );
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );
-require( './tests/media/volume-table-stats' );
+require( './tests/media/volume-table-fetching' );
