@@ -6,6 +6,7 @@ import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
 import { IVolume } from 'modepress';
 import { VolumesController } from '../../../../../src/controllers/volumes';
 import ControllerFactory from '../../../../../src/core/controller-factory';
+import { uploadFileToVolume } from '../../utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
@@ -20,9 +21,12 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
     volumes = ControllerFactory.get( 'volumes' );
     const users = ControllerFactory.get( 'users' );
     const userEntry = await users.getUser( joe.username );
+    const files = ControllerFactory.get( 'files' );
     volA = await volumes.create( { name: 'A', user: userEntry.dbEntry._id.toString() } );
     volB = await volumes.create( { name: 'B', user: userEntry.dbEntry._id.toString() } );
     volC = await volumes.create( { name: 'C', user: userEntry.dbEntry._id.toString() } );
+
+    await uploadFileToVolume( 'img-a.png', volB );
   } )
 
   after( async () => {
@@ -85,6 +89,20 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
     assert.equal( volumes[ 2 ].name, 'A' );
   } )
 
-  // Make sure its sorted by created by default and check the order
-  // So
+  it( 'does sort by memory used', async () => {
+    await page.load( joe );
+    await page.doneLoading();
+    await page.clickVolumeFilter( 'memory' );
+
+    // First Desc
+    let volumes = await page.getVolumes();
+    assert.equal( volumes[ 0 ].name, 'B' );
+    assert.equal( volumes[ 1 ].name, 'C' );
+    assert.equal( volumes[ 2 ].name, 'A' );
+
+    // Now asc
+    await page.clickVolumeFilter( 'memory' );
+    volumes = await page.getVolumes();
+    assert.equal( volumes[ 2 ].name, 'B' );
+  } )
 } );
