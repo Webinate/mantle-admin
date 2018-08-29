@@ -127,13 +127,26 @@ export function openDirectory( id: string, options: Partial<files.GetAllOptions>
     const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
       { ...state.media.filesFilters, ...options } : options;
 
-    const responses = await Promise.all( [
-      volumes.getOne( id ),
-      files.getAll( id, filesFilter )
-    ] );
+    try {
+      const responses = await Promise.all( [
+        volumes.getOne( id ),
+        files.getAll( id, filesFilter )
+      ] );
 
-    dispatch( ActionCreators.SelectedVolume.create( responses[ 0 ] ) );
-    dispatch( ActionCreators.SetFiles.create( { page: responses[ 1 ], filters: filesFilter } ) );
+      dispatch( ActionCreators.SelectedVolume.create( responses[ 0 ] ) );
+      dispatch( ActionCreators.SetFiles.create( { page: responses[ 1 ], filters: filesFilter } ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( err.message ) );
+      dispatch( ActionCreators.SetFiles.create( {
+        page: {
+          count: 0,
+          data: [],
+          index: 0,
+          limit: 10
+        }, filters: filesFilter
+      } ) );
+    }
   }
 }
 

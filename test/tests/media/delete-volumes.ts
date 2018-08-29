@@ -38,7 +38,7 @@ describe( 'Testing the deletion of volumes: ', function() {
     await page.doneLoading();
     await page.selectVolume( 'A' );
     await page.clickDeleteVolume();
-    await page.confirmDelete();
+    await page.confirmModal();
 
     const volumes = await page.getVolumes();
     assert.deepEqual( volumes.find( v => v.name === 'A' ), undefined )
@@ -49,7 +49,7 @@ describe( 'Testing the deletion of volumes: ', function() {
     await page.doneLoading();
     await page.selectVolume( randomName );
     await page.clickDeleteVolume();
-    await page.confirmDelete();
+    await page.confirmModal();
 
     let volumes = await page.getVolumes();
     assert.deepEqual( volumes.find( v => v.name === randomName ), undefined )
@@ -66,7 +66,7 @@ describe( 'Testing the deletion of volumes: ', function() {
     await page.doneLoading();
     await page.selectAll();
     await page.clickDeleteVolume();
-    await page.confirmDelete();
+    await page.confirmModal();
 
     const volumes = await page.getVolumes();
     assert.equal( volumes.length, 0 );

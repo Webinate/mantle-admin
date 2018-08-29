@@ -58,6 +58,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
           ref={e => this._fileInput = e}
           multiple={true}
           style={{ visibility: 'hidden', height: '0px' }}
+          id="mt-file-upload-input"
           type="file"
           onChange={e => this.onFilesChanged( e )}
         />
@@ -88,7 +89,11 @@ export default class FileSidePanel extends React.Component<Props, State> {
         <List
           component="nav"
         >
-          <ListItem button onClick={e => this.onUpload()}>
+          <ListItem
+            button
+            onClick={e => this.onUpload()}
+            id="mt-upload-file"
+          >
             <ListItemIcon>
               <UploadIcon />
             </ListItemIcon>
@@ -98,7 +103,12 @@ export default class FileSidePanel extends React.Component<Props, State> {
             />
           </ListItem>
 
-          <ListItem button disabled={!filesSelected} onClick={e => this.props.onDelete()}>
+          <ListItem
+            button
+            disabled={!filesSelected}
+            onClick={e => this.props.onDelete()}
+            id="mt-delete-file"
+          >
             <ListItemIcon>
               <DeleteIcon />
             </ListItemIcon>
@@ -108,7 +118,12 @@ export default class FileSidePanel extends React.Component<Props, State> {
             />
           </ListItem>
 
-          <ListItem button disabled={!filesSelected} onClick={e => this.props.onRename()}>
+          <ListItem
+            button
+            disabled={!filesSelected}
+            onClick={e => this.props.onRename()}
+            id="mt-rename-file"
+          >
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>

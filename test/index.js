@@ -53,3 +53,5 @@ require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );
 require( './tests/media/volume-table-fetching' );
 require( './tests/media/delete-volumes' );
+require( './tests/media/rename-volumes' );
+require( './tests/media/open-and-upload-file' );

@@ -80,11 +80,17 @@ export class MediaNavigator extends React.Component<Props, State> {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => this.setState( { showRenameForm: false } )} color="primary">
+        <Button
+          id="mt-media-cancel-btn"
+          onClick={() => this.setState( { showRenameForm: false } )}
+          color="primary"
+        >
           Cancel
         </Button>
         <Button
           variant="contained"
+          id="mt-media-confirm-btn"
+          disabled={this.state.newName.trim() === ''}
           onClick={() => {
             this.props.onRename( this.state.newName, this.props.selectedIds[ this.props.selectedIds.length - 1 ] );
             this.setState( { showRenameForm: false } );

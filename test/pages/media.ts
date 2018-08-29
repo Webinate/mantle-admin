@@ -1,6 +1,7 @@
 import Page from 'modepress/clients/modepress-admin/test/pages/page';
 import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
 import * as assert from 'assert';
+import { resolve } from 'path';
 import AppModule from 'modepress/clients/modepress-admin/test/pages/modules/app';
 
 export type PostProfile = {
@@ -94,6 +95,24 @@ export default class PostsPage extends Page {
     }[]>;
   }
 
+  getFiles() {
+    return this.page.$$eval( `.mt-file-row`, elm => {
+      return Array.from( elm ).map( row => {
+        return {
+          image: ( row.querySelector( '.mt-file-preview img' ) as HTMLImageElement ).src,
+          name: row.querySelector( '.mt-file-name' ).textContent,
+          memory: row.querySelector( '.mt-file-memory' ).textContent,
+          date: row.querySelector( '.mt-file-created' ).textContent
+        }
+      } )
+    } ) as Promise<{
+      image: string;
+      name: string;
+      memory: string;
+      date: string;
+    }[]>;
+  }
+
   async clickVolumeFilter( type: 'name' | 'created' | 'memory' ) {
     await this.page.click( `.mt-volume-header-${ type }` );
     await this.doneLoading();
@@ -112,19 +131,40 @@ export default class PostsPage extends Page {
     await handles[ index ].click();
   }
 
+  async openVolume() {
+    await this.page.click( '#mt-open-volume' );
+    await this.doneLoading();
+  }
+
   async clickDeleteVolume() {
     await this.page.click( '#mt-delete-volume' );
     await this.page.waitFor( '#mt-media-confirm-btn' );
   }
 
-  async cancelDelete() {
+  async clickRenameVolume() {
+    await this.page.click( '#mt-rename-volume' );
+    await this.page.waitFor( '#mt-rename-media' );
+  }
+
+  async newName( val: string ) {
+    await this.page.type( '#mt-rename-media', val, { delay: 100 } );
+  }
+
+  async cancelModal() {
     await this.page.click( '#mt-media-cancel-btn' );
     await this.emptySelector( '#mt-media-cancel-btn' );
   }
 
-  async confirmDelete() {
+  async confirmModal() {
     await this.page.click( '#mt-media-confirm-btn' );
     await this.emptySelector( '#mt-media-confirm-btn' );
+    await this.doneLoading();
+  }
+
+  async uploadFile( file: string ) {
+    const handle = await this.page.$( '#mt-file-upload-input' );
+    const filePath = resolve( __dirname + '/../tests/media-files/' + file );
+    await handle.uploadFile( filePath );
     await this.doneLoading();
   }
 

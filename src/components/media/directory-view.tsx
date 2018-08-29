@@ -163,6 +163,7 @@ export class DirectoryView extends React.Component<Props, State> {
                       style={{ cursor: 'pointer' }}
                       role="checkbox"
                       key={`vol-row-${ index }`}
+                      className={`mt-file-row mt-file-row-${ index }`}
                       onClick={e => {
                         this.onSelection( e, file )
                       }}
@@ -179,30 +180,30 @@ export class DirectoryView extends React.Component<Props, State> {
                             else
                               this.onSelectionChange( selected.concat( file._id ) );
                           }}
-                          className="mt-vol-checkbox"
+                          className="mt-file-checkbox"
                           checked={selected.indexOf( file._id ) !== -1}
                         />
                       </TableCell>
                       <TableCell
                         padding="checkbox"
-                        className="mt-vol-type"
+                        className="mt-file-preview"
                       >
                         <div>
                           <img src={this.getPreview( file )} />
                         </div>
                       </TableCell>
                       <TableCell
-                        className="mt-vol-name"
+                        className="mt-file-name"
                       >
                         {file.name}
                       </TableCell>
                       <TableCell
-                        className="mt-vol-memoryaloc"
+                        className="mt-file-memory"
                       >
                         {formatBytes( file.size! )}
                       </TableCell>
                       <TableCell
-                        className="mt-vol-created"
+                        className="mt-file-created"
                       >
                         {format( new Date( file.created! ), 'MMM Do, YYYY' )}
                       </TableCell>
