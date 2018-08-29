@@ -33,7 +33,7 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
     const volume = this.props.selectedVolume;
 
     return (
-      <Container>
+      <Container id="mt-volume-info">
         {volume ? <div>
           <Tooltip title={( volume.user as IUserEntry<'client'> ).username}>
             <Avatar
@@ -46,14 +46,14 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
         <List
           component="nav"
         >
-          {volume ? <ListItem button onClick={e => this.props.onOpen( volume._id )}>
+          {volume ? <ListItem button id="mt-open-volume" onClick={e => this.props.onOpen( volume._id )}>
             <ListItemIcon>
               <FolderOpen />
             </ListItemIcon>
             <ListItemText inset primary={`Open ${ volume.name }`} />
           </ListItem> : undefined}
 
-          <ListItem button disabled={!volume} onClick={e => this.props.onRename()}>
+          <ListItem button id="mt-rename-volume" disabled={!volume} onClick={e => this.props.onRename()}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
@@ -63,7 +63,7 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
             />
           </ListItem>
 
-          <ListItem button onClick={e => this.props.onDelete()}>
+          <ListItem button id="mt-delete-volume" onClick={e => this.props.onDelete()}>
             <ListItemIcon>
               <DeleteIcon />
             </ListItemIcon>

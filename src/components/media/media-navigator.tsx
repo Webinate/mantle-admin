@@ -111,12 +111,12 @@ export class MediaNavigator extends React.Component<Props, State> {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={e => this.setState( { deleteMessage: null } )}>
+          <Button id="mt-media-cancel-btn" onClick={e => this.setState( { deleteMessage: null } )}>
             Cancel
           </Button>
           <Button
             variant="contained"
-            className="mt-confirm"
+            id="mt-media-confirm-btn"
             style={{ background: theme.error.background, color: theme.error.color }}
             onClick={e => {
               this.props.onDelete();

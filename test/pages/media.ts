@@ -99,6 +99,35 @@ export default class PostsPage extends Page {
     await this.doneLoading();
   }
 
+  async selectVolume( name: string ) {
+    const index: number = await this.page.$$eval( `.mt-volume-name`, ( elements, name ) => {
+      const elmArr = Array.from( elements );
+      return elmArr.findIndex( e => e.textContent === name )
+    }, name );
+
+    if ( index === -1 )
+      throw new Error( `${ name } was not found` );
+
+    const handles = await this.page.$$( `.mt-volume-name` );
+    await handles[ index ].click();
+  }
+
+  async clickDeleteVolume() {
+    await this.page.click( '#mt-delete-volume' );
+    await this.page.waitFor( '#mt-media-confirm-btn' );
+  }
+
+  async cancelDelete() {
+    await this.page.click( '#mt-media-cancel-btn' );
+    await this.emptySelector( '#mt-media-cancel-btn' );
+  }
+
+  async confirmDelete() {
+    await this.page.click( '#mt-media-confirm-btn' );
+    await this.emptySelector( '#mt-media-confirm-btn' );
+    await this.doneLoading();
+  }
+
   /**
    * Waits for the page to not be in a busy state
    */
