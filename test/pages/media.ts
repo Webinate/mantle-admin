@@ -128,6 +128,10 @@ export default class PostsPage extends Page {
     await this.doneLoading();
   }
 
+  selectAll() {
+    return this.page.click( '#mt-select-all' );
+  }
+
   /**
    * Waits for the page to not be in a busy state
    */
