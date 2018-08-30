@@ -55,3 +55,6 @@ require( './tests/media/volume-table-fetching' );
 require( './tests/media/delete-volumes' );
 require( './tests/media/rename-volumes' );
 require( './tests/media/open-and-upload-file' );
+require( './tests/media/filter-and-sort-files' );
+require( './tests/media/delete-files' );
+require( './tests/media/rename-files' );

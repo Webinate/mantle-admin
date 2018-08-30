@@ -18,7 +18,7 @@ export const initialState: State = {
   volumePage: null,
   volumeFilters: { index: 0, sort: 'created', sortOrder: 'desc' },
   filesPage: null,
-  filesFilters: { index: 0, search: '' },
+  filesFilters: { index: 0, sort: 'created', sortOrder: 'desc', search: '' },
   selected: null,
   busy: false,
   volumeFormError: null

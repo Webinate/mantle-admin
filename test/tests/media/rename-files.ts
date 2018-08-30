@@ -6,13 +6,15 @@ import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
 import { IVolume } from 'modepress';
 import ControllerFactory from 'modepress/src/core/controller-factory';
 import { randomId } from 'modepress/clients/modepress-admin/test/utils/misc';
+import { uploadFileToVolume } from 'modepress/clients/modepress-admin/test/utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
 let volume: IVolume<'client'>;
 const randomName = randomId();
+const randomFileName = randomId();
 
-describe( 'Testing the uploading of a file: ', function() {
+describe( 'Testing the renaming of files: ', function() {
 
   before( async () => {
     admin = await utils.refreshAdminToken();
@@ -22,36 +24,36 @@ describe( 'Testing the uploading of a file: ', function() {
     const userEntry = await users.getUser( joe.username );
 
     volume = await volumes.create( { name: randomName, user: userEntry.dbEntry._id.toString() } );
+    await uploadFileToVolume( 'img-a.png', volume, 'File A' );
   } )
 
-  it( 'does open a volume & the url is correct', async () => {
-    await page.load( joe );
-    await page.doneLoading();
-    await page.selectVolume( randomName );
-    await page.openVolume();
-
-    const path = await page.page.evaluate( () => window.location.pathname );
-    assert.deepEqual( path, `/dashboard/media/volume/${ volume._id }` );
-  } )
-
-  it( 'does open a volume & the url is correct', async () => {
+  it( 'can select and rename a single file', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.uploadFile( 'img-a.png' );
+    await page.selectFile( 'File A' );
+    await page.clickRenameFile();
+    await page.newName( randomFileName );
+    await page.confirmModal();
 
     const files = await page.getFiles();
-    assert.deepEqual( files.length, 1 );
-    assert.deepEqual( files[ 0 ].name, 'img-a.png' );
-    assert.deepEqual( files[ 0 ].memory, '3.67 KB' );
+    assert.deepEqual( files[ 0 ].name, randomFileName );
   } )
 
-  it( 'does show file information when we click on a file', async () => {
+  it( 'allows an admin to rename a different users file', async () => {
+    await page.load( admin, `/dashboard/media/volume/${ volume._id }` );
+    await page.doneLoading();
+    await page.selectFile( randomFileName );
+    await page.clickRenameFile();
+    await page.newName( 'File A' );
+    await page.confirmModal();
+
+    let files = await page.getFiles();
+    assert.deepEqual( files[ 0 ].name, 'File A' );
+
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectFile( 'img-a.png' );
-    const details = await page.getFileDetails();
-    assert.deepEqual( details.name, 'img-a.png' );
-    assert.deepEqual( details.fileSize, '3.67 KB' );
-    assert.deepEqual( details.fileType, 'image/png' );
+
+    files = await page.getFiles();
+    assert.deepEqual( files[ 0 ].name, 'File A' );
   } )
 } );

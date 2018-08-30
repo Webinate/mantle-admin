@@ -118,6 +118,11 @@ export default class PostsPage extends Page {
     await this.doneLoading();
   }
 
+  async clickFileFilter( type: 'name' | 'created' | 'memory' ) {
+    await this.page.click( `.mt-file-header-${ type }` );
+    await this.doneLoading();
+  }
+
   async selectVolume( name: string ) {
     const index: number = await this.page.$$eval( `.mt-volume-name`, ( elements, name ) => {
       const elmArr = Array.from( elements );
@@ -129,6 +134,35 @@ export default class PostsPage extends Page {
 
     const handles = await this.page.$$( `.mt-volume-name` );
     await handles[ index ].click();
+  }
+
+  async selectFile( name: string ) {
+    const index: number = await this.page.$$eval( `.mt-file-name`, ( elements, name ) => {
+      const elmArr = Array.from( elements );
+      return elmArr.findIndex( e => e.textContent === name )
+    }, name );
+
+    if ( index === -1 )
+      throw new Error( `${ name } was not found` );
+
+    const handles = await this.page.$$( `.mt-file-name` );
+    await handles[ index ].click();
+  }
+
+  async getFileDetails() {
+    return this.page.$eval( `#mt-file-details`, elm => {
+      return {
+        imageUrl: ( elm.querySelector( '#mt-file-url input' ) as HTMLInputElement ).value,
+        fileType: elm.querySelector( '#mt-file-type' ).textContent,
+        fileSize: elm.querySelector( '#mt-file-size' ).textContent,
+        name: elm.querySelector( 'h2' ).textContent
+      }
+    } ) as Promise<{
+      imageUrl: string;
+      fileType: string;
+      fileSize: string;
+      name: string;
+    }>
   }
 
   async openVolume() {
@@ -143,6 +177,11 @@ export default class PostsPage extends Page {
 
   async clickRenameVolume() {
     await this.page.click( '#mt-rename-volume' );
+    await this.page.waitFor( '#mt-rename-media' );
+  }
+
+  async clickRenameFile() {
+    await this.page.click( '#mt-rename-file' );
     await this.page.waitFor( '#mt-rename-media' );
   }
 
@@ -166,6 +205,11 @@ export default class PostsPage extends Page {
     const filePath = resolve( __dirname + '/../tests/media-files/' + file );
     await handle.uploadFile( filePath );
     await this.doneLoading();
+  }
+
+  async clickDeleteFiles() {
+    await this.page.click( '#mt-delete-file' );
+    await this.page.waitFor( '#mt-media-cancel-btn' );
   }
 
   selectAll() {

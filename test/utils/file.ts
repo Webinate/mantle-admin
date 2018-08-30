@@ -21,9 +21,9 @@ export class File {
   }
 }
 
-export async function uploadFileToVolume( file: string, volume: IVolume<'client'> ) {
+export async function uploadFileToVolume( file: string, volume: IVolume<'client'>, name: string = 'test-file' ) {
   const files = ControllerFactory.get( 'files' );
   const filePath = resolve( __dirname + '/../tests/media-files/' + file );
-  const f = new File( 'test-file', filePath, statSync( filePath ).size, 'image/png' );
+  const f = new File( name, filePath, statSync( filePath ).size, 'image/png' );
   return await files.uploadFileToRemote( f, { ...volume, user: ( volume.user as IUserEntry<'client'> )._id }, false );
 }

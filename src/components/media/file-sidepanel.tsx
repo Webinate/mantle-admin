@@ -52,7 +52,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
     const selectedFile = this.props.selectedFile;
 
     return (
-      <Container>
+      <Container id="mt-file-details">
         {selectedFile ? <h2>{selectedFile.name}</h2> : undefined}
         <input
           ref={e => this._fileInput = e}
@@ -68,14 +68,15 @@ export default class FileSidePanel extends React.Component<Props, State> {
         {selectedFile ? <Info>
           <div>
             <div>Size</div>
-            <div className="mt-file-size">{formatBytes( selectedFile.size )}</div>
+            <div id="mt-file-size">{formatBytes( selectedFile.size )}</div>
           </div>
 
           <div>
             <div>URL</div>
-            <div className="mt-file-url">
+            <div id="mt-file-url">
               <input
                 value={selectedFile.publicURL}
+                onChange={e => { }}
                 onClick={e => e.currentTarget.setSelectionRange( 0, e.currentTarget.value.length )}
               />
             </div>
@@ -83,7 +84,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
 
           <div>
             <div>Type</div>
-            <div className="mt-file-type">{selectedFile.mimeType}</div>
+            <div id="mt-file-type">{selectedFile.mimeType}</div>
           </div>
         </Info> : null}
         <List

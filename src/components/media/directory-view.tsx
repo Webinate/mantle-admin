@@ -138,6 +138,7 @@ export class DirectoryView extends React.Component<Props, State> {
                     return (
                       <TableCell
                         key={`header-${ index }`}
+                        className={`mt-file-header-${ h.label }`}
                         sortDirection={filters.sort === h.property ? filters.sortOrder : false}
                       >
                         <TableSortLabel
@@ -225,7 +226,7 @@ const Container = styled.div`
     user-select: none;
   }
 
-  .mt-vol-type > div {
+  .mt-file-preview > div {
     width: 110px;
     height: 110px;
     display: flex;
@@ -234,7 +235,7 @@ const Container = styled.div`
     overflow: hidden;
   }
 
-  .mt-vol-type img {
+  .mt-file-preview img {
     max-width: 100%;
     max-height: 100%;
   }
