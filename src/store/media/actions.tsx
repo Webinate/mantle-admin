@@ -72,11 +72,8 @@ export function deleteFiles( volumeId: string, ids: string[] ) {
       await Promise.all( promises );
 
       const state = getState();
-      const newFilters: Partial<files.GetAllOptions> = state.media.filesFilters ?
-        { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
-
-      const resp = await files.getAll( volumeId, newFilters );
-      dispatch( ActionCreators.SetFiles.create( { page: resp, filters: newFilters } ) );
+      const resp = await files.getAll( volumeId, state.media.filesFilters );
+      dispatch( ActionCreators.SetFiles.create( { page: resp, filters: state.media.filesFilters } ) );
     }
     catch ( err ) {
       dispatch( ActionCreators.SetVolumesBusy.create( false ) );
@@ -97,12 +94,8 @@ export function deleteVolumes( ids: string[] ) {
       await Promise.all( promises );
 
       const state = getState();
-      const newFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
-        { ...state.media.volumeFilters, ...{ index: 0 } } : { index: 0 };
-
-      const resp = await volumes.getAll( newFilters );
-
-      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
+      const resp = await volumes.getAll( state.media.volumeFilters );
+      dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: state.media.volumeFilters } ) );
     }
     catch ( err ) {
       dispatch( ActionCreators.SetVolumesBusy.create( false ) );
