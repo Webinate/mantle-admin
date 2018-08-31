@@ -57,10 +57,17 @@ export class Media extends React.Component<Props, State> {
   }
 
   private onDelete( volumeId?: string ) {
-    if ( volumeId )
-      this.props.deleteFiles( volumeId, this.state.selectedUids );
-    else
-      this.props.deleteVolumes( this.state.selectedUids );
+    const selectedUids = this.state.selectedUids;
+    if ( volumeId ) {
+      this.setState( { selectedUids: [] }, () => {
+        this.props.deleteFiles( volumeId, selectedUids );
+      } )
+    }
+    else {
+      this.setState( { selectedUids: [] }, () => {
+        this.props.deleteVolumes( this.state.selectedUids );
+      } );
+    }
   }
 
   private onSort( sort: SortTypes, direction: SortOrder, volumeId: string | null ) {

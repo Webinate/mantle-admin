@@ -126,7 +126,9 @@ export class MediaNavigator extends React.Component<Props, State> {
             style={{ background: theme.error.background, color: theme.error.color }}
             onClick={e => {
               this.props.onDelete();
-              this.setState( { deleteMessage: null } );
+              this.setState( {
+                deleteMessage: null
+              } );
             }}
             color="primary"
           >
