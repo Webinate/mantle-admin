@@ -16,7 +16,7 @@ export type Props = {
   selectedIds: string[];
   onDelete: () => void;
   onRename: () => void;
-  onUploadFiles: ( files: File[] ) => void;
+  onUploadFiles?: ( files: File[] ) => void;
 }
 
 export type State = {
@@ -34,7 +34,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
   }
 
   private onFilesChanged( e: React.ChangeEvent<HTMLInputElement> ) {
-    if ( e.currentTarget.files )
+    if ( e.currentTarget.files && this.props.onUploadFiles )
       this.props.onUploadFiles( Array.from( e.currentTarget.files ) );
 
     e.currentTarget.value = '';
@@ -57,7 +57,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
         <input
           ref={e => this._fileInput = e}
           multiple={true}
-          style={{ visibility: 'hidden', height: '0px' }}
+          style={{ visibility: 'hidden', height: '0px', width: '4px' }}
           id="mt-file-upload-input"
           type="file"
           onChange={e => this.onFilesChanged( e )}
@@ -196,8 +196,8 @@ const Info = styled.div`
 
 const Preview = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: left;
+  justify-content: left;
   overflow: hidden;
   width: 100%;
   height: 250px;

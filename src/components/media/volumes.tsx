@@ -228,6 +228,12 @@ const Container = styled.div`
   table {
     background: ${theme.light100.background };
     user-select: none;
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  td {
+    overflow: hidden;
   }
 
   img {
@@ -235,6 +241,7 @@ const Container = styled.div`
   }
 
   td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {
-    width: 50px;
+    width: 70px;
+    padding: 0;
   }
 `;

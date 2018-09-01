@@ -11,6 +11,7 @@ import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
 import Drawer from './drawer';
+import { MediaModal } from '../containers/media-modal';
 
 type Props = {
   activeUser: IUserEntry<'client'>;
@@ -26,6 +27,7 @@ type State = {
   detailsOpen: boolean;
   accountsOpen: boolean;
   removeOpen: boolean;
+  showMediaPopup: boolean;
 }
 
 export default class UserProperties extends React.Component<Props, State> {
@@ -35,7 +37,8 @@ export default class UserProperties extends React.Component<Props, State> {
     this.state = {
       detailsOpen: true,
       accountsOpen: false,
-      removeOpen: false
+      removeOpen: false,
+      showMediaPopup: false
     };
   }
 
@@ -64,6 +67,7 @@ export default class UserProperties extends React.Component<Props, State> {
           <Button
             variant="fab"
             color="primary"
+            onClick={e => this.setState( { showMediaPopup: true } )}
             style={{ background: theme.primary200.background, bottom: '10px', right: '10px', position: 'absolute' }}
           ><Icon className="icon icon-camera" />
           </Button>
@@ -191,6 +195,13 @@ export default class UserProperties extends React.Component<Props, State> {
           </Drawer> : undefined}
         </DetailsContainer>
 
+        {this.state.showMediaPopup ?
+          <MediaModal
+            {...{} as any}
+            open={true}
+            onCancel={() => { this.setState( { showMediaPopup: false } ) }}
+
+          /> : undefined}
       </Properties>
     );
   }

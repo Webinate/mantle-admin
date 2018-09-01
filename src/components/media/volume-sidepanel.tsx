@@ -42,7 +42,7 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
             />
           </Tooltip>
         </div> : null}
-        <Divider style={{ margin: '10px auto 0 auto' }} />
+        <Divider style={{ margin: '5px auto 0 auto' }} />
         <List
           component="nav"
         >

@@ -65,7 +65,7 @@ export class Media extends React.Component<Props, State> {
     }
     else {
       this.setState( { selectedUids: [] }, () => {
-        this.props.deleteVolumes( this.state.selectedUids );
+        this.props.deleteVolumes( selectedUids );
       } );
     }
   }
@@ -137,7 +137,6 @@ export class Media extends React.Component<Props, State> {
                 onDelete={() => this.onDelete()}
                 onRename={( newName, id ) => this.props.editVolume( id, { name: newName } )}
                 onSort={( sort, dir ) => this.onSort( sort, dir, null )}
-                onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
                 openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
                 onSelectionChanged={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}

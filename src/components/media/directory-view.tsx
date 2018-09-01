@@ -224,11 +224,19 @@ const Container = styled.div`
   table {
     background: ${theme.light100.background };
     user-select: none;
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .mt-file-preview > div {
-    width: 110px;
-    height: 110px;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;

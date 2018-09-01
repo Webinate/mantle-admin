@@ -28,6 +28,7 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
       dispatch( ActionCreators.SelectedVolume.create( null ) );
       dispatch( ActionCreators.SetVolumesBusy.create( true ) );
       const resp = await volumes.getAll( newFilters );
+      dispatch( ActionCreators.SelectedVolume.create( null ) );
       dispatch( ActionCreators.SetVolumes.create( { page: resp, filters: newFilters } ) );
     }
     catch ( err ) {

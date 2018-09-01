@@ -24,8 +24,9 @@ export type Props = {
   activeVolumeId?: string;
   filesFilters?: Partial<FileGetOptions>;
   volumeFilters?: Partial<GetAllOptions>;
+  style?: React.CSSProperties;
   onRename: ( name: string, id: string ) => void;
-  onUploadFiles: ( files: File[] ) => void;
+  onUploadFiles?: ( files: File[] ) => void;
   onDelete: () => void;
   getVolumes?: ( options: Partial<GetAllOptions> ) => void;
   openVolume?: ( volumeId: string ) => void;
@@ -220,7 +221,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     else if ( this.props.activeVolumeId )
       collapsed = 'none';
 
-    return <div style={{ position: 'relative' }}>
+    return <div style={{ position: 'relative', ...this.props.style }}>
       <SplitPanel
         collapsed={collapsed}
         ratio={0.7}
