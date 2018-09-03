@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField/TextField';
 import Button from '@material-ui/core/Button/Button';
 
 export type Props = {
+  multiselect?: boolean;
   activeVolume?: IVolume<'client'> | null;
   volumes?: Page<IVolume<'client'>> | null;
   files?: Page<IFileEntry<'client'>> | null;
@@ -42,6 +43,10 @@ export type State = {
 }
 
 export class MediaNavigator extends React.Component<Props, State> {
+
+  static defaultProps: Partial<Props> = {
+    multiselect: true
+  }
 
   constructor( props: Props ) {
     super( props );
@@ -187,6 +192,7 @@ export class MediaNavigator extends React.Component<Props, State> {
         volumePage.data.find( v => v._id === selectedUids[ selectedUids.length - 1 ] ) || null : null;
 
       activeView = <Volumes
+        multiselect={this.props.multiselect}
         openVolume={this.props.openVolume!}
         activeFilters={this.props.volumeFilters!}
         onSelectionChanged={this.props.onSelectionChanged}
@@ -203,6 +209,7 @@ export class MediaNavigator extends React.Component<Props, State> {
       }
 
       activeView = <DirectoryView
+        multiselect={this.props.multiselect}
         volume={activeVolume}
         files={filesPage!}
         activeFilters={this.props.filesFilters!}

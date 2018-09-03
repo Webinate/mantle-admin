@@ -85,6 +85,7 @@ export class MediaModal extends React.Component<Props, State> {
 
     if ( activeDir ) {
       navigator = <MediaNavigator
+        multiselect={false}
         filesFilters={this.props.media.filesFilters}
         selectedIds={selectedUids}
         files={this.props.media.filesPage}
@@ -102,13 +103,14 @@ export class MediaModal extends React.Component<Props, State> {
     }
     else {
       navigator = <MediaNavigator
+        multiselect={false}
         volumeFilters={this.props.media.volumeFilters}
         selectedIds={selectedUids}
         style={style}
         onDelete={() => this.onDelete()}
         onRename={( newName, id ) => this.props.editVolume( id, { name: newName } )}
         onSort={( sort, dir ) => this.onSort( sort, dir, null )}
-        openVolume={volume => this.props.openDirectory( volume )}
+        openVolume={volume => this.setState( { selectedUid: null }, () => this.props.openDirectory( volume ) )}
         onSelectionChanged={volumes => this.setState( { selectedUid: volumes[ volumes.length - 1 ] } )}
         loading={this.props.media.busy}
         volumes={this.props.media.volumePage}
@@ -139,11 +141,12 @@ export class MediaModal extends React.Component<Props, State> {
           </Button>
           <Button
             variant="contained"
+            disabled={!activeDir || !this.state.selectedUid}
             id="mt-media-confirm-btn"
             onClick={e => this.props.onCancel()}
             color="primary"
           >
-            Delete
+            Select
           </Button>
         </DialogActions>
       </Dialog>

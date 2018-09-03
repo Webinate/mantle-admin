@@ -18,6 +18,7 @@ export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
+  multiselect?: boolean;
   volume: IVolume<'client'>;
   files: Page<IFileEntry<'client'>> | null;
   loading: boolean;
@@ -32,6 +33,10 @@ export type State = {
 }
 
 export class DirectoryView extends React.Component<Props, State> {
+  static defaultProps: Partial<Props> = {
+    multiselect: true
+  }
+
   private _container: HTMLElement;
 
   constructor( props: Props ) {
@@ -61,6 +66,11 @@ export class DirectoryView extends React.Component<Props, State> {
 
   private onSelection( e: React.MouseEvent<HTMLElement>, volume: IFileEntry<'client'> ) {
     const selected = this.props.selectedUids;
+
+    if ( !this.props.multiselect ) {
+      this.onSelectionChange( [ volume._id ] );
+      return;
+    }
 
     if ( !e.ctrlKey && !e.shiftKey ) {
       this.onSelectionChange( [ volume._id ] );
@@ -121,6 +131,7 @@ export class DirectoryView extends React.Component<Props, State> {
                 >
                   <Checkbox
                     id="mt-select-all"
+                    style={{ display: this.props.multiselect ? '' : 'none' }}
                     checked={allSelected}
                     onClick={e => {
                       if ( allSelected )

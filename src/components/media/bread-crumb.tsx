@@ -30,8 +30,7 @@ export class BreadCrumb extends React.Component<Props, State> {
           onClick={e => this.props.onVolumeSelected()}
         >
           {this.props.volume.type === 'local' ? <FolderIcon /> : <CloudIcon />}
-          <KeyboardArrowRight />
-          {this.props.volume.name}
+          <KeyboardArrowRight />/{this.props.volume.name}
         </h2>
       </Container>
     );
@@ -42,6 +41,18 @@ const Container = styled.div`
   h2 {
     cursor: pointer;
     user-select: none;
+    border-bottom: 1px solid transparent;
+    display: inline-block;
+    padding: 0 0 5px 0;
+    margin: 0;
+
+    &:hover {
+      border-bottom: 1px solid ${theme.primary100.background };
+
+      svg {
+        color: ${theme.primary100.background };
+      }
+    }
   }
 
   svg {

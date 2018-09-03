@@ -195,12 +195,8 @@ const Info = styled.div`
 `;
 
 const Preview = styled.div`
-  display: flex;
-  align-items: left;
-  justify-content: left;
   overflow: hidden;
   width: 100%;
-  height: 250px;
   padding: 0 24px;
 
   img {

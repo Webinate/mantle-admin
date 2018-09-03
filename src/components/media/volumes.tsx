@@ -19,6 +19,7 @@ export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
+  multiselect?: boolean;
   volumes: Page<IVolume<'client'>>;
   loading: boolean;
   selectedUids: string[];
@@ -33,6 +34,10 @@ export type State = {
 }
 
 export class Volumes extends React.Component<Props, State> {
+  static defaultProps: Partial<Props> = {
+    multiselect: true
+  }
+
   private _container: HTMLElement;
 
   constructor( props: Props ) {
@@ -60,6 +65,11 @@ export class Volumes extends React.Component<Props, State> {
 
   private onSelection( e: React.MouseEvent<HTMLElement>, volume: IVolume<'client'> ) {
     const selected = this.props.selectedUids;
+
+    if ( !this.props.multiselect ) {
+      this.onSelectionChange( [ volume._id ] );
+      return;
+    }
 
     if ( !e.ctrlKey && !e.shiftKey ) {
       this.onSelectionChange( [ volume._id ] );
@@ -117,6 +127,7 @@ export class Volumes extends React.Component<Props, State> {
                   <Checkbox
                     id="mt-select-all"
                     checked={allSelected}
+                    style={{ display: this.props.multiselect ? '' : 'none' }}
                     onClick={e => {
                       if ( allSelected )
                         this.onSelectionChange( [] );
