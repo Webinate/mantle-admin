@@ -196,6 +196,7 @@ export class Users extends React.Component<Props, State> {
             resetPasswordRequest={username => { this.props.requestPasswordReset( username ) }}
             activateAccount={username => { this.props.activate( username ) }}
             resendActivation={username => { this.props.resendActivation( username ) }}
+            updateUserAvatar={file => { }}
             activeUser={this.props.auth.user!}
             onDeleteRequested={( user ) => {
               this.setState( {

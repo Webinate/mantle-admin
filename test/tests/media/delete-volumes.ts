@@ -19,11 +19,11 @@ describe( 'Testing the deletion of volumes: ', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    const userEntry = await users.getUser( joe.username );
-    await volumes.create( { name: 'A', user: userEntry.dbEntry._id.toString() } );
-    await volumes.create( { name: 'B', user: userEntry.dbEntry._id.toString() } );
-    await volumes.create( { name: randomName, user: userEntry.dbEntry._id.toString() } );
-    await volumes.create( { name: 'D', user: userEntry.dbEntry._id.toString() } );
+    const userEntry = await users.getUser( { username: joe.username } );
+    await volumes.create( { name: 'A', user: userEntry._id.toString() } );
+    await volumes.create( { name: 'B', user: userEntry._id.toString() } );
+    await volumes.create( { name: randomName, user: userEntry._id.toString() } );
+    await volumes.create( { name: 'D', user: userEntry._id.toString() } );
   } )
 
   it( 'does show the 4 volumes created for the test', async () => {

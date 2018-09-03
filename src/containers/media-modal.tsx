@@ -12,6 +12,7 @@ import DialogContent from '@material-ui/core/DialogContent/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 import Button from '@material-ui/core/Button/Button';
 import { BreadCrumb } from '../components/media/bread-crumb';
+import { IFileEntry } from '../../../../src';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -19,7 +20,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   app: state.app,
   media: state.media,
   open: ownProps.open,
-  onCancel: ownProps.onCancel as () => void
+  onCancel: ownProps.onCancel as () => void,
+  onSelect: ownProps.onSelect as ( file: IFileEntry<'client'> ) => void
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -143,7 +145,7 @@ export class MediaModal extends React.Component<Props, State> {
             variant="contained"
             disabled={!activeDir || !this.state.selectedUid}
             id="mt-media-confirm-btn"
-            onClick={e => this.props.onCancel()}
+            onClick={e => this.props.onSelect( this.props.media.filesPage!.data.find( f => f._id === this.state.selectedUid )! )}
             color="primary"
           >
             Select

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from '../../../../src';
+import { IUserEntry, IFileEntry } from '../../../../src';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -21,6 +21,7 @@ type Props = {
   activateAccount( username: string ): void;
   onDeleteRequested( username: IUserEntry<'client'> ): void;
   resendActivation( username: string ): void;
+  updateUserAvatar( file: IFileEntry<'client'> ): void;
 };
 
 type State = {
@@ -200,7 +201,7 @@ export default class UserProperties extends React.Component<Props, State> {
             {...{} as any}
             open={true}
             onCancel={() => { this.setState( { showMediaPopup: false } ) }}
-
+            onSelect={file => this.setState( { showMediaPopup: false }, () => this.props.updateUserAvatar( file ) )}
           /> : undefined}
       </Properties>
     );
