@@ -21,10 +21,10 @@ describe( 'Testing the fetching of volumes: ', function() {
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
     volumes = ControllerFactory.get( 'volumes' );
     const users = ControllerFactory.get( 'users' );
-    const userEntry = await users.getUser( joe.username );
+    const userEntry = await users.getUser( { username: joe.username } );
     volume = await volumes.create( {
       name: randomId(),
-      user: userEntry!.dbEntry._id.toString()
+      user: userEntry!._id.toString()
     } );
 
     await uploadFileToVolume( 'img-a.png', volume );

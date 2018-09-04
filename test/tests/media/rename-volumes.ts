@@ -20,8 +20,8 @@ describe( 'Testing the renaming of a volume: ', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    const userEntry = await users.getUser( joe.username );
-    await volumes.create( { name: randomName, user: userEntry.dbEntry._id.toString() } );
+    const userEntry = await users.getUser( { username: joe.username } );
+    await volumes.create( { name: randomName, user: userEntry._id.toString() } );
   } )
 
   it( 'does allow a user to rename a volume', async () => {

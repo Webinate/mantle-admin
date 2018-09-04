@@ -20,11 +20,11 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
     volumes = ControllerFactory.get( 'volumes' );
     const users = ControllerFactory.get( 'users' );
-    const userEntry = await users.getUser( joe.username );
+    const userEntry = await users.getUser( { username: joe.username } );
     const files = ControllerFactory.get( 'files' );
-    volA = await volumes.create( { name: 'A', user: userEntry.dbEntry._id.toString() } );
-    volB = await volumes.create( { name: 'B', user: userEntry.dbEntry._id.toString() } );
-    volC = await volumes.create( { name: 'C', user: userEntry.dbEntry._id.toString() } );
+    volA = await volumes.create( { name: 'A', user: userEntry._id.toString() } );
+    volB = await volumes.create( { name: 'B', user: userEntry._id.toString() } );
+    volC = await volumes.create( { name: 'C', user: userEntry._id.toString() } );
 
     await uploadFileToVolume( 'img-a.png', volB );
   } )

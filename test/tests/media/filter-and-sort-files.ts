@@ -18,9 +18,9 @@ describe( 'Testing the sorting and filtering of files: ', function() {
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
     const users = ControllerFactory.get( 'users' );
     const volumes = ControllerFactory.get( 'volumes' );
-    const userEntry = await users.getUser( joe.username );
+    const userEntry = await users.getUser( { username: joe.username } );
 
-    volume = await volumes.create( { name: 'test', user: userEntry.dbEntry._id.toString() } );
+    volume = await volumes.create( { name: 'test', user: userEntry.toString() } );
 
     await uploadFileToVolume( 'img-a.png', volume, 'File A' );
     await uploadFileToVolume( 'img-b.png', volume, 'File B' );

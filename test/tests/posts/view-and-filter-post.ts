@@ -24,14 +24,14 @@ describe( 'View and filter posts created by backend: ', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
-    const joeUser = await users.getUser( joe.username );
-    const adminUser = await users.getUser( admin.username );
+    const joeUser = await users.getUser( { username: joe.username } );
+    const adminUser = await users.getUser( { username: admin.username } );
 
     postA = await controller.create( {
       title: 'AAAA',
       slug: randomId(),
       public: false,
-      author: joeUser.dbEntry._id.toString(),
+      author: joeUser._id.toString(),
       content: 'This is a post\'s content'
     } );
 
@@ -39,7 +39,7 @@ describe( 'View and filter posts created by backend: ', function() {
       title: 'zzzz',
       slug: randomId(),
       public: true,
-      author: adminUser.dbEntry._id.toString(),
+      author: adminUser._id.toString(),
       content: 'This is a post\'s content'
     } );
 
