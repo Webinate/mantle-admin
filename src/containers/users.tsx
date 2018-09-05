@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IUserEntry } from '../../../../src';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
-import { getUsers, removeUser } from '../store/users/actions';
+import { getUsers, removeUser, update } from '../store/users/actions';
 import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import UsersList from '../components/users-list';
@@ -34,13 +34,14 @@ const dispatchToProps = {
   requestPasswordReset: requestPasswordReset,
   activate: activate,
   removeUser: removeUser,
-  resendActivation: resendActivation
+  resendActivation: resendActivation,
+  update
 }
 
 const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
-  selectedUsers: IUserEntry<'client'>[];
+  selectedUids: string[];
   userFilter: string;
   dialogue: null | string;
   dialogueHeader: string;
@@ -56,7 +57,7 @@ export class Users extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      selectedUsers: [],
+      selectedUids: [],
       userFilter: '',
       dialogueHeader: '',
       dialogue: null,
@@ -69,8 +70,8 @@ export class Users extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps( next: Props ) {
-    if ( next.userState.userPage !== this.props.userState.userPage )
-      this.setState( { selectedUsers: [] } );
+    // if ( next.userState.userPage !== this.props.userState.userPage )
+    //  this.setState( { selectedUsers: [] } );
   }
 
   private onUserSelected( user: IUserEntry<'client'>, e: React.MouseEvent<HTMLDivElement> ) {
@@ -78,22 +79,22 @@ export class Users extends React.Component<Props, State> {
     e.stopPropagation();
 
     if ( !e.ctrlKey && !e.shiftKey ) {
-      this.setState( { selectedUsers: [ user ] } );
+      this.setState( { selectedUids: [ user._id ] } );
     }
     else if ( e.ctrlKey ) {
-      if ( this.state.selectedUsers.indexOf( user ) === -1 )
-        this.setState( { selectedUsers: this.state.selectedUsers.concat( user ) } );
+      if ( this.state.selectedUids.indexOf( user._id ) === -1 )
+        this.setState( { selectedUids: this.state.selectedUids.concat( user._id ) } );
       else
-        this.setState( { selectedUsers: this.state.selectedUsers.filter( i => i !== user ) } );
+        this.setState( { selectedUids: this.state.selectedUids.filter( i => i !== user._id ) } );
     }
     else {
       const userPage = this.props.userState.userPage!;
-      const selected = this.state.selectedUsers;
+      const selected = this.state.selectedUids;
 
-      let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
-      let lastIndex = Math.max( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.indexOf( selected[ 0 ] ) : 0 );
+      let firstIndex = Math.min( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.findIndex( u => u._id === selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( userPage.data.indexOf( user ), selected.length > 0 ? userPage.data.findIndex( u => u._id === selected[ 0 ] ) : 0 );
 
-      this.setState( { selectedUsers: userPage.data.slice( firstIndex, lastIndex + 1 ) } );
+      this.setState( { selectedUids: userPage.data.slice( firstIndex, lastIndex + 1 ).map( u => u._id ) } );
     }
   }
 
@@ -134,8 +135,9 @@ export class Users extends React.Component<Props, State> {
   render() {
     const page = ( typeof ( this.props.userState.userPage! ) === 'string' ? null : this.props.userState.userPage! );
     const isBusy = this.props.userState.busy;
-    const selected = this.state.selectedUsers.length > 0 ?
-      this.state.selectedUsers[ this.state.selectedUsers.length - 1 ] : null;
+    const selectedUids = this.state.selectedUids;
+    const selected = selectedUids.length > 0 ?
+      ( this.props.userState.userPage!.data.find( u => u._id === selectedUids[ selectedUids.length - 1 ] ) || null ) : null;
 
     return (
       <div style={{ height: '100%' }}>
@@ -151,14 +153,21 @@ export class Users extends React.Component<Props, State> {
                 id="mt-users-filter"
                 value={this.state.userFilter}
                 onKeyDown={e => {
-                  if ( e.keyCode === 13 )
-                    this.props.getUsers( 0, this.state.userFilter )
+                  if ( e.keyCode === 13 ) {
+                    this.setState( { selectedUids: [] }, () => {
+                      this.props.getUsers( 0, this.state.userFilter )
+                    } );
+                  }
                 }}
                 onChange={( e ) => this.setState( { userFilter: e.currentTarget.value } )}
               />
               <IconButton
                 id="mt-users-search-button"
-                onClick={e => this.props.getUsers( 0, this.state.userFilter )}
+                onClick={e => {
+                  this.setState( { selectedUids: [] }, () => {
+                    this.props.getUsers( 0, this.state.userFilter )
+                  } );
+                }}
                 style={{ verticalAlign: 'middle' }}
               >
                 <SearchIcon style={{ color: theme.primary200.background }} />
@@ -180,12 +189,12 @@ export class Users extends React.Component<Props, State> {
                 onPage={index => this.props.getUsers( index )}
                 index={page.index}
                 total={page.count}
-                contentProps={{ onMouseDown: e => this.setState( { selectedUsers: [] } ) }
+                contentProps={{ onMouseDown: e => this.setState( { selectedUids: [] } ) }
                 }
               >
                 <UsersList
                   users={page.data}
-                  selected={this.state.selectedUsers}
+                  selected={this.state.selectedUids}
                   onUserSelected={( user, e ) => this.onUserSelected( user, e )}
                 />
               </Pager>
@@ -196,7 +205,7 @@ export class Users extends React.Component<Props, State> {
             resetPasswordRequest={username => { this.props.requestPasswordReset( username ) }}
             activateAccount={username => { this.props.activate( username ) }}
             resendActivation={username => { this.props.resendActivation( username ) }}
-            updateUserAvatar={file => { }}
+            updateUserAvatar={( userId, file ) => this.props.update( userId, { avatarFile: file._id } )}
             activeUser={this.props.auth.user!}
             onDeleteRequested={( user ) => {
               this.setState( {

@@ -237,6 +237,7 @@ export default class PostList extends React.Component<Props, State> {
         >
           {posts.data.map( ( post, postIndex ) => {
             const selected = this.props.selected.indexOf( post ) === -1 ? false : true;
+
             return <Post
               key={'post-' + postIndex}
               selected={selected}
@@ -264,7 +265,7 @@ export default class PostList extends React.Component<Props, State> {
               </div>
               <div className="mt-post-info">
                 <Avatar
-                  src={generateAvatarPic( post.author ? ( post.author as IUserEntry<'client'> ).avatar : '' )}
+                  src={generateAvatarPic( post.author as IUserEntry<'client'> )}
                   style={{ width: 60, height: 60, float: 'right', margin: '5px 0 0 0' }}
                 />
                 <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>

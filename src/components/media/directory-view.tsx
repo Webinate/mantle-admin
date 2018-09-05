@@ -246,12 +246,12 @@ const Container = styled.div`
   }
 
   .mt-file-preview > div {
-    width: 80px;
-    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    height: 100%;
+    width: 100%;
   }
 
   .mt-file-preview img {
@@ -260,6 +260,8 @@ const Container = styled.div`
   }
 
   td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {
-    width: 50px;
+    width: 80px;
+    height: 80px;
+    padding: 0;
   }
 `;

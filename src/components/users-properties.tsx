@@ -21,7 +21,7 @@ type Props = {
   activateAccount( username: string ): void;
   onDeleteRequested( username: IUserEntry<'client'> ): void;
   resendActivation( username: string ): void;
-  updateUserAvatar( file: IFileEntry<'client'> ): void;
+  updateUserAvatar( userId: string, file: IFileEntry<'client'> ): void;
 };
 
 type State = {
@@ -74,7 +74,7 @@ export default class UserProperties extends React.Component<Props, State> {
           </Button>
           <Avatar
             className="mt-avatar-image"
-            src={generateAvatarPic( selected.avatar )}
+            src={generateAvatarPic( selected )}
             style={{ display: 'inline-flex', width: 200, height: 200 }}
           />
         </ImgContainer>
@@ -201,7 +201,7 @@ export default class UserProperties extends React.Component<Props, State> {
             {...{} as any}
             open={true}
             onCancel={() => { this.setState( { showMediaPopup: false } ) }}
-            onSelect={file => this.setState( { showMediaPopup: false }, () => this.props.updateUserAvatar( file ) )}
+            onSelect={file => this.setState( { showMediaPopup: false }, () => this.props.updateUserAvatar( this.props.selected!._id, file ) )}
           /> : undefined}
       </Properties>
     );

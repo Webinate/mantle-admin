@@ -1,13 +1,15 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, IUserEntry } from '../../../../../src';
-import { getAll, remove } from '../../../../../src/lib-frontend/users';
+import { getAll, remove, update as updateUser } from '../../../../../src/lib-frontend/users';
 import { IRootState } from '..';
 import { ActionCreators as AppActionCreators } from '../app/actions';
+import { ActionCreators as AppActions } from '../app/actions';
 
 // Action Creators
 export const ActionCreators = {
   SetUsersBusy: new ActionCreator<'users-busy', boolean>( 'users-busy' ),
   SetUsers: new ActionCreator<'users-set-users', Page<IUserEntry<'client'>> | null>( 'users-set-users' ),
+  UpdateUser: new ActionCreator<'users-update-user', IUserEntry<'client'>>( 'users-update-user' ),
   RemoveUser: new ActionCreator<'users-remove-user', string>( 'users-remove-user' )
 };
 
@@ -22,6 +24,20 @@ export function getUsers( index: number = 0, search?: string ) {
     dispatch( ActionCreators.SetUsersBusy.create( true ) );
     const resp = await getAll( { index: index, search: search } );
     dispatch( ActionCreators.SetUsers.create( resp ) );
+  }
+}
+
+export function update( id: string, token: Partial<IUserEntry<'client'>> ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetUsersBusy.create( true ) );
+      const resp = await updateUser( id, token );
+      dispatch( ActionCreators.UpdateUser.create( resp ) );
+    }
+    catch ( err ) {
+      dispatch( ActionCreators.SetUsersBusy.create( false ) );
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
   }
 }
 

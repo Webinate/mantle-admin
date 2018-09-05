@@ -1,18 +1,21 @@
-import { IUserEntry } from '../../../../src';
+import { IUserEntry, IFileEntry } from '../../../../src';
 
 /**
  * Picks a random user avatar based on the given index
  */
-export function generateAvatarPic( avatar: string | null ) {
+export function generateAvatarPic( avatar: IUserEntry<'client'> | null ) {
   if ( avatar === null )
     return '/images/avatar-blank.svg';
 
-  if ( !avatar )
+  if ( !avatar.avatar )
     return `/images/avatar-1.svg`;
 
-  const userNum = parseInt( avatar );
+  if ( avatar.avatarFile )
+    return ( avatar.avatarFile as IFileEntry<'client'> ).publicURL!;
+
+  const userNum = parseInt( avatar.avatar );
   if ( isNaN( userNum ) )
-    return avatar;
+    return avatar.avatar as string;
   else
     return `/images/avatar-${ ( userNum % 5 ) + 1 }.svg`;
 }

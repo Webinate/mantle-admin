@@ -8,7 +8,7 @@ import { generateAvatarPic } from '../utils/component-utils';
 
 type Props = {
   users: IUserEntry<'client'>[];
-  selected: IUserEntry<'client'>[];
+  selected: string[];
   onUserSelected: ( user: IUserEntry<'client'>, e: React.MouseEvent<HTMLDivElement> ) => void;
 };
 
@@ -24,7 +24,7 @@ export default class UsersList extends React.Component<Props, any> {
     return (
       <div className="mt-user-list">
         {users.map( ( user, index ) => {
-          selected = selectedUsers.indexOf( user ) === -1 ? false : true;
+          selected = selectedUsers.indexOf( user._id ) === -1 ? false : true;
 
           return <User
             key={`user-${ index }`}
@@ -32,7 +32,7 @@ export default class UsersList extends React.Component<Props, any> {
             onMouseDown={e => this.props.onUserSelected( user, e )}
           >
             <Avatar
-              src={generateAvatarPic( user.avatar )}
+              src={generateAvatarPic( user )}
               style={{ height: 80, width: 80, float: 'left' }}
             />
             <Details selected={selected}>

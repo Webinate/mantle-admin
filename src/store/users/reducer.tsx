@@ -30,6 +30,20 @@ export default function reducer( state: State = initialState, action: Action | A
       partialState = { busy: action.payload };
       break;
 
+    case ActionCreators.UpdateUser.type:
+      partialState = {
+        busy: false,
+        userPage: {
+          ...page!,
+          data: page!.data.map( ( item, index ) => {
+            if ( item._id === action.payload._id )
+              return action.payload;
+            return item;
+          } )
+        }
+      };
+      break;
+
     case ActionCreators.RemoveUser.type:
       partialState = {
         userPage: { ...page!, data: page!.data.filter( user => user.username !== action.payload ) },

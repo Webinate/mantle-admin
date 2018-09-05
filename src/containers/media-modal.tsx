@@ -54,6 +54,12 @@ export class MediaModal extends React.Component<Props, State> {
     };
   }
 
+  componentWillMount() {
+    this.props.getVolumes!( {
+      index: 0
+    } );
+  }
+
   private onDelete( volumeId?: string ) {
     const selectedUid = this.state.selectedUid!;
 
@@ -147,7 +153,10 @@ export class MediaModal extends React.Component<Props, State> {
             variant="contained"
             disabled={!activeDir || !this.state.selectedUid}
             id="mt-media-confirm-btn"
-            onClick={e => this.props.onSelect( this.props.media.filesPage!.data.find( f => f._id === this.state.selectedUid )! )}
+            onClick={e => {
+              const file = this.props.media.filesPage!.data.find( f => f._id === this.state.selectedUid )!;
+              this.props.onSelect( file );
+            }}
             color="primary"
           >
             Select

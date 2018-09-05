@@ -37,7 +37,7 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
         {volume ? <div>
           <Tooltip title={( volume.user as IUserEntry<'client'> ).username}>
             <Avatar
-              src={generateAvatarPic( ( volume.user as IUserEntry<'client'> ).avatar )}
+              src={generateAvatarPic( ( volume.user as IUserEntry<'client'> ) )}
               style={{ height: 40, width: 40 }}
             />
           </Tooltip>

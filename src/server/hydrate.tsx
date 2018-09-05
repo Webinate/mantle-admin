@@ -6,6 +6,7 @@ import { IAuthReq, IUserEntry } from '../../../../src';
 import postHandler from './posts';
 import mediaHandler from './media';
 import userHandler from './users';
+import { controllers } from 'modepress';
 
 const yargs = require( 'yargs' );
 const args = yargs.argv;
@@ -18,8 +19,13 @@ const args = yargs.argv;
 export async function hydrate( req: IAuthReq ) {
   const actions: Action[] = [];
 
+  let user: IUserEntry<'client'> | null = null;
+
+  if ( req._user )
+    user = await controllers.users.getUser( { id: req._user._id.toString() } );
+
   // Get the user
-  actions.push( ActionCreators.setUser.create( req._user as any as IUserEntry<'client'> ) );
+  actions.push( ActionCreators.setUser.create( user ) );
 
   // Get users if neccessary
   if ( matchPath( req.url, { path: '/dashboard/users' } ) )

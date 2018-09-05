@@ -55,7 +55,7 @@ export default class Dashboard extends React.Component<Props, State> {
             >
               <Avatar
                 style={{ background: theme.primary300.background }}
-                src={generateAvatarPic( this.props.activeUser.avatar )}
+                src={generateAvatarPic( this.props.activeUser )}
               />
             </div>
 

@@ -103,7 +103,7 @@ export default class UserPicker extends React.Component<Props, State> {
                   <ListItemIcon>
                     <Avatar
                       style={{ background: theme.light400.background }}
-                      src={generateAvatarPic( user.avatar )}
+                      src={generateAvatarPic( user )}
                     />
                   </ListItemIcon>
                   <ListItemText primary={user.username} />
@@ -154,7 +154,7 @@ export default class UserPicker extends React.Component<Props, State> {
           height: this.props.imageSize,
           width: this.props.imageSize
         }}
-        src={generateAvatarPic( this.props.user ? this.props.user.avatar : null )}
+        src={generateAvatarPic( this.props.user )}
       />
 
       {this.props.labelPosition === 'right' ? this.renderLabel() : undefined}
