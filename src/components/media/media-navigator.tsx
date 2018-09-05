@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField/TextField';
 import Button from '@material-ui/core/Button/Button';
 
 export type Props = {
+  animated: boolean;
   multiselect?: boolean;
   activeVolume?: IVolume<'client'> | null;
   volumes?: Page<IVolume<'client'>> | null;
@@ -231,6 +232,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     return <div style={{ position: 'relative', ...this.props.style }}>
       <SplitPanel
         collapsed={collapsed}
+        delay={this.props.animated ? undefined : 0}
         ratio={0.7}
         first={() => activeView}
         second={() => {

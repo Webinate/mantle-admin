@@ -20,7 +20,7 @@ describe( 'Testing the sorting and filtering of files: ', function() {
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await users.getUser( { username: joe.username } );
 
-    volume = await volumes.create( { name: 'test', user: userEntry.toString() } );
+    volume = await volumes.create( { name: 'test', user: userEntry._id.toString() } );
 
     await uploadFileToVolume( 'img-a.png', volume, 'File A' );
     await uploadFileToVolume( 'img-b.png', volume, 'File B' );

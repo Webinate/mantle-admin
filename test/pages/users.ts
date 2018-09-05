@@ -29,7 +29,7 @@ export default class UsersPage extends Page {
     await this.filter( email );
     await this.clickFilterBtn();
     await this.doneLoading();
-    const user = await this.getUserByEmail( email );
+    const user = await this.getUserByIndex( 0 );
     await user.click();
     await this.page.waitFor( '.mt-user-properties' );
   }
@@ -80,6 +80,11 @@ export default class UsersPage extends Page {
     }
 
     return null;
+  }
+
+  async getUserByIndex( index: number ) {
+    const users = await this.page.$$( `.mt-user-list > div` );
+    return users[ index ];
   }
 
   getModalMessage() {

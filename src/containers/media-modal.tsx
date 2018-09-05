@@ -87,6 +87,7 @@ export class MediaModal extends React.Component<Props, State> {
 
     if ( activeDir ) {
       navigator = <MediaNavigator
+        animated={this.props.app.debugMode ? false : true}
         multiselect={false}
         filesFilters={this.props.media.filesFilters}
         selectedIds={selectedUids}
@@ -105,6 +106,7 @@ export class MediaModal extends React.Component<Props, State> {
     }
     else {
       navigator = <MediaNavigator
+        animated={this.props.app.debugMode ? false : true}
         multiselect={false}
         volumeFilters={this.props.media.volumeFilters}
         selectedIds={selectedUids}

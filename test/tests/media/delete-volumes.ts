@@ -10,7 +10,7 @@ let page = new MediaPage();
 let admin: Agent, joe: Agent;
 const randomName = randomId();
 
-describe( 'Testing the deletion of volumes: ', function() {
+describe( 'Testing the deletion of volumes:', function() {
 
   before( async () => {
     const volumes = ControllerFactory.get( 'volumes' );

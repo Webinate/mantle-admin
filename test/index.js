@@ -39,16 +39,19 @@ require( './tests/login/login-failures' );
 require( './tests/login/reset-failures' );
 require( './tests/login/register-failures' );
 require( './tests/login/successful-login-logout' );
+
 require( './tests/users/find-user' );
 require( './tests/users/activate-user' );
 require( './tests/users/delete-user' );
 require( './tests/users/resend-activation' );
 require( './tests/users/request-password-reset' );
+
 require( './tests/posts/view-and-filter-post' );
 require( './tests/posts/create' );
 require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );
 require( './tests/posts/delete-posts' );
+
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );
 require( './tests/media/volume-table-fetching' );

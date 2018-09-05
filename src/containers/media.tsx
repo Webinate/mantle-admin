@@ -114,6 +114,7 @@ export class Media extends React.Component<Props, State> {
             <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
             <Route path="/dashboard/media/volume/:id" render={props => {
               return <MediaNavigator
+                animated={this.props.app.debugMode ? false : true}
                 key="nav-directory"
                 filesFilters={this.props.media.filesFilters}
                 selectedIds={this.state.selectedUids}
@@ -131,6 +132,7 @@ export class Media extends React.Component<Props, State> {
             }} />
             <Route path="/dashboard/media" exact={true} render={props => {
               return <MediaNavigator
+                animated={this.props.app.debugMode ? false : true}
                 key="nav-volumes"
                 volumeFilters={this.props.media.volumeFilters}
                 selectedIds={this.state.selectedUids}
