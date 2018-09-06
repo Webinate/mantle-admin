@@ -1,5 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import { IUserEntry } from '../../../../../src';
+import { ActionCreators as UserActions, Action as UserAction } from '../users/actions';
 
 // State
 export type State = {
@@ -17,7 +18,7 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action ): State {
+export default function reducer( state: State = initialState, action: Action | UserAction ): State {
   let partialState: Partial<State> | undefined;
 
   switch ( action.type ) {
@@ -51,6 +52,12 @@ export default function reducer( state: State = initialState, action: Action ): 
         busy: false,
         authenticated: false,
         error: null
+      };
+      break;
+
+    case UserActions.UpdateUser.type:
+      partialState = {
+        user: action.payload
       };
       break;
 

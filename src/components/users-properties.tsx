@@ -14,6 +14,7 @@ import Drawer from './drawer';
 import { MediaModal } from '../containers/media-modal';
 
 type Props = {
+  mediaBusy: boolean;
   activeUser: IUserEntry<'client'>;
   selected: IUserEntry<'client'> | null;
   animated: boolean;
@@ -67,6 +68,7 @@ export default class UserProperties extends React.Component<Props, State> {
         <ImgContainer>
           <Button
             variant="fab"
+            id="mt-upload-profile"
             color="primary"
             onClick={e => this.setState( { showMediaPopup: true } )}
             style={{ background: theme.primary200.background, bottom: '10px', right: '10px', position: 'absolute' }}
@@ -200,6 +202,7 @@ export default class UserProperties extends React.Component<Props, State> {
           <MediaModal
             {...{} as any}
             open={true}
+            isBusy={this.props.mediaBusy}
             onCancel={() => { this.setState( { showMediaPopup: false } ) }}
             onSelect={file => this.setState( { showMediaPopup: false }, () => this.props.updateUserAvatar( this.props.selected!._id, file ) )}
           /> : undefined}
