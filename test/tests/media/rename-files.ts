@@ -1,12 +1,12 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../utils/agent';
 import { IVolume } from 'modepress';
 import ControllerFactory from 'modepress/src/core/controller-factory';
-import { randomId } from 'modepress/clients/modepress-admin/test/utils/misc';
-import { uploadFileToVolume } from 'modepress/clients/modepress-admin/test/utils/file';
+import { randomId } from '../../utils/misc';
+import { uploadFileToVolume } from '../../utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
@@ -30,30 +30,30 @@ describe( 'Testing the renaming of files: ', function() {
   it( 'can select and rename a single file', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectFile( 'File A' );
-    await page.clickRenameFile();
-    await page.newName( randomFileName );
-    await page.confirmModal();
+    await page.mediaModule.selectFile( 'File A' );
+    await page.mediaModule.clickRenameFile();
+    await page.mediaModule.newName( randomFileName );
+    await page.mediaModule.confirmModal();
 
-    const files = await page.getFiles();
+    const files = await page.mediaModule.getFiles();
     assert.deepEqual( files[ 0 ].name, randomFileName );
   } )
 
   it( 'allows an admin to rename a different users file', async () => {
     await page.load( admin, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectFile( randomFileName );
-    await page.clickRenameFile();
-    await page.newName( 'File A' );
-    await page.confirmModal();
+    await page.mediaModule.selectFile( randomFileName );
+    await page.mediaModule.clickRenameFile();
+    await page.mediaModule.newName( 'File A' );
+    await page.mediaModule.confirmModal();
 
-    let files = await page.getFiles();
+    let files = await page.mediaModule.getFiles();
     assert.deepEqual( files[ 0 ].name, 'File A' );
 
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
 
-    files = await page.getFiles();
+    files = await page.mediaModule.getFiles();
     assert.deepEqual( files[ 0 ].name, 'File A' );
   } )
 } );

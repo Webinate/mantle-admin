@@ -1,9 +1,11 @@
 import Page from './page';
 import Agent from '../utils/agent';
 import AppModule from './modules/app';
+import MediaModule from './modules/media-nav';
 
 export default class UsersPage extends Page {
   public appModule: AppModule;
+  public mediaModule: MediaModule;
   private $filter: string;
   private $filterSearch: string;
 
@@ -23,6 +25,7 @@ export default class UsersPage extends Page {
     await super.to( '/dashboard/users' );
 
     this.appModule = new AppModule( this.page );
+    this.mediaModule = new MediaModule( this.page );
   }
 
   async selectUser( email: string ) {
@@ -41,6 +44,15 @@ export default class UsersPage extends Page {
    */
   filter( val?: string ) {
     return super.textfield( this.$filter, val )
+  }
+
+  async selectProfilePic() {
+    await this.page.click( '#mt-upload-profile' );
+    await this.page.waitFor( '.mt-volume-table' );
+  }
+
+  async getUserProfileImg(): Promise<string> {
+    return this.page.$eval( '.mt-user-properties img', ( elm: HTMLImageElement ) => elm.src );
   }
 
   async clickDrawer( headerName: string ) {
@@ -128,10 +140,11 @@ export default class UsersPage extends Page {
       return Array.from( elm.children ).map( child => {
         return {
           username: child.querySelector( '.mt-user-name' ).textContent,
-          email: child.querySelector( '.mt-user-email' ).textContent
+          email: child.querySelector( '.mt-user-email' ).textContent,
+          profileImg: child.querySelector( 'img' ).src
         }
       } )
-    } ) as Promise<{ username: string; email: string; }[]>;
+    } ) as Promise<{ username: string; email: string; profileImg: string; }[]>;
   }
 
   clickFilterBtn() { return this.page.click( this.$filterSearch ); }

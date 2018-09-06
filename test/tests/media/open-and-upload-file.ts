@@ -1,11 +1,11 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../utils/agent';
 import { IVolume } from 'modepress';
 import ControllerFactory from 'modepress/src/core/controller-factory';
-import { randomId } from 'modepress/clients/modepress-admin/test/utils/misc';
+import { randomId } from '../../utils/misc';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
@@ -27,8 +27,8 @@ describe( 'Testing the uploading of a file: ', function() {
   it( 'does open a volume & the url is correct', async () => {
     await page.load( joe );
     await page.doneLoading();
-    await page.selectVolume( randomName );
-    await page.openVolume();
+    await page.mediaModule.selectVolume( randomName );
+    await page.mediaModule.openVolume();
 
     const path = await page.page.evaluate( () => window.location.pathname );
     assert.deepEqual( path, `/dashboard/media/volume/${ volume._id }` );
@@ -37,9 +37,9 @@ describe( 'Testing the uploading of a file: ', function() {
   it( 'does open a volume & the url is correct', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.uploadFile( 'img-a.png' );
+    await page.mediaModule.uploadFile( 'img-a.png' );
 
-    const files = await page.getFiles();
+    const files = await page.mediaModule.getFiles();
     assert.deepEqual( files.length, 1 );
     assert.deepEqual( files[ 0 ].name, 'img-a.png' );
     assert.deepEqual( files[ 0 ].memory, '3.67 KB' );
@@ -48,8 +48,8 @@ describe( 'Testing the uploading of a file: ', function() {
   it( 'does show file information when we click on a file', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectFile( 'img-a.png' );
-    const details = await page.getFileDetails();
+    await page.mediaModule.selectFile( 'img-a.png' );
+    const details = await page.mediaModule.getFileDetails();
     assert.deepEqual( details.name, 'img-a.png' );
     assert.deepEqual( details.fileSize, '3.67 KB' );
     assert.deepEqual( details.fileType, 'image/png' );

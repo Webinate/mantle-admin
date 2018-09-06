@@ -1,8 +1,8 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../utils/agent';
 import { IVolume } from 'modepress';
 import ControllerFactory from 'modepress/src/core/controller-factory';
 import { uploadFileToVolume } from '../../utils/file';
@@ -31,7 +31,7 @@ describe( 'Testing the sorting and filtering of files: ', function() {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
 
-    const files = await page.getFiles();
+    const files = await page.mediaModule.getFiles();
     assert.deepEqual( files.length, 3 );
     assert.deepEqual( files[ 0 ].name, 'File C' );
     assert.deepEqual( files[ 2 ].name, 'File A' );
@@ -40,15 +40,15 @@ describe( 'Testing the sorting and filtering of files: ', function() {
   it( 'does filter based on name', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.clickFileFilter( 'name' );
+    await page.mediaModule.clickFileFilter( 'name' );
 
-    let files = await page.getFiles();
+    let files = await page.mediaModule.getFiles();
     assert.deepEqual( files[ 0 ].name, 'File C' );
     assert.deepEqual( files[ 1 ].name, 'File B' );
     assert.deepEqual( files[ 2 ].name, 'File A' );
 
-    await page.clickFileFilter( 'name' );
-    files = await page.getFiles();
+    await page.mediaModule.clickFileFilter( 'name' );
+    files = await page.mediaModule.getFiles();
 
     assert.deepEqual( files[ 0 ].name, 'File A' );
     assert.deepEqual( files[ 1 ].name, 'File B' );
@@ -58,15 +58,15 @@ describe( 'Testing the sorting and filtering of files: ', function() {
   it( 'does filter based on memory', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.clickFileFilter( 'memory' );
+    await page.mediaModule.clickFileFilter( 'memory' );
 
-    let files = await page.getFiles();
+    let files = await page.mediaModule.getFiles();
     assert.deepEqual( files[ 0 ].name, 'File C' );
     assert.deepEqual( files[ 1 ].name, 'File B' );
     assert.deepEqual( files[ 2 ].name, 'File A' );
 
-    await page.clickFileFilter( 'memory' );
-    files = await page.getFiles();
+    await page.mediaModule.clickFileFilter( 'memory' );
+    files = await page.mediaModule.getFiles();
 
     assert.deepEqual( files[ 0 ].name, 'File A' );
     assert.deepEqual( files[ 1 ].name, 'File B' );
@@ -76,15 +76,15 @@ describe( 'Testing the sorting and filtering of files: ', function() {
   it( 'does filter based on upload date', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.clickFileFilter( 'created' );
+    await page.mediaModule.clickFileFilter( 'created' );
 
-    let files = await page.getFiles();
+    let files = await page.mediaModule.getFiles();
     assert.deepEqual( files[ 0 ].name, 'File A' );
     assert.deepEqual( files[ 1 ].name, 'File B' );
     assert.deepEqual( files[ 2 ].name, 'File C' );
 
-    await page.clickFileFilter( 'created' );
-    files = await page.getFiles();
+    await page.mediaModule.clickFileFilter( 'created' );
+    files = await page.mediaModule.getFiles();
 
     assert.deepEqual( files[ 0 ].name, 'File C' );
     assert.deepEqual( files[ 1 ].name, 'File B' );

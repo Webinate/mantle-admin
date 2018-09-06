@@ -1,12 +1,12 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../utils/agent';
 import { IVolume } from 'modepress';
 import ControllerFactory from 'modepress/src/core/controller-factory';
-import { randomId } from 'modepress/clients/modepress-admin/test/utils/misc';
-import { uploadFileToVolume } from 'modepress/clients/modepress-admin/test/utils/file';
+import { randomId } from '../../utils/misc';
+import { uploadFileToVolume } from '../../utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
@@ -33,11 +33,11 @@ describe( 'Testing the deletion of files: ', function() {
   it( 'can select and delete a single file', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectFile( 'File A' );
-    await page.clickDeleteFiles()
-    await page.confirmModal();
+    await page.mediaModule.selectFile( 'File A' );
+    await page.mediaModule.clickDeleteFiles()
+    await page.mediaModule.confirmModal();
 
-    const files = await page.getFiles();
+    const files = await page.mediaModule.getFiles();
     assert.deepEqual( files.length, 3 );
     assert.deepEqual( files.find( f => f.name === 'File A' ), undefined );
   } )
@@ -45,14 +45,14 @@ describe( 'Testing the deletion of files: ', function() {
   it( 'allows admin to delete a file', async () => {
     await page.load( admin, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectFile( 'File B' );
-    await page.clickDeleteFiles()
-    await page.confirmModal();
+    await page.mediaModule.selectFile( 'File B' );
+    await page.mediaModule.clickDeleteFiles()
+    await page.mediaModule.confirmModal();
 
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
 
-    const files = await page.getFiles();
+    const files = await page.mediaModule.getFiles();
     assert.deepEqual( files.length, 2 );
     assert.deepEqual( files.find( f => f.name === 'File B' ), undefined );
   } )
@@ -60,11 +60,11 @@ describe( 'Testing the deletion of files: ', function() {
   it( 'can delete multiple files at once', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();
-    await page.selectAll();
-    await page.clickDeleteFiles()
-    await page.confirmModal();
+    await page.mediaModule.selectAll();
+    await page.mediaModule.clickDeleteFiles()
+    await page.mediaModule.confirmModal();
 
-    const files = await page.getFiles();
+    const files = await page.mediaModule.getFiles();
     assert.deepEqual( files.length, 0 );
   } )
 } );

@@ -45,6 +45,7 @@ require( './tests/users/activate-user' );
 require( './tests/users/delete-user' );
 require( './tests/users/resend-activation' );
 require( './tests/users/request-password-reset' );
+require( './tests/users/update-profile-pic' );
 
 require( './tests/posts/view-and-filter-post' );
 require( './tests/posts/create' );

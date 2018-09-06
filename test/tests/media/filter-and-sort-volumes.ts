@@ -1,8 +1,8 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../utils/agent';
 import { IVolume } from 'modepress';
 import { VolumesController } from '../../../../../src/controllers/volumes';
 import ControllerFactory from '../../../../../src/core/controller-factory';
@@ -38,14 +38,14 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
   it( 'does show 3 volumes', async () => {
     await page.load( joe );
     await page.doneLoading();
-    const volumes = await page.getVolumes();
+    const volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes.length, 3 )
   } )
 
   it( 'does sort by creation date on load and they are correct', async () => {
     await page.load( joe );
     await page.doneLoading();
-    const volumes = await page.getVolumes();
+    const volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 0 ].name, 'C' );
     assert.equal( volumes[ 1 ].name, 'B' );
     assert.equal( volumes[ 2 ].name, 'A' );
@@ -54,17 +54,17 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
   it( 'does sort by name when we click on the name filter', async () => {
     await page.load( joe );
     await page.doneLoading();
-    await page.clickVolumeFilter( 'name' );
+    await page.mediaModule.clickVolumeFilter( 'name' );
 
     // First Desc
-    let volumes = await page.getVolumes();
+    let volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 0 ].name, 'C' );
     assert.equal( volumes[ 1 ].name, 'B' );
     assert.equal( volumes[ 2 ].name, 'A' );
 
     // Now asc
-    await page.clickVolumeFilter( 'name' );
-    volumes = await page.getVolumes();
+    await page.mediaModule.clickVolumeFilter( 'name' );
+    volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 0 ].name, 'A' );
     assert.equal( volumes[ 1 ].name, 'B' );
     assert.equal( volumes[ 2 ].name, 'C' );
@@ -73,17 +73,17 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
   it( 'does sort by date when we click on the name filter', async () => {
     await page.load( joe );
     await page.doneLoading();
-    await page.clickVolumeFilter( 'created' );
+    await page.mediaModule.clickVolumeFilter( 'created' );
 
     // First Desc
-    let volumes = await page.getVolumes();
+    let volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 0 ].name, 'A' );
     assert.equal( volumes[ 1 ].name, 'B' );
     assert.equal( volumes[ 2 ].name, 'C' );
 
     // Now asc
-    await page.clickVolumeFilter( 'created' );
-    volumes = await page.getVolumes();
+    await page.mediaModule.clickVolumeFilter( 'created' );
+    volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 0 ].name, 'C' );
     assert.equal( volumes[ 1 ].name, 'B' );
     assert.equal( volumes[ 2 ].name, 'A' );
@@ -92,17 +92,17 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
   it( 'does sort by memory used', async () => {
     await page.load( joe );
     await page.doneLoading();
-    await page.clickVolumeFilter( 'memory' );
+    await page.mediaModule.clickVolumeFilter( 'memory' );
 
     // First Desc
-    let volumes = await page.getVolumes();
+    let volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 0 ].name, 'B' );
     assert.equal( volumes[ 1 ].name, 'C' );
     assert.equal( volumes[ 2 ].name, 'A' );
 
     // Now asc
-    await page.clickVolumeFilter( 'memory' );
-    volumes = await page.getVolumes();
+    await page.mediaModule.clickVolumeFilter( 'memory' );
+    volumes = await page.mediaModule.getVolumes();
     assert.equal( volumes[ 2 ].name, 'B' );
   } )
 } );

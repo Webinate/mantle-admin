@@ -1,8 +1,8 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../utils/agent';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
@@ -72,7 +72,7 @@ describe( 'Testing the creation of volumes: ', function() {
     assert.deepEqual( path, '/dashboard/media' );
 
     await page.doneLoading();
-    const volumes = await page.getVolumes();
+    const volumes = await page.mediaModule.getVolumes();
 
     assert.equal( volumes.length, 1 );
     assert.equal( volumes[ 0 ].name, 'TEST' );
