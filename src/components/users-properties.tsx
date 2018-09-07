@@ -9,7 +9,7 @@ import Avatar from '@material-ui/core/Avatar';
 import DatePicker from 'material-ui-pickers/DatePicker';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import { generateAvatarPic } from '../utils/component-utils';
+import { generateAvatarPic, isAdminUser } from '../utils/component-utils';
 import Drawer from './drawer';
 import { MediaModal } from '../containers/media-modal';
 
@@ -62,18 +62,20 @@ export default class UserProperties extends React.Component<Props, State> {
     if ( !selected )
       return <Properties />;
 
+    const isAdmin = isAdminUser( this.props.activeUser );
+
     return (
       <Properties className="mt-user-properties">
 
         <ImgContainer>
-          <Button
+          {isAdmin || selected._id === this.props.activeUser._id ? <Button
             variant="fab"
             id="mt-upload-profile"
             color="primary"
             onClick={e => this.setState( { showMediaPopup: true } )}
             style={{ background: theme.primary200.background, bottom: '10px', right: '10px', position: 'absolute' }}
           ><Icon className="icon icon-camera" />
-          </Button>
+          </Button> : undefined}
           <Avatar
             className="mt-avatar-image"
             src={generateAvatarPic( selected )}

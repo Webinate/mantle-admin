@@ -16,7 +16,7 @@ export default class AppModule extends Module {
     await this.page.waitFor( '.mt-response-message.mt-snack-closed' )
   }
 
-  async getSnackMessage() {
+  async getSnackMessage(): Promise<string> {
     await this.page.waitFor( '.mt-response-message.mt-snack-open' );
     return this.page.$eval( '#mt-close-snackbar-msg', elm => elm.textContent );
   }

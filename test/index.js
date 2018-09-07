@@ -62,3 +62,4 @@ require( './tests/media/open-and-upload-file' );
 require( './tests/media/filter-and-sort-files' );
 require( './tests/media/delete-files' );
 require( './tests/media/rename-files' );
+require( './tests/media/get-files-permissions' );

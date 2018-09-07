@@ -6,19 +6,32 @@ import ControllerFactory from 'modepress/src/core/controller-factory';
 import { IVolume } from 'modepress';
 
 let users = new UsersPage();
-let joe: Agent;
+let joe: Agent, mary: Agent, admin: Agent;
 let volume: IVolume<'client'>;
 
 describe( 'Update profile picture: ', function() {
   before( async () => {
-    const agent = await utils.refreshAdminToken();
+    admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
+    mary = await utils.createAgent( 'Mary', 'mary333@test.com', 'password' );
 
     const usersCtrl = ControllerFactory.get( 'users' );
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await usersCtrl.getUser( { username: joe.username } );
 
     volume = await volumes.create( { name: 'test', user: userEntry._id.toString() } );
+  } )
+
+  it( 'it should not allow a regular user to change another\'s profile pic', async () => {
+    await users.load( mary );
+    await users.selectUser( 'joe222@test.com' );
+    assert.deepEqual( await users.page.$( '#mt-upload-profile' ), null );
+  } )
+
+  it( 'it should allow an admin to change a users profile pic', async () => {
+    await users.load( admin );
+    await users.selectUser( 'joe222@test.com' );
+    assert( await users.page.$( '#mt-upload-profile' ) !== null );
   } )
 
   it( 'it did upload a photo from the media navigator', async () => {
