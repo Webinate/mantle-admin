@@ -95,6 +95,35 @@ export class MediaModal extends React.Component<Props, State> {
     if ( activeDir ) {
       navigator = <MediaNavigator
         animated={this.props.app.debugMode ? false : true}
+        renderOptionalButtons={() => {
+          return <DialogActions
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+            }}
+          >
+            <Button
+              id="mt-media-cancel-btn"
+              onClick={e => this.props.onCancel()}
+              disabled={this.props.isBusy}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              disabled={!activeDir || !this.state.selectedUid || this.props.isBusy}
+              id="mt-media-confirm-btn"
+              onClick={e => {
+                const file = this.props.media.filesPage!.data.find( f => f._id === this.state.selectedUid )!;
+                this.props.onSelect( file );
+              }}
+              color="primary"
+            >
+              Select
+            </Button>
+          </DialogActions>
+        }}
         multiselect={false}
         filesFilters={this.props.media.filesFilters}
         selectedIds={selectedUids}
@@ -144,27 +173,6 @@ export class MediaModal extends React.Component<Props, State> {
           /> : undefined}
           {navigator}
         </DialogContent>
-        <DialogActions>
-          <Button
-            id="mt-media-cancel-btn"
-            onClick={e => this.props.onCancel()}
-            disabled={this.props.isBusy}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            disabled={!activeDir || !this.state.selectedUid || this.props.isBusy}
-            id="mt-media-confirm-btn"
-            onClick={e => {
-              const file = this.props.media.filesPage!.data.find( f => f._id === this.state.selectedUid )!;
-              this.props.onSelect( file );
-            }}
-            color="primary"
-          >
-            Select
-          </Button>
-        </DialogActions>
       </Dialog>
     );
   }

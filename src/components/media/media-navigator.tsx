@@ -35,6 +35,7 @@ export type Props = {
   openDirectory?: ( volumeId: string, options: Partial<GetAllOptions> ) => void;
   onSelectionChanged: ( uids: string[] ) => void;
   onSort: ( sortBy: SortTypes, sortDir: SortOrder ) => void;
+  renderOptionalButtons?: () => undefined | null | JSX.Element;
 }
 
 export type State = {
@@ -243,6 +244,7 @@ export class MediaNavigator extends React.Component<Props, State> {
               onUploadFiles={this.props.onUploadFiles}
               onDelete={() => this.onDelete()}
               onRename={() => this.setState( { newName: '', showRenameForm: true } )}
+              renderOptionalButtons={this.props.renderOptionalButtons}
             />
           }
           else {

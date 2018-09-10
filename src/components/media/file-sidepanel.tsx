@@ -17,6 +17,7 @@ export type Props = {
   onDelete: () => void;
   onRename: () => void;
   onUploadFiles?: ( files: File[] ) => void;
+  renderOptionalButtons?: () => undefined | null | JSX.Element;
 }
 
 export type State = {
@@ -135,6 +136,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
           </ListItem>
         </List>
 
+        {this.props.renderOptionalButtons ? this.props.renderOptionalButtons() : undefined}
       </Container>
     );
   }
