@@ -149,7 +149,7 @@ const Container = styled.div`
   overflow: auto;
 
   > h2 {
-    margin: 20px 24px;
+    margin: 0 24px 10px 24px;
     white-space: initial;
     overflow: hidden;
     overflow-wrap: break-word;
@@ -203,6 +203,6 @@ const Preview = styled.div`
 
   img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 270px;
   }
 `;

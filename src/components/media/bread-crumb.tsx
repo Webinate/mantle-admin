@@ -5,12 +5,10 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import { IVolume } from '../../../../../src';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 export type Props = {
   volume: IVolume<'client'>;
   onVolumeSelected: () => void;
-  isBusy: boolean;
 }
 
 export type State = {
@@ -33,11 +31,6 @@ export class BreadCrumb extends React.Component<Props, State> {
         >
           {this.props.volume.type === 'local' ? <FolderIcon /> : <CloudIcon />}
           <KeyboardArrowRight />/{this.props.volume.name}
-          {this.props.isBusy ? <CircularProgress
-            size={15}
-            className="mt-loading"
-            style={{ verticalAlign: 'middle', margin: '0 0 0 10px' }}
-          /> : undefined}
         </h2>
       </Container>
     );

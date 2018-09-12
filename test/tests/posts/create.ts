@@ -5,13 +5,14 @@ import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'modepress';
+import { IPost, IVolume } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
 let controller: PostsController;
 let postSlug = randomId();
+let volume: IVolume<'client'>;
 
 describe( 'Testing the creation of posts: ', function() {
 
@@ -19,7 +20,18 @@ describe( 'Testing the creation of posts: ', function() {
     controller = ControllerFactory.get( 'posts' );
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
+
+    const usersCtrl = ControllerFactory.get( 'users' );
+    const volumes = ControllerFactory.get( 'volumes' );
+    const userEntry = await usersCtrl.getUser( { username: admin.username } );
+    volume = await volumes.create( { name: randomId(), user: userEntry._id.toString() } );
+
     await postPage.load( admin );
+  } )
+
+  after( async () => {
+    const volumes = ControllerFactory.get( 'volumes' );
+    await volumes.remove( { _id: volume._id } );
   } )
 
   it( 'does not let regular users click new post', async () => {
@@ -87,6 +99,46 @@ describe( 'Testing the creation of posts: ', function() {
   it( 'did edit content in the tiny editor', async () => {
     await postPage.content( 'Simple content babes' );
     assert.equal( await postPage.content(), 'Simple content babes' );
+  } )
+
+  it( 'did select a featured image', async () => {
+
+    // Clear featured img button should be disabled
+    assert.deepEqual( await postPage.$( '#mt-remove-featured' ), null );
+
+    // Check for default image
+    let featuredImg = await postPage.getFeaturedImg();
+    assert( featuredImg.endsWith( 'post-feature.svg' ) );
+
+    await postPage.clickFeaturedImg();
+
+    // Check there is 1 volume and go into it
+    const volumes = await postPage.mediaModule.getVolumes();
+    assert.deepEqual( volumes[ 0 ].name, volume.name );
+
+    await postPage.mediaModule.selectVolume( volume.name );
+    await postPage.mediaModule.openVolume();
+
+    // Make sure there are no files
+    let files = await postPage.mediaModule.getFiles();
+    assert.deepEqual( files.length, 0 );
+
+    // Upload an image file
+    await postPage.mediaModule.uploadFile( 'img-a.png' );
+
+    files = await postPage.mediaModule.getFiles();
+    assert.deepEqual( files.length, 1 );
+    assert.deepEqual( files[ 0 ].name, 'img-a.png' );
+
+    await postPage.mediaModule.selectFile( 'img-a.png' );
+    await postPage.mediaModule.confirmModal();
+
+    // Check for updated image
+    featuredImg = await postPage.getFeaturedImg();
+    assert( featuredImg.endsWith( 'img-a.png' ) );
+
+    // Remove img is back
+    assert( await postPage.$( '#mt-remove-featured' ) );
   } )
 
   it( 'has created a post with valid data', async () => {

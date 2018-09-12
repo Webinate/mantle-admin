@@ -14,7 +14,6 @@ import Drawer from './drawer';
 import { MediaModal } from '../containers/media-modal';
 
 type Props = {
-  mediaBusy: boolean;
   activeUser: IUserEntry<'client'>;
   selected: IUserEntry<'client'> | null;
   animated: boolean;
@@ -204,7 +203,6 @@ export default class UserProperties extends React.Component<Props, State> {
           <MediaModal
             {...{} as any}
             open={true}
-            isBusy={this.props.mediaBusy}
             onCancel={() => { this.setState( { showMediaPopup: false } ) }}
             onSelect={file => this.setState( { showMediaPopup: false }, () => this.props.updateUserAvatar( this.props.selected!._id, file ) )}
           /> : undefined}

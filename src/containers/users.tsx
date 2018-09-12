@@ -23,7 +23,6 @@ import SearchIcon from '@material-ui/icons/Search';
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   userState: state.users,
-  mediaState: state.media,
   auth: state.authentication,
   admin: state.admin,
   app: state.app
@@ -202,7 +201,6 @@ export class Users extends React.Component<Props, State> {
               : undefined
           }}
           second={() => <UserProperties
-            mediaBusy={this.props.mediaState.busy}
             animated={this.props.app.debugMode ? false : true}
             resetPasswordRequest={username => { this.props.requestPasswordReset( username ) }}
             activateAccount={username => { this.props.activate( username ) }}

@@ -4,7 +4,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
 import Pager from '../pager';
-import { Page, IPost, IUserEntry } from '../../../../../src';
+import { Page, IPost, IUserEntry, IFileEntry } from '../../../../../src';
 import * as format from 'date-fns/format';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
@@ -258,7 +258,7 @@ export default class PostList extends React.Component<Props, State> {
                   onClick={e => this.props.onDelete( post )}
                 ><DeleteIcon style={{ color: theme.primary200.background }} /></IconButton> : undefined
               }
-              <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={post.featuredImage} /> : <img src={'/images/post-feature.svg'} />}</div>
+              <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={( post.featuredImage as IFileEntry<'client'> ).publicURL} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
                 <i>{format( new Date( post.lastUpdated ), 'MMM Do, YYYY' )}</i>
                 <i>{format( new Date( post.createdOn ), 'MMM Do, YYYY' )}</i>

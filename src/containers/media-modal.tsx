@@ -13,6 +13,7 @@ import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 import Button from '@material-ui/core/Button/Button';
 import { BreadCrumb } from '../components/media/bread-crumb';
 import { IFileEntry } from '../../../../src';
+import { LinearProgress } from '@material-ui/core';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -21,8 +22,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   media: state.media,
   open: ownProps.open,
   onCancel: ownProps.onCancel as () => void,
-  onSelect: ownProps.onSelect as ( file: IFileEntry<'client'> ) => void,
-  isBusy: ownProps.isBusy as boolean
+  onSelect: ownProps.onSelect as ( file: IFileEntry<'client'> ) => void
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -106,13 +106,13 @@ export class MediaModal extends React.Component<Props, State> {
             <Button
               id="mt-media-cancel-btn"
               onClick={e => this.props.onCancel()}
-              disabled={this.props.isBusy}
+              disabled={this.props.media.busy}
             >
               Cancel
             </Button>
             <Button
               variant="contained"
-              disabled={!activeDir || !this.state.selectedUid || this.props.isBusy}
+              disabled={!activeDir || !this.state.selectedUid || this.props.media.busy}
               id="mt-media-confirm-btn"
               onClick={e => {
                 const file = this.props.media.filesPage!.data.find( f => f._id === this.state.selectedUid )!;
@@ -165,9 +165,9 @@ export class MediaModal extends React.Component<Props, State> {
         maxWidth={false}
         PaperProps={{ style: { maxWidth: '70%' } }}
       >
+        {this.props.media.busy ? <LinearProgress className="mt-loading" /> : undefined}
         <DialogContent>
           {activeDir ? <BreadCrumb
-            isBusy={this.props.isBusy}
             volume={activeDir}
             onVolumeSelected={() => this.props.getVolumes( { index: 0, search: '' } )}
           /> : undefined}

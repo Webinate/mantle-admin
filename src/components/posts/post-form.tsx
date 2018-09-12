@@ -7,7 +7,8 @@ import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import { IPost, IUserEntry } from '../../../../../src';
+import RemoveIcon from '@material-ui/icons/Delete';
+import { IPost, IUserEntry, IFileEntry } from '../../../../../src';
 import { default as styled } from '../../theme/styled';
 import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
@@ -15,6 +16,8 @@ import SlugEditor from '../slug-editor';
 import UserPicker from '../user-picker';
 import { CategoryEditor } from '../../containers/category-editor';
 import FormControl from '@material-ui/core/FormControl';
+import { MediaModal } from '../../containers/media-modal';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export type Props = {
   activeUser: IUserEntry<'client'>;
@@ -30,6 +33,7 @@ export type State = {
   editable: Partial<IPost<'client'>>;
   currentTagText: string;
   slugWasEdited: boolean;
+  showMediaPopup: boolean;
 }
 
 export default class PostForm extends React.Component<Props, State> {
@@ -38,7 +42,8 @@ export default class PostForm extends React.Component<Props, State> {
     this.state = {
       editable: props.post ? { ...props.post } : this.createEmptyPost(),
       currentTagText: '',
-      slugWasEdited: false
+      slugWasEdited: false,
+      showMediaPopup: false
     };
   }
 
@@ -265,6 +270,27 @@ export default class PostForm extends React.Component<Props, State> {
           />
         </RightPanel>
 
+        <RightPanel style={{ position: 'relative' }}>
+          {this.state.editable.featuredImage ? <IconButton
+            id="mt-remove-featured"
+            onClick={e => this.setState( { editable: { ...this.state.editable, featuredImage: '' } } )}
+            style={{ position: 'absolute', top: '5px', right: '5px' }}>
+            <RemoveIcon />
+          </IconButton> : undefined}
+          <h3>Featured Image</h3>
+          <FeaturedImg
+            id="mt-featured-img"
+            onClick={e => this.setState( { showMediaPopup: true } )}
+          >
+            <Tooltip title="Click to upload image">
+              {this.state.editable.featuredImage ?
+                <img src={( this.state.editable.featuredImage as IFileEntry<'client'> ).publicURL} /> :
+                <img src={'/images/post-feature.svg'} />
+              }
+            </Tooltip>
+          </FeaturedImg>
+        </RightPanel>
+
         <RightPanel>
           <CategoryEditor
             onCategorySelected={category => {
@@ -285,6 +311,17 @@ export default class PostForm extends React.Component<Props, State> {
           />
         </RightPanel>
       </div>
+
+      {this.state.showMediaPopup ?
+        <MediaModal
+          {...{} as any}
+          open={true}
+          onCancel={() => { this.setState( { showMediaPopup: false } ) }}
+          onSelect={file => this.setState( {
+            showMediaPopup: false,
+            editable: { ...this.state.editable, featuredImage: file }
+          } )}
+        /> : undefined}
     </Form >;
   }
 }
@@ -322,6 +359,17 @@ const Form = styled.form`
     margin: 0 0 0 20px;
     max-width: 350px;
   }
+  }
+`;
+
+const FeaturedImg = styled.div`
+  margin: 16px 0 0 0;
+  text-align: center;
+  cursor: pointer;
+
+  img {
+    max-height: 100%;
+    max-width: 100%;
   }
 `;
 
