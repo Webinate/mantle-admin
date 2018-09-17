@@ -260,13 +260,19 @@ export default class PostList extends React.Component<Props, State> {
               }
               <div className="mt-post-featured-thumb">{post.featuredImage ? <img src={( post.featuredImage as IFileEntry<'client'> ).publicURL} /> : <img src={'/images/post-feature.svg'} />}</div>
               <div className="mt-post-dates">
-                <i>{format( new Date( post.lastUpdated ), 'MMM Do, YYYY' )}</i>
-                <i>{format( new Date( post.createdOn ), 'MMM Do, YYYY' )}</i>
+                <div>
+                  <div><i>Last Updated:</i></div>
+                  <div><i className="mt-post-last-updated">{format( new Date( post.lastUpdated ), 'MMM Do, YYYY' )}</i></div>
+                </div>
+                <div>
+                  <div><i>Created:</i></div>
+                  <div><i className="mt-post-created">{format( new Date( post.createdOn ), 'MMM Do, YYYY' )}</i></div>
+                </div>
               </div>
               <div className="mt-post-info">
                 <Avatar
                   src={generateAvatarPic( post.author as IUserEntry<'client'> )}
-                  style={{ width: 60, height: 60, float: 'right', margin: '5px 0 0 0' }}
+                  style={{ width: 40, height: 40, float: 'right', margin: '5px 0 0 0' }}
                 />
                 <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
               </div>
@@ -360,9 +366,20 @@ const Post = styled.div`
   .mt-post-dates {
     padding: 5px 0 0 0;
     border-top: 1px solid #ccc;
+    display: flex;
+    > div {
+      flex: 1;
 
-    i:first-child { float: left; }
-    i:last-child { float: right; }
+      > div:first-child {
+        font-size: 12px;
+        opacity: 0.7;
+        margin: 0 0 2px 0;
+      }
+
+      &:last-child {
+        text-align: right;
+      }
+    }
   }
 
   &:active {
@@ -379,15 +396,19 @@ const Post = styled.div`
     height: 200px;
     background: ${( props: PostProps ) => props.selected ? theme.light100.background : theme.light100.background };
     color: ${( props: PostProps ) => props.selected ? theme.light100.color : '' };
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    box-sizing: border-box;
   }
 
   .mt-post-featured-thumb img {
-    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
   }
 
   h3 {
-    padding: 5px 0 0 0;
-    clear: both;
+    padding: 0;
   }
 `;

@@ -53,111 +53,121 @@ export default class FileSidePanel extends React.Component<Props, State> {
     const selectedFile = this.props.selectedFile;
 
     return (
-      <Container id="mt-file-details">
-        {selectedFile ? <h2>{selectedFile.name}</h2> : undefined}
-        <input
-          ref={e => this._fileInput = e}
-          multiple={true}
-          style={{ visibility: 'hidden', height: '0px', width: '4px' }}
-          id="mt-file-upload-input"
-          type="file"
-          onChange={e => this.onFilesChanged( e )}
-        />
-        {selectedFile ? <Preview>
-          <img src={this.getPreview( selectedFile )} />
-        </Preview> : null}
-        {selectedFile ? <Info>
-          <div>
-            <div>Size</div>
-            <div id="mt-file-size">{formatBytes( selectedFile.size )}</div>
-          </div>
-
-          <div>
-            <div>URL</div>
-            <div id="mt-file-url">
-              <input
-                value={selectedFile.publicURL}
-                onChange={e => { }}
-                onClick={e => e.currentTarget.setSelectionRange( 0, e.currentTarget.value.length )}
-              />
+      <Container id="mt-file-details" panelProps={this.props}>
+        <div>
+          {selectedFile ? <h2>{selectedFile.name}</h2> : undefined}
+          <input
+            ref={e => this._fileInput = e}
+            multiple={true}
+            style={{ visibility: 'hidden', height: '0px', width: '4px' }}
+            id="mt-file-upload-input"
+            type="file"
+            onChange={e => this.onFilesChanged( e )}
+          />
+          {selectedFile ? <Preview>
+            <img src={this.getPreview( selectedFile )} />
+          </Preview> : null}
+          {selectedFile ? <Info>
+            <div>
+              <div>Size</div>
+              <div id="mt-file-size">{formatBytes( selectedFile.size )}</div>
             </div>
-          </div>
 
-          <div>
-            <div>Type</div>
-            <div id="mt-file-type">{selectedFile.mimeType}</div>
-          </div>
-        </Info> : null}
-        <List
-          component="nav"
-        >
-          <ListItem
-            button
-            onClick={e => this.onUpload()}
-            id="mt-upload-file"
+            <div>
+              <div>URL</div>
+              <div id="mt-file-url">
+                <input
+                  value={selectedFile.publicURL}
+                  onChange={e => { }}
+                  onClick={e => e.currentTarget.setSelectionRange( 0, e.currentTarget.value.length )}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div>Type</div>
+              <div id="mt-file-type">{selectedFile.mimeType}</div>
+            </div>
+          </Info> : null}
+          <List
+            component="nav"
           >
-            <ListItemIcon>
-              <UploadIcon />
-            </ListItemIcon>
-            <ListItemText
-              inset
-              primary="Upload files"
-            />
-          </ListItem>
+            <ListItem
+              button
+              onClick={e => this.onUpload()}
+              id="mt-upload-file"
+            >
+              <ListItemIcon>
+                <UploadIcon />
+              </ListItemIcon>
+              <ListItemText
+                inset
+                primary="Upload files"
+              />
+            </ListItem>
 
-          <ListItem
-            button
-            disabled={!filesSelected}
-            onClick={e => this.props.onDelete()}
-            id="mt-delete-file"
-          >
-            <ListItemIcon>
-              <DeleteIcon />
-            </ListItemIcon>
-            <ListItemText
-              inset
-              primary="Delete files"
-            />
-          </ListItem>
+            <ListItem
+              button
+              disabled={!filesSelected}
+              onClick={e => this.props.onDelete()}
+              id="mt-delete-file"
+            >
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText
+                inset
+                primary="Delete files"
+              />
+            </ListItem>
 
-          <ListItem
-            button
-            disabled={!filesSelected}
-            onClick={e => this.props.onRename()}
-            id="mt-rename-file"
-          >
-            <ListItemIcon>
-              <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText
-              inset
-              primary="Rename"
-            />
-          </ListItem>
-        </List>
-
+            <ListItem
+              button
+              disabled={!filesSelected}
+              onClick={e => this.props.onRename()}
+              id="mt-rename-file"
+            >
+              <ListItemIcon>
+                <AssignmentIcon />
+              </ListItemIcon>
+              <ListItemText
+                inset
+                primary="Rename"
+              />
+            </ListItem>
+          </List>
+        </div>
         {this.props.renderOptionalButtons ? this.props.renderOptionalButtons() : undefined}
       </Container>
     );
   }
 }
 
+interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+  panelProps: Props;
+}
+
 const Container = styled.div`
   background: ${theme.light100.background };
   height: 100%;
   box-sizing: border-box;
-  overflow: auto;
-
-  > h2 {
-    margin: 0 24px 10px 24px;
-    white-space: initial;
-    overflow: hidden;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-  }
 
   > div:first-child {
-    padding: 10px 24px 0 24px;
+    height: calc(100% - ${( props: ContainerProps ) => props.panelProps.renderOptionalButtons ? '55px' : '0px' });
+    box-sizing: border-box;
+    overflow: auto;
+
+    > div:first-child {
+      padding: 10px 24px 0 24px;
+    }
+
+    > h2 {
+      margin: 0 24px 10px 24px;
+      white-space: initial;
+      overflow: hidden;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
   }
 `;
 

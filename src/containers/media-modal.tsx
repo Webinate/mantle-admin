@@ -96,13 +96,7 @@ export class MediaModal extends React.Component<Props, State> {
       navigator = <MediaNavigator
         animated={this.props.app.debugMode ? false : true}
         renderOptionalButtons={() => {
-          return <DialogActions
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-            }}
-          >
+          return <DialogActions>
             <Button
               id="mt-media-cancel-btn"
               onClick={e => this.props.onCancel()}
@@ -163,10 +157,11 @@ export class MediaModal extends React.Component<Props, State> {
         open={this.props.open}
         scroll="paper"
         maxWidth={false}
+        onClose={() => this.props.onCancel()}
         PaperProps={{ style: { maxWidth: '70%' } }}
       >
         {this.props.media.busy ? <LinearProgress className="mt-loading" /> : undefined}
-        <DialogContent>
+        <DialogContent style={{ paddingBottom: '6px' }}>
           {activeDir ? <BreadCrumb
             volume={activeDir}
             onVolumeSelected={() => this.props.getVolumes( { index: 0, search: '' } )}
