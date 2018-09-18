@@ -2,6 +2,7 @@ import { combineReducers, ReducersMapObject } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import { default as usersReducer, State as IUserState } from './users/reducer';
 import { default as postsReducer, State as IPostState } from './posts/reducer';
+import { default as commentsReducer, State as ICommentState } from './comments/reducer';
 import { default as categoriesReducer, State as ICategoryState } from './categories/reducer';
 import { default as authReducer, State as IAuthState } from './authentication/reducer';
 import { default as adminReducer, State as IAdminState } from './admin-actions/reducer';
@@ -11,6 +12,7 @@ import { default as mediaReducer, State as IMediaResponseState } from './media/r
 export type IRootState = {
   users: IUserState,
   posts: IPostState,
+  comments: ICommentState,
   categories: ICategoryState,
   authentication: IAuthState,
   admin: IAdminState,
@@ -23,6 +25,7 @@ export type IRootState = {
 const rootReducer = combineReducers<IRootState>( {
   users: usersReducer,
   posts: postsReducer,
+  comments: commentsReducer,
   categories: categoriesReducer,
   authentication: authReducer,
   router: routerReducer,

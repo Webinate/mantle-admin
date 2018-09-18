@@ -4,6 +4,7 @@ import { ActionCreators } from '../store/authentication/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
 import { IAuthReq, IUserEntry } from '../../../../src';
 import postHandler from './posts';
+import commentHandler from './comments';
 import mediaHandler from './media';
 import userHandler from './users';
 import { controllers } from 'modepress';
@@ -34,6 +35,10 @@ export async function hydrate( req: IAuthReq ) {
   // Get posts if neccessary
   if ( matchPath( req.url, { path: '/dashboard/posts' } ) )
     await postHandler( req, actions );
+
+  // Get comments if neccessary
+  if ( matchPath( req.url, { path: '/dashboard/comments' } ) )
+    await commentHandler( req, actions );
 
   // Get media if neccessary
   if ( matchPath( req.url, { path: '/dashboard/media' } ) )
