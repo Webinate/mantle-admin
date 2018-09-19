@@ -6,6 +6,8 @@ import { GetAllOptions } from 'modepress/src/lib-frontend/comments';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
+import * as format from 'date-fns/format';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 export type Props = {
   page: Page<IComment<'client'>> | null;
@@ -31,15 +33,24 @@ export class CommentsList extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.getAll( {
-      index: 0
+      index: 0,
+      depth: -1,
+      expanded: true
     } );
   }
 
   render() {
     const comments = this.props.page;
 
+    if ( this.props.loading )
+      return (
+        <div className="mt-loading" style={{ textAlign: 'center', padding: '0 0 20px 0' }} >
+          <CircularProgress size={30} />
+        </div>
+      );
+
     if ( !comments || comments.data.length === 0 )
-      return <div>No Comments</div>;
+      return null;
 
     return (
       <Pager
@@ -63,16 +74,23 @@ export class CommentsList extends React.Component<Props, State> {
           id="mt-comments"
           innerRef={elm => this._container = elm}
         >
-          {comments.data.map( comment => {
+          {comments.data.map( ( comment, index ) => {
             return (
-              <Comment className="mt-comment">
+              <Comment className="mt-comment" key={'comment-' + index.toString()}>
                 <div className="mt-comment-avatar">
                   <Avatar src={generateAvatarPic( comment.user as IUserEntry<'client'> )} />
                 </div>
-                <div
-                  className="mt-comment-text"
-                  dangerouslySetInnerHTML={{ __html: comment.content }}
-                />
+                <div>
+                  <div className="mt-comment-author">{comment.author}</div>
+                  <div
+                    className="mt-comment-text"
+                    dangerouslySetInnerHTML={{ __html: comment.content }}
+                  />
+                  <div className="mt-comment-dates">
+                    {format( new Date( comment.lastUpdated ), 'H:m, MMMM Do, YYYY' )}
+                  </div>
+                </div>
+
               </Comment>
             );
           } )}
@@ -88,7 +106,7 @@ const PostsInnerContent = styled.div`
 
 const Comment = styled.div`
   display: flex;
-  margin: 0 0 4px 0;
+  margin: 0 0 8px 0;
 
   > div {
     flex: 1;
@@ -98,12 +116,14 @@ const Comment = styled.div`
     max-width: 50px;
   }
 
-  .mt-comment-text {
-    background: ${theme.light100.background };
-    border: 1px solid ${theme.light100.border };
-    border-radius: 5px;
-    padding: 10px;
-    position: relative;
-    box-sizing: border-box;
+  .mt-comment-author {
+    font-size: 12px;
+    font-weight: bold;
+    color: ${theme.primary100.background };
+  }
+
+  .mt-comment-dates {
+    color: ${theme.light200.softColor };
+    font-size: 12px;
   }
 `;

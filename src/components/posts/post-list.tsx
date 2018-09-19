@@ -12,6 +12,7 @@ import theme from '../../theme/mui-theme';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Create';
 import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
+import * as posts from '../../../../../src/lib-frontend/posts';
 import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';
@@ -21,6 +22,7 @@ export type Props = {
   loading: boolean;
   posts: Page<IPost<'client'>> | null;
   getPosts: ( options: Partial<GetAllOptions> ) => void;
+  postFilters: Partial<posts.GetAllOptions> | null;
   onPostSelected: ( post: IPost<'client'>[] ) => void
   onEdit: ( post: IPost<'client'> ) => void;
   onDelete: ( post: IPost<'client'> ) => void;
@@ -50,9 +52,9 @@ export default class PostList extends React.Component<Props, State> {
     super( props );
     this.state = {
       showDeleteModal: false,
-      sortAscending: false,
+      sortAscending: props.postFilters && props.postFilters.sortOrder! === 'asc' ? true : false,
       visibility: 'all',
-      sortBy: 'created',
+      sortBy: props.postFilters ? props.postFilters.sort! : 'created',
       user: null,
       visibilityOpen: false,
       sortByOpen: false

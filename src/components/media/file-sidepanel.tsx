@@ -162,7 +162,7 @@ const Container = styled.div`
     }
 
     > h2 {
-      margin: 0 24px 10px 24px;
+      margin: ${ ( props: ContainerProps ) => props.panelProps.renderOptionalButtons ? '0' : '20px' } 24px 10px 24px;
       white-space: initial;
       overflow: hidden;
       overflow-wrap: break-word;

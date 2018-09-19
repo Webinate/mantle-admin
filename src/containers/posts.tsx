@@ -144,7 +144,7 @@ export class Posts extends React.Component<Props, State> {
                   <CommentsList
                     page={commentsPage}
                     loading={this.props.comments.busy}
-                    getAll={options => this.props.getComments( options )}
+                    getAll={options => this.props.getComments( { ...options, postId: props.match.params.postId } )}
                     onCommentsSelected={ids => { }}
                   />
                 </div>
@@ -155,6 +155,7 @@ export class Posts extends React.Component<Props, State> {
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
                 filtersOpen={this.state.filtersOpen}
+                postFilters={this.props.posts.postFilters}
                 posts={page}
                 loading={isBusy}
                 animated={this.props.app.debugMode ? false : true}

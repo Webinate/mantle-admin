@@ -23,12 +23,13 @@ export function getComments( options: Partial<comments.GetAllOptions>, postId?: 
     const newFilters: Partial<comments.GetAllOptions> = state.comments.commentFilters ?
       { ...state.comments.commentFilters, ...options } : options;
 
+    // Resets the array first
+    dispatch( ActionCreators.SetComments.create( { page: { count: 0, data: [], index: 0, limit: 0 }, filters: newFilters } ) );
     dispatch( ActionCreators.SetCommentsBusy.create( true ) );
+
     let resp: Page<IComment<'client'>>;
-    if ( !postId )
-      resp = await comments.getAll( newFilters );
-    else
-      resp = await comments.getAllFromParent( postId, newFilters );
+
+    resp = await comments.getAll( newFilters );
 
     dispatch( ActionCreators.SetComments.create( { page: resp, filters: newFilters } ) );
   }
@@ -38,7 +39,7 @@ export function createComment( postId: string, comment: Partial<IComment<'client
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetCommentsBusy.create( true ) );
-      await comments.create( postId, comment );;
+      await comments.create( postId, comment );
       dispatch( getComments( {} ) )
     }
     catch ( err ) {

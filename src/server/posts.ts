@@ -26,14 +26,14 @@ export default async function( req: IAuthReq, actions: Action[] ) {
 
     actions.push( PostActions.SetPost.create( postReply[ 0 ] ) );
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
-    actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: { index: 0 } } ) );
+    actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: { index: 0, depth: -1, expanded: true, postId: matchesEdit.params.id } } ) );
   }
   else if ( matchesNew ) {
     let categories = await controllers.categories.getAll( { expanded: true, depth: -1, root: true } );
     actions.push( CategoryActions.SetCategories.create( categories ) );
   }
   else {
-    let posts = await controllers.posts.getPosts( { public: isAdmin ? undefined : true } );
+    let posts = await controllers.posts.getPosts( { public: isAdmin ? undefined : true, sort: 'modified', sortOrder: 'desc' } );
     actions.push( PostActions.SetPosts.create( { page: posts, filters: { index: 0, keyword: '' } } ) );
   }
 }

@@ -19,7 +19,7 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     actions.push( CommentActions.SetComment.create( comment ) );
   }
   else {
-    let comments = await controllers.comments.getAll( { public: isAdmin ? undefined : true } );
-    actions.push( CommentActions.SetComments.create( { page: comments, filters: { index: 0, keyword: '' } } ) );
+    let comments = await controllers.comments.getAll( { public: isAdmin ? undefined : true, depth: -1, expanded: true } );
+    actions.push( CommentActions.SetComments.create( { page: comments, filters: { index: 0, depth: -1, expanded: true } } ) );
   }
 }
