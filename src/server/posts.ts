@@ -1,6 +1,7 @@
 import { RedirectError } from './errors';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
+import { ActionCreators as CommentActions } from '../store/comments/actions';
 import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';
@@ -19,11 +20,13 @@ export default async function( req: IAuthReq, actions: Action[] ) {
   if ( matchesEdit ) {
     const postReply = await Promise.all( [
       controllers.posts.getPost( { id: matchesEdit.params.id } ),
-      controllers.categories.getAll( { expanded: true, depth: -1, root: true } )
+      controllers.categories.getAll( { expanded: true, depth: -1, root: true } ),
+      controllers.comments.getAll( { expanded: true, depth: -1, index: 0 } )
     ] );
 
     actions.push( PostActions.SetPost.create( postReply[ 0 ] ) );
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
+    actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: { index: 0 } } ) );
   }
   else if ( matchesNew ) {
     let categories = await controllers.categories.getAll( { expanded: true, depth: -1, root: true } );

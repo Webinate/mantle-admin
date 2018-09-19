@@ -4,6 +4,7 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
+import { getComments, createComment } from '../store/comments/actions';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -18,10 +19,13 @@ import PostList from '../components/posts/post-list';
 import PostForm from '../components/posts/post-form';
 import { GetAllOptions } from '../../../../src/lib-frontend/posts';
 import PostFilterBar from '../components/posts/posts-filter-bar';
+import NewComment from '../components/comments/new-comment';
+import { CommentsList } from '../components/comments/comments-list';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   posts: state.posts,
+  comments: state.comments,
   categories: state.categories,
   user: state.authentication.user,
   app: state.app,
@@ -31,15 +35,16 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  getPosts: getPosts,
-  getCategories: getCategories,
-  getPost: getPost,
-  createPost: createPost,
+  getPosts,
+  getCategories,
+  getPost,
+  createPost,
   removePost: deletePosts,
-  createCategory: createCategory,
-  removeCategory: removeCategory,
-  editPost: editPost,
-  push: push
+  createCategory,
+  removeCategory,
+  editPost,
+  push,
+  getComments, createComment
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -87,8 +92,9 @@ export class Posts extends React.Component<Props, State> {
   }
 
   render() {
-    let page = this.props.posts.postPage;
-    let post = this.props.posts.post;
+    const page = this.props.posts.postPage;
+    const post = this.props.posts.post;
+    const commentsPage = this.props.comments.commentPage;
     const isBusy = this.props.posts.busy;
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
@@ -128,6 +134,22 @@ export class Posts extends React.Component<Props, State> {
               post={post}
               onUpdate={post => this.props.editPost( post )}
               isAdmin={isAdmin}
+              renderAfterForm={() => (
+                <div>
+                  <NewComment
+                    auth={this.props.user!}
+                    enabled={!this.props.comments.busy}
+                    onNewComment={comment => this.props.createComment( props.match.params.postId, { content: comment } )}
+                  />
+                  <CommentsList
+                    page={commentsPage}
+                    loading={this.props.comments.busy}
+                    getAll={options => this.props.getComments( options )}
+                    onCommentsSelected={ids => { }}
+                  />
+                </div>
+
+              )}
             />}
             />
             <Route path="/dashboard/posts" exact={true} render={props => {

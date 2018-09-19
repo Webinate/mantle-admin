@@ -13,6 +13,8 @@ export type Props = {
   loading: boolean;
   onPage: ( offset: number ) => void;
   contentProps?: React.HTMLProps<HTMLDivElement>;
+  heightFromContents?: boolean;
+  footerBackground?: boolean;
 }
 
 type State = {
@@ -22,6 +24,11 @@ type State = {
  * A component for paging through large datasets
  */
 export default class Pager extends React.Component<Props, State> {
+
+  static defaultProps: Partial<Props> = {
+    footerBackground: true,
+    heightFromContents: false
+  }
 
   constructor( props: Props ) {
     super( props );
@@ -34,16 +41,20 @@ export default class Pager extends React.Component<Props, State> {
     const total = this.props.total;
     const limit = this.props.limit;
     const isOverflowing = !( ( index === 0 ) && ( index + limit >= total ) );
+    let height: string | undefined = isOverflowing ? 'calc(100% - 50px)' : '100%';
+
+    if ( this.props.heightFromContents )
+      height = undefined;
 
     return (
-      <Container>
+      <Container props={this.props}>
         <div {...this.props.contentProps}
-          style={{ height: isOverflowing ? 'calc(100% - 50px)' : '100%', overflow: 'auto' }}
+          style={{ height: height, overflow: 'auto' }}
         >
           {this.props.children}
         </div>
         {isOverflowing ? (
-          <Footer>
+          <Footer props={this.props}>
             <Text>
               {Math.min( ( index + 1 ), total ) + '-' + Math.min( ( index + limit ), total ) + ' of ' + total}
             </Text>
@@ -101,15 +112,19 @@ export default class Pager extends React.Component<Props, State> {
   }
 }
 
+interface PagerProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
+  props: Props;
+}
+
 const Container = styled.div`
-  height: 100%;
+  height: ${ ( options: PagerProps ) => options.props.heightFromContents ? '' : '100%' };
   position: relative;
 `;
 
 const Footer = styled.div`
-  height: 50px;
-  background: ${theme.light100.background };
-  border-top: 1px solid ${theme.light100.border };
+  height: ${ ( options: PagerProps ) => options.props.heightFromContents ? '' : '50px' };
+  background: ${ ( options: PagerProps ) => !options.props.footerBackground ? '' : theme.light100.background };
+  border-top: ${( options: PagerProps ) => !options.props.footerBackground ? '' : `1px solid ${ theme.light100.border }` };
   box-sizing: border-box;
   padding: 0 10px;
   box-sizing: border-box;

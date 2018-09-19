@@ -8,6 +8,7 @@ import { generateAvatarPic } from 'modepress/clients/modepress-admin/src/utils/c
 import theme from '../../theme/mui-theme';
 
 export type Props = {
+  enabled: boolean;
   auth: IUserEntry<'client'>;
   onNewComment: ( comment: string ) => void;
 }
@@ -36,25 +37,25 @@ export default class NewComment extends React.Component<Props, State> {
             placeholder="Write a comment"
             id="mt-new-comment-content"
             value={this.state.comment}
-            onKeyDown={e => {
-              if ( e.keyCode === 13 )
-                this.props.onNewComment( this.state.comment );
-            }}
             onChange={( e ) => {
               e.currentTarget.style.height = '1px';
               e.currentTarget.style.height = ( 20 + e.currentTarget.scrollHeight ) + 'px';
-
               this.setState( { comment: e.currentTarget.value } )
             }}
           />
           <div className="mt-comment-form-actions">
-            <IconButton style={{ height: '40px', width: '40px' }}>
+            <IconButton
+              id="mt-new-comment-add-btn"
+              disabled={!this.props.enabled}
+              onClick={e => {
+                this.props.onNewComment( this.state.comment );
+                this.setState( { comment: '' } );
+              }}
+              style={{ height: '40px', width: '40px' }}>
               <CommentIcon style={{ fontSize: '18px' }} />
             </IconButton>
           </div>
-
         </div>
-
       </Container>
     )
   }
@@ -62,7 +63,7 @@ export default class NewComment extends React.Component<Props, State> {
 
 const Container = styled.div`
   display: flex;
-  padding: 20px 0;
+  padding: 20px 0 5px 0;
 
   > div {
     flex: 1;
@@ -83,5 +84,15 @@ const Container = styled.div`
     border: 1px solid ${theme.light100.border };
     resize: none;
     font-weight: lighter;
+    margin: 0 0 5px 0;
+
+    &::placeholder {
+      color: ${theme.light100.softColor };
+    }
+
+    &:active, &:focus {
+      border: 1px solid ${theme.primary100.border };
+      outline: none;
+    }
   }
 `;

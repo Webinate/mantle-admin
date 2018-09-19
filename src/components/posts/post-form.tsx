@@ -18,7 +18,6 @@ import { CategoryEditor } from '../../containers/category-editor';
 import FormControl from '@material-ui/core/FormControl';
 import { MediaModal } from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
-import NewComment from 'modepress/clients/modepress-admin/src/components/comments/new-comment';
 
 export type Props = {
   activeUser: IUserEntry<'client'>;
@@ -28,6 +27,7 @@ export type Props = {
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
+  renderAfterForm?: () => undefined | null | JSX.Element;
 }
 
 export type State = {
@@ -165,10 +165,8 @@ export default class PostForm extends React.Component<Props, State> {
           }}
         />
 
-        <NewComment
-          auth={this.props.activeUser}
-          onNewComment={comment => { }}
-        />
+        {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
+
       </div>
       <div>
         <RightPanel>
