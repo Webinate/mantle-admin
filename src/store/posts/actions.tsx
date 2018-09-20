@@ -1,6 +1,7 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, IPost } from '../../../../../src';
 import * as posts from '../../../../../src/lib-frontend/posts';
+import { PostsGetAllOptions } from 'modepress';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { push } from 'react-router-redux';
@@ -8,7 +9,7 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<posts.GetAllOptions> }>( 'posts-set-posts' ),
+  SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
   SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' )
 };
 
@@ -18,10 +19,10 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 /**
  * Refreshes the user state
  */
-export function getPosts( options: Partial<posts.GetAllOptions> ) {
+export function getPosts( options: Partial<PostsGetAllOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     const state = getState();
-    const newFilters: Partial<posts.GetAllOptions> = state.posts.postFilters ?
+    const newFilters = state.posts.postFilters ?
       { ...state.posts.postFilters, ...options } : options;
 
     dispatch( ActionCreators.SetPostsBusy.create( true ) );

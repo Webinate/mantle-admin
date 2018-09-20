@@ -17,7 +17,6 @@ import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import PostList from '../components/posts/post-list';
 import PostForm from '../components/posts/post-form';
-import { GetAllOptions } from '../../../../src/lib-frontend/posts';
 import PostFilterBar from '../components/posts/posts-filter-bar';
 import NewComment from '../components/comments/new-comment';
 import { CommentsList } from '../components/comments/comments-list';
@@ -165,7 +164,7 @@ export class Posts extends React.Component<Props, State> {
                 onPostSelected={selected => {
                   this.setState( { selectedPosts: selected } )
                 }}
-                getPosts={( options: Partial<GetAllOptions> ) => this.props.getPosts( options )}
+                getPosts={( options ) => this.props.getPosts( options )}
               />;
             }} />
           </Switch>

@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { IComment, Page, IUserEntry } from 'modepress';
+import { IComment, Page, IUserEntry, CommentGetAllOptions } from 'modepress';
 import Pager from 'modepress/clients/modepress-admin/src/components/pager';
 import { default as styled } from 'modepress/clients/modepress-admin/src/theme/styled';
-import { GetAllOptions } from 'modepress/src/lib-frontend/comments';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
@@ -12,7 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 export type Props = {
   page: Page<IComment<'client'>> | null;
   loading: boolean;
-  getAll: ( options: Partial<GetAllOptions> ) => void;
+  getAll: ( options: Partial<CommentGetAllOptions> ) => void;
   onCommentsSelected: ( uids: string[] ) => void;
 };
 

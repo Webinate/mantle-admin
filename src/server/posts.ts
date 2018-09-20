@@ -21,7 +21,7 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     const postReply = await Promise.all( [
       controllers.posts.getPost( { id: matchesEdit.params.id } ),
       controllers.categories.getAll( { expanded: true, depth: -1, root: true } ),
-      controllers.comments.getAll( { expanded: true, depth: -1, index: 0 } )
+      controllers.comments.getAll( { expanded: true, depth: -1, index: 0, postId: matchesEdit.params.id } )
     ] );
 
     actions.push( PostActions.SetPost.create( postReply[ 0 ] ) );
@@ -33,7 +33,7 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     actions.push( CategoryActions.SetCategories.create( categories ) );
   }
   else {
-    let posts = await controllers.posts.getPosts( { public: isAdmin ? undefined : true, sort: 'modified', sortOrder: 'desc' } );
-    actions.push( PostActions.SetPosts.create( { page: posts, filters: { index: 0, keyword: '' } } ) );
+    let posts = await controllers.posts.getPosts( { visibility: isAdmin ? 'all' : 'public', sort: 'modified', sortOrder: 'desc' } );
+    actions.push( PostActions.SetPosts.create( { page: posts, filters: { index: 0, keyword: '', sort: 'modified', sortOrder: 'desc' } } ) );
   }
 }

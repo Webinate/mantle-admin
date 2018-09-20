@@ -11,8 +11,7 @@ import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Create';
-import { GetAllOptions } from '../../../../../src/lib-frontend/posts';
-import * as posts from '../../../../../src/lib-frontend/posts';
+import { PostsGetAllOptions } from 'modepress';
 import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';
@@ -21,8 +20,8 @@ export type Props = {
   animated: boolean;
   loading: boolean;
   posts: Page<IPost<'client'>> | null;
-  getPosts: ( options: Partial<GetAllOptions> ) => void;
-  postFilters: Partial<posts.GetAllOptions> | null;
+  getPosts: ( options: Partial<PostsGetAllOptions> ) => void;
+  postFilters: Partial<PostsGetAllOptions> | null;
   onPostSelected: ( post: IPost<'client'>[] ) => void
   onEdit: ( post: IPost<'client'> ) => void;
   onDelete: ( post: IPost<'client'> ) => void;

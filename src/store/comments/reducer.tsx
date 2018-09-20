@@ -1,10 +1,10 @@
 import { ActionCreators, Action } from './actions';
-import * as comments from '../../../../../src/lib-frontend/comments';
+import { CommentGetAllOptions } from 'modepress';
 import { Page, IComment } from '../../../../../src';
 
 // State
 export type State = {
-  readonly commentFilters: Partial<comments.GetAllOptions> | null;
+  readonly commentFilters: Partial<CommentGetAllOptions> | null;
   readonly commentPage: Page<IComment<'client'>> | null;
   readonly comment: IComment<'client'> | null;
   readonly busy: boolean;

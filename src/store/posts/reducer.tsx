@@ -1,10 +1,10 @@
 import { ActionCreators, Action } from './actions';
-import * as posts from '../../../../../src/lib-frontend/posts';
+import { PostsGetAllOptions } from 'modepress';
 import { Page, IPost } from '../../../../../src';
 
 // State
 export type State = {
-  readonly postFilters: Partial<posts.GetAllOptions> | null;
+  readonly postFilters: Partial<PostsGetAllOptions> | null;
   readonly postPage: Page<IPost<'client'>> | null;
   readonly post: IPost<'client'> | null;
   readonly busy: boolean;
