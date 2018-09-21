@@ -9,7 +9,6 @@ import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirecto
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
-import { GetAllOptions } from '../../../../src/lib-frontend/volumes';
 import { SortTypes } from '../components/media/directory-view';
 import { SortOrder } from '../components/media/volumes';
 import { isAdminUser } from '../utils/component-utils';
@@ -143,7 +142,7 @@ export class Media extends React.Component<Props, State> {
                 onSelectionChanged={volumes => this.setState( { selectedUids: volumes } )}
                 loading={this.props.media.busy}
                 volumes={this.props.media.volumePage}
-                getVolumes={( options: Partial<GetAllOptions> ) => this.props.getVolumes( options )}
+                getVolumes={( options ) => this.props.getVolumes( options )}
               />;
             }} />
           </Switch>

@@ -2,6 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
 import * as files from '../../../../../src/lib-frontend/files';
+import { FilesGetOptions, VolumesGetOptions } from 'modepress';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { isAdminUser } from '../../utils/component-utils';
@@ -9,8 +10,8 @@ import { isAdminUser } from '../../utils/component-utils';
 // Action Creators
 export const ActionCreators = {
   SetVolumesBusy: new ActionCreator<'media-busy', boolean>( 'media-busy' ),
-  SetVolumes: new ActionCreator<'media-set-volumes', { page: Page<IVolume<'client'>>, filters: Partial<volumes.GetAllOptions> }>( 'media-set-volumes' ),
-  SetFiles: new ActionCreator<'media-set-files', { page: Page<IFileEntry<'client'>>, filters: Partial<volumes.GetAllOptions> }>( 'media-set-files' ),
+  SetVolumes: new ActionCreator<'media-set-volumes', { page: Page<IVolume<'client'>>, filters: Partial<VolumesGetOptions> }>( 'media-set-volumes' ),
+  SetFiles: new ActionCreator<'media-set-files', { page: Page<IFileEntry<'client'>>, filters: Partial<FilesGetOptions> }>( 'media-set-files' ),
   SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client'> | null>( 'media-selected-volume' ),
   VolumeFormError: new ActionCreator<'media-volume-form-error', Error>( 'media-volume-form-error' ),
 };
@@ -18,11 +19,11 @@ export const ActionCreators = {
 // Action Types
 export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 
-export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
+export function getVolumes( options: Partial<VolumesGetOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       const state = getState();
-      const newFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
+      const newFilters: Partial<VolumesGetOptions> = state.media.volumeFilters ?
         { ...state.media.volumeFilters, ...options } : options;
 
       dispatch( ActionCreators.SelectedVolume.create( null ) );
@@ -41,7 +42,7 @@ export function getVolumes( options: Partial<volumes.GetAllOptions> ) {
 export function upload( volumeId: string, filesArr: File[] ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     const state = getState();
-    const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
+    const filesFilter: Partial<FilesGetOptions> = state.media.filesFilters ?
       { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
 
     try {
@@ -113,12 +114,12 @@ export function getVolume( id: string ) {
   }
 }
 
-export function openDirectory( id: string, options: Partial<files.GetAllOptions> = { index: 0 } ) {
+export function openDirectory( id: string, options: Partial<FilesGetOptions> = { index: 0 } ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );
 
     const state = getState();
-    const filesFilter: Partial<files.GetAllOptions> = state.media.filesFilters ?
+    const filesFilter = state.media.filesFilters ?
       { ...state.media.filesFilters, ...options } : options;
 
     try {
@@ -180,7 +181,7 @@ export function createVolume( token: Partial<IVolume<'client'>>, callback: () =>
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       const state = getState();
-      const volumeFilters: Partial<volumes.GetAllOptions> = state.media.volumeFilters ?
+      const volumeFilters = state.media.volumeFilters ?
         { ...state.media.volumeFilters, ...{ index: 0 } } : { index: 0 };
 
       dispatch( ActionCreators.SetVolumesBusy.create( true ) );

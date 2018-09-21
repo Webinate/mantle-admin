@@ -12,7 +12,7 @@ import { IVolume, Page, IFileEntry } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
-import { GetOptions } from '../../../../../src/controllers/files';
+import { FilesGetOptions } from 'modepress';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
@@ -23,8 +23,8 @@ export type Props = {
   files: Page<IFileEntry<'client'>> | null;
   loading: boolean;
   selectedUids: string[];
-  activeFilters: Partial<GetOptions>;
-  openDirectory: ( id: string, optons: GetOptions ) => void;
+  activeFilters: Partial<FilesGetOptions>;
+  openDirectory: ( id: string, optons: FilesGetOptions ) => void;
   onSelectionChanged: ( uids: string[] ) => void;
   onSort: ( sortBy: SortTypes, sortDir: SortOrder ) => void;
 }

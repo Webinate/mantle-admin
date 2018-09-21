@@ -1,14 +1,13 @@
 import { ActionCreators, Action } from './actions';
-import * as volumes from '../../../../../src/lib-frontend/volumes';
-import * as files from '../../../../../src/lib-frontend/files';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
+import { VolumesGetOptions, FilesGetOptions } from 'modepress';
 
 // State
 export type State = {
   readonly volumePage: Page<IVolume<'client'>> | null;
-  readonly volumeFilters: Partial<volumes.GetAllOptions>;
+  readonly volumeFilters: Partial<VolumesGetOptions>;
   readonly filesPage: Page<IFileEntry<'client'>> | null;
-  readonly filesFilters: Partial<files.GetAllOptions>;
+  readonly filesFilters: Partial<FilesGetOptions>;
   readonly selected: IVolume<'client'> | null;
   readonly busy: boolean;
   readonly volumeFormError: Error | null;

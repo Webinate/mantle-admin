@@ -4,7 +4,6 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
 import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
-import { GetAllOptions } from '../../../../src/lib-frontend/volumes';
 import { SortTypes } from '../components/media/directory-view';
 import { SortOrder } from '../components/media/volumes';
 import Dialog from '@material-ui/core/Dialog/Dialog';
@@ -148,7 +147,7 @@ export class MediaModal extends React.Component<Props, State> {
         onSelectionChanged={volumes => this.setState( { selectedUid: volumes[ volumes.length - 1 ] } )}
         loading={this.props.media.busy}
         volumes={this.props.media.volumePage}
-        getVolumes={( options: Partial<GetAllOptions> ) => this.props.getVolumes( options )}
+        getVolumes={( options ) => this.props.getVolumes( options )}
       />;
     }
 

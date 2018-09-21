@@ -13,7 +13,7 @@ import { IVolume, Page } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
-import { GetAllOptions } from '../../../../../src/lib-frontend/volumes';
+import { VolumesGetOptions } from 'modepress';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';
@@ -23,9 +23,9 @@ export type Props = {
   volumes: Page<IVolume<'client'>>;
   loading: boolean;
   selectedUids: string[];
-  activeFilters: Partial<GetAllOptions>;
+  activeFilters: Partial<VolumesGetOptions>;
   onSelectionChanged: ( uids: string[] ) => void;
-  getVolumes: ( options: Partial<GetAllOptions> ) => void;
+  getVolumes: ( options: Partial<VolumesGetOptions> ) => void;
   onSort: ( sortBy: SortTypes, sortDir: SortOrder ) => void;
   openVolume: ( volumeId: string ) => void;
 }
