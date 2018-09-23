@@ -48,3 +48,16 @@ export function createComment( postId: string, comment: Partial<IComment<'client
     }
   }
 }
+
+export function editComment( commentId: string, token: Partial<IComment<'client'>> ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetCommentsBusy.create( true ) );
+      await comments.update( commentId, token );
+      dispatch( getComments( {} ) )
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+    }
+  }
+}

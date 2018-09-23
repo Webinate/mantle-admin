@@ -13,10 +13,12 @@ export type Props = {
   loading: boolean;
   getAll: ( options: Partial<CommentGetAllOptions> ) => void;
   onCommentsSelected: ( uids: string[] ) => void;
+  onEdit: ( id: string, token: Partial<IComment<'client'>> ) => void;
 };
 
 export type State = {
-
+  activeCommentId: string;
+  activeCommentText: string;
 };
 
 export class CommentsList extends React.Component<Props, State> {
@@ -26,7 +28,8 @@ export class CommentsList extends React.Component<Props, State> {
     super( props );
     this._container = null;
     this.state = {
-
+      activeCommentId: '',
+      activeCommentText: ''
     };
   }
 
@@ -35,6 +38,13 @@ export class CommentsList extends React.Component<Props, State> {
       index: 0,
       depth: -1,
       expanded: true
+    } );
+  }
+
+  private onEdit( comment: IComment<'client'> ) {
+    this.setState( {
+      activeCommentId: comment._id,
+      activeCommentText: comment.content
     } );
   }
 
@@ -74,20 +84,76 @@ export class CommentsList extends React.Component<Props, State> {
           innerRef={elm => this._container = elm}
         >
           {comments.data.map( ( comment, index ) => {
+            const isEditting = this.state.activeCommentId === comment._id;
+
             return (
-              <Comment className="mt-comment" key={'comment-' + index.toString()}>
+              <Comment
+                className={`mt-comment ${ isEditting ? 'mt-editting' : '' }`}
+                key={'comment-' + index.toString()}
+              >
                 <div className="mt-comment-avatar">
                   <Avatar src={generateAvatarPic( comment.user as IUserEntry<'client'> )} />
                 </div>
                 <div>
                   <div className="mt-comment-author">{comment.author}</div>
-                  <div
-                    className="mt-comment-text"
-                    dangerouslySetInnerHTML={{ __html: comment.content }}
-                  />
-                  <div className="mt-comment-dates">
-                    {format( new Date( comment.lastUpdated ), 'H:m, MMMM Do, YYYY' )}
-                  </div>
+                  {
+                    !isEditting ?
+                      <div
+                        className="mt-comment-text"
+                        dangerouslySetInnerHTML={{ __html: comment.content }}
+                      /> :
+                      <textarea
+                        id="mt-comment-edit-txt"
+                        autoFocus={true}
+                        ref={elm => {
+                          if ( !elm )
+                            return;
+
+                          elm.style.height = '1px';
+                          elm.style.height = ( 20 + elm.scrollHeight ) + 'px';
+                        }}
+                        onChange={e => {
+                          e.currentTarget.style.height = '1px';
+                          e.currentTarget.style.height = ( 20 + e.currentTarget.scrollHeight ) + 'px';
+                          this.setState( { activeCommentText: e.currentTarget.value } )
+                        }}
+                        value={this.state.activeCommentText}
+                      />
+                  }
+                  {
+                    isEditting ?
+                      <div
+                        className="mt-edit-conf-panel"
+                      >
+                        <span
+                          id="mt-edit-comment-cancel"
+                          onClick={e => this.setState( { activeCommentId: '' } )}
+                        >
+                          Cancel
+                        </span>
+                        <span
+                          id="mt-edit-comment-save"
+                          onClick={e => {
+                            this.props.onEdit( comment._id, { content: this.state.activeCommentText } );
+                            this.setState( { activeCommentId: '' } );
+                          }}
+                        >
+                          Save
+                        </span>
+                      </div> :
+                      <div
+                        className="mt-comment-editpnl">
+                        <span
+                          className="mt-edit-comment-btn"
+                          onClick={e => this.onEdit( comment )}
+                        >
+                          Edit
+                        </span>
+                        <span className="mt-comment-date">
+                          {format( new Date( comment.lastUpdated ), 'H:m, MMMM Do, YYYY' )}
+                        </span>
+                      </div>
+                  }
                 </div>
 
               </Comment>
@@ -106,9 +172,24 @@ const PostsInnerContent = styled.div`
 const Comment = styled.div`
   display: flex;
   margin: 0 0 8px 0;
+  color: ${theme.light100.color };
 
   > div {
     flex: 1;
+  }
+
+  .mt-comment-editpnl {
+    margin: 6px 0 0 0;
+  }
+
+  &.mt-editting {
+    margin: 20px 0 0 0;
+    transition: 0.3s margin;
+  }
+
+  .mt-edit-conf-panel {
+    text-align: right;
+    margin: 6px 0 6px 0;
   }
 
   .mt-comment-avatar {
@@ -118,10 +199,47 @@ const Comment = styled.div`
   .mt-comment-author {
     font-size: 12px;
     font-weight: bold;
-    color: ${theme.primary100.background };
   }
 
-  .mt-comment-dates {
+  #mt-edit-comment-save {
+    margin: 0 0 0 10px;
+  }
+
+  .mt-edit-comment-btn, #mt-edit-comment-save, #mt-edit-comment-cancel {
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 400;
+    color: ${theme.primary200.background };
+    &:hover {
+      color: ${theme.primary300.background };
+    }
+  }
+
+  .mt-edit-comment-btn {
+    margin: 0 5px 0 0;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid ${theme.light100.border };
+    resize: none;
+    font-weight: lighter;
+    margin: 2px 0 0 0;
+
+    &::placeholder {
+      color: ${theme.light100.softColor };
+    }
+
+    &:active, &:focus {
+      border: 1px solid ${theme.primary100.border };
+      outline: none;
+    }
+  }
+
+  .mt-comment-date {
     color: ${theme.light200.softColor };
     font-size: 12px;
   }

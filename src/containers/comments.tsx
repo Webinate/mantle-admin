@@ -3,7 +3,7 @@ import { IRootState } from 'modepress/clients/modepress-admin/src/store';
 import { connectWrapper, returntypeof } from 'modepress/clients/modepress-admin/src/utils/decorators';
 import { default as styled } from 'modepress/clients/modepress-admin/src/theme/styled';
 import ContentHeader from 'modepress/clients/modepress-admin/src/components/content-header';
-import { getComments } from '../store/comments/actions';
+import { getComments, editComment } from '../store/comments/actions';
 import FilterBar from 'modepress/clients/modepress-admin/src/components/comments/filter-bar';
 import { IComment } from 'modepress';
 import { isAdminUser } from '../utils/component-utils';
@@ -19,7 +19,8 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  getAll: getComments
+  getAll: getComments,
+  editComment
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -83,6 +84,7 @@ export class Comments extends React.Component<Props, State> {
         <Container>
           <CommentsList
             getAll={options => this.props.getAll( options )}
+            onEdit={( id, token ) => this.props.editComment( id, token )}
             onCommentsSelected={uids => this.setState( { selectedUids: uids } )}
             loading={isBusy}
             page={page}

@@ -4,7 +4,7 @@ import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
-import { getComments, createComment } from '../store/comments/actions';
+import { getComments, createComment, editComment } from '../store/comments/actions';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -43,7 +43,9 @@ const dispatchToProps = {
   removeCategory,
   editPost,
   push,
-  getComments, createComment
+  getComments,
+  createComment,
+  editComment
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -142,6 +144,7 @@ export class Posts extends React.Component<Props, State> {
                   />
                   <CommentsList
                     page={commentsPage}
+                    onEdit={( id, token ) => this.props.editComment( id, token )}
                     loading={this.props.comments.busy}
                     getAll={options => this.props.getComments( { ...options, postId: props.match.params.postId } )}
                     onCommentsSelected={ids => { }}
