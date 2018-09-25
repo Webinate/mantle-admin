@@ -25,7 +25,6 @@ export function getComments( options: Partial<CommentGetAllOptions>, postId?: st
       { ...state.comments.commentFilters, ...options } : options;
 
     // Resets the array first
-    dispatch( ActionCreators.SetComments.create( { page: { count: 0, data: [], index: 0, limit: 0 }, filters: newFilters } ) );
     dispatch( ActionCreators.SetCommentsBusy.create( true ) );
 
     let resp: Page<IComment<'client'>>;
@@ -36,11 +35,11 @@ export function getComments( options: Partial<CommentGetAllOptions>, postId?: st
   }
 }
 
-export function createComment( postId: string, comment: Partial<IComment<'client'>> ) {
+export function createComment( postId: string, comment: Partial<IComment<'client'>>, parent?: string ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetCommentsBusy.create( true ) );
-      await comments.create( postId, comment );
+      await comments.create( postId, comment, parent );
       dispatch( getComments( {} ) )
     }
     catch ( err ) {
@@ -54,6 +53,19 @@ export function editComment( commentId: string, token: Partial<IComment<'client'
     try {
       dispatch( ActionCreators.SetCommentsBusy.create( true ) );
       await comments.update( commentId, token );
+      dispatch( getComments( {} ) )
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+    }
+  }
+}
+
+export function deleteComment( commentId: string ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetCommentsBusy.create( true ) );
+      await comments.remove( commentId );
       dispatch( getComments( {} ) )
     }
     catch ( err ) {

@@ -9,8 +9,10 @@ import theme from '../../theme/mui-theme';
 
 export type Props = {
   enabled: boolean;
+  commentMode?: boolean;
   auth: IUserEntry<'client'>;
   onNewComment: ( comment: string ) => void;
+  onCancel?: () => void;
 }
 
 type State = {
@@ -18,6 +20,10 @@ type State = {
 };
 
 export default class NewComment extends React.Component<Props, State> {
+
+  static defaultProps: Partial<Props> = {
+    commentMode: false
+  }
 
   constructor( props: Props ) {
     super( props );
@@ -37,24 +43,51 @@ export default class NewComment extends React.Component<Props, State> {
             placeholder="Write a comment"
             id="mt-new-comment-content"
             value={this.state.comment}
+            autoFocus={this.props.commentMode ? true : undefined}
             onChange={( e ) => {
               e.currentTarget.style.height = '1px';
               e.currentTarget.style.height = ( 20 + e.currentTarget.scrollHeight ) + 'px';
               this.setState( { comment: e.currentTarget.value } )
             }}
           />
-          <div className="mt-comment-form-actions">
-            <IconButton
-              id="mt-new-comment-add-btn"
-              disabled={!this.props.enabled}
-              onClick={e => {
-                this.props.onNewComment( this.state.comment );
-                this.setState( { comment: '' } );
-              }}
-              style={{ height: '40px', width: '40px' }}>
-              <CommentIcon style={{ fontSize: '18px' }} />
-            </IconButton>
-          </div>
+          {
+            this.props.commentMode ?
+              <div className="mt-comment-form-actions">
+                <span
+                  id="mt-new-comment-cancel-btn"
+                  onClick={e => {
+                    if ( this.props.onCancel )
+                      this.props.onCancel()
+                  }}
+                >Cancel</span>
+                <span
+                  id="mt-new-comment-add-btn"
+                  onClick={e => {
+                    if ( this.state.comment.trim() === '' )
+                      return;
+
+                    this.props.onNewComment( this.state.comment );
+                    this.setState( { comment: '' } );
+                  }}
+                >Reply</span>
+              </div> :
+              <div className="mt-comment-form-actions">
+                <IconButton
+                  id="mt-new-comment-add-btn"
+                  disabled={!this.props.enabled}
+                  onClick={e => {
+                    if ( this.state.comment.trim() === '' )
+                      return;
+
+                    this.props.onNewComment( this.state.comment );
+                    this.setState( { comment: '' } );
+                  }}
+                  style={{ height: '40px', width: '40px' }}>
+                  <CommentIcon style={{ fontSize: '18px' }} />
+                </IconButton>
+              </div>
+          }
+
         </div>
       </Container>
     )
@@ -69,6 +102,19 @@ const Container = styled.div`
     flex: 1;
     &:first-child {
       max-width: 60px;
+    }
+  }
+
+  #mt-new-comment-cancel-btn, #mt-new-comment-add-btn {
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 400;
+    margin: 0 0 0 5px;
+    line-height: 30px;
+    color: ${theme.primary200.background };
+
+    &:hover {
+      color: ${theme.primary300.background };
     }
   }
 

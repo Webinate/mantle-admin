@@ -1,6 +1,7 @@
 import { ActionCreators, Action } from './actions';
 import { CommentGetAllOptions } from 'modepress';
 import { Page, IComment } from '../../../../../src';
+import { ActionCreators as AppActions, Action as AppAction } from '../app/actions';
 
 // State
 export type State = {
@@ -18,7 +19,7 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action ): State {
+export default function reducer( state: State = initialState, action: Action | AppAction ): State {
   let partialState: Partial<State> | undefined;
 
   switch ( action.type ) {
@@ -37,6 +38,12 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.SetComment.type:
       partialState = {
         comment: action.payload,
+        busy: false
+      };
+      break;
+
+    case AppActions.serverResponse.type:
+      partialState = {
         busy: false
       };
       break;
