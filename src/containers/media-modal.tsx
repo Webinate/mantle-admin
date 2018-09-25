@@ -88,7 +88,7 @@ export class MediaModal extends React.Component<Props, State> {
     let navigator: JSX.Element | null = null;
     const style: React.CSSProperties = {
       width: '100%',
-      height: '600px'
+      height: '700px'
     };
 
     if ( activeDir ) {

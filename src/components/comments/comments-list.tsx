@@ -109,13 +109,6 @@ export class CommentsList extends React.Component<Props, State> {
   render() {
     const comments = this.props.page;
 
-    // if ( this.props.loading )
-    //   return (
-    //     <div className="mt-loading" style={{ textAlign: 'center', padding: '0 0 20px 0' }} >
-    //       <CircularProgress size={30} />
-    //     </div>
-    //   );
-
     if ( !comments )
       return null;
 
