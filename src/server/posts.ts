@@ -29,12 +29,6 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     postId: matchesEdit ? matchesEdit.params.id : undefined
   };
 
-
-  if ( !isAdmin ) {
-    if ( matchesNew || matchesEdit )
-      throw new RedirectError( '/dashboard/posts' );
-  }
-
   if ( matchesEdit ) {
     const postReply = await Promise.all( [
       controllers.posts.getPost( { id: matchesEdit.params.id } ),
@@ -42,11 +36,19 @@ export default async function( req: IAuthReq, actions: Action[] ) {
       controllers.comments.getAll( initialCommentFilter )
     ] );
 
-    actions.push( PostActions.SetPost.create( postReply[ 0 ] ) );
+    const post = postReply[ 0 ];
+
+    if ( !isAdmin && !post.public )
+      throw new RedirectError( '/dashboard/posts' );
+
+    actions.push( PostActions.SetPost.create( post ) );
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
     actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: initialCommentFilter } ) );
   }
   else if ( matchesNew ) {
+    if ( !isAdmin )
+      throw new RedirectError( '/dashboard/posts' );
+
     let categories = await controllers.categories.getAll( initialCategoryFilter );
     actions.push( CategoryActions.SetCategories.create( categories ) );
   }

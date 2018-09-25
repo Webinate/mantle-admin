@@ -20,6 +20,7 @@ import PostForm from '../components/posts/post-form';
 import PostFilterBar from '../components/posts/posts-filter-bar';
 import NewComment from '../components/comments/new-comment';
 import { CommentsList } from '../components/comments/comments-list';
+import PostPreview from '../components/posts/post-preview';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -93,13 +94,36 @@ export class Posts extends React.Component<Props, State> {
     this.props.getPosts( { index: 0, keyword: term } );
   }
 
+  private renderComment( postId: string ) {
+    const commentsPage = this.props.comments.commentPage;
+    const user = this.props.user!;
+
+    return <div>
+      <NewComment
+        auth={user}
+        enabled={!this.props.comments.busy}
+        onNewComment={comment => this.props.createComment( postId, { content: comment } )}
+      />
+      <CommentsList
+        page={commentsPage}
+        onReply={( post, parent, comment ) => this.props.createComment( post, comment, parent )}
+        auth={this.props.user!}
+        onEdit={( id, token ) => this.props.editComment( id, token )}
+        loading={this.props.comments.busy}
+        getAll={options => this.props.getComments( { ...options, postId: postId } )}
+        onDelete={id => this.props.deleteComment( id )}
+        onCommentsSelected={ids => { }}
+      />
+    </div>
+  }
+
   render() {
     const page = this.props.posts.postPage;
     const post = this.props.posts.post;
-    const commentsPage = this.props.comments.commentPage;
     const isBusy = this.props.posts.busy;
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
+    const user = this.props.user!;
 
     return (
       <div style={{ height: '100%' }} className="mt-post-container">
@@ -123,40 +147,37 @@ export class Posts extends React.Component<Props, State> {
             <Route path="/dashboard/posts/new" render={props => <PostForm
               onCreate={post => this.props.createPost( post )}
               isAdmin={isAdmin}
-              activeUser={this.props.user!}
+              activeUser={user}
             />}
             />
-            <Route path="/dashboard/posts/edit/:postId" render={props => <PostForm
-              id={props.match.params.postId}
-              activeUser={this.props.user!}
-              onFetch={id => {
-                this.props.getPost( id );
-                this.props.getCategories();
-              }}
-              post={post}
-              onUpdate={post => this.props.editPost( post )}
-              isAdmin={isAdmin}
-              renderAfterForm={() => (
-                <div>
-                  <NewComment
-                    auth={this.props.user!}
-                    enabled={!this.props.comments.busy}
-                    onNewComment={comment => this.props.createComment( props.match.params.postId, { content: comment } )}
-                  />
-                  <CommentsList
-                    page={commentsPage}
-                    onReply={(post, parent, comment) => this.props.createComment( post, comment, parent )}
-                    auth={this.props.user!}
-                    onEdit={( id, token ) => this.props.editComment( id, token )}
-                    loading={this.props.comments.busy}
-                    getAll={options => this.props.getComments( { ...options, postId: props.match.params.postId } )}
-                    onDelete={id => this.props.deleteComment( id )}
-                    onCommentsSelected={ids => { }}
-                  />
-                </div>
-
-              )}
-            />}
+            <Route path="/dashboard/posts/edit/:postId" render={props => {
+              if ( isAdmin || ( post && user._id === post._id ) ) {
+                return <PostForm
+                  id={props.match.params.postId}
+                  activeUser={user}
+                  onFetch={id => {
+                    this.props.getPost( id );
+                    this.props.getCategories();
+                  }}
+                  post={post}
+                  onUpdate={post => this.props.editPost( post )}
+                  isAdmin={isAdmin}
+                  renderAfterForm={() => this.renderComment( props.match.params.postId )}
+                />
+              }
+              else {
+                return <PostPreview
+                  post={post}
+                  loading={isBusy}
+                  id={props.match.params.postId}
+                  onFetch={id => {
+                    this.props.getPost( id );
+                    this.props.getCategories();
+                  }}
+                  renderComments={() => this.renderComment( props.match.params.postId )}
+                />
+              }
+            }}
             />
             <Route path="/dashboard/posts" exact={true} render={props => {
               return <PostList
