@@ -100,6 +100,7 @@ export class Utils {
   async initialize() {
     this.browser = await puppeteer.launch( { headless: false } );
     this.page = await this.browser.newPage();
+    await this.page.setViewport( { width: 1024, height: 768 } );
     this.config = JSON.parse( fs.readFileSync( args.config ).toString() );
     this.modepress = JSON.parse( fs.readFileSync( './modepress.json' ).toString() );
     this.host = this.getHost();
