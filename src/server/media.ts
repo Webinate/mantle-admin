@@ -7,10 +7,8 @@ import { RedirectError } from './errors';
 import { VolumesGetOptions, FilesGetOptions } from 'modepress';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
-  const isAdmin = req._user && req._user.privileges < 2 ? true : false;
   const volumesView = matchPath<any>( req.url, { path: '/dashboard/media/volumes/:id' } );
   const initialVolumeFilter: Partial<VolumesGetOptions> = {
-    user: isAdmin ? undefined : req._user!.username as string,
     index: 0,
     search: '',
     sort: 'created',
