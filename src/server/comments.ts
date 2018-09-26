@@ -12,7 +12,10 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     visibility: isAdmin ? 'all' : 'public',
     index: 0,
     depth: -1,
-    expanded: true
+    expanded: true,
+    sortType: 'updated',
+    sortOrder: 'desc',
+    root: true
   };
 
   if ( !isAdmin ) {

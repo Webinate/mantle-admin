@@ -31,7 +31,7 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.SetVolumes.type:
       partialState = {
         volumePage: action.payload.page,
-        volumeFilters: action.payload.filters,
+        volumeFilters: { ...state.volumeFilters, ...action.payload.filters },
         busy: false
       };
       break;
@@ -39,7 +39,7 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.SetFiles.type:
       partialState = {
         filesPage: action.payload.page,
-        filesFilters: action.payload.filters,
+        filesFilters: { ...state.filesFilters, ...action.payload.filters },
         busy: false
       };
       break;

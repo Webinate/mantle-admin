@@ -22,8 +22,7 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 export function getPosts( options: Partial<PostsGetAllOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     const state = getState();
-    const newFilters = state.posts.postFilters ?
-      { ...state.posts.postFilters, ...options } : options;
+    const newFilters = { ...state.posts.postFilters, ...options };
 
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
     const resp = await posts.getAll( newFilters );
@@ -64,7 +63,7 @@ export function deletePosts( toDelete: Partial<IPost<'client'>>[] ) {
 
       dispatch( AppActions.serverResponse.create( toDelete.length > 1 ? `Deleted [${ toDelete.length }] posts` : `Post '${ toDelete[ 0 ].title }' deleted` ) );
       const state = getState();
-      const filters = state.posts.postFilters || { index: 0, keyword: '' };
+      const filters = { ...state.posts.postFilters, ...{ index: 0, keyword: '' } };
       const resp = await posts.getAll( filters );
       dispatch( ActionCreators.SetPosts.create( { page: resp, filters: filters } ) );
     }

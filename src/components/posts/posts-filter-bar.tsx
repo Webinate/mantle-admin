@@ -53,7 +53,6 @@ export default class PostFilterBar extends React.Component<Props, State> {
       return (
         <div>
           <TextField
-            className="posts-filter"
             placeholder="Filter by title or content"
             id="mt-posts-filter"
             value={this.state.searchFilter}

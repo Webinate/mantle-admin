@@ -21,8 +21,7 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 export function getComments( options: Partial<CommentGetAllOptions>, postId?: string ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     const state = getState();
-    const newFilters = state.comments.commentFilters ?
-      { ...state.comments.commentFilters, ...options } : options;
+    const newFilters = { ...state.comments.commentFilters, ...options };
 
     // Resets the array first
     dispatch( ActionCreators.SetCommentsBusy.create( true ) );

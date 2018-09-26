@@ -21,7 +21,7 @@ export type Props = {
   loading: boolean;
   posts: Page<IPost<'client'>> | null;
   getPosts: ( options: Partial<PostsGetAllOptions> ) => void;
-  postFilters: Partial<PostsGetAllOptions> | null;
+  postFilters: Partial<PostsGetAllOptions>;
   onPostSelected: ( post: IPost<'client'>[] ) => void
   onEdit: ( post: IPost<'client'> ) => void;
   onDelete: ( post: IPost<'client'> ) => void;
@@ -51,9 +51,9 @@ export default class PostList extends React.Component<Props, State> {
     super( props );
     this.state = {
       showDeleteModal: false,
-      sortAscending: props.postFilters && props.postFilters.sortOrder! === 'asc' ? true : false,
+      sortAscending: props.postFilters.sortOrder && props.postFilters.sortOrder === 'asc' ? true : false,
       visibility: 'all',
-      sortBy: props.postFilters ? props.postFilters.sort! : 'created',
+      sortBy: props.postFilters.sort ? props.postFilters.sort : 'created',
       user: null,
       visibilityOpen: false,
       sortByOpen: false

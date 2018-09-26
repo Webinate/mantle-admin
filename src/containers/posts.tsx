@@ -112,7 +112,6 @@ export class Posts extends React.Component<Props, State> {
         loading={this.props.comments.busy}
         getAll={options => this.props.getComments( { ...options, postId: postId } )}
         onDelete={id => this.props.deleteComment( id )}
-        onCommentsSelected={ids => { }}
       />
     </div>
   }

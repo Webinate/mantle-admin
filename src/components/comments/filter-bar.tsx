@@ -3,7 +3,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import FilterIcon from '@material-ui/icons/FilterList';
-import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
 
 export type Props = {
@@ -11,7 +10,6 @@ export type Props = {
   isAdminUser: boolean;
   commentsSelected: boolean;
   onSearch: ( term: string ) => void;
-  onDelete: () => void;
   onFilterToggle: ( val: boolean ) => void;
 }
 
@@ -33,9 +31,8 @@ export default class FilterBar extends React.Component<Props, State> {
     return (
       <div>
         <TextField
-          className="posts-filter"
           placeholder="Filter by title or content"
-          id="mt-posts-filter"
+          id="mt-comments-filter"
           value={this.state.searchFilter}
           onKeyDown={e => {
             if ( e.keyCode === 13 )
@@ -44,7 +41,7 @@ export default class FilterBar extends React.Component<Props, State> {
           onChange={( e ) => this.setState( { searchFilter: e.currentTarget.value } )}
         />
         <IconButton
-          className="mt-posts-search"
+          className="mt-comments-search"
           color="primary"
           onClick={e => this.props.onSearch( this.state.searchFilter )}
         >
@@ -53,20 +50,10 @@ export default class FilterBar extends React.Component<Props, State> {
         <Tooltip title={this.props.filtersOpen ? 'Close filter options' : 'Open filter options'}>
           <IconButton
             color="primary"
-            className="mt-posts-filter"
+            className="mt-comments-filter"
             onClick={e => this.props.onFilterToggle( !this.props.filtersOpen )}
           >
             <FilterIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete selected posts">
-          <IconButton
-            color="primary"
-            className="mt-posts-delete-multi"
-            disabled={this.props.commentsSelected}
-            onClick={e => this.props.onDelete()}
-          >
-            <DeleteIcon />
           </IconButton>
         </Tooltip>
       </div>

@@ -4,14 +4,14 @@ import { Page, IPost } from '../../../../../src';
 
 // State
 export type State = {
-  readonly postFilters: Partial<PostsGetAllOptions> | null;
+  readonly postFilters: Partial<PostsGetAllOptions>;
   readonly postPage: Page<IPost<'client'>> | null;
   readonly post: IPost<'client'> | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
-  postFilters: null,
+  postFilters: { index: 0 },
   postPage: null,
   post: null,
   busy: false
@@ -25,7 +25,7 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.SetPosts.type:
       partialState = {
         postPage: action.payload.page,
-        postFilters: action.payload.filters,
+        postFilters: { ...state.postFilters, ...action.payload.filters },
         busy: false
       };
       break;

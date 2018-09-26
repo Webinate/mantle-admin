@@ -5,14 +5,14 @@ import { ActionCreators as AppActions, Action as AppAction } from '../app/action
 
 // State
 export type State = {
-  readonly commentFilters: Partial<CommentGetAllOptions> | null;
+  readonly commentFilters: Partial<CommentGetAllOptions>;
   readonly commentPage: Page<IComment<'client'>> | null;
   readonly comment: IComment<'client'> | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
-  commentFilters: null,
+  commentFilters: { index: 0, root: true },
   commentPage: null,
   comment: null,
   busy: false
@@ -31,7 +31,7 @@ export default function reducer( state: State = initialState, action: Action | A
       partialState = {
         busy: false,
         commentPage: action.payload.page,
-        commentFilters: action.payload.filters
+        commentFilters: { ...state.commentFilters, ...action.payload.filters }
       };
       break;
 

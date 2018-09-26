@@ -17,9 +17,10 @@ import NewComment from './new-comment';
 export type Props = {
   page: Page<IComment<'client'>> | null;
   loading: boolean;
+  heightFromContents?: boolean;
   auth: IUserEntry<'client'>;
+  style?: React.CSSProperties;
   getAll: ( options: Partial<CommentGetAllOptions> ) => void;
-  onCommentsSelected: ( uids: string[] ) => void;
   onEdit: ( id: string, token: Partial<IComment<'client'>> ) => void;
   onDelete: ( id: string ) => void;
   onReply: ( post: string, parent: string, token: Partial<IComment<'client'>> ) => void;
@@ -34,6 +35,10 @@ export type State = {
 
 export class CommentsList extends React.Component<Props, State> {
   private _container: HTMLElement | null;
+
+  static defaultProps: Partial<Props> = {
+    heightFromContents: true
+  }
 
   constructor( props: Props ) {
     super( props );
@@ -122,7 +127,7 @@ export class CommentsList extends React.Component<Props, State> {
         total={comments.count}
         limit={comments.limit}
         index={comments.index}
-        heightFromContents={true}
+        heightFromContents={this.props.heightFromContents}
         footerBackground={false}
         onPage={index => {
           if ( this._container )
@@ -130,16 +135,14 @@ export class CommentsList extends React.Component<Props, State> {
 
           this.props.getAll( { index: index } )
         }}
-        contentProps={{
-          onMouseDown: e => this.props.onCommentsSelected( [] )
-        }}
       >
         <PostsInnerContent
           id="mt-comments"
+          style={this.props.style}
           innerRef={elm => this._container = elm}
         >
           {this.props.loading ? <div className="mt-loading" style={{ textAlign: 'center', padding: '0 0 20px 0' }} >
-            <CircularProgress size={30} />
+            <CircularProgress className="mt-loading" size={30} />
           </div> : undefined}
 
           {flattened.map( ( comment, index ) => {
