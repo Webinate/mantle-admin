@@ -43,7 +43,8 @@ export default class MediaPage extends Page {
     assert.deepEqual( path, '/dashboard/media/new' );
   }
 
-  volumeName( val?: string ) {
+  async volumeName( val?: string ) {
+    await this.page.waitFor( '#mt-volume-name' );
     return this.input( '#mt-volume-name', val );
   }
 
@@ -71,7 +72,8 @@ export default class MediaPage extends Page {
     return this.page.$eval( '#mt-volume-memory-error', elm => elm.textContent );
   }
 
-  clickNext() {
+  async clickNext() {
+    await this.page.waitFor( '#mt-vol-next' );
     return this.click( '#mt-vol-next' );
   }
 
