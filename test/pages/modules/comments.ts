@@ -1,5 +1,5 @@
-import Module from "modepress/clients/modepress-admin/test/pages/modules/module";
-import App from "modepress/clients/modepress-admin/test/pages/modules/app";
+import Module from "../../../test/pages/modules/module";
+import App from "../../../test/pages/modules/app";
 import { Page } from 'puppeteer';
 
 /**
@@ -24,9 +24,11 @@ export default class CommentsModule extends Module {
       return Array.from( elm ).map( row => {
         return {
           img: ( row.querySelector( '.mt-comment-avatar img' ) as HTMLImageElement ).src,
-          author: row.querySelector( '.mt-comment-author' ).textContent,
-          content: row.querySelector( '.mt-comment-text' ).innerHTML,
-          date: row.querySelector( '.mt-comment-date' ).textContent
+          author: row.querySelector( '.mt-comment-author' )!.textContent,
+          content: row.querySelector( '.mt-comment-text' )!.innerHTML,
+          date: row.querySelector( '.mt-comment-date' )!.textContent,
+          hasEditBtn: row.querySelector( '.mt-edit-comment-btn' ) ? true : false,
+          hasDelBtn: row.querySelector( '.mt-del-comment-btn' ) ? true : false
         }
       } )
     } ) as Promise<{
@@ -34,10 +36,12 @@ export default class CommentsModule extends Module {
       author: string;
       content: string;
       date: string;
+      hasEditBtn: boolean;
+      hasDelBtn: boolean;
     }[]>;
   }
 
-  async deleteComment( index: number ) {
+  async clickDelete( index: number ) {
     await this.page.click( `.mt-comment:nth-child(${ index + 1 }) .mt-del-comment-btn` );
     await this.page.waitFor( '#mt-comment-delete-msg' );
   }

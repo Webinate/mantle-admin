@@ -1,5 +1,5 @@
-import { RedirectError } from 'modepress/clients/modepress-admin/src/server/errors';
-import { ActionCreators as CommentActions } from 'modepress/clients/modepress-admin/src/store/comments/actions';
+import { RedirectError } from '../../src/server/errors';
+import { ActionCreators as CommentActions } from '../store/comments/actions';
 import { IAuthReq, CommentGetAllOptions } from 'modepress';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';

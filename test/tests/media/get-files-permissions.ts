@@ -1,11 +1,11 @@
-import MediaPage from 'modepress/clients/modepress-admin/test/pages/media';
+import MediaPage from '../../../test/pages/media';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from '../../../test/utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
+import Agent from '../../../test/utils/agent';
 import { IVolume } from 'modepress';
 import ControllerFactory from 'modepress/src/core/controller-factory';
-import { uploadFileToVolume } from 'modepress/clients/modepress-admin/test/utils/file';
+import { uploadFileToVolume } from '../../../test/utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent, mary: Agent;

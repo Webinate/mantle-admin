@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { default as styled } from 'modepress/clients/modepress-admin/src/theme/styled';
+import { default as styled } from '../../theme/styled';
 import { IUserEntry } from 'modepress';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import CommentIcon from '@material-ui/icons/Comment';
-import { generateAvatarPic } from 'modepress/clients/modepress-admin/src/utils/component-utils';
+import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
@@ -44,6 +44,7 @@ export default class NewComment extends React.Component<Props, State> {
             id="mt-new-comment-content"
             value={this.state.comment}
             autoFocus={this.props.commentMode ? true : undefined}
+            onClick={e => e.stopPropagation()}
             onChange={( e ) => {
               e.currentTarget.style.height = '1px';
               e.currentTarget.style.height = ( 20 + e.currentTarget.scrollHeight ) + 'px';
@@ -56,6 +57,7 @@ export default class NewComment extends React.Component<Props, State> {
                 <span
                   id="mt-new-comment-cancel-btn"
                   onClick={e => {
+                    e.stopPropagation();
                     if ( this.props.onCancel )
                       this.props.onCancel()
                   }}
@@ -66,6 +68,7 @@ export default class NewComment extends React.Component<Props, State> {
                     if ( this.state.comment.trim() === '' )
                       return;
 
+                    e.stopPropagation();
                     this.props.onNewComment( this.state.comment );
                     this.setState( { comment: '' } );
                   }}

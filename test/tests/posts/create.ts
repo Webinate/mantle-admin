@@ -5,7 +5,7 @@ import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost, IVolume } from 'modepress';
+import { IVolume } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();

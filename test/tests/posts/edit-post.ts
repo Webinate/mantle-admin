@@ -33,7 +33,7 @@ describe( 'View & edit post created by backend: ', function() {
     await postPage.load( admin );
   } )
 
-  it( 'does not let regular users go to the edit post page directly', async () => {
+  it( 'does not let regular users click new post', async () => {
     await postPage.load( joe, `/dashboard/posts/edit/${ post._id }` );
     await postPage.waitFor( 'button[disabled].mt-new-post' )
   } )

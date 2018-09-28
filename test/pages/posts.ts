@@ -64,6 +64,29 @@ export default class PostsPage extends Page {
     await this.doneLoading()
   }
 
+  async isPreview() {
+    const result = await this.page.$( '#mt-post-preview' );
+    return result ? true : false;
+  }
+
+  async previewDetails() {
+    const result: {
+      avatar: string;
+      author: string;
+      title: string;
+      content: string;
+    } = await this.page.$eval( '#mt-post-preview', elm => {
+      return {
+        avatar: ( elm.querySelector( '.mt-preview-author-avatar img' ) as HTMLImageElement ).src,
+        author: ( elm.querySelector( '#mt-preview-author' ) as HTMLDivElement ).textContent,
+        title: ( elm.querySelector( '#mt-preview-title' ) as HTMLDivElement ).textContent,
+        content: ( elm.querySelector( '#mt-preview-content' ) as HTMLDivElement ).innerHTML
+      }
+    } );
+
+    return result;
+  }
+
   async clickUpdate() {
     await this.page.click( '.mt-post-confirm' );
     await this.doneLoading()
@@ -85,7 +108,7 @@ export default class PostsPage extends Page {
       } );
 
       const handle = await frames[ 1 ].$( '#tinymce' );
-      await handle.type( val, { delay: 10 } );
+      await handle!.type( val, { delay: 10 } );
     }
   }
 
@@ -214,9 +237,9 @@ export default class PostsPage extends Page {
     return this.page.$$eval( `.mt-post${ onlySelectedPosts ? '.selected' : '' }`, nodes => {
       return Array.from( nodes ).map( child => {
         return {
-          name: child.querySelector( '.mt-post-name' ).textContent,
-          image: child.querySelector( '.mt-post-info img' ).getAttribute( 'src' ),
-          featuredImage: child.querySelector( '.mt-post-featured-thumb img' ).getAttribute( 'src' )
+          name: child.querySelector( '.mt-post-name' )!.textContent,
+          image: child.querySelector( '.mt-post-info img' )!.getAttribute( 'src' ),
+          featuredImage: child.querySelector( '.mt-post-featured-thumb img' )!.getAttribute( 'src' )
         }
       } )
     } );
@@ -290,7 +313,7 @@ export default class PostsPage extends Page {
    */
   async selectPost( title: string, multiple: boolean = false ) {
     const index = await this.page.$$eval( `.mt-post`, ( nodes, title: string ) => {
-      const index = Array.from( nodes ).findIndex( elm => elm.querySelector( '.mt-post-name' ).textContent === title )
+      const index = Array.from( nodes ).findIndex( elm => elm.querySelector( '.mt-post-name' )!.textContent === title )
       return index;
     }, title );
 

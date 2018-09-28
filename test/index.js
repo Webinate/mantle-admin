@@ -52,6 +52,7 @@ require( './tests/posts/create' );
 require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );
 require( './tests/posts/delete-posts' );
+require( './tests/posts/preview-post' );
 
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );
@@ -65,3 +66,5 @@ require( './tests/media/rename-files' );
 require( './tests/media/get-files-permissions' );
 
 require( './tests/comments/view-and-filter-comments' );
+require( './tests/comments/comment-user-permissions' );
+require( './tests/comments/comment-deletion' );

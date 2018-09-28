@@ -1,18 +1,18 @@
-import CommentsPage from '../../pages/comments';
+import CommentsPage from '../../../test/pages/comments';
 import * as assert from 'assert';
-import utils from '../../utils';
+import utils from '../../../test/utils';
 import { } from 'mocha';
-import Agent from '../../utils/agent';
-import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
+import Agent from '../../../test/utils/agent';
+import { randomId } from '../../../test/utils/misc';
+import ControllerFactory from 'modepress/src/core/controller-factory';
 import { IPost, IComment } from 'modepress';
 
 let commentPage = new CommentsPage();
-let admin: Agent, joe: Agent;
+let admin: Agent, joe: Agent, mary: Agent;
 let post: IPost<'client'>;;
 let comment1: IComment<'client'>, comment2: IComment<'client'>;
 
-describe( 'View and filter comments created by backend: ', function() {
+describe( 'Show / Hide comment edit & delete buttons based on user: ', function() {
 
   before( async () => {
     const controller = ControllerFactory.get( 'posts' );
@@ -21,6 +21,7 @@ describe( 'View and filter comments created by backend: ', function() {
 
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
+    mary = await utils.createAgent( 'Mary', 'mary333@test.com', 'password' );
 
     const joeUser = await users.getUser( { username: joe.username } );
     const adminUser = await users.getUser( { username: admin.username } );
@@ -35,10 +36,6 @@ describe( 'View and filter comments created by backend: ', function() {
 
     comment1 = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );
     comment2 = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId() } );
-
-    // Update the first so that its the most edited one
-    await comments.update( comment1._id.toString(), { content: comment1.content } );
-
     await commentPage.load( admin );
   } )
 
@@ -51,19 +48,30 @@ describe( 'View and filter comments created by backend: ', function() {
     await posts.removePost( post._id.toString() );
   } )
 
-  it( 'shows the last edited comment is first', async () => {
-    await commentPage.doneLoading();
+  it( 'allows an admin to edit & delete all comments', async () => {
+    await commentPage.load( admin );
     const comments = await commentPage.commentModule.getComments();
-    assert.equal( comments[ 0 ].content, comment1.content );
-    assert.equal( comments[ 1 ].content, comment2.content );
+    assert.deepEqual( comments[ 0 ].hasDelBtn, true );
+    assert.deepEqual( comments[ 0 ].hasEditBtn, true );
+    assert.deepEqual( comments[ 1 ].hasDelBtn, true );
+    assert.deepEqual( comments[ 1 ].hasEditBtn, true );
   } )
 
-  it( 'sorts by creation date', async () => {
-    await commentPage.toggleFilterOptionsPanel( true );
-    await commentPage.selectSortType( 'created' );
-    await commentPage.doneLoading();
+  it( 'does not allow a regular user to edit other comments', async () => {
+    await commentPage.load( joe );
     const comments = await commentPage.commentModule.getComments();
-    assert.equal( comments[ 0 ].content, comment2.content );
-    assert.equal( comments[ 1 ].content, comment1.content );
+    assert.deepEqual( comments[ 0 ].hasDelBtn, false );
+    assert.deepEqual( comments[ 0 ].hasEditBtn, false );
+    assert.deepEqual( comments[ 1 ].hasDelBtn, true );
+    assert.deepEqual( comments[ 1 ].hasEditBtn, true );
+  } )
+
+  it( 'does not allow unassociated users any edit buttons', async () => {
+    await commentPage.load( mary );
+    const comments = await commentPage.commentModule.getComments();
+    assert.deepEqual( comments[ 0 ].hasDelBtn, false );
+    assert.deepEqual( comments[ 0 ].hasEditBtn, false );
+    assert.deepEqual( comments[ 1 ].hasDelBtn, false );
+    assert.deepEqual( comments[ 1 ].hasEditBtn, false );
   } )
 } );

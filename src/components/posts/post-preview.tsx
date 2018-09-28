@@ -9,10 +9,10 @@ import theme from '../../theme/mui-theme';
 
 export type Props = {
   post: IPost<'client'> | null;
-  id: string;
+  id?: string;
   loading: boolean;
-  renderComments: () => undefined | null | JSX.Element;
-  onFetch: ( id: string ) => void;
+  renderComments?: () => undefined | null | JSX.Element;
+  onFetch?: ( id: string ) => void;
 }
 
 type State = {
@@ -28,7 +28,8 @@ export default class PostPreview extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.props.onFetch( this.props.id )
+    if ( this.props.onFetch && this.props.id )
+      this.props.onFetch( this.props.id )
   }
 
   render() {
@@ -39,25 +40,26 @@ export default class PostPreview extends React.Component<Props, State> {
 
     const post = this.props.post;
 
-    return <Container>
+    return <Container id="mt-post-preview">
       <div className="mt-preview-headers">
-        <div>
+        <div className="mt-preview-author-avatar">
           <Avatar src={generateAvatarPic( post.author as IUserEntry<'client'> )} />
         </div>
         <div>
-          <h1>{post.title}</h1>
+          <h1 id="mt-preview-title">{post.title}</h1>
           <div id="mt-header-details">
-            <span id="mt-preview-name">Posted by <span id="mt-preview-author">{( post.author as IUserEntry<'client'> ).username}</span></span>
+            <span>Posted </span>
+            {post.author ? <span>by <span id="mt-preview-author">{( post.author as IUserEntry<'client'> ).username}</span></span> : undefined}
             <span id="mt-preview-date">{format( new Date( post.lastUpdated ), '[at] H:m [on] MMMM Do YYYY' )}</span>
           </div>
           <div
-            id="mt-post-preview"
+            id="mt-preview-content"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </div>
       </div>
       <div id="mt-preview-comments">
-        {this.props.renderComments()}
+        {this.props.renderComments ? this.props.renderComments() : undefined}
       </div>
     </Container >
   }
