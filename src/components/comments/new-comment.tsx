@@ -41,7 +41,7 @@ export default class NewComment extends React.Component<Props, State> {
         <div>
           <textarea
             placeholder="Write a comment"
-            id="mt-new-comment-content"
+            id={this.props.commentMode ? 'mt-reply-comment-content' : 'mt-new-comment-content'}
             value={this.state.comment}
             autoFocus={this.props.commentMode ? true : undefined}
             onClick={e => e.stopPropagation()}
@@ -55,7 +55,7 @@ export default class NewComment extends React.Component<Props, State> {
             this.props.commentMode ?
               <div className="mt-comment-form-actions">
                 <span
-                  id="mt-new-comment-cancel-btn"
+                  id="mt-reply-comment-cancel-btn"
                   onClick={e => {
                     e.stopPropagation();
                     if ( this.props.onCancel )
@@ -63,7 +63,7 @@ export default class NewComment extends React.Component<Props, State> {
                   }}
                 >Cancel</span>
                 <span
-                  id="mt-new-comment-add-btn"
+                  id="mt-reply-comment-add-btn"
                   onClick={e => {
                     if ( this.state.comment.trim() === '' )
                       return;
@@ -108,7 +108,8 @@ const Container = styled.div`
     }
   }
 
-  #mt-new-comment-cancel-btn, #mt-new-comment-add-btn {
+  #mt-new-comment-cancel-btn, #mt-reply-comment-cancel-btn,
+    #mt-new-comment-add-btn, #mt-reply-comment-add-btn {
     font-size: 12px;
     cursor: pointer;
     font-weight: 400;

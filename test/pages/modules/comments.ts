@@ -21,14 +21,15 @@ export default class CommentsModule extends Module {
     await this.doneLoading();
 
     return this.page.$$eval( `.mt-comment`, elm => {
-      return Array.from( elm ).map( row => {
+      return Array.from( elm ).map( ( row: HTMLElement ) => {
         return {
           img: ( row.querySelector( '.mt-comment-avatar img' ) as HTMLImageElement ).src,
           author: row.querySelector( '.mt-comment-author' )!.textContent,
           content: row.querySelector( '.mt-comment-text' )!.innerHTML,
           date: row.querySelector( '.mt-comment-date' )!.textContent,
           hasEditBtn: row.querySelector( '.mt-edit-comment-btn' ) ? true : false,
-          hasDelBtn: row.querySelector( '.mt-del-comment-btn' ) ? true : false
+          hasDelBtn: row.querySelector( '.mt-del-comment-btn' ) ? true : false,
+          isReply: row.classList.contains( 'mt-is-child' )
         }
       } )
     } ) as Promise<{
@@ -38,6 +39,7 @@ export default class CommentsModule extends Module {
       date: string;
       hasEditBtn: boolean;
       hasDelBtn: boolean;
+      isReply: boolean;
     }[]>;
   }
 
@@ -54,6 +56,28 @@ export default class CommentsModule extends Module {
   async confirmDelete() {
     await this.page.click( '#mt-del-comment-confirm-btn' );
     await this.emptySelector( '#mt-del-comment-confirm-btn' );
+    await this.doneLoading();
+  }
+
+  async addComment( text: string ) {
+    const newCommentSelector = '#mt-new-comment-content';
+
+    await this.doneLoading();
+    await this.page.waitFor( newCommentSelector );
+    await this.page.focus( newCommentSelector );
+    await this.input( newCommentSelector, text );
+    await this.page.click( '#mt-new-comment-add-btn' );
+    await this.doneLoading();
+  }
+
+  async replyComment( targetIndex: number, text: string ) {
+    const replySelector = "#mt-reply-comment-content";
+    await this.page.click( `.mt-comment:nth-child(${ targetIndex + 1 }) .mt-reply-comment-btn` );
+    await this.doneLoading();
+    await this.page.waitFor( replySelector );
+    await this.page.focus( replySelector );
+    await this.input( replySelector, text );
+    await this.page.click( '#mt-reply-comment-add-btn' );
     await this.doneLoading();
   }
 }

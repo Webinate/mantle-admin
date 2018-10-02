@@ -2,6 +2,7 @@ import Page from './page';
 import Agent from '../utils/agent';
 import * as assert from 'assert';
 import CategoryModule from './modules/categories';
+import CommentsModule from './modules/comments';
 import AppModule from './modules/app';
 import MediaModule from './modules/media-nav';
 
@@ -16,6 +17,7 @@ export default class PostsPage extends Page {
   public categories: CategoryModule;
   public appModule: AppModule;
   public mediaModule: MediaModule;
+  public commentsModule: CommentsModule;
 
   constructor() {
     super();
@@ -35,6 +37,7 @@ export default class PostsPage extends Page {
     this.categories = new CategoryModule( this.page );
     this.appModule = new AppModule( this.page );
     this.mediaModule = new MediaModule( this.page );
+    this.commentsModule = new CommentsModule( this.page );
   }
 
   /**
