@@ -73,7 +73,7 @@ describe( 'Test the deletion of comments:', function() {
       assert.notDeepEqual( comments[ 2 ].content, joesOtherComment.content );
   } )
 
-  it( 'allows user to delete nested comment with admin reply', async () => {
+  it( 'allows regular user to delete root comment with admin reply', async () => {
     await commentPage.load( joe );
     let comments = await commentPage.commentModule.getComments();
     assert.deepEqual( comments[ 0 ].content, joesParentComment.content );

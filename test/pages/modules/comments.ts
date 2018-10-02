@@ -43,9 +43,30 @@ export default class CommentsModule extends Module {
     }[]>;
   }
 
+  async canDelete( index: number ) {
+    const result = await this.page.$( `.mt-comment:nth-child(${ index + 1 }) .mt-del-comment-btn` );
+    return result ? true : false;
+  }
+
+  async canEdit( index: number ) {
+    const result = await this.page.$( `.mt-comment:nth-child(${ index + 1 }) .mt-edit-comment-btn` );
+    return result ? true : false;
+  }
+
   async clickDelete( index: number ) {
     await this.page.click( `.mt-comment:nth-child(${ index + 1 }) .mt-del-comment-btn` );
     await this.page.waitFor( '#mt-comment-delete-msg' );
+  }
+
+  async editComment( index: number, text: string ) {
+    const inputSelector = '#mt-comment-edit-txt';
+    await this.page.click( `.mt-comment:nth-child(${ index + 1 }) .mt-edit-comment-btn` );
+    await this.page.waitFor( inputSelector );
+    await this.page.focus( inputSelector );
+    await this.input( inputSelector, text );
+    await this.page.click( '#mt-edit-comment-save' );
+    await this.emptySelector( '#mt-edit-comment-save' );
+    await this.doneLoading();
   }
 
   async cancelDelete() {
