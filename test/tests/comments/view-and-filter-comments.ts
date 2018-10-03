@@ -66,4 +66,17 @@ describe( 'View and filter comments created by backend: ', function() {
     assert.equal( comments[ 0 ].content, comment2.content );
     assert.equal( comments[ 1 ].content, comment1.content );
   } )
+
+  it( 'sorts by comment user', async () => {
+    await commentPage.load( admin );
+    await commentPage.toggleFilterOptionsPanel( true );
+    await commentPage.selectUserFilter( joe.email );
+
+    let comments = await commentPage.commentModule.getComments();
+    assert.equal( comments[ 0 ].author, joe.username );
+
+    await commentPage.selectUserFilter( admin.email );
+    comments = await commentPage.commentModule.getComments();
+    assert.equal( comments[ 0 ].author, admin.username );
+  } )
 } );

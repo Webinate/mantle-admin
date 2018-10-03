@@ -34,6 +34,29 @@ export default class CommentsPage extends Page {
     return this.emptySelector( '.mt-loading' );
   }
 
+  async user( val?: string ) {
+    if ( val === undefined ) {
+      return this.page.$eval( '.my-user-picker-label', elm => elm.textContent )
+    }
+    else {
+      await this.page.waitFor( '.my-user-picker-btn' );
+      await this.page.click( '.my-user-picker-btn' );
+      await this.page.waitFor( '.mt-user-autocomplete input' );
+      await this.page.type( '.mt-user-autocomplete input', val, { delay: 50 } );
+      await this.page.waitFor( '.mt-user-drop-item:first-child' );
+      await this.page.click( '.mt-user-drop-item:first-child' );
+      await this.emptySelector( '.mt-user-autocomplete input' )
+    }
+  }
+
+  /**
+   * Select the user filter
+   */
+  async selectUserFilter( val?: string ) {
+    await this.user( val );
+    await this.doneLoading();
+  }
+
   /**
    * Filters the comments by title and content
    * @param search The filter text

@@ -67,5 +67,6 @@ require( './tests/media/rename-files' );
 require( './tests/media/get-files-permissions' );
 
 require( './tests/comments/view-and-filter-comments' );
+require( './tests/comments/view-comment-posts' );
 require( './tests/comments/comment-user-permissions' );
 require( './tests/comments/comment-deletion' );

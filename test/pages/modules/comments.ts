@@ -20,7 +20,7 @@ export default class CommentsModule extends Module {
   async getComments() {
     await this.doneLoading();
 
-    return this.page.$$eval( `.mt-comment`, elm => {
+    return await this.page.$$eval( `.mt-comment`, elm => {
       return Array.from( elm ).map( ( row: HTMLElement ) => {
         return {
           img: ( row.querySelector( '.mt-comment-avatar img' ) as HTMLImageElement ).src,
@@ -41,6 +41,29 @@ export default class CommentsModule extends Module {
       hasDelBtn: boolean;
       isReply: boolean;
     }[]>;
+  }
+
+  select( index: number ) {
+    return this.page.click( `.mt-comment:nth-child(${ index + 1 }) .mt-comment-text` );
+  }
+
+  async previewDetails() {
+    await this.page.waitFor( `#mt-post-preview` );
+    return await this.page.$eval( `#mt-post-preview`, elm => {
+      return {
+        img: ( elm.querySelector( '.mt-preview-author-avatar img' ) as HTMLImageElement ).src,
+        title: elm.querySelector( '#mt-preview-title' ).textContent,
+        author: elm.querySelector( '#mt-preview-author' ).textContent,
+        date: elm.querySelector( '#mt-preview-date' ).textContent,
+        content: elm.querySelector( '#mt-preview-content' ).innerHTML
+      }
+    } ) as Promise<{
+      img: string;
+      author: string;
+      content: string;
+      date: string;
+      title: string;
+    }>;
   }
 
   async canDelete( index: number ) {
