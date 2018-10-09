@@ -145,7 +145,14 @@ export default class MainController extends Controller {
       }
 
       initialState = store.getState();
-      html = renderToStaticMarkup( <HTML html={html} styles={styleTags} stylesMaterial={styleTagsMaterial} intialData={initialState} agent={muiAgent} /> );
+      html = renderToStaticMarkup( <HTML
+        html={html}
+        styles={styleTags}
+        stylesMaterial={styleTagsMaterial}
+        intialData={initialState}
+        agent={muiAgent!}
+      /> );
+
       res.send( html );
     }
     catch ( err ) {

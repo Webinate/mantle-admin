@@ -18,6 +18,7 @@ import { CategoryEditor } from '../../containers/category-editor';
 import FormControl from '@material-ui/core/FormControl';
 import { MediaModal } from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
+import { DraftEditor } from '../../containers/draft-editor';
 
 export type Props = {
   activeUser: IUserEntry<'client'>;
@@ -156,6 +157,8 @@ export default class PostForm extends React.Component<Props, State> {
             </div>
           </SlugContainer>
         </div>
+
+        <DraftEditor />
 
         <TinyPostEditor
           content={this.state.editable.content!}
