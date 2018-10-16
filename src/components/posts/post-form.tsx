@@ -10,7 +10,6 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Delete';
 import { IPost, IUserEntry, IFileEntry } from '../../../../../src';
 import { default as styled } from '../../theme/styled';
-import TinyPostEditor from './tiny-post-editor';
 import theme from '../../theme/mui-theme';
 import SlugEditor from '../slug-editor';
 import UserPicker from '../user-picker';
@@ -157,17 +156,7 @@ export default class PostForm extends React.Component<Props, State> {
             </div>
           </SlugContainer>
         </div>
-
         <DraftEditor />
-
-        <TinyPostEditor
-          content={this.state.editable.content!}
-          onContentChanged={content => {
-            // Doing this in a mutable way becase we dont to overload the tiny editor
-            this.state.editable.content = content;
-          }}
-        />
-
         {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
 
       </div>
