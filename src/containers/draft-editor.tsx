@@ -100,10 +100,6 @@ export class DraftEditor extends React.Component<Props, State> {
 
     if ( blockType === 'ordered-list-item' || blockType === 'unordered-list-item' || blockType === 'unstyled' )
       return 'not-handled';
-    if ( blockType === 'code-block' && e.shiftKey ) {
-      this.setState( { editorState: RichUtils.insertSoftNewline( state ) } );
-      return 'handled';
-    }
 
     this.updateElmHtml( id, state );
     setTimeout( () => {
@@ -268,6 +264,17 @@ const Container = styled.div`
   padding: 0;
   height: calc(100% - 50px);
   box-sizing: border-box;
+
+  .mt-editor-container {
+    code {
+      font-family: monospace;
+    }
+
+    p {
+      margin: 5px 0;
+    }
+  }
+
 
   .mt-element {
     border: 1px dashed transparent;
