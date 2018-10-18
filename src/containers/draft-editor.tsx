@@ -7,6 +7,7 @@ import { default as theme } from '../theme/mui-theme';
 import { stateToHTML } from 'draft-js-export-html';
 import { stateFromHTML } from 'draft-js-import-html';
 import * as Immutable from 'immutable';
+import DraftToolbar from '../components/draft/draft-toolbar';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -176,6 +177,13 @@ export class DraftEditor extends React.Component<Props, State> {
     return (
       <div style={{ height: '100%' }}>
         <Container>
+          <DraftToolbar
+            onCreateBlock={type => this._createBlock( type.label, type.type )}
+            activeStyle={currentStyle}
+            onInlineToggle={styleStyle => this.setState( { editorState: RichUtils.toggleInlineStyle( this.state.editorState, styleStyle.type ) } )}
+            activeBlockType={blockType}
+
+          />
           {BLOCK_TYPES.map( s => <Button
             key={s.label}
             style={{
