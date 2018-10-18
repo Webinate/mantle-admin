@@ -42,14 +42,14 @@ export class DraftEditor extends React.Component<Props, State> {
       activeElm: null
     };
 
-    const blockRenderMap = Immutable.Map( {
+    const blockRenderMap = Immutable.Map<any, any>( {
       'paragraph': {
         element: 'p'
       },
       'unstyled': {
         element: 'p'
       }
-    } as any );
+    } );
 
     this._blockRenderMap = DefaultDraftBlockRenderMap.merge( blockRenderMap );
   }
