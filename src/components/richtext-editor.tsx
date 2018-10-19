@@ -83,14 +83,14 @@ export default class RichTextEditor extends React.Component<Props, State> {
       this._observer.disconnect();
 
     if ( elm ) {
-      document.execCommand( "insertBrOnReturn", false, "false" )
-      document.execCommand( "defaultParagraphSeparator", false, "div" );
-      document.addEventListener( "selectionchange", this.onSelectionChangeProxy );
+      document.execCommand( 'insertBrOnReturn', false, 'false' )
+      document.execCommand( 'defaultParagraphSeparator', false, 'div' );
+      document.addEventListener( 'selectionchange', this.onSelectionChangeProxy );
       this._observer = new MutationObserver( e => this.onEditorChange( e ) );
       this._observer.observe( elm, { attributes: true, childList: true, subtree: true } );
     }
     else if ( this._editor ) {
-      document.removeEventListener( "selectionchange", this.onSelectionChangeProxy );
+      document.removeEventListener( 'selectionchange', this.onSelectionChangeProxy );
     }
 
     this._editor = elm;

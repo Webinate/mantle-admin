@@ -52,6 +52,7 @@ export class DraftEditor extends React.Component<Props, State> {
       }
     } );
 
+    this._editor = null;
     this._blockRenderMap = DefaultDraftBlockRenderMap.merge( blockRenderMap );
   }
 
@@ -61,7 +62,7 @@ export class DraftEditor extends React.Component<Props, State> {
     else
       this.setState( { initialized: true } );
 
-    this.focusEditor();
+    this._createBlock( 'paragraph' );
   }
 
   private focusEditor() {
@@ -104,7 +105,7 @@ export class DraftEditor extends React.Component<Props, State> {
 
     this.updateElmHtml( id, state );
     setTimeout( () => {
-      const newId = this._createBlock( 'paragraph', 'paragraph' );
+      const newId = this._createBlock( 'paragraph' );
       this.setState( { activeElm: newId }, () => this.focusEditor() );
     }, 100 );
 
@@ -127,7 +128,7 @@ export class DraftEditor extends React.Component<Props, State> {
     } );
   }
 
-  private _createBlock( type: string, s: string ): string {
+  private _createBlock( s: string ): string {
     const newId = this.state.elements.length.toString();
 
     let newState = EditorState.createEmpty();
@@ -139,33 +140,15 @@ export class DraftEditor extends React.Component<Props, State> {
         { html: '', id: newId }
       ),
       activeElm: this.state.elements.length.toString()
-    }, () => this.focusEditor() );
+    } );
+
+    setTimeout( () => this.focusEditor(), 500 );
     return newId;
   }
 
   render() {
     if ( !this.state.initialized )
       return <div></div>;
-
-    const INLINE_STYLES = [
-      { label: 'Bold', style: 'BOLD' },
-      { label: 'Italic', style: 'ITALIC' },
-      { label: 'Underline', style: 'UNDERLINE' },
-      { label: 'Monospace', style: 'CODE' },
-    ];
-    const BLOCK_TYPES = [
-      { label: 'H1', style: 'header-one' },
-      { label: 'H2', style: 'header-two' },
-      { label: 'H3', style: 'header-three' },
-      { label: 'H4', style: 'header-four' },
-      { label: 'H5', style: 'header-five' },
-      { label: 'H6', style: 'header-six' },
-      { label: 'Blockquote', style: 'blockquote' },
-      { label: 'UL', style: 'unordered-list-item' },
-      { label: 'OL', style: 'ordered-list-item' },
-      { label: 'Code Block', style: 'code-block' },
-      { label: 'Paragraph', style: 'paragraph' }
-    ];
 
     const currentStyle = this.state.editorState.getCurrentInlineStyle();
     const selection = this.state.editorState.getSelection();
@@ -178,39 +161,13 @@ export class DraftEditor extends React.Component<Props, State> {
       <div style={{ height: '100%' }}>
         <Container>
           <DraftToolbar
-            onCreateBlock={type => this._createBlock( type.label, type.type )}
+            onCreateBlock={type => this._createBlock( type.type )}
+            onAddMedia={() => { }}
             activeStyle={currentStyle}
             onInlineToggle={styleStyle => this.setState( { editorState: RichUtils.toggleInlineStyle( this.state.editorState, styleStyle.type ) } )}
             activeBlockType={blockType}
 
           />
-          {BLOCK_TYPES.map( s => <Button
-            key={s.label}
-            style={{
-              margin: '0 10px 0 0',
-              fontWeight: s.style === blockType ? 'bold' : undefined
-            }}
-            onClick={e => {
-              this._createBlock( s.label, s.style )
-            }}
-          >{s.label}</Button> )}
-
-          {INLINE_STYLES.map( s => <Button
-            key={s.label}
-            style={{
-              margin: '0 10px 0 0',
-              fontWeight: currentStyle.has( s.style ) ? 'bold' : undefined
-            }}
-            onMouseDown={e => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              this.setState( {
-                editorState: RichUtils.toggleInlineStyle( this.state.editorState, s.style )
-              } );
-            }}
-          >{s.label}</Button> )}
-
 
           <div
             className="mt-editor-container"
@@ -223,9 +180,9 @@ export class DraftEditor extends React.Component<Props, State> {
                     className={`mt-element active`}
                   >
                     <Editor
+                      ref={e => this._editor = e}
                       onBlur={() => this.updateElmHtml( elm.id, this.state.editorState )}
                       blockRenderMap={this._blockRenderMap}
-                      ref={editor => this._editor = editor}
                       keyBindingFn={e => this.mapKeyToEditorCommand( e )}
                       onTab={e => this.mapKeyToEditorCommand( e )}
                       editorState={this.state.editorState}
@@ -260,18 +217,15 @@ export class DraftEditor extends React.Component<Props, State> {
   }
 }
 
-
-const Button = styled.div`
-  margin: 0 10px 0 0;
-  cursor: pointer;
-  display: inline-block;
-`;
-
 const Container = styled.div`
   overflow: auto;
   padding: 0;
   height: calc(100% - 50px);
   box-sizing: border-box;
+  background: ${theme.light100.background };
+  border: 1px solid ${theme.light100.border };
+  color: ${theme.light100.color };
+  border-radius: 4px;
 
   .mt-editor-container {
     code {
@@ -301,8 +255,7 @@ const Container = styled.div`
   }
 
   .mt-editor-container {
-    padding: 5px;
+    padding: 10px;
     box-sizing: border-box;
-    background: ${ theme.light100.background };
   }
 `;

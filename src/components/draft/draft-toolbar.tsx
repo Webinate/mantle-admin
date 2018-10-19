@@ -4,10 +4,12 @@ import { default as theme } from '../../theme/mui-theme';
 import { DraftBlockType, DraftInlineStyle } from 'draft-js';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Icon from '@material-ui/core/Icon';
 
 type Props = {
   onCreateBlock: ( type: BlockType ) => void;
   onInlineToggle: ( type: InlineType ) => void;
+  onAddMedia: () => void;
   activeBlockType: DraftBlockType;
   activeStyle: DraftInlineStyle;
   animate?: boolean;
@@ -18,12 +20,12 @@ type State = {
 };
 
 export type BlockType = {
-  label: string;
+  label: string | JSX.Element;
   type: DraftBlockType
 }
 
 export type InlineType = {
-  label: string;
+  label: string | JSX.Element;
   type: 'BOLD' | 'ITALIC' | 'UNDERLINE'
 }
 
@@ -34,13 +36,18 @@ export default class DraftToolbar extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
     animate: false
   }
-  private _blockTypes: BlockType[];
+  private _regularBlocks: BlockType[];
+  private _listBlocks: BlockType[];
   private _inlineStyles: InlineType[];
+  private _lastSelectedBlock: BlockType | null;
+  private _iconStyles: React.CSSProperties;
 
   constructor( props: Props ) {
     super( props );
 
-    this._blockTypes = [
+    this._iconStyles = { fontSize: '16px' };
+
+    this._regularBlocks = [
       { label: 'Header 1', type: 'header-one' },
       { label: 'Header 2', type: 'header-two' },
       { label: 'Header 3', type: 'header-three' },
@@ -48,16 +55,19 @@ export default class DraftToolbar extends React.Component<Props, State> {
       { label: 'Header 5', type: 'header-five' },
       { label: 'Header 6', type: 'header-six' },
       { label: 'Blockquote', type: 'blockquote' },
-      { label: 'Unordered List', type: 'unordered-list-item' },
-      { label: 'Ordered List', type: 'ordered-list-item' },
       { label: 'Code Block', type: 'code-block' },
       { label: 'Paragraph', type: 'paragraph' }
     ];
 
+    this._listBlocks = [
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-ul" /></Icon>, type: 'unordered-list-item' },
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-ol" /></Icon>, type: 'ordered-list-item' }
+    ];
+
     this._inlineStyles = [
-      { label: 'B', type: 'BOLD' },
-      { label: 'I', type: 'ITALIC' },
-      { label: 'U', type: 'UNDERLINE' }
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-bold" /></Icon>, type: 'BOLD' },
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-italic" /></Icon>, type: 'ITALIC' },
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-underline" /></Icon>, type: 'UNDERLINE' }
     ];
 
     this.state = {
@@ -65,43 +75,60 @@ export default class DraftToolbar extends React.Component<Props, State> {
     };
   }
 
-  private handleClick( event: React.MouseEvent<HTMLElement> ) {
-    this.setState( { anchorEl: event.currentTarget } );
-  };
-
-  private handleClose() {
-    this.setState( { anchorEl: undefined } );
-  };
-
   render() {
+    const iconStyle = this._iconStyles;
     const inlines = this._inlineStyles;
-    const blocks = this._blockTypes;
+    const pBlock: BlockType = {
+      label: (
+        <Icon style={iconStyle}>
+          <i className="icon icon-editor-para" />
+        </Icon>
+      ), type: 'paragraph'
+    };
+    const listBlocks = this._listBlocks;
+    const blocks = this._regularBlocks;
     const activeBlock = blocks.find( block => block.type === this.props.activeBlockType ) || blocks[ 0 ];
     const activeStyle = this.props.activeStyle;
 
-    return <Container className="mt-draft-toolbar">
+    return <div className="mt-draft-toolbar">
       <ButtonGroup>
         <div
           id="mt-draft-blocks"
-          onClick={e => this.handleClick( e )}
+          onClick={e => this.setState( { anchorEl: e.currentTarget } )}
         >{activeBlock.label}
         </div>
         <Menu
           id="mt-draft-blocks-menu"
+
+          onTransitionEnd={e => {
+            if ( this._lastSelectedBlock )
+              this.props.onCreateBlock( this._lastSelectedBlock );
+
+            this._lastSelectedBlock = null;
+          }}
           anchorEl={this.state.anchorEl}
           open={Boolean( this.state.anchorEl )}
-          onClose={() => this.handleClose()}
+          onClose={() => this.setState( { anchorEl: undefined } )}
         >
-          {blocks.map( block => <MenuItem onClick={e => this.handleClose()}>{block.label}</MenuItem> )}
+          {blocks.map( block => (
+            <MenuItem
+              key={block.type}
+              onClick={e => {
+                this._lastSelectedBlock = block;
+                this.setState( { anchorEl: undefined } );
+              }}
+            >
+              {block.label}
+            </MenuItem>
+          )
+          )}
         </Menu>
       </ButtonGroup>
 
       <ButtonGroup>
         {inlines.map( inline => <div
-          key={inline.label}
-          style={{
-            fontWeight: activeStyle.has( inline.type ) ? 'bold' : undefined
-          }}
+          key={inline.type}
+          className={`${ activeStyle.has( inline.type ) ? 'active' : '' }`}
           onMouseDown={e => {
             e.preventDefault();
             e.stopPropagation();
@@ -109,23 +136,77 @@ export default class DraftToolbar extends React.Component<Props, State> {
           }}
         >{inline.label}</div> )}
       </ButtonGroup>
-    </Container>;
+
+      <ButtonGroup>
+        {listBlocks.map( listBlock => <div
+          key={listBlock.type}
+          className={`${ activeStyle.has( listBlock.type ) ? 'active' : '' }`}
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onCreateBlock( listBlock );
+          }}
+        >{listBlock.label}</div> )}
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <div
+          className={`${ activeStyle.has( pBlock.type ) ? 'active' : '' }`}
+          onClick={e => {
+            this.props.onCreateBlock( pBlock );
+          }}
+        >{pBlock.label}
+        </div>
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <div onClick={e => {
+          this.props.onAddMedia();
+        }}
+        >
+          <Icon style={iconStyle}>
+            <i className="icon icon-editor-img" />
+          </Icon>
+        </div>
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <div onClick={e => {
+          this.props.onAddMedia();
+        }}
+        >
+          <Icon style={iconStyle}>
+            <i className="icon icon-editor-link" />
+          </Icon>
+        </div>
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <div onClick={e => {
+          this.props.onAddMedia();
+        }}
+        >
+          <Icon style={iconStyle}>
+            <i className="icon icon-editor-html" />
+          </Icon>
+        </div>
+      </ButtonGroup>
+    </div>;
   }
 }
 
-const Container = styled.div`
-  background: ${theme.light100.background };
-  color: ${theme.light100.color };
-`;
-
 const ButtonGroup = styled.div`
   display: inline-block;
+  vertical-align: middle;
   margin: 0 10px 0 0;
-  border: 1px solid ${theme.light100.border };
   border-radius: 4px;
   cursor: pointer;
 
   > div {
+    &:hover, &.active {
+      background: ${theme.light200.background };
+    }
+
     padding: 5px;
     display: inline-block;
   }

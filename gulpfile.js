@@ -28,6 +28,12 @@ function generateFonts( callback ) {
   webfontsGenerator( {
     fontName: 'mantle',
     cssFontsUrl: '../fonts/',
+    formatOptions: {
+      svg: {
+        normalize: false,
+        round: 0
+      }
+    },
     css: true,
     cssDest: './dist/client/css/mantle.css',
     html: false,
@@ -52,12 +58,12 @@ function generateFonts( callback ) {
 function buildClient( callback ) {
   webpack( require( './webpack.config.js' ), function( err, stats ) {
 
-    if (stats.hasWarnings()) {
+    if ( stats.hasWarnings() ) {
       const info = stats.toJson();
-      console.warn(info.warnings);
+      console.warn( info.warnings );
     }
 
-    if (err || stats.hasErrors()) {
+    if ( err || stats.hasErrors() ) {
       const info = stats.toJson();
       throw info.errors;
     }
@@ -150,3 +156,5 @@ gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, build
 gulp.task( 'build-prod', gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) );
 gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
 gulp.task( 'tiny-files', copyTinyFiles );
+gulp.task( 'fonts', generateFonts );
+gulp.task( 'statics', buildStatics );
