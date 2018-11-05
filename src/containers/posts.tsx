@@ -5,6 +5,7 @@ import ContentHeader from '../components/content-header';
 import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { getComments, createComment, editComment, deleteComment } from '../store/comments/actions';
+import { getAllTemplates } from '../store/templates/actions';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -48,7 +49,8 @@ const dispatchToProps = {
   getComments,
   createComment,
   editComment,
-  deleteComment
+  deleteComment,
+  getAllTemplates
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -75,6 +77,10 @@ export class Posts extends React.Component<Props, State> {
       showDeleteModal: false,
       filtersOpen: false
     }
+  }
+
+  componentDidMount() {
+    this.props.getAllTemplates()
   }
 
   private onDelete( post: IPost<'client'> ) {
@@ -124,7 +130,7 @@ export class Posts extends React.Component<Props, State> {
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
     const user = this.props.user!;
-    const templatesPage = this.props.templates.templatesPage;
+    const templates = this.props.templates;
 
     return (
       <div style={{ height: '100%' }} className="mt-post-container">
@@ -147,7 +153,7 @@ export class Posts extends React.Component<Props, State> {
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <PostForm
               onCreate={post => this.props.createPost( post )}
-              templates={templatesPage ? templatesPage.data : []}
+              templates={templates}
               isAdmin={isAdmin}
               activeUser={user}
             />}
@@ -161,7 +167,7 @@ export class Posts extends React.Component<Props, State> {
                     this.props.getPost( id );
                     this.props.getCategories();
                   }}
-                  templates={templatesPage ? templatesPage.data : []}
+                  templates={templates}
                   post={post}
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}

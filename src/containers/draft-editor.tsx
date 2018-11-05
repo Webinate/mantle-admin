@@ -220,7 +220,7 @@ export class DraftEditor extends React.Component<Props, State> {
 const Container = styled.div`
   overflow: auto;
   padding: 0;
-  height: calc(100% - 50px);
+  min-height: 150px;
   box-sizing: border-box;
   background: ${theme.light100.background };
   border: 1px solid ${theme.light100.border };

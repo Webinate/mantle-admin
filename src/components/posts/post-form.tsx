@@ -9,7 +9,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, ITemplate } from '../../../../../src';
+import { IPost, IUserEntry, IFileEntry } from '../../../../../src';
+import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 import SlugEditor from '../slug-editor';
@@ -19,13 +20,14 @@ import FormControl from '@material-ui/core/FormControl';
 import { MediaModal } from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
 import { DraftEditor } from '../../containers/draft-editor';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 export type Props = {
   activeUser: IUserEntry<'client'>;
   isAdmin: boolean;
   id?: string;
   post?: Partial<IPost<'client'>> | null;
-  templates: ITemplate<'client'>[];
+  templates: TemplateState;
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
@@ -115,6 +117,8 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   render() {
+    const templates = this.props.templates;
+
     return <Form>
       <div>
         <div>
@@ -312,18 +316,20 @@ export default class PostForm extends React.Component<Props, State> {
         <RightPanel>
           <h3>Template</h3>
           <div>
-            {this.props.templates.map( t => (
-              <FormControlLabel
-                key={t._id}
-                label={t.name}
-                control={<Checkbox
-                  value={t._id}
-                  checked={false}
-                  color="primary"
-                  className={`mt-template`}
-                />}
-              />
-            ) )}
+            {templates.busy || !templates.templatesPage ?
+              <CircularProgress className="mt-loading mt-loading-templates" size={30} style={{ margin: '10px auto' }} /> :
+              templates.templatesPage.data.map( t => (
+                <FormControlLabel
+                  key={t._id}
+                  label={t.name}
+                  control={<Checkbox
+                    value={t._id}
+                    checked={false}
+                    color="primary"
+                    className={`mt-template`}
+                  />}
+                />
+              ) )}
           </div>
         </RightPanel>
       </div>
