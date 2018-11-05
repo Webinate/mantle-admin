@@ -14,7 +14,7 @@ import createHistory from 'history/createMemoryHistory';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { Controller } from '../../../src';
 import { IAuthReq, IClient } from '../../../src';
-import { authentication, serializers } from '../../../src';
+import { serializers, decorators } from '../../../src';
 import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
@@ -62,11 +62,17 @@ export default class MainController extends Controller {
       } ).initialize( app, db ),
       new serializers.comments( {
         rootPath: apiUrl
+      } ).initialize( app, db ),
+      new serializers.documents( {
+        rootPath: apiUrl
+      } ).initialize( app, db ),
+      new serializers.templates( {
+        rootPath: apiUrl
       } ).initialize( app, db )
     ] );
 
     const router = express.Router();
-    router.get( '*', [ authentication.identifyUser, this.renderPage.bind( this ) ] );
+    router.get( '*', [ this.renderPage.bind( this ) ] );
     app.use( '/', router );
     return this;
   }
@@ -74,6 +80,7 @@ export default class MainController extends Controller {
   /**
    * Draws the html page and its initial react state and component tree
    */
+  @decorators.identify()
   private async renderPage( req: IAuthReq, res: express.Response, next: Function ) {
     const context: { url?: string } = {}
     const history = createHistory();

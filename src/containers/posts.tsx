@@ -30,6 +30,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   user: state.authentication.user,
   app: state.app,
   routing: state.router,
+  templates: state.templates,
   location: ownProps.location as Location
 } );
 
@@ -123,6 +124,7 @@ export class Posts extends React.Component<Props, State> {
     const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
     const user = this.props.user!;
+    const templatesPage = this.props.templates.templatesPage;
 
     return (
       <div style={{ height: '100%' }} className="mt-post-container">
@@ -145,6 +147,7 @@ export class Posts extends React.Component<Props, State> {
           <Switch>
             <Route path="/dashboard/posts/new" render={props => <PostForm
               onCreate={post => this.props.createPost( post )}
+              templates={templatesPage ? templatesPage.data : []}
               isAdmin={isAdmin}
               activeUser={user}
             />}
@@ -158,6 +161,7 @@ export class Posts extends React.Component<Props, State> {
                     this.props.getPost( id );
                     this.props.getCategories();
                   }}
+                  templates={templatesPage ? templatesPage.data : []}
                   post={post}
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}

@@ -2,6 +2,7 @@ import { PostsGetAllOptions, CommentGetAllOptions, CategoriesGetManyOptions } fr
 import { RedirectError } from './errors';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
+import { ActionCreators as TemplatesActions } from '../store/templates/actions';
 import { ActionCreators as CommentActions } from '../store/comments/actions';
 import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
@@ -33,7 +34,8 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     const postReply = await Promise.all( [
       controllers.posts.getPost( { id: matchesEdit.params.id } ),
       controllers.categories.getAll( initialCategoryFilter ),
-      controllers.comments.getAll( initialCommentFilter )
+      controllers.comments.getAll( initialCommentFilter ),
+      controllers.templates.getMany()
     ] );
 
     const post = postReply[ 0 ];
@@ -44,13 +46,19 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     actions.push( PostActions.SetPost.create( post ) );
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
     actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: initialCommentFilter } ) );
+    actions.push( TemplatesActions.GetAll.create( postReply[ 3 ] ) );
   }
   else if ( matchesNew ) {
     if ( !isAdmin )
       throw new RedirectError( '/dashboard/posts' );
 
-    let categories = await controllers.categories.getAll( initialCategoryFilter );
-    actions.push( CategoryActions.SetCategories.create( categories ) );
+    const responses = await Promise.all( [
+      controllers.categories.getAll( initialCategoryFilter ),
+      controllers.templates.getMany()
+    ] );
+
+    actions.push( CategoryActions.SetCategories.create( responses[ 0 ] ) );
+    actions.push( TemplatesActions.GetAll.create( responses[ 1 ] ) );
   }
   else {
     let posts = await controllers.posts.getPosts( initialPostsFilter );

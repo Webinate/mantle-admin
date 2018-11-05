@@ -5,10 +5,11 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry } from '../../../../../src';
+import { IPost, IUserEntry, IFileEntry, ITemplate } from '../../../../../src';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 import SlugEditor from '../slug-editor';
@@ -24,6 +25,7 @@ export type Props = {
   isAdmin: boolean;
   id?: string;
   post?: Partial<IPost<'client'>> | null;
+  templates: ITemplate<'client'>[];
   onFetch?: ( id: string ) => void;
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
@@ -305,6 +307,24 @@ export default class PostForm extends React.Component<Props, State> {
 
             } as any}
           />
+        </RightPanel>
+
+        <RightPanel>
+          <h3>Template</h3>
+          <div>
+            {this.props.templates.map( t => (
+              <FormControlLabel
+                key={t._id}
+                label={t.name}
+                control={<Checkbox
+                  value={t._id}
+                  checked={false}
+                  color="primary"
+                  className={`mt-template`}
+                />}
+              />
+            ) )}
+          </div>
         </RightPanel>
       </div>
 
