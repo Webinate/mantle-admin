@@ -138,9 +138,10 @@ export class Posts extends React.Component<Props, State> {
           title="Posts"
           busy={isBusy}
           renderFilters={() => <PostFilterBar
+            loading={isBusy}
             onSearch={term => this.onSearch( term )}
             postsSelected={this.state.selectedPosts.length > 0 ? false : true}
-            onNew={() => this.props.push( '/dashboard/posts/new' )}
+            onNew={() => this.props.createPost( { title: 'New Post', slug: 'new-post' } )}
             onDelete={() => this.onDeleteMultiple()}
             isAdminUser={isAdmin ? false : true}
             onFilterToggle={val => this.setState( { filtersOpen: val } )}
@@ -151,13 +152,6 @@ export class Posts extends React.Component<Props, State> {
         </ContentHeader>
         <PostsContainer>
           <Switch>
-            <Route path="/dashboard/posts/new" render={props => <PostForm
-              onCreate={post => this.props.createPost( post )}
-              templates={templates}
-              isAdmin={isAdmin}
-              activeUser={user}
-            />}
-            />
             <Route path="/dashboard/posts/edit/:postId" render={props => {
               if ( isAdmin || ( post && user._id === post._id ) ) {
                 return <PostForm

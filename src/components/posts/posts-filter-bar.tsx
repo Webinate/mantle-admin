@@ -14,6 +14,7 @@ export type Props = {
   filtersOpen: boolean;
   isAdminUser: boolean;
   postsSelected: boolean;
+  loading: boolean;
   onCancel: () => void;
   onSearch: ( term: string ) => void;
   onNew: () => void;
@@ -92,7 +93,7 @@ export default class PostFilterBar extends React.Component<Props, State> {
             variant="contained"
             onClick={e => this.props.onNew()}
             className="mt-new-post"
-            disabled={this.props.isAdminUser}
+            disabled={this.props.isAdminUser || this.props.loading}
             color="primary"
           >
             <AddIcon style={buttonIconStyle} />

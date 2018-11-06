@@ -1,35 +1,30 @@
 import * as React from 'react';
-import { Editor, EditorState, RichUtils, DraftHandleValue, DefaultDraftBlockRenderMap, getDefaultKeyBinding } from 'draft-js';
-import { IRootState } from '../store';
-import { connectWrapper, returntypeof } from '../utils/decorators';
-import { default as styled } from '../theme/styled';
-import { default as theme } from '../theme/mui-theme';
+import { Editor, EditorState, RichUtils, DraftHandleValue, DefaultDraftBlockRenderMap, getDefaultKeyBinding, DraftBlockType } from 'draft-js';
+import { default as styled } from '../../theme/styled';
+import { default as theme } from '../../theme/mui-theme';
 import { stateToHTML } from 'draft-js-export-html';
 import { stateFromHTML } from 'draft-js-import-html';
 import * as Immutable from 'immutable';
-import DraftToolbar from '../components/draft/draft-toolbar';
+import DraftToolbar from '../draft/draft-toolbar';
+import { IPost, IDocument, DraftElements } from 'modepress';
+import { IPopulatedDraft } from '../../../../../src/types/models/i-draft';
 
-// Map state to props
-const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
-} );
-
-// Map actions to props (This binds the actions to the dispatch fucntion)
-const dispatchToProps = {
+export type Props = {
+  post: Partial<IPost<'client'>>;
+  activeElement: string | null;
+  onCreateElm: ( type: DraftElements ) => void;
+  onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
 }
 
-const stateProps = returntypeof( mapStateToProps );
-type Props = typeof stateProps & typeof dispatchToProps;
-type State = {
+export type State = {
   editorState: EditorState;
   initialized: boolean;
   activeElm: string | null;
-  elements: { html: string; id: string; }[];
 };
 
 /**
  * The main application entry point
  */
-@connectWrapper( mapStateToProps, dispatchToProps )
 export class DraftEditor extends React.Component<Props, State> {
   private _editor: Editor | null;
   private _blockRenderMap: any;
@@ -39,8 +34,7 @@ export class DraftEditor extends React.Component<Props, State> {
     this.state = {
       editorState: EditorState.createEmpty(),
       initialized: false,
-      elements: [],
-      activeElm: null
+      activeElm: props.activeElement
     };
 
     const blockRenderMap = Immutable.Map<any, any>( {
@@ -56,13 +50,18 @@ export class DraftEditor extends React.Component<Props, State> {
     this._blockRenderMap = DefaultDraftBlockRenderMap.merge( blockRenderMap );
   }
 
+  componentWillReceiveProps( next: Props ) {
+    if ( next.activeElement && next.activeElement !== this.props.activeElement )
+      this.setState( { activeElm: this.props.activeElement }, () => {
+        this.focusEditor()
+      } );
+  }
+
   componentDidMount() {
     if ( typeof window === 'undefined' || typeof document === 'undefined' )
       return;
     else
       this.setState( { initialized: true } );
-
-    this._createBlock( 'paragraph' );
   }
 
   private focusEditor() {
@@ -103,53 +102,84 @@ export class DraftEditor extends React.Component<Props, State> {
     if ( blockType === 'ordered-list-item' || blockType === 'unordered-list-item' || blockType === 'unstyled' )
       return 'not-handled';
 
-    this.updateElmHtml( id, state );
-    setTimeout( () => {
-      const newId = this._createBlock( 'paragraph' );
-      this.setState( { activeElm: newId }, () => this.focusEditor() );
-    }, 100 );
+    this.updateElmHtml( id, state, true );
+    // setTimeout( () => {
+    //   const newId = this._createBlock( 'paragraph' );
+    //   this.setState( { activeElm: newId }, () => this.focusEditor() );
+    // }, 100 );
 
     return 'handled';
   }
 
-  private updateElmHtml( id: string, state: EditorState ) {
+  private updateElmHtml( id: string, state: EditorState, createParagraph: boolean ) {
     const contentState = state.getCurrentContent();
     let html = stateToHTML( contentState );
-
-    this.setState( {
-      elements: this.state.elements.map( elm => {
-        if ( elm.id === id )
-          return { ...elm, html: html };
-        else
-          return elm;
-      } ),
-      activeElm: null,
-      editorState: EditorState.createEmpty()
-    } );
+    this.props.onUpdateElm( id, html, createParagraph );
   }
 
-  private _createBlock( s: string ): string {
-    const newId = this.state.elements.length.toString();
+  // private updateElmHtml( id: string, state: EditorState ) {
+  //   const contentState = state.getCurrentContent();
+  //   let html = stateToHTML( contentState );
 
-    let newState = EditorState.createEmpty();
-    newState = RichUtils.toggleBlockType( newState, s );
+  //   this.setState( {
+  //     elements: this.state.elements.map( elm => {
+  //       if ( elm.id === id )
+  //         return { ...elm, html: html };
+  //       else
+  //         return elm;
+  //     } ),
+  //     activeElm: null,
+  //     editorState: EditorState.createEmpty()
+  //   } );
+  // }
 
-    this.setState( {
-      editorState: newState,
-      elements: this.state.elements.concat(
-        { html: '', id: newId }
-      ),
-      activeElm: this.state.elements.length.toString()
-    } );
+  // private _createBlock( s: string ): string {
+  //   const document = this.props.post.document as IDocument<'client'>;
+  //   const draft = document.currentDraft as IPopulatedDraft<'client'>;
+  //   const elements = draft.elements;
 
-    setTimeout( () => this.focusEditor(), 500 );
-    return newId;
+  //   const newId = this.state.elements.length.toString();
+
+  //   let newState = EditorState.createEmpty();
+  //   newState = RichUtils.toggleBlockType( newState, s );
+
+  //   this.setState( {
+  //     editorState: newState,
+  //     elements: this.state.elements.concat(
+  //       { html: '', id: newId }
+  //     ),
+  //     activeElm: this.state.elements.length.toString()
+  //   } );
+
+  //   setTimeout( () => this.focusEditor(), 500 );
+  //   return newId;
+  // }
+
+  private _onCreateElm( type: DraftBlockType ) {
+    if ( type === 'paragraph' )
+      this.props.onCreateElm( 'elm-paragraph' );
+    if ( type === 'header-one' )
+      this.props.onCreateElm( 'elm-header-1' );
+    if ( type === 'header-two' )
+      this.props.onCreateElm( 'elm-header-2' );
+    if ( type === 'header-three' )
+      this.props.onCreateElm( 'elm-header-3' );
+    if ( type === 'header-four' )
+      this.props.onCreateElm( 'elm-header-4' );
+    if ( type === 'header-five' )
+      this.props.onCreateElm( 'elm-header-5' );
+    if ( type === 'header-six' )
+      this.props.onCreateElm( 'elm-header-6' );
+    if ( type === 'code-block' )
+      this.props.onCreateElm( 'elm-code' );
   }
 
   render() {
     if ( !this.state.initialized )
       return <div></div>;
 
+    const document = this.props.post.document as IDocument<'client'>;
+    const draft = document.currentDraft as IPopulatedDraft<'client'>;
     const currentStyle = this.state.editorState.getCurrentInlineStyle();
     const selection = this.state.editorState.getSelection();
     const blockType = this.state.editorState
@@ -158,10 +188,10 @@ export class DraftEditor extends React.Component<Props, State> {
       .getType();
 
     return (
-      <div style={{ height: '100%' }}>
+      <div>
         <Container>
           <DraftToolbar
-            onCreateBlock={type => this._createBlock( type.type )}
+            onCreateBlock={type => this._onCreateElm( type.type )}
             onAddMedia={() => { }}
             activeStyle={currentStyle}
             onInlineToggle={styleStyle => this.setState( { editorState: RichUtils.toggleInlineStyle( this.state.editorState, styleStyle.type ) } )}
@@ -172,21 +202,21 @@ export class DraftEditor extends React.Component<Props, State> {
           <div
             className="mt-editor-container"
           >
-            {this.state.elements.map( elm => {
-              if ( this.state.activeElm === elm.id )
+            {draft.elements.map( elm => {
+              if ( this.state.activeElm === elm._id )
                 return (
                   <div
-                    key={elm.id}
+                    key={elm._id}
                     className={`mt-element active`}
                   >
                     <Editor
                       ref={e => this._editor = e}
-                      onBlur={() => this.updateElmHtml( elm.id, this.state.editorState )}
+                      onBlur={() => this.updateElmHtml( elm._id, this.state.editorState, false )}
                       blockRenderMap={this._blockRenderMap}
                       keyBindingFn={e => this.mapKeyToEditorCommand( e )}
                       onTab={e => this.mapKeyToEditorCommand( e )}
                       editorState={this.state.editorState}
-                      handleReturn={( e, state ) => this._onReturn( elm.id, state, e )}
+                      handleReturn={( e, state ) => this._onReturn( elm._id, state, e )}
                       handleKeyCommand={( command, state ) => this._handleKeyCommand( command, state )}
                       onChange={e => {
                         this.setState( { editorState: e } );
@@ -196,21 +226,19 @@ export class DraftEditor extends React.Component<Props, State> {
                 );
 
               return <div
-                key={elm.id}
+                key={elm._id}
                 className="mt-element"
                 onClick={e => {
                   const contentState = stateFromHTML( elm.html );
                   this.setState( {
-                    activeElm: elm.id,
+                    activeElm: elm._id,
                     editorState: EditorState.createWithContent( contentState )
                   }, () => this.focusEditor() );
                 }}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}
-
           </div>
-
         </Container>
       </div>
     );
@@ -220,7 +248,7 @@ export class DraftEditor extends React.Component<Props, State> {
 const Container = styled.div`
   overflow: auto;
   padding: 0;
-  min-height: 150px;
+  min-height: 300px;
   box-sizing: border-box;
   background: ${theme.light100.background };
   border: 1px solid ${theme.light100.border };

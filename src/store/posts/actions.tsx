@@ -45,7 +45,7 @@ export function createPost( post: Partial<IPost<'client'>> ) {
       const resp = await posts.create( post );
       dispatch( AppActions.serverResponse.create( `New Post '${ resp.title }' created` ) );
       dispatch( ActionCreators.SetPostsBusy.create( false ) );
-      dispatch( push( '/dashboard/posts' ) );
+      dispatch( push( `/dashboard/posts/edit/${ resp._id }` ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );

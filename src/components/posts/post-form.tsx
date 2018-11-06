@@ -19,7 +19,7 @@ import { CategoryEditor } from '../../containers/category-editor';
 import FormControl from '@material-ui/core/FormControl';
 import { MediaModal } from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
-import { DraftEditor } from '../../containers/draft-editor';
+import { DraftEditor } from './draft-editor';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 export type Props = {
@@ -162,7 +162,12 @@ export default class PostForm extends React.Component<Props, State> {
             </div>
           </SlugContainer>
         </div>
-        <DraftEditor />
+        <DraftEditor
+          post={this.state.editable}
+          activeElement={null}
+          onCreateElm={type => { }}
+          onUpdateElm={( id, html, createParagraph ) => { }}
+        />
         {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
 
       </div>
