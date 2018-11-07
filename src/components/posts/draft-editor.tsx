@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Editor, ContentState, convertFromHTML, EditorState, RichUtils, DraftHandleValue, DefaultDraftBlockRenderMap, getDefaultKeyBinding, DraftBlockType } from 'draft-js';
+import { Editor, EditorState, RichUtils, convertFromHTML, ContentState, DraftHandleValue, DefaultDraftBlockRenderMap, getDefaultKeyBinding, DraftBlockType } from 'draft-js';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import { stateToHTML } from 'draft-js-export-html';
 import { stateFromHTML } from 'draft-js-import-html';
 import * as Immutable from 'immutable';
 import DraftToolbar from '../draft/draft-toolbar';
-import { IDraftElement } from 'modepress';
+import { IDraftElement, DraftElements } from 'modepress';
 
 export type Props = {
   elements: IDraftElement<'client'>[];
@@ -71,17 +71,44 @@ export class DraftEditor extends React.Component<Props, State> {
       this.setState( { initialized: true } );
   }
 
+  private draftToBlockType( type: DraftElements ): DraftBlockType {
+    if ( type === 'elm-header-1' )
+      return 'header-one';
+    if ( type === 'elm-header-2' )
+      return 'header-two';
+    if ( type === 'elm-header-3' )
+      return 'header-three';
+    if ( type === 'elm-header-4' )
+      return 'header-four';
+    if ( type === 'elm-header-5' )
+      return 'header-five';
+    if ( type === 'elm-header-6' )
+      return 'header-six';
+    if ( type === 'elm-code' )
+      return 'code-block';
+    if ( type === 'elm-paragraph' )
+      return 'paragraph';
+    if ( type === 'elm-list' )
+      return 'unordered-list-item';
+    else
+      return 'unstyled';
+  }
+
   private initDraftState( elm: IDraftElement<'client'> ) {
-    // const contentState = stateFromHTML( elm.html );
+    const contentState = stateFromHTML( elm.html );
+    let editorState = EditorState.createWithContent( contentState );
+    editorState = RichUtils.toggleBlockType( editorState, this.draftToBlockType( elm.type ) );
+
     const blocksFromHTML = convertFromHTML( elm.html );
     const state = ContentState.createFromBlockArray(
       blocksFromHTML.contentBlocks,
       blocksFromHTML.entityMap
     );
+    const newState = EditorState.createWithContent( state );
 
     this.setState( {
       activeElm: elm._id,
-      editorState: EditorState.createWithContent( state )
+      editorState: newState
     }, () => {
       if ( this._editor )
         this._editor.focus();
@@ -126,7 +153,7 @@ export class DraftEditor extends React.Component<Props, State> {
     if ( blockType === 'ordered-list-item' || blockType === 'unordered-list-item' || blockType === 'unstyled' )
       return 'not-handled';
 
-    this.updateElmHtml( id, state, true );
+    // this.updateElmHtml( id, state, true );
     // setTimeout( () => {
     //   const newId = this._createBlock( 'paragraph' );
     //   this.setState( { activeElm: newId }, () => this.focusEditor() );
@@ -135,10 +162,11 @@ export class DraftEditor extends React.Component<Props, State> {
     return 'handled';
   }
 
-  private updateElmHtml( id: string, state: EditorState, createParagraph: boolean ) {
+  private updateElmHtml( elm: IDraftElement<'client'>, state: EditorState, createParagraph: boolean ) {
     const contentState = state.getCurrentContent();
     let html = stateToHTML( contentState );
-    this.props.onUpdateElm( id, html, createParagraph );
+    if ( elm.html !== html )
+      this.props.onUpdateElm( elm._id, html, createParagraph );
   }
 
   // private updateElmHtml( id: string, state: EditorState ) {
@@ -238,7 +266,7 @@ export class DraftEditor extends React.Component<Props, State> {
                   >
                     <Editor
                       ref={e => this._editor = e}
-                      onBlur={() => this.updateElmHtml( elm._id, this.state.editorState, false )}
+                      onBlur={() => this.updateElmHtml( elm, this.state.editorState, false )}
                       blockRenderMap={this._blockRenderMap}
                       keyBindingFn={e => this.mapKeyToEditorCommand( e )}
                       onTab={e => this.mapKeyToEditorCommand( e )}

@@ -11,6 +11,7 @@ import { push } from 'react-router-redux';
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
   AddElement: new ActionCreator<'posts-add-elm', IDraftElement<'client'>>( 'posts-add-elm' ),
+  UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client'>>( 'posts-update-elm' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
   SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' )
 };
@@ -97,6 +98,20 @@ export function addElement( docId: string, element: Partial<IDraftElement<'clien
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await documents.addElement( docId, element );
       dispatch( ActionCreators.AddElement.create( resp ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+  }
+}
+
+export function updateElement( docId: string, elementId: string, html: string, createParagraph: boolean ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const resp = await documents.editElement( docId, elementId, { html } );
+      dispatch( ActionCreators.UpdateElement.create( resp ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );

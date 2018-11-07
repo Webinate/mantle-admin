@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
-import { getPosts, getPost, createPost, deletePosts, editPost, addElement } from '../store/posts/actions';
+import { getPosts, getPost, createPost, deletePosts, editPost, addElement, updateElement } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { getComments, createComment, editComment, deleteComment } from '../store/comments/actions';
 import { getAllTemplates } from '../store/templates/actions';
@@ -49,6 +49,7 @@ const dispatchToProps = {
   getComments,
   createComment,
   addElement,
+  updateElement,
   editComment,
   deleteComment,
   getAllTemplates
@@ -196,7 +197,7 @@ export class Posts extends React.Component<Props, State> {
                   isAdmin={isAdmin}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}
                   onCreateElm={( elm => this.props.addElement( ( post.document as IDocument<'client'> )._id, elm ) )}
-                  onUpdateElm={( id, html, createParagraph ) => { }}
+                  onUpdateElm={( id, html, createParagraph ) => this.props.updateElement( ( post.document as IDocument<'client'> )._id, id, html, createParagraph )}
                 />
               }
               else {

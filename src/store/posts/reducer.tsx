@@ -57,6 +57,19 @@ export default function reducer( state: State = initialState, action: Action ): 
       };
       break;
 
+    case ActionCreators.UpdateElement.type:
+      const shallowCopy2 = { ...state.post! };
+      const doc2 = shallowCopy2.document as IDocument<'client'>;
+      const draft2 = doc2.currentDraft as IPopulatedDraft<'client'>;
+      draft2.elements = draft2.elements.map( elm => elm._id === action.payload._id ? action.payload : elm );
+
+      partialState = {
+        activeElement: action.payload._id,
+        busy: false,
+        post: shallowCopy2
+      };
+      break;
+
     default: return state;
   }
 
