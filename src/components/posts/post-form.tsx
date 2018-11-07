@@ -9,7 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, IDraftElement } from '../../../../../src';
+import { IPost, IUserEntry, IFileEntry, IDraftElement, IDocument, IPopulatedDraft } from 'modepress';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
@@ -26,7 +26,7 @@ export type Props = {
   activeUser: IUserEntry<'client'>;
   isAdmin: boolean;
   id?: string;
-  post?: Partial<IPost<'client'>>;
+  post: Partial<IPost<'client'>>;
   templates: TemplateState;
   activeElement: string | null;
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
@@ -99,6 +99,8 @@ export default class PostForm extends React.Component<Props, State> {
 
   render() {
     const templates = this.props.templates;
+    const doc = this.props.post.document as IDocument<'client'>;
+    const draft = doc.currentDraft as IPopulatedDraft<'client'>;
 
     return <Form>
       <div>
@@ -144,7 +146,7 @@ export default class PostForm extends React.Component<Props, State> {
           </SlugContainer>
         </div>
         <DraftEditor
-          post={this.state.editable}
+          elements={draft.elements}
           activeElement={this.props.activeElement}
           onCreateElm={elm => this.props.onCreateElm( elm )}
           onUpdateElm={( id, html, createParagraph ) => this.props.onUpdateElm( id, html, createParagraph )}

@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { Editor, EditorState, RichUtils, DraftHandleValue, DefaultDraftBlockRenderMap, getDefaultKeyBinding, DraftBlockType } from 'draft-js';
+import { Editor, ContentState, convertFromHTML, EditorState, RichUtils, DraftHandleValue, DefaultDraftBlockRenderMap, getDefaultKeyBinding, DraftBlockType } from 'draft-js';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import { stateToHTML } from 'draft-js-export-html';
 import { stateFromHTML } from 'draft-js-import-html';
 import * as Immutable from 'immutable';
 import DraftToolbar from '../draft/draft-toolbar';
-import { IPost, IDocument, IDraftElement } from 'modepress';
-import { IPopulatedDraft } from '../../../../../src/types/models/i-draft';
+import { IDraftElement } from 'modepress';
 
 export type Props = {
-  post: Partial<IPost<'client'>>;
+  elements: IDraftElement<'client'>[];
   activeElement: string | null;
   onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
   onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
@@ -31,8 +30,14 @@ export class DraftEditor extends React.Component<Props, State> {
 
   constructor( props: Props ) {
     super( props );
+
+    const activeElm = props.elements.find( e => e._id === props.activeElement );
+    const initialState = activeElm ?
+      EditorState.createWithContent( stateFromHTML( activeElm.html ) ) :
+      EditorState.createEmpty();
+
     this.state = {
-      editorState: EditorState.createEmpty(),
+      editorState: initialState,
       initialized: false,
       activeElm: props.activeElement
     };
@@ -53,7 +58,9 @@ export class DraftEditor extends React.Component<Props, State> {
   componentWillReceiveProps( next: Props ) {
     if ( next.activeElement && next.activeElement !== this.props.activeElement )
       this.setState( { activeElm: next.activeElement }, () => {
-        this.focusEditor()
+        const elm = next.elements.find( e => e._id === next.activeElement );
+        if ( elm )
+          this.initDraftState( elm );
       } );
   }
 
@@ -64,10 +71,27 @@ export class DraftEditor extends React.Component<Props, State> {
       this.setState( { initialized: true } );
   }
 
-  private focusEditor() {
-    if ( this._editor )
-      this._editor.focus();
+  private initDraftState( elm: IDraftElement<'client'> ) {
+    // const contentState = stateFromHTML( elm.html );
+    const blocksFromHTML = convertFromHTML( elm.html );
+    const state = ContentState.createFromBlockArray(
+      blocksFromHTML.contentBlocks,
+      blocksFromHTML.entityMap
+    );
+
+    this.setState( {
+      activeElm: elm._id,
+      editorState: EditorState.createWithContent( state )
+    }, () => {
+      if ( this._editor )
+        this._editor.focus();
+    } );
   }
+
+  // private focusEditor() {
+  //   if ( this._editor )
+  //     this._editor.focus();
+  // }
 
   private _handleKeyCommand( command: string, editorState: EditorState ) {
     const newState = RichUtils.handleKeyCommand( editorState, command );
@@ -161,15 +185,15 @@ export class DraftEditor extends React.Component<Props, State> {
     if ( type === 'header-one' )
       this.props.onCreateElm( { type: 'elm-header-1', html: '<h1></h1>' } );
     if ( type === 'header-two' )
-      this.props.onCreateElm( { type: 'elm-header-2', html: '<h2></h2>' } );
+      this.props.onCreateElm( { type: 'elm-header-2', html: '<h2> </h2>' } );
     if ( type === 'header-three' )
-      this.props.onCreateElm( { type: 'elm-header-3', html: '<h3></h3>' } );
+      this.props.onCreateElm( { type: 'elm-header-3', html: '<h3> </h3>' } );
     if ( type === 'header-four' )
-      this.props.onCreateElm( { type: 'elm-header-4', html: '<h4></h4>' } );
+      this.props.onCreateElm( { type: 'elm-header-4', html: '<h4> </h4>' } );
     if ( type === 'header-five' )
       this.props.onCreateElm( { type: 'elm-header-5', html: '<h5></h5>' } );
     if ( type === 'header-six' )
-      this.props.onCreateElm( { type: 'elm-header-6', html: '<h6></h6>' } );
+      this.props.onCreateElm( { type: 'elm-header-6', html: '<h6>This is a header</h6>' } );
     if ( type === 'code-block' )
       this.props.onCreateElm( { type: 'elm-code', html: '<pre></pre>' } );
     if ( type === 'ordered-list-item' )
@@ -182,8 +206,7 @@ export class DraftEditor extends React.Component<Props, State> {
     if ( !this.state.initialized )
       return <div></div>;
 
-    const document = this.props.post.document as IDocument<'client'>;
-    const draft = document.currentDraft as IPopulatedDraft<'client'>;
+    const elements = this.props.elements;
     const currentStyle = this.state.editorState.getCurrentInlineStyle();
     const selection = this.state.editorState.getSelection();
     const blockType = this.state.editorState
@@ -206,7 +229,7 @@ export class DraftEditor extends React.Component<Props, State> {
           <div
             className="mt-editor-container"
           >
-            {draft.elements.map( elm => {
+            {elements.map( elm => {
               if ( this.state.activeElm === elm._id )
                 return (
                   <div
@@ -232,13 +255,7 @@ export class DraftEditor extends React.Component<Props, State> {
               return <div
                 key={elm._id}
                 className="mt-element"
-                onClick={e => {
-                  const contentState = stateFromHTML( elm.html );
-                  this.setState( {
-                    activeElm: elm._id,
-                    editorState: EditorState.createWithContent( contentState )
-                  }, () => this.focusEditor() );
-                }}
+                onClick={e => this.initDraftState( elm )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}

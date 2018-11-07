@@ -81,7 +81,14 @@ export class Posts extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.props.getAllTemplates()
+    this.props.getAllTemplates();
+    this.props.getPosts( {
+      index: 0,
+      sortOrder: this.props.posts.postFilters.sortOrder,
+      visibility: this.props.posts.postFilters.visibility,
+      author: '',
+      sort: this.props.posts.postFilters.sort
+    } );
   }
 
   componentWillReceiveProps( next: Props ) {
