@@ -6,13 +6,13 @@ import { stateToHTML } from 'draft-js-export-html';
 import { stateFromHTML } from 'draft-js-import-html';
 import * as Immutable from 'immutable';
 import DraftToolbar from '../draft/draft-toolbar';
-import { IPost, IDocument, DraftElements } from 'modepress';
+import { IPost, IDocument, IDraftElement } from 'modepress';
 import { IPopulatedDraft } from '../../../../../src/types/models/i-draft';
 
 export type Props = {
   post: Partial<IPost<'client'>>;
   activeElement: string | null;
-  onCreateElm: ( type: DraftElements ) => void;
+  onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
   onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
 }
 
@@ -52,7 +52,7 @@ export class DraftEditor extends React.Component<Props, State> {
 
   componentWillReceiveProps( next: Props ) {
     if ( next.activeElement && next.activeElement !== this.props.activeElement )
-      this.setState( { activeElm: this.props.activeElement }, () => {
+      this.setState( { activeElm: next.activeElement }, () => {
         this.focusEditor()
       } );
   }
@@ -157,21 +157,25 @@ export class DraftEditor extends React.Component<Props, State> {
 
   private _onCreateElm( type: DraftBlockType ) {
     if ( type === 'paragraph' )
-      this.props.onCreateElm( 'elm-paragraph' );
+      this.props.onCreateElm( { type: 'elm-paragraph', html: '<p></p>' } );
     if ( type === 'header-one' )
-      this.props.onCreateElm( 'elm-header-1' );
+      this.props.onCreateElm( { type: 'elm-header-1', html: '<h1></h1>' } );
     if ( type === 'header-two' )
-      this.props.onCreateElm( 'elm-header-2' );
+      this.props.onCreateElm( { type: 'elm-header-2', html: '<h2></h2>' } );
     if ( type === 'header-three' )
-      this.props.onCreateElm( 'elm-header-3' );
+      this.props.onCreateElm( { type: 'elm-header-3', html: '<h3></h3>' } );
     if ( type === 'header-four' )
-      this.props.onCreateElm( 'elm-header-4' );
+      this.props.onCreateElm( { type: 'elm-header-4', html: '<h4></h4>' } );
     if ( type === 'header-five' )
-      this.props.onCreateElm( 'elm-header-5' );
+      this.props.onCreateElm( { type: 'elm-header-5', html: '<h5></h5>' } );
     if ( type === 'header-six' )
-      this.props.onCreateElm( 'elm-header-6' );
+      this.props.onCreateElm( { type: 'elm-header-6', html: '<h6></h6>' } );
     if ( type === 'code-block' )
-      this.props.onCreateElm( 'elm-code' );
+      this.props.onCreateElm( { type: 'elm-code', html: '<pre></pre>' } );
+    if ( type === 'ordered-list-item' )
+      this.props.onCreateElm( { type: 'elm-list', html: '<ol><li></li></ol>' } );
+    if ( type === 'unordered-list-item' )
+      this.props.onCreateElm( { type: 'elm-list', html: '<ul><li></li></ul>' } );
   }
 
   render() {

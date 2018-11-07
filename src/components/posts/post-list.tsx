@@ -60,16 +60,6 @@ export default class PostList extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    this.props.getPosts( {
-      index: 0,
-      sortOrder: this.state.sortAscending ? 'asc' : 'desc',
-      visibility: this.state.visibility,
-      author: '',
-      sort: this.state.sortBy
-    } );
-  }
-
   componentWillReceiveProps( next: Props ) {
     if ( next.posts !== this.props.posts )
       this.props.onPostSelected( [] );

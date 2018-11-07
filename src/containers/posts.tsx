@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
-import { getPosts, getPost, createPost, deletePosts, editPost } from '../store/posts/actions';
+import { getPosts, getPost, createPost, deletePosts, editPost, addElement } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { getComments, createComment, editComment, deleteComment } from '../store/comments/actions';
 import { getAllTemplates } from '../store/templates/actions';
@@ -12,7 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
-import { IPost } from '../../../../src';
+import { IPost, IDocument } from '../../../../src';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
@@ -48,6 +48,7 @@ const dispatchToProps = {
   push,
   getComments,
   createComment,
+  addElement,
   editComment,
   deleteComment,
   getAllTemplates
@@ -81,6 +82,27 @@ export class Posts extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.getAllTemplates()
+  }
+
+  componentWillReceiveProps( next: Props ) {
+    if ( next.location.pathname !== this.props.location.pathname ) {
+      const inPostsRoot = matchPath( next.location.pathname, { exact: true, path: '/dashboard/posts' } );
+
+      if ( inPostsRoot ) {
+        this.props.getPosts( {
+          index: 0,
+          sortOrder: this.props.posts.postFilters.sortOrder,
+          visibility: this.props.posts.postFilters.visibility,
+          author: '',
+          sort: this.props.posts.postFilters.sort
+        } );
+      }
+      else {
+        const matches = matchPath<{ postId: string }>( next.location.pathname, { exact: true, path: '/dashboard/posts/edit/:postId' } );
+        this.props.getPost( matches!.params.postId );
+        this.props.getCategories();
+      }
+    }
   }
 
   private onDelete( post: IPost<'client'> ) {
@@ -152,20 +174,22 @@ export class Posts extends React.Component<Props, State> {
         </ContentHeader>
         <PostsContainer>
           <Switch>
-            <Route path="/dashboard/posts/edit/:postId" render={props => {
+            <Route path="/dashboard/posts/edit/:postId" exact={true} render={props => {
+              if ( !post )
+                return null;
+
               if ( isAdmin || ( post && user._id === post._id ) ) {
                 return <PostForm
                   id={props.match.params.postId}
                   activeUser={user}
-                  onFetch={id => {
-                    this.props.getPost( id );
-                    this.props.getCategories();
-                  }}
                   templates={templates}
                   post={post}
+                  activeElement={this.props.posts.activeElement}
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}
+                  onCreateElm={( elm => this.props.addElement( ( post.document as IDocument<'client'> )._id, elm ) )}
+                  onUpdateElm={( id, html, createParagraph ) => { }}
                 />
               }
               else {
@@ -173,10 +197,6 @@ export class Posts extends React.Component<Props, State> {
                   post={post}
                   loading={isBusy}
                   id={props.match.params.postId}
-                  onFetch={id => {
-                    this.props.getPost( id );
-                    this.props.getCategories();
-                  }}
                   renderComments={() => this.renderComment( props.match.params.postId )}
                 />
               }

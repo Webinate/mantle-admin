@@ -11,7 +11,6 @@ import { controllers } from '../../../../src';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
   const isAdmin = req._user && req._user.privileges < 2 ? true : false;
-  const matchesNew = matchPath<any>( req.url, { path: '/dashboard/posts/new' } );
   const matchesEdit = matchPath<any>( req.url, { path: '/dashboard/posts/edit/:id' } );
   const initialCategoryFilter: Partial<CategoriesGetManyOptions> = {
     expanded: true,
@@ -47,18 +46,6 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
     actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: initialCommentFilter } ) );
     actions.push( TemplatesActions.GetAll.create( postReply[ 3 ] ) );
-  }
-  else if ( matchesNew ) {
-    if ( !isAdmin )
-      throw new RedirectError( '/dashboard/posts' );
-
-    const responses = await Promise.all( [
-      controllers.categories.getAll( initialCategoryFilter ),
-      controllers.templates.getMany()
-    ] );
-
-    actions.push( CategoryActions.SetCategories.create( responses[ 0 ] ) );
-    actions.push( TemplatesActions.GetAll.create( responses[ 1 ] ) );
   }
   else {
     let posts = await controllers.posts.getPosts( initialPostsFilter );

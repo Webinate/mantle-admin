@@ -1,6 +1,7 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IPost } from '../../../../../src';
+import { Page, IPost, IDraftElement } from '../../../../../src';
 import * as posts from '../../../../../src/lib-frontend/posts';
+import * as documents from '../../../../../src/lib-frontend/documents';
 import { PostsGetAllOptions } from 'modepress';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
@@ -9,6 +10,7 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
+  AddElement: new ActionCreator<'posts-add-elm', IDraftElement<'client'>>( 'posts-add-elm' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
   SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' )
 };
@@ -81,6 +83,20 @@ export function editPost( post: Partial<IPost<'client'>> ) {
       const resp = await posts.update( post._id as string, post );
       dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
       dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+  }
+}
+
+export function addElement( docId: string, element: Partial<IDraftElement<'client'>> ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const resp = await documents.addElement( docId, element );
+      dispatch( ActionCreators.AddElement.create( resp ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );

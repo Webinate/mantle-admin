@@ -9,7 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry } from '../../../../../src';
+import { IPost, IUserEntry, IFileEntry, IDraftElement } from '../../../../../src';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
@@ -26,12 +26,14 @@ export type Props = {
   activeUser: IUserEntry<'client'>;
   isAdmin: boolean;
   id?: string;
-  post?: Partial<IPost<'client'>> | null;
+  post?: Partial<IPost<'client'>>;
   templates: TemplateState;
-  onFetch?: ( id: string ) => void;
+  activeElement: string | null;
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
+  onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
+  onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
 }
 
 export type State = {
@@ -45,16 +47,11 @@ export default class PostForm extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
     this.state = {
-      editable: props.post ? { ...props.post } : this.createEmptyPost(),
+      editable: { ...props.post },
       currentTagText: '',
       slugWasEdited: false,
       showMediaPopup: false
     };
-  }
-
-  componentDidMount() {
-    if ( this.props.onFetch )
-      this.props.onFetch( this.props.id! )
   }
 
   componentWillReceiveProps( next: Props ) {
@@ -63,22 +60,6 @@ export default class PostForm extends React.Component<Props, State> {
         editable: { ...next.post },
         currentTagText: ''
       } );
-  }
-
-  private createEmptyPost(): Partial<IPost<'client'>> {
-    return {
-      title: '',
-      brief: '',
-      categories: [],
-      tags: [],
-      content: '',
-      public: false,
-      slug: '',
-      featuredImage: '',
-      createdOn: Date.now(),
-      lastUpdated: Date.now(),
-      author: this.props.activeUser
-    }
   }
 
   private addTag() {
@@ -164,9 +145,9 @@ export default class PostForm extends React.Component<Props, State> {
         </div>
         <DraftEditor
           post={this.state.editable}
-          activeElement={null}
-          onCreateElm={type => { }}
-          onUpdateElm={( id, html, createParagraph ) => { }}
+          activeElement={this.props.activeElement}
+          onCreateElm={elm => this.props.onCreateElm( elm )}
+          onUpdateElm={( id, html, createParagraph ) => this.props.onUpdateElm( id, html, createParagraph )}
         />
         {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
 

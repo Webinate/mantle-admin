@@ -8,11 +8,10 @@ import * as format from 'date-fns/format';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  post: IPost<'client'> | null;
+  post: IPost<'client'>;
   id?: string;
   loading: boolean;
   renderComments?: () => undefined | null | JSX.Element;
-  onFetch?: ( id: string ) => void;
 }
 
 type State = {
@@ -27,15 +26,8 @@ export default class PostPreview extends React.Component<Props, State> {
     }
   }
 
-  componentDidMount() {
-    if ( this.props.onFetch && this.props.id )
-      this.props.onFetch( this.props.id )
-  }
-
   render() {
-
-
-    if ( this.props.loading || !this.props.post )
+    if ( this.props.loading )
       return <CircularProgress className="mt-loading" />
 
     const post = this.props.post;
