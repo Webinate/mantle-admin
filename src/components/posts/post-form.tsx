@@ -9,7 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, IDraftElement } from 'modepress';
+import { IPost, IUserEntry, IFileEntry, IDraftElement, IDocument, IPopulatedDraft } from 'modepress';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
@@ -20,8 +20,9 @@ import FormControl from '@material-ui/core/FormControl';
 import { MediaModal } from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
 // import { DraftEditor } from './draft-editor';
+import { ElmEditor } from './elm-editor';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import TinyPostEditor from './tiny-post-editor';
+// import TinyPostEditor from './tiny-post-editor';
 
 export type Props = {
   activeUser: IUserEntry<'client'>;
@@ -100,8 +101,8 @@ export default class PostForm extends React.Component<Props, State> {
 
   render() {
     const templates = this.props.templates;
-    // const doc = this.props.post.document as IDocument<'client'>;
-    // const draft = doc.currentDraft as IPopulatedDraft<'client'>;
+    const doc = this.props.post.document as IDocument<'client'>;
+    const draft = doc.currentDraft as IPopulatedDraft<'client'>;
 
     return <Form>
       <div>
@@ -146,13 +147,13 @@ export default class PostForm extends React.Component<Props, State> {
             </div>
           </SlugContainer>
         </div>
-        <TinyPostEditor
+        {/* <TinyPostEditor
           content={this.state.editable.content!}
           onContentChanged={content => {
             // Doing this in a mutable way becase we dont to overload the tiny editor
             this.state.editable.content = content;
           }}
-        />
+        /> */}
 
         {/* <DraftEditor
           elements={draft.elements}
@@ -160,6 +161,13 @@ export default class PostForm extends React.Component<Props, State> {
           onCreateElm={elm => this.props.onCreateElm( elm )}
           onUpdateElm={( id, html, createParagraph ) => this.props.onUpdateElm( id, html, createParagraph )}
         /> */}
+
+        <ElmEditor
+          elements={draft.elements}
+          activeElement={this.props.activeElement}
+          onCreateElm={elm => this.props.onCreateElm( elm )}
+          onUpdateElm={( id, html, createParagraph ) => this.props.onUpdateElm( id, html, createParagraph )}
+        />
         {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
 
       </div>
