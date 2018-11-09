@@ -3,7 +3,7 @@ import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
 import { IDraftElement } from 'modepress';
-import { InlineType } from '../draft/draft-toolbar';
+import { InlineType } from './editor-toolbar';
 
 export type Props = {
   elements: IDraftElement<'client'>[];
@@ -22,6 +22,7 @@ export type State = {
  */
 export class ElmEditor extends React.Component<Props, State> {
   private _activeElm: HTMLElement;
+  private _firstElm: HTMLElement;
 
   constructor( props: Props ) {
     super( props );
@@ -56,19 +57,38 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
-  private updateElmHtml( elm: IDraftElement<'client'>, html: string, createParagraph: boolean ) {
+  private updateElmHtml( elm: IDraftElement<'client'>, createParagraph: boolean ) {
+
+    this.clean( this._activeElm );
+    const first = this._activeElm.firstElementChild as HTMLElement;
+    const firstInnerChild = first.firstElementChild;
+    const lastInnerChild = first.lastElementChild;
+    if ( firstInnerChild && firstInnerChild.parentNode && firstInnerChild instanceof HTMLBRElement )
+      first.removeChild( firstInnerChild );
+    if ( lastInnerChild && lastInnerChild.parentNode && lastInnerChild instanceof HTMLBRElement )
+      first.removeChild( lastInnerChild );
+
+    let html = first.outerHTML;
     if ( elm.html !== html ) {
-      this.clean( this._activeElm );
-      const first = this._activeElm.firstElementChild as HTMLElement;
-      const firstInnerChild = first.children[ 0 ];
-      const lastInnerChild = first.children[ first.children.length - 1 ];
-      if ( firstInnerChild instanceof HTMLBRElement )
-        first.removeChild( firstInnerChild );
-      if ( lastInnerChild instanceof HTMLBRElement )
-        first.removeChild( lastInnerChild );
-
-
       this.props.onUpdateElm( elm._id, html, createParagraph );
+    }
+  }
+
+  private focusLast( el: HTMLElement ) {
+    el.focus();
+    if ( typeof window.getSelection != "undefined" && typeof document.createRange != "undefined" ) {
+      var range = document.createRange();
+      range.selectNodeContents( el );
+      range.collapse( false );
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange( range );
+    }
+    else if ( typeof ( document.body as any ).createTextRange != "undefined" ) {
+      var textRange = ( document.body as any ).createTextRange();
+      textRange.moveToElementText( el );
+      textRange.collapse( false );
+      textRange.select();
     }
   }
 
@@ -95,23 +115,66 @@ export class ElmEditor extends React.Component<Props, State> {
       this.props.onCreateElm( { type: 'elm-list', html: '<ul><li></li></ul>' } );
   }
 
-  private editElm( elm: IDraftElement<'client'> ) {
+  private editElm( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
     this.setState( {
       activeElm: elm._id
     } );
   }
 
   private toggleInline( inline: InlineType ) {
-    document.execCommand( inline.type.toLowerCase() );
+    document.execCommand( inline.type.toLowerCase(), false, undefined );
   }
 
-  private focus( elm: HTMLElement ) {
+  private activateElm( elm: HTMLElement ) {
     this._activeElm = elm;
-    const firstElm = elm.firstElementChild as HTMLElement;
-    if ( firstElm.children.length === 0 )
-      firstElm.appendChild( document.createElement( 'br' ) );
+    this._firstElm = elm.firstElementChild as HTMLElement;
 
-    firstElm.focus();
+    // if ( this._firstElm.children.length === 0 )
+    //  this._firstElm.appendChild( document.createElement( 'br' ) );
+
+    this.focusLast( this._firstElm );
+
+  }
+
+  private clear( elm: HTMLElement ) {
+    while ( elm.firstChild )
+      elm.removeChild( elm.firstChild );
+  }
+
+  private onKeyUp( e: React.KeyboardEvent<HTMLElement> ) {
+    // Backkspace / Delete
+    if ( e.keyCode === 8 || e.keyCode === 46 ) {
+
+      if ( this._activeElm.children.length === 0 || this._activeElm.children[ 0 ].tagName !== this._firstElm.tagName ) {
+        this.clear( this._activeElm );
+        this.clear( this._firstElm );
+        this._firstElm = this._firstElm.cloneNode() as HTMLElement;
+        this._activeElm.append( this._firstElm );
+        this.focusLast( this._firstElm );
+      }
+    }
+  }
+
+  private onKeyDown( e: React.KeyboardEvent<HTMLElement> ) {
+    let command = '';
+
+
+    // Tab
+    if ( e.keyCode === 9 )
+      command = e.shiftKey ? 'outdent' : 'indent';
+    if ( e.ctrlKey && e.keyCode === 66 )
+      command = 'bold';
+    if ( e.ctrlKey && e.keyCode === 73 )
+      command = 'italic';
+    if ( e.ctrlKey && e.keyCode === 85 )
+      command = 'underline';
+
+
+    if ( command !== '' ) {
+      document.execCommand( command, false, undefined );
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 
   render() {
@@ -141,19 +204,21 @@ export class ElmEditor extends React.Component<Props, State> {
                       if ( !e )
                         return;
 
-                      this.focus( e );
+                      this.activateElm( e );
                     }}
-                    onBlur={e => this.updateElmHtml( elm, e.currentTarget.innerHTML, false )}
+                    onBlur={e => this.updateElmHtml( elm, false )}
                     className={`mt-element active`}
                     dangerouslySetInnerHTML={{ __html: elm.html || '<p></p>' }}
                     contentEditable={true}
+                    onKeyDown={e => this.onKeyDown( e )}
+                    onKeyUp={e => this.onKeyUp( e )}
                   />
                 );
 
               return <div
                 key={elm._id}
                 className="mt-element"
-                onClick={e => this.editElm( elm )}
+                onClick={e => this.editElm( e, elm )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}
@@ -174,6 +239,11 @@ const Container = styled.div`
   color: ${theme.light100.color };
   border-radius: 4px;
 
+  font-weight: thinner;
+  b, strong {
+    font-weight: bold;
+  }
+
   .mt-editor-container {
     code {
       font-family: monospace;
@@ -188,6 +258,7 @@ const Container = styled.div`
   .mt-element {
     border: 1px dashed transparent;
     padding: 5px;
+    > * { min-height: 10px; }
 
     &.active, &:hover {
       border: 1px dashed ${ theme.light200.border };

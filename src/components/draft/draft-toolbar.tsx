@@ -26,7 +26,7 @@ export type BlockType = {
 
 export type InlineType = {
   label: string | JSX.Element;
-  type: 'BOLD' | 'ITALIC' | 'UNDERLINE'
+  type: 'bold' | 'italic' | 'underline'
 }
 
 /**
@@ -65,9 +65,9 @@ export default class DraftToolbar extends React.Component<Props, State> {
     ];
 
     this._inlineStyles = [
-      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-bold" /></Icon>, type: 'BOLD' },
-      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-italic" /></Icon>, type: 'ITALIC' },
-      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-underline" /></Icon>, type: 'UNDERLINE' }
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-bold" /></Icon>, type: 'bold' },
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-italic" /></Icon>, type: 'italic' },
+      { label: <Icon style={this._iconStyles}><i className="icon icon-editor-underline" /></Icon>, type: 'underline' }
     ];
 
     this.state = {
