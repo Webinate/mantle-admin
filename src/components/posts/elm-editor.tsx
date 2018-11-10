@@ -7,14 +7,15 @@ import { InlineType } from './editor-toolbar';
 
 export type Props = {
   elements: IDraftElement<'client'>[];
-  activeElement: string | null;
+  selected: string[];
+  onSelectionChanged: ( ids: string[] ) => void;
   onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
+  onDeleteElm: ( ids: string[] ) => void;
   onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
 }
 
 export type State = {
   initialized: boolean;
-  activeElm: string | null;
 };
 
 /**
@@ -23,18 +24,14 @@ export type State = {
 export class ElmEditor extends React.Component<Props, State> {
   private _activeElm: HTMLElement;
   private _firstElm: HTMLElement;
+  private _keyProxy: any;
 
   constructor( props: Props ) {
     super( props );
+    this._keyProxy = this.onWindowKeyDown.bind( this );
     this.state = {
-      initialized: false,
-      activeElm: props.activeElement
+      initialized: false
     };
-  }
-
-  componentWillReceiveProps( next: Props ) {
-    if ( next.activeElement && next.activeElement !== this.props.activeElement )
-      this.setState( { activeElm: next.activeElement } );
   }
 
   componentDidMount() {
@@ -42,6 +39,18 @@ export class ElmEditor extends React.Component<Props, State> {
       return;
     else
       this.setState( { initialized: true } );
+
+    window.addEventListener( 'keydown', this._keyProxy );
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener( 'keydown', this._keyProxy );
+  }
+
+  private onWindowKeyDown( e: KeyboardEvent ) {
+    // Delete
+    if ( e.keyCode === 46 && this.props.selected.length > 0 )
+      this.props.onDeleteElm( this.props.selected );
   }
 
   private clean( node: Node ) {
@@ -83,6 +92,10 @@ export class ElmEditor extends React.Component<Props, State> {
       var sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange( range );
+
+      if ( !this.elementInViewport( el ) )
+        el.scrollIntoView();
+      el.parentElement!.focus();
     }
     else if ( typeof ( document.body as any ).createTextRange != "undefined" ) {
       var textRange = ( document.body as any ).createTextRange();
@@ -115,10 +128,49 @@ export class ElmEditor extends React.Component<Props, State> {
       this.props.onCreateElm( { type: 'elm-list', html: '<ul><li></li></ul>' } );
   }
 
-  private editElm( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
-    this.setState( {
-      activeElm: elm._id
-    } );
+  private elementInViewport( el: HTMLElement ) {
+    let top = el.offsetTop;
+    let left = el.offsetLeft;
+    const width = el.offsetWidth;
+    const height = el.offsetHeight;
+
+    while ( el.offsetParent ) {
+      el = el.offsetParent as HTMLElement;
+      top += el.offsetTop;
+      left += el.offsetLeft;
+    }
+
+    return (
+      top >= window.pageYOffset &&
+      left >= window.pageXOffset &&
+      ( top + height ) <= ( window.pageYOffset + window.innerHeight ) &&
+      ( left + width ) <= ( window.pageXOffset + window.innerWidth )
+    );
+  }
+
+  private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if ( !e.ctrlKey && !e.shiftKey ) {
+      this.props.onSelectionChanged( [ elm._id ] );
+    }
+    else if ( e.ctrlKey ) {
+      if ( this.props.selected.indexOf( elm._id ) === -1 )
+        this.props.onSelectionChanged( this.props.selected.concat( elm._id ) );
+      else
+        this.props.onSelectionChanged( this.props.selected.filter( i => i !== elm._id ) );
+    }
+    else {
+      const elements = this.props.elements.map( elm => elm._id );
+      const selected = this.props.selected;
+
+      let firstIndex = Math.min( elements.indexOf( elm._id ), selected.length > 0 ? elements.indexOf( selected[ 0 ] ) : 0 );
+      let lastIndex = Math.max( elements.indexOf( elm._id ), selected.length > 0 ? selected.indexOf( selected[ 0 ] ) : 0 );
+
+      this.props.onSelectionChanged( elements.slice( firstIndex, lastIndex + 1 ) );
+    }
   }
 
   private toggleInline( inline: InlineType ) {
@@ -128,12 +180,7 @@ export class ElmEditor extends React.Component<Props, State> {
   private activateElm( elm: HTMLElement ) {
     this._activeElm = elm;
     this._firstElm = elm.firstElementChild as HTMLElement;
-
-    // if ( this._firstElm.children.length === 0 )
-    //  this._firstElm.appendChild( document.createElement( 'br' ) );
-
     this.focusLast( this._firstElm );
-
   }
 
   private clear( elm: HTMLElement ) {
@@ -144,7 +191,6 @@ export class ElmEditor extends React.Component<Props, State> {
   private onKeyUp( e: React.KeyboardEvent<HTMLElement> ) {
     // Backkspace / Delete
     if ( e.keyCode === 8 || e.keyCode === 46 ) {
-
       if ( this._activeElm.children.length === 0 || this._activeElm.children[ 0 ].tagName !== this._firstElm.tagName ) {
         this.clear( this._activeElm );
         this.clear( this._firstElm );
@@ -157,7 +203,6 @@ export class ElmEditor extends React.Component<Props, State> {
 
   private onKeyDown( e: React.KeyboardEvent<HTMLElement> ) {
     let command = '';
-
 
     // Tab
     if ( e.keyCode === 9 )
@@ -182,10 +227,21 @@ export class ElmEditor extends React.Component<Props, State> {
       return <div></div>;
 
     const elements = this.props.elements;
+    const selection = this.props.selected;
+    let firstIndex = -1;
+    let lastIndex = -1;
+
+    if ( selection.length > 0 ) {
+      firstIndex = elements.findIndex( e => selection[ 0 ] === e._id );
+      lastIndex = elements.findIndex( e => selection[ selection.length - 1 ] === e._id );
+    }
 
     return (
       <div>
-        <Container>
+        <Container
+          firstIndex={firstIndex}
+          lastIndex={lastIndex}
+        >
           <EditorToolbar
             onCreateBlock={type => this._onCreateElm( type.type )}
             onAddMedia={() => { }}
@@ -196,7 +252,8 @@ export class ElmEditor extends React.Component<Props, State> {
             className="mt-editor-container"
           >
             {elements.map( elm => {
-              if ( this.state.activeElm === elm._id )
+
+              if ( selection.length === 1 && selection[ 0 ] === elm._id )
                 return (
                   <div
                     key={elm._id}
@@ -204,10 +261,11 @@ export class ElmEditor extends React.Component<Props, State> {
                       if ( !e )
                         return;
 
-                      this.activateElm( e );
+                      setTimeout( () => this.activateElm( e ), 200 );
+
                     }}
                     onBlur={e => this.updateElmHtml( elm, false )}
-                    className={`mt-element active`}
+                    className={`mt-element active focussed`}
                     dangerouslySetInnerHTML={{ __html: elm.html || '<p></p>' }}
                     contentEditable={true}
                     onKeyDown={e => this.onKeyDown( e )}
@@ -217,8 +275,8 @@ export class ElmEditor extends React.Component<Props, State> {
 
               return <div
                 key={elm._id}
-                className="mt-element"
-                onClick={e => this.editElm( e, elm )}
+                className={`mt-element${ selection.includes( elm._id ) ? ' active' : '' }`}
+                onMouseDown={e => this.onElmDown( e, elm )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}
@@ -227,6 +285,11 @@ export class ElmEditor extends React.Component<Props, State> {
       </div>
     );
   }
+}
+
+export interface EditorStyleProps {
+  firstIndex: number;
+  lastIndex: number;
 }
 
 const Container = styled.div`
@@ -254,20 +317,45 @@ const Container = styled.div`
     }
   }
 
+  [contenteditable]:focus {
+    outline: none;
+  }
+
+  h1:empty { min-height: 30px; }
+  h2:empty { min-height: 25px; }
+  h3:empty { min-height: 20px; }
+  h4:empty { min-height: 16px; }
+  h5:empty { min-height: 14px; }
+  h6:empty { min-height: 11px; }
+  p:empty, pre:empty { min-height: 17px; }
+
 
   .mt-element {
-    border: 1px dashed transparent;
+    border: 2px dashed transparent;
     padding: 5px;
     > * { min-height: 10px; }
 
-    &.active, &:hover {
-      border: 1px dashed ${ theme.light200.border };
+    &.focussed {
+
     }
 
     &.active {
       background: ${ theme.light200.background };
       color: ${ theme.light200.color };
     }
+
+    ${ ( props: EditorStyleProps ) => props.firstIndex !== -1 ? `
+      &.active {
+        border-left: 2px dashed ${ theme.primary100.border };
+        border-right: 2px dashed ${ theme.primary100.border };
+      }
+      &:nth-child( ${ props.firstIndex + 1 } ) {
+        border-top: 2px dashed ${ theme.primary100.border };
+      }
+      &:nth-child( ${ props.lastIndex + 1 } ) {
+        border-bottom: 2px dashed ${ theme.primary100.border };
+      }
+    ` : `` }
 
     box-sizing: border-box;
   }

@@ -9,7 +9,7 @@ export type State = {
   readonly postPage: Page<IPost<'client'>> | null;
   readonly post: IPost<'client'> | null;
   readonly busy: boolean;
-  readonly activeElement: string | null;
+  readonly selection: string[];
 };
 
 export const initialState: State = {
@@ -17,7 +17,7 @@ export const initialState: State = {
   postPage: null,
   post: null,
   busy: false,
-  activeElement: null
+  selection: []
 };
 
 // Reducer
@@ -45,28 +45,47 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.AddElement.type:
-      const shallowCopy = { ...state.post! };
-      const doc = shallowCopy.document as IDocument<'client'>;
-      const draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      var shallowCopy = { ...state.post! };
+      var doc = shallowCopy.document as IDocument<'client'>;
+      var draft = doc.currentDraft as IPopulatedDraft<'client'>;
       draft.elements.push( action.payload );
 
       partialState = {
-        activeElement: action.payload._id,
+        selection: [ action.payload._id ],
         busy: false,
         post: shallowCopy
       };
       break;
 
     case ActionCreators.UpdateElement.type:
-      const shallowCopy2 = { ...state.post! };
-      const doc2 = shallowCopy2.document as IDocument<'client'>;
-      const draft2 = doc2.currentDraft as IPopulatedDraft<'client'>;
-      draft2.elements = draft2.elements.map( elm => elm._id === action.payload._id ? action.payload : elm );
+      var shallowCopy = { ...state.post! };
+      var doc = shallowCopy.document as IDocument<'client'>;
+      var draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      draft.elements = draft.elements.map( elm => elm._id === action.payload._id ? action.payload : elm );
 
       partialState = {
-        activeElement: action.payload._id,
+        selection: [],
         busy: false,
-        post: shallowCopy2
+        post: shallowCopy
+      };
+      break;
+
+    case ActionCreators.SetElmSelection.type:
+      partialState = {
+        selection: action.payload
+      };
+      break;
+
+    case ActionCreators.RemoveElements.type:
+      var shallowCopy = { ...state.post! };
+      var doc = shallowCopy.document as IDocument<'client'>;
+      var draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      draft.elements = draft.elements.filter( elm => !action.payload.includes( elm._id ) );
+
+      partialState = {
+        selection: [],
+        busy: false,
+        post: shallowCopy
       };
       break;
 

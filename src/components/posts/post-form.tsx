@@ -30,12 +30,16 @@ export type Props = {
   id?: string;
   post: Partial<IPost<'client'>>;
   templates: TemplateState;
-  activeElement: string | null;
+
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
+
+  selectedElements: string[];
   onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
   onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
+  onDeleteElements: ( ids: string[] ) => void;
+  onSelectionChanged: ( ids: string[] ) => void;
 }
 
 export type State = {
@@ -164,9 +168,11 @@ export default class PostForm extends React.Component<Props, State> {
 
         <ElmEditor
           elements={draft.elements}
-          activeElement={this.props.activeElement}
           onCreateElm={elm => this.props.onCreateElm( elm )}
           onUpdateElm={( id, html, createParagraph ) => this.props.onUpdateElm( id, html, createParagraph )}
+          onDeleteElm={ids => this.props.onDeleteElements( ids )}
+          onSelectionChanged={uids => this.props.onSelectionChanged( uids )}
+          selected={this.props.selectedElements}
         />
         {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
 

@@ -12,8 +12,10 @@ export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
   AddElement: new ActionCreator<'posts-add-elm', IDraftElement<'client'>>( 'posts-add-elm' ),
   UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client'>>( 'posts-update-elm' ),
+  RemoveElements: new ActionCreator<'posts-remove-elms', string[]>( 'posts-remove-elms' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
-  SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' )
+  SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' ),
+  SetElmSelection: new ActionCreator<'posts-elm-set-selection', string[]>( 'posts-elm-set-selection' )
 };
 
 // Action Types
@@ -112,6 +114,20 @@ export function updateElement( docId: string, elementId: string, html: string, c
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await documents.editElement( docId, elementId, { html } );
       dispatch( ActionCreators.UpdateElement.create( resp ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+  }
+}
+
+export function deleteElements( docId: string, ids: string[] ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      await Promise.all( ids.map( id => documents.removeElement( docId, id ) ) );
+      dispatch( ActionCreators.RemoveElements.create( ids ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
