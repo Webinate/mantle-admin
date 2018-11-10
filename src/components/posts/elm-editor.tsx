@@ -105,29 +105,9 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
-  private _onCreateElm( type: string ) {
-    if ( type === 'paragraph' )
-      this.props.onCreateElm( { type: 'elm-paragraph', html: '<p></p>' } );
-    if ( type === 'header-one' )
-      this.props.onCreateElm( { type: 'elm-header-1', html: '<h1></h1>' } );
-    if ( type === 'header-two' )
-      this.props.onCreateElm( { type: 'elm-header-2', html: '<h2></h2>' } );
-    if ( type === 'header-three' )
-      this.props.onCreateElm( { type: 'elm-header-3', html: '<h3></h3>' } );
-    if ( type === 'header-four' )
-      this.props.onCreateElm( { type: 'elm-header-4', html: '<h4></h4>' } );
-    if ( type === 'header-five' )
-      this.props.onCreateElm( { type: 'elm-header-5', html: '<h5></h5>' } );
-    if ( type === 'header-six' )
-      this.props.onCreateElm( { type: 'elm-header-6', html: '<h6></h6>' } );
-    if ( type === 'code-block' )
-      this.props.onCreateElm( { type: 'elm-code', html: '<pre></pre>' } );
-    if ( type === 'ordered-list-item' )
-      this.props.onCreateElm( { type: 'elm-list', html: '<ol><li></li></ol>' } );
-    if ( type === 'unordered-list-item' )
-      this.props.onCreateElm( { type: 'elm-list', html: '<ul><li></li></ul>' } );
-  }
-
+  /**
+   * Checks if an element is in view
+   */
   private elementInViewport( el: HTMLElement ) {
     let top = el.offsetTop;
     let left = el.offsetLeft;
@@ -148,6 +128,9 @@ export class ElmEditor extends React.Component<Props, State> {
     );
   }
 
+  /**
+   * Select the active elements
+   */
   private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
 
     e.preventDefault();
@@ -173,16 +156,25 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Toggle an inline style
+   */
   private toggleInline( inline: InlineType ) {
-    document.execCommand( inline.type.toLowerCase(), false, undefined );
+    document.execCommand( inline, false, undefined );
   }
 
+  /**
+   * Activates an element for editing
+   */
   private activateElm( elm: HTMLElement ) {
     this._activeElm = elm;
     this._firstElm = elm.firstElementChild as HTMLElement;
     this.focusLast( this._firstElm );
   }
 
+  /**
+   * Remove all child elements from a node
+   */
   private clear( elm: HTMLElement ) {
     while ( elm.firstChild )
       elm.removeChild( elm.firstChild );
@@ -202,23 +194,32 @@ export class ElmEditor extends React.Component<Props, State> {
   }
 
   private onKeyDown( e: React.KeyboardEvent<HTMLElement> ) {
-    let command = '';
+    let inline = '';
+    let newBlock: Partial<IDraftElement<'client'>> | null = null;
 
     // Tab
     if ( e.keyCode === 9 )
-      command = e.shiftKey ? 'outdent' : 'indent';
-    if ( e.ctrlKey && e.keyCode === 66 )
-      command = 'bold';
-    if ( e.ctrlKey && e.keyCode === 73 )
-      command = 'italic';
-    if ( e.ctrlKey && e.keyCode === 85 )
-      command = 'underline';
+      inline = e.shiftKey ? 'outdent' : 'indent';
+    else if ( e.ctrlKey && e.keyCode === 66 )
+      inline = 'bold';
+    else if ( e.ctrlKey && e.keyCode === 73 )
+      inline = 'italic';
+    else if ( e.ctrlKey && e.keyCode === 85 )
+      inline = 'underline';
+    //Enter
+    else if ( e.keyCode === 13 )
+      newBlock = { type: 'elm-paragraph', html: '<p></p>' };
 
 
-    if ( command !== '' ) {
-      document.execCommand( command, false, undefined );
+    if ( inline !== '' ) {
+      document.execCommand( inline, false, undefined );
       e.preventDefault();
       e.stopPropagation();
+    }
+    else if ( newBlock ) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.props.onCreateElm( newBlock );
     }
   }
 
@@ -243,7 +244,7 @@ export class ElmEditor extends React.Component<Props, State> {
           lastIndex={lastIndex}
         >
           <EditorToolbar
-            onCreateBlock={type => this._onCreateElm( type.type )}
+            onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html } )}
             onAddMedia={() => { }}
             onInlineToggle={styleStyle => this.toggleInline( styleStyle )}
           />
@@ -331,7 +332,7 @@ const Container = styled.div`
 
 
   .mt-element {
-    border: 2px dashed transparent;
+    border: 1px solid transparent;
     padding: 5px;
     > * { min-height: 10px; }
 
@@ -346,14 +347,14 @@ const Container = styled.div`
 
     ${ ( props: EditorStyleProps ) => props.firstIndex !== -1 ? `
       &.active {
-        border-left: 2px dashed ${ theme.primary100.border };
-        border-right: 2px dashed ${ theme.primary100.border };
+        border-left: 1px dashed ${ theme.primary100.border };
+        border-right: 1px dashed ${ theme.primary100.border };
       }
       &:nth-child( ${ props.firstIndex + 1 } ) {
-        border-top: 2px dashed ${ theme.primary100.border };
+        border-top: 1px dashed ${ theme.primary100.border };
       }
       &:nth-child( ${ props.lastIndex + 1 } ) {
-        border-bottom: 2px dashed ${ theme.primary100.border };
+        border-bottom: 1px dashed ${ theme.primary100.border };
       }
     ` : `` }
 
