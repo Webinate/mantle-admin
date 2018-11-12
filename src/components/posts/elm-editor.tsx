@@ -53,6 +53,9 @@ export class ElmEditor extends React.Component<Props, State> {
       this.props.onDeleteElm( this.props.selected );
   }
 
+  /**
+   * Removes empty text nodes
+   */
   private clean( node: Node ) {
     for ( let n = 0; n < node.childNodes.length; n++ ) {
       const child = node.childNodes[ n ];
@@ -66,6 +69,11 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Updates an element and then optionally creates a new paragraph
+   * @param elm The element to update
+   * @param createParagraph Should we create a paragraph when done updating
+   */
   private updateElmHtml( elm: IDraftElement<'client'>, createParagraph: boolean ) {
 
     this.clean( this._activeElm );
@@ -84,6 +92,9 @@ export class ElmEditor extends React.Component<Props, State> {
       this.props.onCreateElm( { type: 'elm-paragraph' } );
   }
 
+  /**
+   * Focus on the last child element within a node
+   */
   private focusLast( el: HTMLElement ) {
     el.focus();
     if ( typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined" ) {

@@ -22,6 +22,7 @@ import PostFilterBar from '../components/posts/posts-filter-bar';
 import NewComment from '../components/comments/new-comment';
 import { CommentsList } from '../components/comments/comments-list';
 import PostPreview from '../components/posts/post-preview';
+import { randomId } from '../utils/misc';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -174,7 +175,7 @@ export class Posts extends React.Component<Props, State> {
             loading={isBusy}
             onSearch={term => this.onSearch( term )}
             postsSelected={this.state.selectedPosts.length > 0 ? false : true}
-            onNew={() => this.props.createPost( { title: 'New Post', slug: 'new-post' } )}
+            onNew={() => this.props.createPost( { title: 'New Post', slug: randomId() } )}
             onDelete={() => this.onDeleteMultiple()}
             isAdminUser={isAdmin ? false : true}
             onFilterToggle={val => this.setState( { filtersOpen: val } )}
@@ -197,6 +198,7 @@ export class Posts extends React.Component<Props, State> {
                   activeUser={user}
                   templates={templates}
                   post={post}
+                  elements={this.props.posts.draftElements!}
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}

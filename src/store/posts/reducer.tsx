@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { PostsGetAllOptions, IDocument } from 'modepress';
+import { PostsGetAllOptions, IDocument, IDraftElement } from 'modepress';
 import { Page, IPost } from '../../../../../src';
 import { IPopulatedDraft } from '../../../../../src/types/models/i-draft';
 
@@ -10,6 +10,7 @@ export type State = {
   readonly post: IPost<'client'> | null;
   readonly busy: boolean;
   readonly selection: string[];
+  readonly draftElements: IDraftElement<'client'>[] | null;
 };
 
 export const initialState: State = {
@@ -17,15 +18,13 @@ export const initialState: State = {
   postPage: null,
   post: null,
   busy: false,
-  selection: []
+  selection: [],
+  draftElements: null
 };
 
 // Reducer
 export default function reducer( state: State = initialState, action: Action ): State {
   let partialState: Partial<State> | undefined;
-  let shallowCopy: IPost<'client'>;
-  let doc: IDocument<'client'>;
-  let draft: IPopulatedDraft<'client'>;
 
   switch ( action.type ) {
     case ActionCreators.SetPosts.type:
@@ -41,37 +40,37 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.SetPost.type:
+      let doc = action.payload.document as IDocument<'client'>;
+      let draft = doc.currentDraft as IPopulatedDraft<'client'>;
+
       partialState = {
         post: action.payload,
+        draftElements: [ ...draft.elements ],
         busy: false
       };
       break;
 
     case ActionCreators.AddElement.type:
-      shallowCopy = { ...state.post! };
-      doc = shallowCopy.document as IDocument<'client'>;
-      draft = doc.currentDraft as IPopulatedDraft<'client'>;
-      if ( action.payload.index !== undefined )
-        draft.elements.splice( action.payload.index, 0, action.payload.elm );
+      let elements: IDraftElement<'client'>[];
+      if ( action.payload.index !== undefined ) {
+        state.draftElements!.splice( action.payload.index, 0, action.payload.elm );
+        elements = [ ...state.draftElements! ];
+      }
       else
-        draft.elements.push( action.payload.elm );
+        elements = state.draftElements!.concat( action.payload.elm );
 
       partialState = {
+        draftElements: elements,
         selection: [ action.payload.elm._id ],
         busy: false,
-        post: shallowCopy
+        post: state.post!
       };
       break;
 
     case ActionCreators.UpdateElement.type:
-      shallowCopy = { ...state.post! };
-      doc = shallowCopy.document as IDocument<'client'>;
-      draft = doc.currentDraft as IPopulatedDraft<'client'>;
-      draft.elements = draft.elements.map( elm => elm._id === action.payload._id ? action.payload : elm );
-
       partialState = {
-        selection: [],
-        post: shallowCopy
+        draftElements: state.draftElements!.map( elm => elm._id === action.payload._id ? action.payload : elm ),
+        post: state.post!
       };
       break;
 
@@ -82,15 +81,11 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.RemoveElements.type:
-      shallowCopy = { ...state.post! };
-      doc = shallowCopy.document as IDocument<'client'>;
-      draft = doc.currentDraft as IPopulatedDraft<'client'>;
-      draft.elements = draft.elements.filter( elm => !action.payload.includes( elm._id ) );
-
       partialState = {
+        draftElements: state.draftElements!.filter( elm => !action.payload.includes( elm._id ) ),
         selection: [],
         busy: false,
-        post: shallowCopy
+        post: state.post!
       };
       break;
 

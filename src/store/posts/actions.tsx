@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IPost, IDraftElement, IDocument, IPopulatedDraft } from '../../../../../src';
+import { Page, IPost, IDraftElement } from '../../../../../src';
 import * as posts from '../../../../../src/lib-frontend/posts';
 import * as documents from '../../../../../src/lib-frontend/documents';
 import { PostsGetAllOptions } from 'modepress';
@@ -96,10 +96,8 @@ export function editPost( post: Partial<IPost<'client'>> ) {
 
 function getSelectedIndex( state: IRootState, ) {
   const selection = state.posts.selection;
-  const post = state.posts.post as IPost<'client'>;
-  const doc = post.document as IDocument<'client'>;
-  const curDraft = doc.currentDraft as IPopulatedDraft<'client'>;
-  const index = selection.length > 0 ? curDraft.elements.findIndex(
+  const elements = state.posts.draftElements || [];
+  const index = selection.length > 0 ? elements.findIndex(
     el => el._id === selection[ selection.length - 1 ] ) + 1 : undefined;
   return index;
 }
@@ -131,8 +129,10 @@ export function updateElement( docId: string, elementId: string, html: string, c
         const newElm = await documents.addElement( docId, { type: 'elm-paragraph' }, index );
         dispatch( ActionCreators.AddElement.create( { elm: newElm, index: index } ) );
       }
-      else
+      else {
         dispatch( ActionCreators.SetPostsBusy.create( false ) );
+        dispatch( ActionCreators.SetElmSelection.create( [ resp._id ] ) );
+      }
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
