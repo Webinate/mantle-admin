@@ -71,7 +71,6 @@ export default function reducer( state: State = initialState, action: Action ): 
 
       partialState = {
         selection: [],
-        busy: false,
         post: shallowCopy
       };
       break;

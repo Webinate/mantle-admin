@@ -94,17 +94,22 @@ export function editPost( post: Partial<IPost<'client'>> ) {
   }
 }
 
+function getSelectedIndex( state: IRootState, ) {
+  const selection = state.posts.selection;
+  const post = state.posts.post as IPost<'client'>;
+  const doc = post.document as IDocument<'client'>;
+  const curDraft = doc.currentDraft as IPopulatedDraft<'client'>;
+  const index = selection.length > 0 ? curDraft.elements.findIndex(
+    el => el._id === selection[ selection.length - 1 ] ) + 1 : undefined;
+  return index;
+}
+
 export function addElement( docId: string, element: Partial<IDraftElement<'client'>> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
-      const selection = getState().posts.selection;
-      const post = getState().posts.post as IPost<'client'>;
-      const doc = post.document as IDocument<'client'>;
-      const curDraft = doc.currentDraft as IPopulatedDraft<'client'>;
-      const index = selection.length > 0 ? curDraft.elements.findIndex(
-        el => el._id === selection[ selection.length - 1 ] ) : undefined;
 
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const index = getSelectedIndex( getState() );
       const resp = await documents.addElement( docId, element, index );
       dispatch( ActionCreators.AddElement.create( { elm: resp, index: index } ) );
     }
@@ -121,6 +126,13 @@ export function updateElement( docId: string, elementId: string, html: string, c
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await documents.editElement( docId, elementId, { html } );
       dispatch( ActionCreators.UpdateElement.create( resp ) );
+      if ( createParagraph ) {
+        const index = getSelectedIndex( getState() );
+        const newElm = await documents.addElement( docId, { type: 'elm-paragraph' }, index );
+        dispatch( ActionCreators.AddElement.create( { elm: newElm, index: index } ) );
+      }
+      else
+        dispatch( ActionCreators.SetPostsBusy.create( false ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );

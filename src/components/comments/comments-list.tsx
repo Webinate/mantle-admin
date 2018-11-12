@@ -17,6 +17,7 @@ import NewComment from './new-comment';
 export type Props = {
   page: Page<IComment<'client'>> | null;
   loading: boolean;
+  selectable?: boolean;
   heightFromContents?: boolean;
   auth: IUserEntry<'client'>;
   style?: React.CSSProperties;
@@ -40,7 +41,8 @@ export class CommentsList extends React.Component<Props, State> {
 
   static defaultProps: Partial<Props> = {
     heightFromContents: true,
-    selectedUids: []
+    selectedUids: [],
+    selectable: true
   }
 
   constructor( props: Props ) {
@@ -161,9 +163,10 @@ export class CommentsList extends React.Component<Props, State> {
 
             return (
               <Comment
+                selectable={this.props.selectable!}
                 className={`mt-comment ${ isEditting ? 'mt-editting' : '' } ${ isChild ? 'mt-is-child' : '' } ${ isSelected ? 'mt-comment-selected' : '' }`}
                 key={'comment-' + index.toString()}
-                onClick={e => {
+                onClick={() => {
                   if ( this.props.onCommentSelected ) {
                     this.setState( { commentToReplyId: '', activeCommentId: '' } );
                     this.props.onCommentSelected( comment );
@@ -293,6 +296,9 @@ export class CommentsList extends React.Component<Props, State> {
   }
 }
 
+interface CommentStyleProps extends React.HTMLAttributes<HTMLElement> {
+  selectable: boolean;
+}
 
 const PostsInnerContent = styled.div`
 `;
@@ -303,7 +309,16 @@ const Comment = styled.div`
   padding: 4px 8px 4px 4px;
   border-radius: 5px;
   color: ${theme.light100.color };
-  cursor: pointer;
+
+  ${ ( props: CommentStyleProps ) => props.selectable ? `
+    cursor: pointer;
+
+    &:hover, &.mt-comment-selected {
+      background: ${theme.light100.background };
+      color: ${theme.light100.color };
+    }
+  ` : '' }
+
 
   > div {
     flex: 1;
@@ -313,10 +328,6 @@ const Comment = styled.div`
     margin-left: 30px;
   }
 
-  &:hover, &.mt-comment-selected {
-    background: ${theme.light100.background };
-    color: ${theme.light100.color };
-  }
 
   .mt-comment-editpnl {
     margin: 2px 0 0 0;

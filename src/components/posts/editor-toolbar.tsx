@@ -132,9 +132,9 @@ export default class EditorToolbar extends React.Component<Props, State> {
           open={Boolean( this.state.anchorEl )}
           onClose={() => this.setState( { anchorEl: undefined } )}
         >
-          {blocks.map( block => (
+          {blocks.map( ( block, index ) => (
             <MenuItem
-              key={block.type}
+              key={`bocks-${ index }`}
               onClick={e => {
                 this._lastSelectedBlock = block;
                 this.setState( { anchorEl: undefined } );
@@ -148,9 +148,9 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        {inlines.map( inline => <div
+        {inlines.map( ( inline, index ) => <div
           className={`mt-inline-btn ${ activeInlines.includes( inline.type ) ? 'active' : '' }`}
-          key={inline.type}
+          key={`elm-inline-${ index }`}
           onMouseDown={e => {
             e.preventDefault();
             e.stopPropagation();
@@ -160,8 +160,8 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        {listBlocks.map( listBlock => <div
-          key={listBlock.type}
+        {listBlocks.map( ( listBlock, index ) => <div
+          key={`elm-lists-${ index }`}
           onClick={e => {
             e.preventDefault();
             e.stopPropagation();

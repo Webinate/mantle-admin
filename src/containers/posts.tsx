@@ -145,6 +145,7 @@ export class Posts extends React.Component<Props, State> {
       />
       <CommentsList
         page={commentsPage}
+        selectable={false}
         onReply={( post, parent, comment ) => this.props.createComment( post, comment, parent )}
         auth={this.props.user!}
         onEdit={( id, token ) => this.props.editComment( id, token )}

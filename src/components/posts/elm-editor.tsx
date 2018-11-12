@@ -49,7 +49,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
   private onWindowKeyDown( e: KeyboardEvent ) {
     // Delete
-    if ( e.keyCode === 46 && this.props.selected.length > 0 )
+    if ( e.keyCode === 46 && this.props.selected.length > 1 )
       this.props.onDeleteElm( this.props.selected );
   }
 
@@ -78,9 +78,10 @@ export class ElmEditor extends React.Component<Props, State> {
       first.removeChild( lastInnerChild );
 
     let html = first.outerHTML;
-    if ( elm.html !== html ) {
+    if ( elm.html !== html )
       this.props.onUpdateElm( elm._id, html, createParagraph );
-    }
+    else if ( createParagraph )
+      this.props.onCreateElm( { type: 'elm-paragraph' } );
   }
 
   private focusLast( el: HTMLElement ) {
@@ -132,10 +133,6 @@ export class ElmEditor extends React.Component<Props, State> {
    * Select the active elements
    */
   private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
-
-    e.preventDefault();
-    e.stopPropagation();
-
     if ( !e.ctrlKey && !e.shiftKey ) {
       this.props.onSelectionChanged( [ elm._id ] );
     }
@@ -193,9 +190,31 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
+  private getSelectedElement() {
+    const elements = this.props.elements;
+    const selection = this.props.selected;
+    if ( selection.length === 0 )
+      return null;
+
+    const activeElm = elements.find( e => e._id === selection[ selection.length - 1 ] );
+    if ( !activeElm )
+      return null;
+
+    return activeElm;
+  }
+
+  private onEnter( e: React.KeyboardEvent<HTMLElement> ) {
+    const selectedElm = this.getSelectedElement();
+
+    if ( selectedElm && selectedElm.type !== 'elm-list' ) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.updateElmHtml( selectedElm, true );
+    }
+  }
+
   private onKeyDown( e: React.KeyboardEvent<HTMLElement> ) {
     let inline = '';
-    let newBlock: Partial<IDraftElement<'client'>> | null = null;
 
     // Tab
     if ( e.keyCode === 9 )
@@ -208,18 +227,12 @@ export class ElmEditor extends React.Component<Props, State> {
       inline = 'underline';
     // Enter
     else if ( e.keyCode === 13 )
-      newBlock = { type: 'elm-paragraph', html: '<p></p>' };
-
+      return this.onEnter( e );
 
     if ( inline !== '' ) {
       document.execCommand( inline, false, undefined );
       e.preventDefault();
       e.stopPropagation();
-    }
-    else if ( newBlock ) {
-      e.preventDefault();
-      e.stopPropagation();
-      this.props.onCreateElm( newBlock );
     }
   }
 
@@ -252,12 +265,12 @@ export class ElmEditor extends React.Component<Props, State> {
           <div
             className="mt-editor-container"
           >
-            {elements.map( elm => {
+            {elements.map( ( elm, index ) => {
 
               if ( selection.length === 1 && selection[ 0 ] === elm._id )
                 return (
                   <div
-                    key={elm._id}
+                    key={`elm-${ index }`}
                     ref={e => {
                       if ( !e )
                         return;
@@ -275,9 +288,9 @@ export class ElmEditor extends React.Component<Props, State> {
                 );
 
               return <div
-                key={elm._id}
+                key={`elm-${ index }`}
                 className={`mt-element${ selection.includes( elm._id ) ? ' active' : '' }`}
-                onMouseDown={e => this.onElmDown( e, elm )}
+                onClick={e => this.onElmDown( e, elm )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}
