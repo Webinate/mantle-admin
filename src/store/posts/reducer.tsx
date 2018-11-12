@@ -51,10 +51,13 @@ export default function reducer( state: State = initialState, action: Action ): 
       shallowCopy = { ...state.post! };
       doc = shallowCopy.document as IDocument<'client'>;
       draft = doc.currentDraft as IPopulatedDraft<'client'>;
-      draft.elements.push( action.payload );
+      if ( action.payload.index !== undefined )
+        draft.elements.splice( action.payload.index, 0, action.payload.elm );
+      else
+        draft.elements.push( action.payload.elm );
 
       partialState = {
-        selection: [ action.payload._id ],
+        selection: [ action.payload.elm._id ],
         busy: false,
         post: shallowCopy
       };

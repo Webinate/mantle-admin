@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IPost, IDraftElement } from '../../../../../src';
+import { Page, IPost, IDraftElement, IDocument, IPopulatedDraft } from '../../../../../src';
 import * as posts from '../../../../../src/lib-frontend/posts';
 import * as documents from '../../../../../src/lib-frontend/documents';
 import { PostsGetAllOptions } from 'modepress';
@@ -10,7 +10,7 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  AddElement: new ActionCreator<'posts-add-elm', IDraftElement<'client'>>( 'posts-add-elm' ),
+  AddElement: new ActionCreator<'posts-add-elm', { elm: IDraftElement<'client'>, index?: number }>( 'posts-add-elm' ),
   UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client'>>( 'posts-update-elm' ),
   RemoveElements: new ActionCreator<'posts-remove-elms', string[]>( 'posts-remove-elms' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
@@ -97,9 +97,16 @@ export function editPost( post: Partial<IPost<'client'>> ) {
 export function addElement( docId: string, element: Partial<IDraftElement<'client'>> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
+      const selection = getState().posts.selection;
+      const post = getState().posts.post as IPost<'client'>;
+      const doc = post.document as IDocument<'client'>;
+      const curDraft = doc.currentDraft as IPopulatedDraft<'client'>;
+      const index = selection.length > 0 ? curDraft.elements.findIndex(
+        el => el._id === selection[ selection.length - 1 ] ) : undefined;
+
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
-      const resp = await documents.addElement( docId, element );
-      dispatch( ActionCreators.AddElement.create( resp ) );
+      const resp = await documents.addElement( docId, element, index );
+      dispatch( ActionCreators.AddElement.create( { elm: resp, index: index } ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
