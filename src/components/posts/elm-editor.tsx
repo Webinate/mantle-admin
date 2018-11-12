@@ -54,7 +54,7 @@ export class ElmEditor extends React.Component<Props, State> {
   }
 
   private clean( node: Node ) {
-    for ( var n = 0; n < node.childNodes.length; n++ ) {
+    for ( let n = 0; n < node.childNodes.length; n++ ) {
       const child = node.childNodes[ n ];
       if ( child.nodeType === 8 || ( child.nodeType === 3 && !/\S/.test( child.nodeValue! ) ) ) {
         node.removeChild( child );
@@ -85,7 +85,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
   private focusLast( el: HTMLElement ) {
     el.focus();
-    if ( typeof window.getSelection != "undefined" && typeof document.createRange != "undefined" ) {
+    if ( typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined" ) {
       var range = document.createRange();
       range.selectNodeContents( el );
       range.collapse( false );
@@ -97,8 +97,8 @@ export class ElmEditor extends React.Component<Props, State> {
         el.scrollIntoView();
       el.parentElement!.focus();
     }
-    else if ( typeof ( document.body as any ).createTextRange != "undefined" ) {
-      var textRange = ( document.body as any ).createTextRange();
+    else if ( typeof ( document.body as any ).createTextRange !== "undefined" ) {
+      const textRange = ( document.body as any ).createTextRange();
       textRange.moveToElementText( el );
       textRange.collapse( false );
       textRange.select();
@@ -206,7 +206,7 @@ export class ElmEditor extends React.Component<Props, State> {
       inline = 'italic';
     else if ( e.ctrlKey && e.keyCode === 85 )
       inline = 'underline';
-    //Enter
+    // Enter
     else if ( e.keyCode === 13 )
       newBlock = { type: 'elm-paragraph', html: '<p></p>' };
 

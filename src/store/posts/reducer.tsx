@@ -23,6 +23,9 @@ export const initialState: State = {
 // Reducer
 export default function reducer( state: State = initialState, action: Action ): State {
   let partialState: Partial<State> | undefined;
+  let shallowCopy: IPost<'client'>;
+  let doc: IDocument<'client'>;
+  let draft: IPopulatedDraft<'client'>;
 
   switch ( action.type ) {
     case ActionCreators.SetPosts.type:
@@ -45,9 +48,9 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.AddElement.type:
-      var shallowCopy = { ...state.post! };
-      var doc = shallowCopy.document as IDocument<'client'>;
-      var draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      shallowCopy = { ...state.post! };
+      doc = shallowCopy.document as IDocument<'client'>;
+      draft = doc.currentDraft as IPopulatedDraft<'client'>;
       draft.elements.push( action.payload );
 
       partialState = {
@@ -58,9 +61,9 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.UpdateElement.type:
-      var shallowCopy = { ...state.post! };
-      var doc = shallowCopy.document as IDocument<'client'>;
-      var draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      shallowCopy = { ...state.post! };
+      doc = shallowCopy.document as IDocument<'client'>;
+      draft = doc.currentDraft as IPopulatedDraft<'client'>;
       draft.elements = draft.elements.map( elm => elm._id === action.payload._id ? action.payload : elm );
 
       partialState = {
@@ -77,9 +80,9 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.RemoveElements.type:
-      var shallowCopy = { ...state.post! };
-      var doc = shallowCopy.document as IDocument<'client'>;
-      var draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      shallowCopy = { ...state.post! };
+      doc = shallowCopy.document as IDocument<'client'>;
+      draft = doc.currentDraft as IPopulatedDraft<'client'>;
       draft.elements = draft.elements.filter( elm => !action.payload.includes( elm._id ) );
 
       partialState = {

@@ -92,11 +92,11 @@ export default class EditorToolbar extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    document.addEventListener( "selectionchange", this._onSelectionChange );
+    document.addEventListener( 'selectionchange', this._onSelectionChange );
   }
 
   componentWillUnmount() {
-    document.removeEventListener( "selectionchange", this._onSelectionChange );
+    document.removeEventListener( 'selectionchange', this._onSelectionChange );
   }
 
   render() {
