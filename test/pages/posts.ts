@@ -46,8 +46,6 @@ export default class PostsPage extends Page {
   async clickNewPost() {
     await this.page.click( 'button.mt-new-post' );
     await this.page.waitFor( '#mt-post-title' );
-    const path = await this.page.evaluate( () => window.location.pathname )
-    assert.deepEqual( path, '/dashboard/posts/new' );
   }
 
   async inEditMode() {
@@ -63,8 +61,15 @@ export default class PostsPage extends Page {
    */
   async clickConfirm() {
     await this.page.click( '.mt-post-confirm' );
-    await this.page.waitFor( 'button.mt-new-post' );
     await this.doneLoading()
+  }
+
+  /**
+   * Clicks the back button
+   */
+  async clickBack() {
+    await this.page.click( '#mt-to-post-list' );
+    await this.emptySelector( '.mt-post-confirm' );
   }
 
   async isPreview() {
@@ -93,6 +98,25 @@ export default class PostsPage extends Page {
   async clickUpdate() {
     await this.page.click( '.mt-post-confirm' );
     await this.doneLoading()
+  }
+
+  async updateElmContent( index: number, val: string ) {
+    const elements = await this.page.$$( '.mt-element' )
+    await elements[ index ].click();
+    await this.page.$( '.mt-element.active.focussed.cursor' );
+    await this.sleep( 500 );
+    await this.page.keyboard.down( 'Control' );
+    await this.page.keyboard.press( 'KeyA' );
+    await this.page.keyboard.up( 'Control' );
+    await this.page.keyboard.press( 'Delete' );
+    await this.page.keyboard.type( val, { delay: 10 } );
+    await this.page.keyboard.press( 'Escape' );
+    await this.doneLoading();
+    await this.emptySelector( '.mt-element.active.focussed.cursor' );
+  }
+
+  async getElmContent( index: number ) {
+    return this.page.$eval( `.mt-element:nth-child(${ index + 1 })`, ( elm: HTMLElement ) => elm.innerHTML );
   }
 
   /**

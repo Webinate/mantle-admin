@@ -36,7 +36,7 @@ export type Props = {
 
   selectedElements: string[];
   onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
-  onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
+  onUpdateElm: ( id: string, html: string, createParagraph: boolean, deselect: boolean ) => void;
   onDeleteElements: ( ids: string[] ) => void;
   onSelectionChanged: ( ids: string[] ) => void;
 }
@@ -151,7 +151,7 @@ export default class PostForm extends React.Component<Props, State> {
         <ElmEditor
           elements={this.props.elements}
           onCreateElm={elm => this.props.onCreateElm( elm )}
-          onUpdateElm={( id, html, createParagraph ) => this.props.onUpdateElm( id, html, createParagraph )}
+          onUpdateElm={( id, html, createParagraph, deselect ) => this.props.onUpdateElm( id, html, createParagraph, deselect )}
           onDeleteElm={ids => this.props.onDeleteElements( ids )}
           onSelectionChanged={uids => this.props.onSelectionChanged( uids )}
           selected={this.props.selectedElements}
@@ -173,7 +173,7 @@ export default class PostForm extends React.Component<Props, State> {
             color="primary"
             fullWidth={true}
             disabled={!this.isPostValid()}
-          >{this.props.post ? 'Update' : 'Publish'}</Button>
+          >Update</Button>
 
           <FormControl className="mt-visibility-toggle">
             <FormControlLabel
@@ -373,7 +373,6 @@ const Form = styled.form`
     flex: 1;
     margin: 0 0 0 20px;
     max-width: 350px;
-  }
   }
 `;
 

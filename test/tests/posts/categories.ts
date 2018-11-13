@@ -10,7 +10,7 @@ import { CategoriesController } from '../../../../../src/controllers/categories'
 
 let postPage = new PostsPage();
 let admin: Agent;
-let controller: CategoriesController;
+let post: IPost<'client'>;
 let rootCat = randomId();
 let childCat = randomId();
 let childDeeperCat = randomId();
@@ -18,9 +18,26 @@ let childDeeperCat = randomId();
 describe( 'Testing the interactions with categories in posts:', function() {
 
   before( async () => {
-    controller = ControllerFactory.get( 'categories' );
+    const posts = ControllerFactory.get( 'posts' );
     admin = await utils.refreshAdminToken();
-    await postPage.load( admin, '/dashboard/posts/new' );
+    post = await posts.create( {
+      title: 'Test Post',
+      brief: 'Oh my brief',
+      tags: [ 'Tag 1', 'Tag 2' ],
+      slug: randomId(),
+      public: false,
+      content: 'This is a post\'s content'
+    } )
+
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    await postPage.waitFor( '#mt-post-title' );
+  } )
+
+  after( async () => {
+    await ControllerFactory.get( 'posts' ).removePost( post._id.toString() );
+    const categories = ControllerFactory.get( 'categories' );
+    const category = await categories.getBySlug( rootCat.toLowerCase() )
+    await categories.remove( category._id );
   } )
 
   it( 'does autofill the category when none is set', async () => {
@@ -130,10 +147,5 @@ describe( 'Testing the interactions with categories in posts:', function() {
     // Check it does not have root's children
     assert.equal( categories.indexOf( childCat ), -1 );
     assert.equal( categories.indexOf( childDeeperCat ), -1 );
-  } )
-
-  after( async () => {
-    let category = await controller.getBySlug( rootCat.toLowerCase() )
-    await controller.remove( category._id );
   } )
 } );

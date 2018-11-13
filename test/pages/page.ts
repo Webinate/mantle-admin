@@ -74,7 +74,7 @@ export default class Page {
    */
   async pathname() {
     let location = await this.page.evaluate( async () => window.location );
-    return location.pathname;
+    return location.pathname as string;
   }
 
   /**
@@ -91,9 +91,9 @@ export default class Page {
         elm.focus();
       } );
 
-      await this.page.type( selector, val, { delay: 8 } );
-      await this.page.keyboard.press( 'Digit0' )
-      await this.page.keyboard.press( 'Backspace' )
+      await this.page.keyboard.type( val, { delay: 10 } );
+      await this.page.keyboard.press( 'Digit0' );
+      await this.page.keyboard.press( 'Backspace' );
     }
   }
 

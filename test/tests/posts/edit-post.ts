@@ -33,12 +33,17 @@ describe( 'View & edit post created by backend: ', function() {
     await postPage.load( admin );
   } )
 
-  it( 'does not let regular users click new post', async () => {
+  after( async () => {
+    if ( post )
+      await controller.removePost( post._id.toString() );
+  } )
+
+  it( 'does not let regular user navigate to edit post page', async () => {
     await postPage.load( joe, `/dashboard/posts/edit/${ post._id }` );
     await postPage.waitFor( 'button[disabled].mt-new-post' )
   } )
 
-  it( 'does let admin users go to the edit post page directly', async () => {
+  it( 'does let admin users navigate to edit post page directly', async () => {
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
     await postPage.waitFor( '#mt-post-title' );
   } )
@@ -79,10 +84,5 @@ describe( 'View & edit post created by backend: ', function() {
     const posts = await postPage.getPosts();
     assert( posts.length > 0 );
     assert.equal( posts[ 0 ].name, 'Test Post EDITED' );
-  } )
-
-  after( async () => {
-    if ( post )
-      await controller.removePost( post._id.toString() );
   } )
 } );

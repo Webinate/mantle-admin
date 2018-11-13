@@ -5,7 +5,7 @@ import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IVolume } from 'modepress';
+import { IVolume, IPost, IDocument, IPopulatedDraft } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
@@ -13,6 +13,7 @@ let admin: Agent, joe: Agent;
 let controller: PostsController;
 let postSlug = randomId();
 let volume: IVolume<'client'>;
+let createdPost: IPost<'client'>;
 
 describe( 'Testing the creation of posts: ', function() {
 
@@ -32,6 +33,7 @@ describe( 'Testing the creation of posts: ', function() {
   after( async () => {
     const volumes = ControllerFactory.get( 'volumes' );
     await volumes.remove( { _id: volume._id } );
+    await controller.removePost( createdPost._id );
   } )
 
   it( 'does not let regular users click new post', async () => {
@@ -39,22 +41,24 @@ describe( 'Testing the creation of posts: ', function() {
     await postPage.waitFor( 'button[disabled].mt-new-post ' )
   } )
 
-  it( 'does not let regular users go to the new post page directly', async () => {
-    await postPage.load( joe, '/dashboard/posts/new' );
-    await postPage.waitFor( 'button[disabled].mt-new-post' )
-  } )
-
-  it( 'does let admin users go to the new post page directly', async () => {
-    await postPage.load( admin, '/dashboard/posts/new' );
-    await postPage.waitFor( '#mt-post-title' );
-  } )
-
   it( 'does let admin click new post', async () => {
     await postPage.load( admin );
     await postPage.clickNewPost();
+
+    // Now check that post was created
+    const path = await postPage.pathname();
+    const id = path.split( '/' ).pop();
+    createdPost = await controller.getPost( { id } );
+    assert( createdPost );
   } )
 
-  it( 'does not allow post creation without title and slug', async () => {
+  it( 'does have two templates', async () => {
+    await postPage.addTag( 'tag 1' );
+    await postPage.addTag( 'tag 2' );
+  } )
+
+  it( 'does not allow post creation with empty title and slug', async () => {
+    await postPage.title( '' );
     await postPage.waitFor( 'button[disabled].mt-post-confirm' );
   } )
 
@@ -97,8 +101,8 @@ describe( 'Testing the creation of posts: ', function() {
   } )
 
   it( 'did edit content in the tiny editor', async () => {
-    await postPage.content( 'Simple content babes' );
-    assert.equal( await postPage.content(), 'Simple content babes' );
+    await postPage.updateElmContent( 0, 'Simple content babes' );
+    assert.equal( await postPage.getElmContent( 0 ), '<p>Simple content babes</p>' );
   } )
 
   it( 'did select a featured image', async () => {
@@ -144,24 +148,22 @@ describe( 'Testing the creation of posts: ', function() {
   it( 'has created a post with valid data', async () => {
     await postPage.title( postSlug );
     await postPage.setSlug( postSlug );
-    await postPage.content( 'This is a post bruv' );
     await postPage.addTag( 'Test Dino' );
-
+    await postPage.updateElmContent( 0, 'This is a post bruv' );
     await postPage.clickConfirm();
-    assert.equal( await postPage.inEditMode(), false );
+    await postPage.clickBack();
+
     const posts = await postPage.getPosts();
     assert.equal( posts[ 0 ].name, postSlug );
 
     // Confirm the post is saved as it was created
     const post = await controller.getPost( { slug: postSlug } );
-    assert.equal( post.content, '<p>This is a post bruv</p>' );
+    const doc = post.document as IDocument<'client'>;
+    const draft = doc.currentDraft as IPopulatedDraft<'client'>;
+    assert.equal( draft.elements[ 0 ].html, '<p>This is a post bruv</p>' );
+
     assert.equal( post.title, postSlug );
     assert.equal( post.slug, postSlug );
     assert( post.tags.includes( 'Test Dino' ) );
-  } )
-
-  after( async () => {
-    const post = await controller.getPost( { slug: postSlug } );
-    await controller.removePost( post._id.toString() );
   } )
 } );

@@ -11,7 +11,7 @@ export type Props = {
   onSelectionChanged: ( ids: string[] ) => void;
   onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
   onDeleteElm: ( ids: string[] ) => void;
-  onUpdateElm: ( id: string, html: string, createParagraph: boolean ) => void;
+  onUpdateElm: ( id: string, html: string, createParagraph: boolean, deselect: boolean ) => void;
 }
 
 export type State = {
@@ -24,6 +24,7 @@ export type State = {
 export class ElmEditor extends React.Component<Props, State> {
   private _activeElm: HTMLElement;
   private _firstElm: HTMLElement;
+  private _lastFocussedElm: HTMLElement;
   private _keyProxy: any;
 
   constructor( props: Props ) {
@@ -32,6 +33,11 @@ export class ElmEditor extends React.Component<Props, State> {
     this.state = {
       initialized: false
     };
+  }
+
+  componentWillReceiveProps( next: Props ) {
+    if ( this._lastFocussedElm && next.selected.length === 0 && this.props.selected.length > 0 )
+      this._lastFocussedElm.classList.remove( 'cursor' );
   }
 
   componentDidMount() {
@@ -73,8 +79,9 @@ export class ElmEditor extends React.Component<Props, State> {
    * Updates an element and then optionally creates a new paragraph
    * @param elm The element to update
    * @param createParagraph Should we create a paragraph when done updating
+   * @param deselect If true, then nothing should be selected after update
    */
-  private updateElmHtml( elm: IDraftElement<'client'>, createParagraph: boolean ) {
+  private updateElmHtml( elm: IDraftElement<'client'>, createParagraph: boolean, deselect: boolean ) {
 
     this.clean( this._activeElm );
     const first = this._activeElm.firstElementChild as HTMLElement;
@@ -87,29 +94,37 @@ export class ElmEditor extends React.Component<Props, State> {
 
     let html = first.outerHTML;
     if ( elm.html !== html )
-      this.props.onUpdateElm( elm._id, html, createParagraph );
+      this.props.onUpdateElm( elm._id, html, createParagraph, deselect );
     else if ( createParagraph )
       this.props.onCreateElm( { type: 'elm-paragraph' } );
+    else if ( deselect )
+      this.props.onSelectionChanged( [] );
   }
 
   /**
    * Focus on the last child element within a node
    */
   private focusLast( el: HTMLElement ) {
+    if ( this._lastFocussedElm )
+      this._lastFocussedElm.classList.remove( 'cursor' );
+
     el.focus();
-    if ( typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined" ) {
-      var range = document.createRange();
+    if ( typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined' ) {
+      const range = document.createRange();
       range.selectNodeContents( el );
       range.collapse( false );
-      var sel = window.getSelection();
+      const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange( range );
 
       if ( !this.elementInViewport( el ) )
         el.scrollIntoView();
+
       el.parentElement!.focus();
+      this._lastFocussedElm = el.parentElement!;
+      this._lastFocussedElm.classList.add( 'cursor' );
     }
-    else if ( typeof ( document.body as any ).createTextRange !== "undefined" ) {
+    else if ( typeof ( document.body as any ).createTextRange !== 'undefined' ) {
       const textRange = ( document.body as any ).createTextRange();
       textRange.moveToElementText( el );
       textRange.collapse( false );
@@ -143,7 +158,7 @@ export class ElmEditor extends React.Component<Props, State> {
   /**
    * Select the active elements
    */
-  private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
+  private onElmClick( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
     if ( !e.ctrlKey && !e.shiftKey ) {
       this.props.onSelectionChanged( [ elm._id ] );
     }
@@ -199,6 +214,12 @@ export class ElmEditor extends React.Component<Props, State> {
         this.focusLast( this._firstElm );
       }
     }
+    // Escape
+    if ( e.keyCode === 27 ) {
+      const selected = this.getSelectedElement();
+      if ( selected )
+        this.updateElmHtml( selected, false, true );
+    }
   }
 
   private getSelectedElement() {
@@ -220,7 +241,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( selectedElm && selectedElm.type !== 'elm-list' ) {
       e.preventDefault();
       e.stopPropagation();
-      this.updateElmHtml( selectedElm, true );
+      this.updateElmHtml( selectedElm, true, false );
     }
   }
 
@@ -289,7 +310,7 @@ export class ElmEditor extends React.Component<Props, State> {
                       setTimeout( () => this.activateElm( e ), 200 );
 
                     }}
-                    onBlur={e => this.updateElmHtml( elm, false )}
+                    onBlur={e => this.updateElmHtml( elm, false, true )}
                     className={`mt-element active focussed`}
                     dangerouslySetInnerHTML={{ __html: elm.html || '<p></p>' }}
                     contentEditable={true}
@@ -301,7 +322,7 @@ export class ElmEditor extends React.Component<Props, State> {
               return <div
                 key={`elm-${ index }`}
                 className={`mt-element${ selection.includes( elm._id ) ? ' active' : '' }`}
-                onClick={e => this.onElmDown( e, elm )}
+                onClick={e => this.onElmClick( e, elm )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}

@@ -118,7 +118,7 @@ export function addElement( docId: string, element: Partial<IDraftElement<'clien
   }
 }
 
-export function updateElement( docId: string, elementId: string, html: string, createParagraph: boolean ) {
+export function updateElement( docId: string, elementId: string, html: string, createParagraph: boolean, deselect: boolean ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
@@ -128,10 +128,15 @@ export function updateElement( docId: string, elementId: string, html: string, c
         const index = getSelectedIndex( getState() );
         const newElm = await documents.addElement( docId, { type: 'elm-paragraph' }, index );
         dispatch( ActionCreators.AddElement.create( { elm: newElm, index: index } ) );
+        if ( deselect )
+          dispatch( ActionCreators.SetElmSelection.create( [] ) );
       }
       else {
         dispatch( ActionCreators.SetPostsBusy.create( false ) );
-        dispatch( ActionCreators.SetElmSelection.create( [ resp._id ] ) );
+        if ( deselect )
+          dispatch( ActionCreators.SetElmSelection.create( [] ) );
+        else
+          dispatch( ActionCreators.SetElmSelection.create( [ resp._id ] ) );
       }
     }
     catch ( err ) {

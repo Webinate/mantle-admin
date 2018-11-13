@@ -42,6 +42,7 @@ export default class PostFilterBar extends React.Component<Props, State> {
     if ( !this.props.inPostsRoot ) {
       return (
         <Button
+          id="mt-to-post-list"
           style={{ margin: '5px 0 0 0' }}
           onClick={e => this.props.onCancel()}
         >
