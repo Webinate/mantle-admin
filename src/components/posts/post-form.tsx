@@ -5,11 +5,15 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
+import Icon from '@material-ui/core/Icon';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, IDraftElement } from 'modepress';
+import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument } from 'modepress';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
@@ -22,6 +26,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { ElmEditor } from './elm-editor';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 export type Props = {
   activeUser: IUserEntry<'client'>;
   isAdmin: boolean;
@@ -29,6 +38,7 @@ export type Props = {
   post: Partial<IPost<'client'>>;
   elements: IDraftElement<'client'>[];
   templates: TemplateState;
+  categoriesLoading: boolean;
 
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
@@ -102,9 +112,250 @@ export default class PostForm extends React.Component<Props, State> {
     return true;
   }
 
-  render() {
-    const templates = this.props.templates;
+  private onTemplateChange( template: ITemplate<'client'> ) {
 
+  }
+
+  private renderUpdateBox() {
+    return <ExpansionPanel expanded={true}>
+      <ExpansionPanelDetails>
+        <div className="mt-panel-inner">
+          <Button
+            variant="contained"
+            className="mt-post-confirm"
+            onClick={e => {
+              if ( this.props.post && this.props.onUpdate )
+                this.props.onUpdate( this.state.editable );
+              else if ( this.props.onCreate )
+                this.props.onCreate( this.state.editable );
+            }}
+            color="primary"
+            fullWidth={true}
+            disabled={!this.isPostValid()}
+          >Update</Button>
+
+          <FormControl className="mt-visibility-toggle">
+            <FormControlLabel
+              control={
+                <Switch
+                  color="primary"
+
+                  checked={this.state.editable.public ? true : false}
+                  onChange={e => {
+                    this.setState( {
+                      editable: {
+                        ...this.state.editable,
+                        public: this.state.editable.public ? false : true
+                      }
+                    } )
+                  }}
+                />
+              }
+              label={<span className="mt-visibility-toggle-label">{this.state.editable.public ? 'Post is public' : 'Post is private'}</span>}
+            />
+          </FormControl>
+          {this.props.post ?
+            <Dates>
+              <div>Created: </div>
+              <div>
+                {format( new Date( this.props.post.createdOn! ), 'MMM Do, YYYY' )}
+              </div>
+              <div>Updated: </div>
+              <div>
+                {format( new Date( this.props.post.lastUpdated! ), 'MMM Do, YYYY' )}
+              </div>
+            </Dates> : undefined}
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
+  private renderTags() {
+    return <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+        <h3>Post Tags</h3>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div className="mt-panel-inner">
+          <TagsInput style={{ display: 'flex' }}>
+            <div>
+              <TextField
+                id="mt-add-new-tag"
+                helperText="Type a tag and hit enter"
+                value={this.state.currentTagText}
+                fullWidth={true}
+                onKeyUp={e => {
+                  if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' )
+                    this.addTag();
+                }}
+                onChange={( e ) => this.setState( { currentTagText: e.currentTarget.value } )}
+              />
+            </div>
+            <div>
+              <IconButton
+                id="mt-add-tag"
+                onClick={e => this.addTag()}
+                style={{ margin: '0 4px' }}>
+                <AddIcon />
+              </IconButton>
+            </div>
+          </TagsInput>
+          <TagWrapper>
+            {this.state.editable.tags!.map( ( tag, tagIndex ) => {
+              return <Chip
+                key={`tag-${ tagIndex }`}
+                label={tag}
+                className="mt-tag-chip"
+                style={{ margin: '4px 4px 0 0' }}
+                onDelete={e => {
+                  this.setState( {
+                    editable: {
+                      ...this.state.editable,
+                      tags: this.state.editable.tags!.filter( t => t !== tag )
+                    }
+                  } )
+                }}
+              />;
+            } )}
+          </TagWrapper>
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
+  private renderMeta() {
+    return <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+        <h3>Post Meta Data</h3>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div className="mt-panel-inner">
+          <TextField
+            id="mt-post-desc"
+            value={this.state.editable.brief}
+            fullWidth={true}
+            multiline={true}
+            helperText="Post Brief Description"
+            onChange={( e ) => this.setState( { editable: { ...this.state.editable, brief: e.currentTarget.value } } )}
+          />
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
+  private renderFeaturedImg() {
+    return <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+        <h3>Featured Image</h3>
+        {this.state.editable.featuredImage ? <Icon
+          id="mt-remove-featured"
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.setState( { editable: { ...this.state.editable, featuredImage: '' } } );
+          }}
+          style={{
+            margin: '5px 0px 0px 18px',
+            position: 'absolute',
+            right: '40px'
+          }}>
+          <RemoveIcon style={{ fontSize: '18px', color: theme.primary200.background }} />
+        </Icon> : undefined}
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div style={{ position: 'relative', flex: '1' }}>
+          <FeaturedImg
+            id="mt-featured-img"
+            onClick={e => this.setState( { showMediaPopup: true } )}
+          >
+            <Tooltip title="Click to upload image">
+              {this.state.editable.featuredImage ?
+                <img src={( this.state.editable.featuredImage as IFileEntry<'client'> ).publicURL} /> :
+                <img src={'/images/post-feature.svg'} />
+              }
+            </Tooltip>
+          </FeaturedImg>
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
+  private renderCategories() {
+    return <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+        <h3>Categories</h3>
+        {this.props.categoriesLoading ? <span
+          style={{ margin: '4px 0 0 15px' }}
+          className="mt-cat-loading"
+        >
+          <CircularProgress size={20} />
+        </span> : undefined}
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div className="mt-panel-inner">
+          <CategoryEditor
+            onCategorySelected={category => {
+              let newIds: string[] = [];
+              const index = this.state.editable.categories!.indexOf( category._id );
+
+              if ( index === -1 )
+                newIds = this.state.editable.categories!.concat( category._id );
+              else
+                newIds = this.state.editable.categories!.filter( f => f !== category._id );
+
+              this.setState( { editable: { ...this.state.editable, categories: newIds } } )
+            }}
+            {...{
+              selected: this.state.editable.categories || [],
+
+            } as any}
+          />
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
+  private renderTemplates() {
+    const templates = this.props.templates;
+    const doc = this.props.post.document as IDocument<'client'>;
+    const template = doc.template as ITemplate<'client'>;
+
+    return <ExpansionPanel>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+        <h3>Templates</h3>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div className="mt-panel-inner">
+          {templates.busy || !templates.templatesPage ?
+            <CircularProgress
+              className="mt-loading mt-loading-templates"
+              size={30}
+              style={{ margin: '10px auto' }}
+            /> : (
+              <List>
+                {templates.templatesPage.data.map( t => (
+                  <ListItem
+                    key={t._id}
+                  >
+                    <ListItemText primary={t.name} />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        color="primary"
+                        onChange={e => this.onTemplateChange( t )}
+                        checked={template._id === t._id}
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ) )}
+              </List>
+            )
+          }
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
+  render() {
     return <Form>
       <div>
         <div>
@@ -160,171 +411,12 @@ export default class PostForm extends React.Component<Props, State> {
 
       </div>
       <div>
-        <RightPanel>
-          <Button
-            variant="contained"
-            className="mt-post-confirm"
-            onClick={e => {
-              if ( this.props.post && this.props.onUpdate )
-                this.props.onUpdate( this.state.editable );
-              else if ( this.props.onCreate )
-                this.props.onCreate( this.state.editable );
-            }}
-            color="primary"
-            fullWidth={true}
-            disabled={!this.isPostValid()}
-          >Update</Button>
-
-          <FormControl className="mt-visibility-toggle">
-            <FormControlLabel
-              control={
-                <Switch
-                  color="primary"
-
-                  checked={this.state.editable.public ? true : false}
-                  onChange={e => {
-                    this.setState( {
-                      editable: {
-                        ...this.state.editable,
-                        public: this.state.editable.public ? false : true
-                      }
-                    } )
-                  }}
-                />
-              }
-              label={<span className="mt-visibility-toggle-label">{this.state.editable.public ? 'Post is public' : 'Post is private'}</span>}
-            />
-          </FormControl>
-          {this.props.post ?
-            <Dates>
-              <div>Created: </div>
-              <div>
-                {format( new Date( this.props.post.createdOn! ), 'MMM Do, YYYY' )}
-              </div>
-              <div>Updated: </div>
-              <div>
-                {format( new Date( this.props.post.lastUpdated! ), 'MMM Do, YYYY' )}
-              </div>
-            </Dates> : undefined}
-        </RightPanel>
-
-        <RightPanel>
-          <h3>Post Tags</h3>
-          <TagsInput style={{ display: 'flex' }}>
-            <div>
-              <TextField
-                id="mt-add-new-tag"
-                helperText="Type a tag and hit enter"
-                value={this.state.currentTagText}
-                fullWidth={true}
-                onKeyUp={e => {
-                  if ( e.keyCode === 13 && this.state.currentTagText.trim() !== '' )
-                    this.addTag();
-                }}
-                onChange={( e ) => this.setState( { currentTagText: e.currentTarget.value } )}
-              />
-            </div>
-            <div>
-              <IconButton
-                id="mt-add-tag"
-                onClick={e => this.addTag()}
-                style={{ margin: '0 4px' }}>
-                <AddIcon />
-              </IconButton>
-            </div>
-          </TagsInput>
-          <TagWrapper>
-            {this.state.editable.tags!.map( ( tag, tagIndex ) => {
-              return <Chip
-                key={`tag-${ tagIndex }`}
-                label={tag}
-                className="mt-tag-chip"
-                style={{ margin: '4px 4px 0 0' }}
-                onDelete={e => {
-                  this.setState( {
-                    editable: {
-                      ...this.state.editable,
-                      tags: this.state.editable.tags!.filter( t => t !== tag )
-                    }
-                  } )
-                }}
-              />;
-            } )}
-          </TagWrapper>
-        </RightPanel>
-
-        <RightPanel>
-          <h3>Post Meta</h3>
-          <TextField
-            id="mt-post-desc"
-            value={this.state.editable.brief}
-            fullWidth={true}
-            multiline={true}
-            helperText="Post Brief Description"
-            onChange={( e ) => this.setState( { editable: { ...this.state.editable, brief: e.currentTarget.value } } )}
-          />
-        </RightPanel>
-
-        <RightPanel style={{ position: 'relative' }}>
-          {this.state.editable.featuredImage ? <IconButton
-            id="mt-remove-featured"
-            onClick={e => this.setState( { editable: { ...this.state.editable, featuredImage: '' } } )}
-            style={{ position: 'absolute', top: '5px', right: '5px' }}>
-            <RemoveIcon />
-          </IconButton> : undefined}
-          <h3>Featured Image</h3>
-          <FeaturedImg
-            id="mt-featured-img"
-            onClick={e => this.setState( { showMediaPopup: true } )}
-          >
-            <Tooltip title="Click to upload image">
-              {this.state.editable.featuredImage ?
-                <img src={( this.state.editable.featuredImage as IFileEntry<'client'> ).publicURL} /> :
-                <img src={'/images/post-feature.svg'} />
-              }
-            </Tooltip>
-          </FeaturedImg>
-        </RightPanel>
-
-        <RightPanel>
-          <CategoryEditor
-            onCategorySelected={category => {
-              let newIds: string[] = [];
-              const index = this.state.editable.categories!.indexOf( category._id );
-
-              if ( index === -1 )
-                newIds = this.state.editable.categories!.concat( category._id );
-              else
-                newIds = this.state.editable.categories!.filter( f => f !== category._id );
-
-              this.setState( { editable: { ...this.state.editable, categories: newIds } } )
-            }}
-            {...{
-              selected: this.state.editable.categories || [],
-
-            } as any}
-          />
-        </RightPanel>
-
-        <RightPanel>
-          <h3>Template</h3>
-          <div>
-            {templates.busy || !templates.templatesPage ?
-              <CircularProgress className="mt-loading mt-loading-templates" size={30} style={{ margin: '10px auto' }} /> :
-              templates.templatesPage.data.map( t => (
-                <FormControlLabel
-                  key={t._id}
-                  label={t.name}
-                  control={<Checkbox
-                    value={t._id}
-                    checked={false}
-                    color="primary"
-                    className={`mt-template`}
-                  />}
-                />
-              ) )}
-          </div>
-        </RightPanel>
+        {this.renderUpdateBox()}
+        {this.renderTags()}
+        {this.renderMeta()}
+        {this.renderFeaturedImg()}
+        {this.renderCategories()}
+        {this.renderTemplates()}
       </div>
 
       {this.state.showMediaPopup ?
@@ -344,6 +436,14 @@ export default class PostForm extends React.Component<Props, State> {
 const Form = styled.form`
   padding: 10px;
   display: flex;
+
+  h3 {
+    margin: 5px 0;
+  }
+
+  .mt-panel-inner {
+    width: 100%;
+  }
 
   #mt-post-title {
     display: block;
@@ -377,10 +477,8 @@ const Form = styled.form`
 `;
 
 const FeaturedImg = styled.div`
-  margin: 16px 0 0 0;
   text-align: center;
   cursor: pointer;
-
   img {
     max-height: 100%;
     max-width: 100%;
@@ -437,17 +535,4 @@ align-items: center;
   flex: 1;
   max-width: 50px;
 }
-`;
-
-const RightPanel = styled.div`
-  background: ${theme.light100.background };
-  border: 1px solid ${theme.light100.border };
-  padding: 20px;
-  border-radius: 5px;
-  overflow: hidden;
-  margin: 0 0 10px 0;
-
-  > h3 {
-    margin: 0;
-  }
 `;

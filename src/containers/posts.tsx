@@ -33,6 +33,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   app: state.app,
   routing: state.router,
   templates: state.templates,
+  categoriesLoading: state.categories.busy,
   location: ownProps.location as Location
 } );
 
@@ -196,6 +197,7 @@ export class Posts extends React.Component<Props, State> {
                 return <PostForm
                   id={props.match.params.postId}
                   activeUser={user}
+                  categoriesLoading={this.props.categoriesLoading}
                   templates={templates}
                   post={post}
                   elements={this.props.posts.draftElements!}

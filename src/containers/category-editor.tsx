@@ -4,8 +4,6 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Dialog from '@material-ui/core/Dialog';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import IconButton from '@material-ui/core/IconButton';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
@@ -22,7 +20,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
-
 import theme from '../theme/mui-theme';
 import { ICategory } from '../../../../src';
 import { connectWrapper, returntypeof } from '../utils/decorators';
@@ -231,7 +228,7 @@ export class CategoryEditor extends React.Component<Props, State> {
     };
 
     const checkboxIconStyle: React.CSSProperties = {
-      fill: this.state.deleteMode || this.state.editMode ? theme.primary200.background : theme.primary300.background,
+      fill: theme.primary200.background,
       height: '26px',
       width: '26px'
     };
@@ -300,6 +297,21 @@ export class CategoryEditor extends React.Component<Props, State> {
             >Cancel</Button>
           </CategoryButtons> :
           <CategoryButtons>
+            {!this.state.addCategoryMode && !this.state.deleteMode && categories.length > 0 && !this.state.editMode ?
+              <Button
+                className="mt-new-category-btn"
+                onClick={e => this.setState( { editMode: true } )}
+              >
+                <EditIcon style={{
+                  color: theme.primary200.background,
+                  margin: '0 5px 0 0',
+                  fontSize: '20px'
+                }}
+                />
+                Edit Categories
+            </Button>
+              : undefined}
+
             <Button
               className="mt-new-category-btn"
               onClick={e => this.setState( {
@@ -309,7 +321,11 @@ export class CategoryEditor extends React.Component<Props, State> {
                 autoSlug: '',
               } )}
             >
-              <AddIcon style={{ margin: '0 5px 0 0' }} />
+              <AddIcon style={{
+                color: theme.primary200.background,
+                margin: '0 5px 0 0'
+              }}
+              />
               Add Category
             </Button>
 
@@ -320,7 +336,10 @@ export class CategoryEditor extends React.Component<Props, State> {
                   deleteMode: true
                 } )}
               >
-                <RemoveIcon style={{ margin: '0 5px 0 0' }} />
+                <RemoveIcon style={{
+                  color: theme.primary200.background,
+                  margin: '0 5px 0 0'
+                }} />
                 Remove Category
               </Button> : undefined}
           </CategoryButtons>
@@ -333,28 +352,6 @@ export class CategoryEditor extends React.Component<Props, State> {
     const categories: ICategory<'client'>[] = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
     return (
       <Container className="mt-category-container">
-        <CategoriesHeader>
-          <div>
-            <h3>{this.state.addCategoryMode ? this.state.newCategory._id ? 'Edit Category' : 'New Category' : 'Categories'}</h3>
-          </div>
-          <div>
-            {this.props.categories.busy ? <span
-              className="mt-cat-loading"
-            >
-              <CircularProgress size={20} />
-            </span> : !this.state.addCategoryMode && !this.state.deleteMode && categories.length > 0 && !this.state.editMode ?
-                <IconButton
-                  className="mt-edit-cat-btn"
-                  onClick={e => this.setState( { editMode: true } )}
-                  style={{ padding: 0, position: 'absolute', top: '-10px', right: 0 }}
-                >
-                  <EditIcon style={{ padding: 0 }} />
-                </IconButton>
-                : undefined}
-          </div>
-
-        </CategoriesHeader>
-
         <div>
           {this.state.addCategoryMode ?
             this.renderNewCategoryForm( categories ) : this.renderAllCategories( categories )}
@@ -379,6 +376,7 @@ export class CategoryEditor extends React.Component<Props, State> {
                     deleteMode: false
                   } )}
                 >Cancel</Button>
+
                 <Button
                   variant="contained"
                   color="primary"
@@ -394,22 +392,6 @@ export class CategoryEditor extends React.Component<Props, State> {
     );
   }
 }
-
-const CategoriesHeader = styled.div`
-  display: flex;
-  > div {
-    flex: 1;
-    position: relative;
-  }
-
-  > div:last-child {
-    text-align: right;
-  }
-
-  h3 {
-    margin: 0;
-  }
-`;
 
 const Container = styled.div`
   > h3 {
@@ -431,7 +413,6 @@ const CategoryChildren = styled.div`
 `;
 
 const ActiveCategories = styled.div`
-  padding: 10px 0 0 0;
 `;
 
 const CategoryButtons = styled.div`
