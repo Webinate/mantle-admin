@@ -43,6 +43,7 @@
         "--config=../../config.json",
         "--logging=false",
         "--runningTests=true",
+        "--runningClientTests=true",
         "--debug=true",
         "--clientsFolder=../../clients/",
         "--remotes.local.url=http://localhost:8001",

@@ -44,7 +44,7 @@ export async function hydrate( req: IAuthReq ) {
   if ( matchPath( req.url, { path: '/dashboard/media' } ) )
     await mediaHandler( req, actions );
 
-  if ( args.runningTests )
+  if ( args.runningClientTests )
     actions.push( AppActions.setDebugMode.create( true ) );
 
   return actions;
