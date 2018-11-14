@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
-import { getPosts, getPost, createPost, deletePosts, editPost, addElement, updateElement, deleteElements, ActionCreators as PostCreators } from '../store/posts/actions';
+import { getPosts, getPost, createPost, deletePosts, editPost, addElement, changeTemplate, updateElement, deleteElements, ActionCreators as PostCreators } from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { getComments, createComment, editComment, deleteComment } from '../store/comments/actions';
 import { getAllTemplates } from '../store/templates/actions';
@@ -55,6 +55,7 @@ const dispatchToProps = {
   editComment,
   deleteComment,
   getAllTemplates,
+  changeTemplate,
   deleteElements,
   setElmSelection: PostCreators.SetElmSelection.create
 }
@@ -200,6 +201,7 @@ export class Posts extends React.Component<Props, State> {
                   activeUser={user}
                   categoriesLoading={this.props.categoriesLoading}
                   templates={templates}
+                  onTemplateChanged={( templateId ) => this.props.changeTemplate( doc._id, templateId )}
                   post={post}
                   elements={this.props.posts.draftElements!}
                   onUpdate={post => this.props.editPost( post )}

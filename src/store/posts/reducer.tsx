@@ -39,6 +39,10 @@ export default function reducer( state: State = initialState, action: Action ): 
       partialState = { busy: action.payload };
       break;
 
+    case ActionCreators.SetTemplate.type:
+      partialState = { post: { ...state.post!, document: action.payload } };
+      break;
+
     case ActionCreators.SetPost.type:
       let doc = action.payload.document as IDocument<'client'>;
       let draft = doc.currentDraft as IPopulatedDraft<'client'>;

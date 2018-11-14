@@ -44,6 +44,7 @@ export type Props = {
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
+  onTemplateChanged: ( templateId: string ) => void;
 
   selectedElements: string[];
   onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
@@ -57,25 +58,34 @@ export type State = {
   currentTagText: string;
   slugWasEdited: boolean;
   showMediaPopup: boolean;
+  activeTemplate: string;
 }
 
 export default class PostForm extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
+    const doc = props.post.document as IDocument<'client'>;
+    const template = doc.template as ITemplate<'client'>;
     this.state = {
       editable: { ...props.post },
       currentTagText: '',
       slugWasEdited: false,
-      showMediaPopup: false
+      showMediaPopup: false,
+      activeTemplate: template._id
     };
   }
 
   componentWillReceiveProps( next: Props ) {
-    if ( next.post !== this.props.post )
+    if ( next.post !== this.props.post ) {
+      const doc = next.post.document as IDocument<'client'>;
+      const template = doc.template as ITemplate<'client'>;
+
       this.setState( {
         editable: { ...next.post },
-        currentTagText: ''
+        currentTagText: '',
+        activeTemplate: template._id
       } );
+    }
   }
 
   private addTag() {
@@ -111,10 +121,6 @@ export default class PostForm extends React.Component<Props, State> {
       return false;
 
     return true;
-  }
-
-  private onTemplateChange( template: ITemplate<'client'> ) {
-
   }
 
   private renderUpdateBox() {
@@ -318,8 +324,7 @@ export default class PostForm extends React.Component<Props, State> {
 
   private renderTemplates() {
     const templates = this.props.templates;
-    const doc = this.props.post.document as IDocument<'client'>;
-    const template = doc.template as ITemplate<'client'>;
+    const templateId = this.state.activeTemplate;
 
     return <ExpansionPanel className="mt-templates-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
@@ -342,8 +347,8 @@ export default class PostForm extends React.Component<Props, State> {
                     <ListItemSecondaryAction>
                       <Switch
                         color="primary"
-                        onChange={e => this.onTemplateChange( t )}
-                        checked={template._id === t._id}
+                        onChange={e => this.setState( { activeTemplate: t._id } )}
+                        checked={templateId === t._id}
                       />
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -351,6 +356,15 @@ export default class PostForm extends React.Component<Props, State> {
               </List>
             )
           }
+
+          <Button
+            color="primary"
+            variant="contained"
+            fullWidth={true}
+            onClick={e => this.props.onTemplateChanged( this.state.activeTemplate )}
+          >
+            Apply Template
+          </Button>
         </div>
       </ExpansionPanelDetails>
     </ExpansionPanel>

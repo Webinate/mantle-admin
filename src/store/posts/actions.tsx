@@ -1,5 +1,5 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IPost, IDraftElement } from '../../../../../src';
+import { Page, IPost, IDraftElement, IDocument } from '../../../../../src';
 import * as posts from '../../../../../src/lib-frontend/posts';
 import * as documents from '../../../../../src/lib-frontend/documents';
 import { PostsGetAllOptions } from 'modepress';
@@ -15,6 +15,7 @@ export const ActionCreators = {
   RemoveElements: new ActionCreator<'posts-remove-elms', string[]>( 'posts-remove-elms' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
   SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' ),
+  SetTemplate: new ActionCreator<'posts-set-template', IDocument<'client'>>( 'posts-set-template' ),
   SetElmSelection: new ActionCreator<'posts-elm-set-selection', string[]>( 'posts-elm-set-selection' )
 };
 
@@ -85,6 +86,22 @@ export function editPost( post: Partial<IPost<'client'>> ) {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await posts.update( post._id as string, post );
       dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
+  }
+}
+
+export function changeTemplate( docId: string, templateId: string ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    try {
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const resp = await documents.setTemplate( docId, templateId );
+      dispatch( ActionCreators.SetTemplate.create( resp ) );
+      dispatch( AppActions.serverResponse.create( `Post template updated` ) );
       dispatch( ActionCreators.SetPostsBusy.create( false ) );
     }
     catch ( err ) {
