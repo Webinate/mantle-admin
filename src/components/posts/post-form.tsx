@@ -62,12 +62,15 @@ export type State = {
 }
 
 export default class PostForm extends React.Component<Props, State> {
+  private _editableRef: Partial<IPost<'client'>>;
+
   constructor( props: Props ) {
     super( props );
+    this._editableRef = { ...props.post };
     const doc = props.post.document as IDocument<'client'>;
     const template = doc.template as ITemplate<'client'>;
     this.state = {
-      editable: { ...props.post },
+      editable: this._editableRef,
       currentTagText: '',
       slugWasEdited: false,
       showMediaPopup: false,
@@ -77,11 +80,12 @@ export default class PostForm extends React.Component<Props, State> {
 
   componentWillReceiveProps( next: Props ) {
     if ( next.post !== this.props.post ) {
+      this._editableRef = { ...next.post };
       const doc = next.post.document as IDocument<'client'>;
       const template = doc.template as ITemplate<'client'>;
 
       this.setState( {
-        editable: { ...next.post },
+        editable: this._editableRef,
         currentTagText: '',
         activeTemplate: template._id
       } );
@@ -322,9 +326,18 @@ export default class PostForm extends React.Component<Props, State> {
     </ExpansionPanel>
   }
 
+  private hasModified() {
+    if ( this.state.editable !== this._editableRef )
+      return true;
+    else
+      return false;
+  }
+
   private renderTemplates() {
     const templates = this.props.templates;
     const templateId = this.state.activeTemplate;
+    const doc = this.state.editable.document as IDocument<'client'>;
+    const curTemplate = doc.template as ITemplate<'client'>;
 
     return <ExpansionPanel className="mt-templates-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
@@ -361,16 +374,30 @@ export default class PostForm extends React.Component<Props, State> {
             color="primary"
             variant="contained"
             fullWidth={true}
+            disabled={this.state.activeTemplate === curTemplate._id}
             onClick={e => this.props.onTemplateChanged( this.state.activeTemplate )}
           >
             Apply Template
           </Button>
+
+          {this.hasModified() ? <div style={{
+            textAlign: 'center',
+            color: theme.error.background,
+            margin: '20px 0 0 0'
+          }}
+            id="mt-changes-warning"
+          >
+            Note: You have unsaved changes, these will be overritten if you apply a new template
+          </div> : undefined}
+
         </div>
       </ExpansionPanelDetails>
     </ExpansionPanel>
   }
 
   render() {
+    const doc = this.state.editable.document as IDocument<'client'>;
+
     return <Form
       animated={this.props.animated}
     >
@@ -418,6 +445,7 @@ export default class PostForm extends React.Component<Props, State> {
         </div>
         <ElmEditor
           elements={this.props.elements}
+          document={doc}
           onCreateElm={elm => this.props.onCreateElm( elm )}
           onUpdateElm={( id, html, createParagraph, deselect ) => this.props.onUpdateElm( id, html, createParagraph, deselect )}
           onDeleteElm={ids => this.props.onDeleteElements( ids )}

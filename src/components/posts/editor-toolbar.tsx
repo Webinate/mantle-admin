@@ -11,6 +11,7 @@ type Props = {
   onInlineToggle: ( type: InlineType ) => void;
   onAddMedia: () => void;
   animate?: boolean;
+  style: React.CSSProperties;
 }
 
 type State = {
@@ -113,7 +114,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
     const blocks = this._regularBlocks;
     const activeInlines = this.state.activeInlines;
 
-    return <div className="mt-draft-toolbar">
+    return <div style={this.props.style} className="mt-draft-toolbar">
       <ButtonGroup>
         <div
           id="mt-draft-blocks"

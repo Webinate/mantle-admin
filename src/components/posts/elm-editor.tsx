@@ -2,12 +2,13 @@ import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
-import { IDraftElement } from 'modepress';
+import { IDraftElement, IDocument, ITemplate, IPopulatedDraft } from 'modepress';
 import { InlineType } from './editor-toolbar';
 
 export type Props = {
   elements: IDraftElement<'client'>[];
   selected: string[];
+  document: IDocument<'client'>;
   onSelectionChanged: ( ids: string[] ) => void;
   onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
   onDeleteElm: ( ids: string[] ) => void;
@@ -16,6 +17,7 @@ export type Props = {
 
 export type State = {
   initialized: boolean;
+  selectedZone: string;
 };
 
 /**
@@ -31,7 +33,8 @@ export class ElmEditor extends React.Component<Props, State> {
     super( props );
     this._keyProxy = this.onWindowKeyDown.bind( this );
     this.state = {
-      initialized: false
+      initialized: false,
+      selectedZone: ( props.document.template as ITemplate<'client'> ).zones[ 0 ]
     };
   }
 
@@ -272,18 +275,47 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( !this.state.initialized )
       return <div></div>;
 
-    const elements = this.props.elements;
+    let elements = this.props.elements;
     const selection = this.props.selected;
+    const doc = this.props.document
+    const template = doc.template as ITemplate<'client'>;
     let firstIndex = -1;
     let lastIndex = -1;
+    const selectedZone = this.state.selectedZone;
+    const draft = doc.currentDraft as IPopulatedDraft<'client'>;
+    const zones = template.zones.concat( 'unassigned' );
 
     if ( selection.length > 0 ) {
       firstIndex = elements.findIndex( e => selection[ 0 ] === e._id );
       lastIndex = elements.findIndex( e => selection[ selection.length - 1 ] === e._id );
     }
 
+    if ( draft.templateMap[ selectedZone ] )
+      elements = elements.filter( e => !draft.templateMap[ selectedZone ].includes( e._id ) );
+    else
+      elements = elements.filter( e => {
+        if ( selectedZone !== 'unassigned' )
+          return false;
+
+        let isAssigned = false;
+        if ( !isAssigned ) {
+          for ( let t in draft.templateMap ) {
+            isAssigned = draft.templateMap[ t ].includes( e._id );
+            if ( isAssigned )
+              break;
+          }
+        }
+
+        return !isAssigned;
+      } );
+
     return (
       <div>
+        {zones.map( ( z, index ) => <Tab
+          key={`tab-${ index }`}
+          onClick={e => this.setState( { selectedZone: z } )}
+          className={`mt-editor-tab ${ selectedZone === z ? 'active' : 'inactive' }`}>{z}
+        </Tab> )}
         <Container
           firstIndex={firstIndex}
           lastIndex={lastIndex}
@@ -292,6 +324,7 @@ export class ElmEditor extends React.Component<Props, State> {
             onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html } )}
             onAddMedia={() => { }}
             onInlineToggle={styleStyle => this.toggleInline( styleStyle )}
+            style={{ margin: '10px' }}
           />
 
           <div
@@ -308,7 +341,6 @@ export class ElmEditor extends React.Component<Props, State> {
                         return;
 
                       setTimeout( () => this.activateElm( e ), 200 );
-
                     }}
                     onBlur={e => this.updateElmHtml( elm, false, true )}
                     className={`mt-element active focussed`}
@@ -337,6 +369,23 @@ export interface EditorStyleProps {
   firstIndex: number;
   lastIndex: number;
 }
+const Tab = styled.div`
+  display: inline-block;
+  padding: 5px;
+  text-transform: capitalize;
+  background: ${theme.light100.background };
+  border-top: 1px solid ${theme.light100.border };
+  border-left: 1px solid ${theme.light100.border };
+  border-right: 1px solid ${theme.light100.border };
+  position: relative;
+  top: 2px;
+  margin: 0 4px 0 0;
+  cursor: pointer;
+
+  &.inactive {
+    background: ${theme.light200.background };
+  }
+`
 
 const Container = styled.div`
   overflow: auto;
