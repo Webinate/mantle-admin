@@ -89,6 +89,7 @@ describe( 'Testing the creation of posts: ', function() {
   } )
 
   it( 'did add and remove tags', async () => {
+    await postPage.openPanel( 'tags' );
     await postPage.addTag( 'tag 1' );
     await postPage.addTag( 'tag 2' );
     assert.equal( await postPage.hasTag( 'tag 1' ), true );
@@ -106,6 +107,8 @@ describe( 'Testing the creation of posts: ', function() {
   } )
 
   it( 'did select a featured image', async () => {
+
+    await postPage.openPanel( 'featured' );
 
     // Clear featured img button should be disabled
     assert.deepEqual( await postPage.$( '#mt-remove-featured' ), null );

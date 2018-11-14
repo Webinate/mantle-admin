@@ -6,7 +6,6 @@ import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'modepress';
-import { CategoriesController } from '../../../../../src/controllers/categories';
 
 let postPage = new PostsPage();
 let admin: Agent;
@@ -31,6 +30,8 @@ describe( 'Testing the interactions with categories in posts:', function() {
 
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
     await postPage.waitFor( '#mt-post-title' );
+    await postPage.openPanel( 'categories' );
+    await postPage.openPanel( 'tags' );
   } )
 
   after( async () => {

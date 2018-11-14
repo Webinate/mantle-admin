@@ -39,6 +39,7 @@ export type Props = {
   elements: IDraftElement<'client'>[];
   templates: TemplateState;
   categoriesLoading: boolean;
+  animated: boolean;
 
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
@@ -117,7 +118,7 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   private renderUpdateBox() {
-    return <ExpansionPanel expanded={true}>
+    return <ExpansionPanel expanded={true} className="mt-update-panel">
       <ExpansionPanelDetails>
         <div className="mt-panel-inner">
           <Button
@@ -171,7 +172,7 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   private renderTags() {
-    return <ExpansionPanel>
+    return <ExpansionPanel className="mt-tags-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
         <h3>Post Tags</h3>
       </ExpansionPanelSummary>
@@ -224,7 +225,7 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   private renderMeta() {
-    return <ExpansionPanel>
+    return <ExpansionPanel className="mt-meta-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
         <h3>Post Meta Data</h3>
       </ExpansionPanelSummary>
@@ -244,7 +245,7 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   private renderFeaturedImg() {
-    return <ExpansionPanel>
+    return <ExpansionPanel className="mt-featured-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
         <h3>Featured Image</h3>
         {this.state.editable.featuredImage ? <Icon
@@ -281,7 +282,7 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   private renderCategories() {
-    return <ExpansionPanel>
+    return <ExpansionPanel className="mt-categories-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
         <h3>Categories</h3>
         {this.props.categoriesLoading ? <span
@@ -320,7 +321,7 @@ export default class PostForm extends React.Component<Props, State> {
     const doc = this.props.post.document as IDocument<'client'>;
     const template = doc.template as ITemplate<'client'>;
 
-    return <ExpansionPanel>
+    return <ExpansionPanel className="mt-templates-panel">
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
         <h3>Templates</h3>
       </ExpansionPanelSummary>
@@ -356,7 +357,9 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   render() {
-    return <Form>
+    return <Form
+      animated={this.props.animated}
+    >
       <div>
         <div>
           <input
@@ -429,8 +432,12 @@ export default class PostForm extends React.Component<Props, State> {
             editable: { ...this.state.editable, featuredImage: file }
           } )}
         /> : undefined}
-    </Form >;
+    </Form>;
   }
+}
+
+interface FormStyleProps extends React.HTMLAttributes<HTMLElement> {
+  animated: boolean;
 }
 
 const Form = styled.form`
@@ -440,6 +447,8 @@ const Form = styled.form`
   h3 {
     margin: 5px 0;
   }
+
+  ${ ( props: FormStyleProps ) => !props.animated ? '* { transition: none !important; }' : '' }
 
   .mt-panel-inner {
     width: 100%;

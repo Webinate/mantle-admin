@@ -196,6 +196,7 @@ export class Posts extends React.Component<Props, State> {
 
                 return <PostForm
                   id={props.match.params.postId}
+                  animated={this.props.app.debugMode ? false : true}
                   activeUser={user}
                   categoriesLoading={this.props.categoriesLoading}
                   templates={templates}

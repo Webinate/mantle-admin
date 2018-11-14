@@ -59,6 +59,8 @@ describe( 'View & edit post created by backend: ', function() {
   } )
 
   it( 'can update post details', async () => {
+    await postPage.openPanel( 'tags' );
+
     await postPage.title( 'Test Post EDITED' );
     await postPage.brief( 'Oh my brief EDITED' );
     await postPage.removeTag( 'Tag 1' );

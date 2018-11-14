@@ -299,7 +299,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           <CategoryButtons>
             {!this.state.addCategoryMode && !this.state.deleteMode && categories.length > 0 && !this.state.editMode ?
               <Button
-                className="mt-new-category-btn"
+                className="mt-edit-cat-btn"
                 onClick={e => this.setState( { editMode: true } )}
               >
                 <EditIcon style={{

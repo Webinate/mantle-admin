@@ -57,6 +57,22 @@ export default class PostsPage extends Page {
   }
 
   /**
+   * Clicks the new post button and waits for the components to be on the dom
+   */
+  openPanel( which: 'categories' | 'tags' | 'meta' | 'featured' | 'templates' ) {
+    if ( which === 'categories' )
+      return this.page.click( '.mt-categories-panel .mt-panel-expand' );
+    else if ( which === 'tags' )
+      return this.page.click( '.mt-tags-panel .mt-panel-expand' );
+    else if ( which === 'meta' )
+      return this.page.click( '.mt-meta-panel .mt-panel-expand' );
+    else if ( which === 'featured' )
+      return this.page.click( '.mt-featured-panel .mt-panel-expand' );
+    else if ( which === 'templates' )
+      return this.page.click( '.mt-templates-panel .mt-panel-expand' );
+  }
+
+  /**
    * Clicks the confirm btn to save or update
    */
   async clickConfirm() {
