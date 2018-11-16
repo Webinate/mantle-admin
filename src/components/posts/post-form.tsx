@@ -40,13 +40,11 @@ export type Props = {
   templates: TemplateState;
   categoriesLoading: boolean;
   animated: boolean;
-
+  selectedElements: string[];
   onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: ( templateId: string ) => void;
-
-  selectedElements: string[];
   onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
   onUpdateElm: ( id: string, html: string, createParagraph: boolean, deselect: boolean ) => void;
   onDeleteElements: ( ids: string[] ) => void;
@@ -104,7 +102,8 @@ export default class PostForm extends React.Component<Props, State> {
     this.setState( {
       currentTagText: '',
       editable: {
-        ...this.state.editable, tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
+        ...this.state.editable,
+        tags: this.state.editable.tags!.concat( this.state.currentTagText.trim() )
       }
     } )
   }

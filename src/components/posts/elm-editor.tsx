@@ -2,7 +2,7 @@ import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
-import { IDraftElement, IDocument, ITemplate, IPopulatedDraft } from 'modepress';
+import { IDraftElement, IDocument, ITemplate } from 'modepress';
 import { InlineType } from './editor-toolbar';
 
 export type Props = {
@@ -39,6 +39,9 @@ export class ElmEditor extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps( next: Props ) {
+    const nextTemplate = next.document.template as ITemplate<'client'>;
+    if ( next.document !== this.props.document )
+      this.setState( { selectedZone: nextTemplate.zones[ 0 ] } );
     if ( this._lastFocussedElm && next.selected.length === 0 && this.props.selected.length > 0 )
       this._lastFocussedElm.classList.remove( 'cursor' );
   }
@@ -99,7 +102,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( elm.html !== html )
       this.props.onUpdateElm( elm._id, html, createParagraph, deselect );
     else if ( createParagraph )
-      this.props.onCreateElm( { type: 'elm-paragraph' } );
+      this.props.onCreateElm( { type: 'elm-paragraph', zone: this.state.selectedZone } );
     else if ( deselect )
       this.props.onSelectionChanged( [] );
   }
@@ -282,32 +285,22 @@ export class ElmEditor extends React.Component<Props, State> {
     let firstIndex = -1;
     let lastIndex = -1;
     const selectedZone = this.state.selectedZone;
-    const draft = doc.currentDraft as IPopulatedDraft<'client'>;
     const zones = template.zones.concat( 'unassigned' );
+    const unassigned: IDraftElement<'client'>[] = [];
+
+    for ( const elm of elements )
+      if ( !zones.includes( elm.zone ) )
+        unassigned.push( elm );
+
+    if ( selectedZone === 'unassigned' )
+      elements = unassigned;
+    else
+      elements = elements.filter( e => zones.includes( e.zone || '' ) );
 
     if ( selection.length > 0 ) {
       firstIndex = elements.findIndex( e => selection[ 0 ] === e._id );
       lastIndex = elements.findIndex( e => selection[ selection.length - 1 ] === e._id );
     }
-
-    if ( draft.templateMap[ selectedZone ] )
-      elements = elements.filter( e => !draft.templateMap[ selectedZone ].includes( e._id ) );
-    else
-      elements = elements.filter( e => {
-        if ( selectedZone !== 'unassigned' )
-          return false;
-
-        let isAssigned = false;
-        if ( !isAssigned ) {
-          for ( let t in draft.templateMap ) {
-            isAssigned = draft.templateMap[ t ].includes( e._id );
-            if ( isAssigned )
-              break;
-          }
-        }
-
-        return !isAssigned;
-      } );
 
     return (
       <div>
