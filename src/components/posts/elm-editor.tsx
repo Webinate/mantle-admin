@@ -65,6 +65,50 @@ export class ElmEditor extends React.Component<Props, State> {
       this.props.onDeleteElm( this.props.selected );
   }
 
+  private getLastLeafNode( source: Node ) {
+    if ( source.childNodes.length === 0 )
+      return source;
+
+    function getLeafNodeChild( child: Node ): Node {
+      if ( child.childNodes.length === 0 )
+        return child;
+
+      return getLeafNodeChild( child.childNodes[ child.childNodes.length - 1 ] );
+    }
+
+    return getLeafNodeChild( source.childNodes[ source.childNodes.length - 1 ] );
+  }
+
+  /**
+   * Going backwards, this gets the first editable node
+   */
+  private getFirstEditable( source: Node ) {
+    const voidNodeTags = [ 'AREA', 'BASE', 'BR', 'COL', 'EMBED',
+      'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'MENUITEM', 'META',
+      'PARAM', 'SOURCE', 'TRACK', 'WBR', 'BASEFONT',
+      'BGSOUND', 'FRAME', 'ISINDEX' ];
+
+    //Basic idea from: https://stackoverflow.com/questions/19790442/test-if-an-element-can-contain-text
+    function canContainText( node: Node ) {
+      if ( node.nodeType == 1 ) //is an element node
+        return !voidNodeTags.includes( node.nodeName );
+      else  //is not an element node
+        return false;
+    };
+
+    function getFirstEditableChild( child: Node | null ): Node | null {
+      if ( !child )
+        return null;
+
+      if ( canContainText( child ) )
+        return child;
+
+      return getFirstEditableChild( child.previousSibling || child.parentNode );
+    }
+
+    return getFirstEditableChild( source );
+  }
+
   /**
    * Removes empty text nodes
    */
@@ -115,27 +159,29 @@ export class ElmEditor extends React.Component<Props, State> {
       this._lastFocussedElm.classList.remove( 'cursor' );
 
     el.focus();
-    if ( typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined' ) {
-      const range = document.createRange();
+
+    let firstEditable: Node | null = this.getFirstEditable( this.getLastLeafNode( el ) );
+    const range = document.createRange();
+
+    if ( firstEditable && firstEditable.childNodes.length > 0 && firstEditable.childNodes[ 0 ].nodeType === 3 ) {
+      range.setStart( firstEditable!.childNodes[ 0 ], firstEditable!.childNodes[ 0 ].textContent!.length );
+      range.collapse( true );
+    }
+    else {
       range.selectNodeContents( el );
-      range.collapse( false );
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange( range );
-
-      if ( !this.elementInViewport( el ) )
-        el.scrollIntoView();
-
-      el.parentElement!.focus();
-      this._lastFocussedElm = el.parentElement!;
-      this._lastFocussedElm.classList.add( 'cursor' );
+      range.selectNodeContents( firstEditable || el );
     }
-    else if ( typeof ( document.body as any ).createTextRange !== 'undefined' ) {
-      const textRange = ( document.body as any ).createTextRange();
-      textRange.moveToElementText( el );
-      textRange.collapse( false );
-      textRange.select();
-    }
+
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange( range );
+
+    if ( !this.elementInViewport( el ) )
+      el.scrollIntoView();
+
+    el.parentElement!.focus();
+    this._lastFocussedElm = el.parentElement!;
+    this._lastFocussedElm.classList.add( 'cursor' );
   }
 
   /**
@@ -331,7 +377,7 @@ export class ElmEditor extends React.Component<Props, State> {
           />
 
           <div
-            className={`mt-editor-container ${ selection.length > 1 ? ' mt-multi-select' : '' }`}
+            className={`mt-editor-container`}
           >
             {elements.map( ( elm, index ) => {
 
@@ -399,7 +445,6 @@ const Container = styled.div`
   border: 1px solid ${theme.light100.border };
   color: ${theme.light100.color };
   border-radius: 4px;
-  user-select: none;
   font-weight: thinner;
 
   b, strong {
@@ -432,6 +477,8 @@ const Container = styled.div`
   .mt-element {
     border: 1px solid transparent;
     padding: 5px;
+    outline: 0px solid transparent;
+
     > * { min-height: 10px; }
 
     &.focussed {
