@@ -12,7 +12,7 @@ export type Props = {
   onSelectionChanged: ( ids: string[] ) => void;
   onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
   onDeleteElm: ( ids: string[] ) => void;
-  onUpdateElm: ( id: string, html: string, createParagraph: boolean, deselect: boolean ) => void;
+  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
 }
 
 export type State = {
@@ -84,10 +84,10 @@ export class ElmEditor extends React.Component<Props, State> {
   /**
    * Updates an element and then optionally creates a new paragraph
    * @param elm The element to update
-   * @param createParagraph Should we create a paragraph when done updating
+   * @param createElement Should we create a paragraph when done updating
    * @param deselect If true, then nothing should be selected after update
    */
-  private updateElmHtml( elm: IDraftElement<'client'>, createParagraph: boolean, deselect: boolean ) {
+  private updateElmHtml( elm: IDraftElement<'client'>, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
 
     this.clean( this._activeElm );
     const first = this._activeElm.firstElementChild as HTMLElement;
@@ -100,8 +100,8 @@ export class ElmEditor extends React.Component<Props, State> {
 
     let html = first.outerHTML;
     if ( elm.html !== html )
-      this.props.onUpdateElm( elm._id, html, createParagraph, deselect );
-    else if ( createParagraph )
+      this.props.onUpdateElm( elm._id, html, createElement, deselect );
+    else if ( createElement )
       this.props.onCreateElm( { type: 'elm-paragraph', zone: this.state.selectedZone } );
     else if ( deselect )
       this.props.onSelectionChanged( [] );
@@ -164,7 +164,13 @@ export class ElmEditor extends React.Component<Props, State> {
   /**
    * Select the active elements
    */
-  private onElmClick( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
+  private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if ( this.props.selected.length === 1 )
+      this.updateElmHtml( this.props.elements.find( e => e._id === this.props.selected[ 0 ] )!, null, 'none' );
+
     if ( !e.ctrlKey && !e.shiftKey ) {
       this.props.onSelectionChanged( [ elm._id ] );
     }
@@ -224,7 +230,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( e.keyCode === 27 ) {
       const selected = this.getSelectedElement();
       if ( selected )
-        this.updateElmHtml( selected, false, true );
+        this.updateElmHtml( selected, null, 'deselect' );
     }
   }
 
@@ -247,7 +253,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( selectedElm && selectedElm.type !== 'elm-list' ) {
       e.preventDefault();
       e.stopPropagation();
-      this.updateElmHtml( selectedElm, true, false );
+      this.updateElmHtml( selectedElm, { type: 'elm-paragraph', zone: this.state.selectedZone }, 'select' );
     }
   }
 
@@ -289,13 +295,13 @@ export class ElmEditor extends React.Component<Props, State> {
     const unassigned: IDraftElement<'client'>[] = [];
 
     for ( const elm of elements )
-      if ( !zones.includes( elm.zone ) )
+      if ( !zones.includes( elm.zone ) || elm.zone === 'unassigned' )
         unassigned.push( elm );
 
     if ( selectedZone === 'unassigned' )
       elements = unassigned;
     else
-      elements = elements.filter( e => zones.includes( e.zone || '' ) );
+      elements = elements.filter( e => e.zone === selectedZone );
 
     if ( selection.length > 0 ) {
       firstIndex = elements.findIndex( e => selection[ 0 ] === e._id );
@@ -306,7 +312,10 @@ export class ElmEditor extends React.Component<Props, State> {
       <div>
         {zones.map( ( z, index ) => <Tab
           key={`tab-${ index }`}
-          onClick={e => this.setState( { selectedZone: z } )}
+          onClick={e => {
+            this.props.onSelectionChanged( [] );
+            this.setState( { selectedZone: z } )
+          }}
           className={`mt-editor-tab ${ selectedZone === z ? 'active' : 'inactive' }`}>{z}
         </Tab> )}
         <Container
@@ -314,14 +323,15 @@ export class ElmEditor extends React.Component<Props, State> {
           lastIndex={lastIndex}
         >
           <EditorToolbar
-            onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html } )}
+            onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html, zone: this.state.selectedZone } )}
             onAddMedia={() => { }}
+            onDelete={() => this.props.onDeleteElm( this.props.selected )}
             onInlineToggle={styleStyle => this.toggleInline( styleStyle )}
             style={{ margin: '10px' }}
           />
 
           <div
-            className="mt-editor-container"
+            className={`mt-editor-container ${ selection.length > 1 ? ' mt-multi-select' : '' }`}
           >
             {elements.map( ( elm, index ) => {
 
@@ -335,7 +345,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
                       setTimeout( () => this.activateElm( e ), 200 );
                     }}
-                    onBlur={e => this.updateElmHtml( elm, false, true )}
+                    onBlur={e => this.updateElmHtml( elm, null, 'select' )}
                     className={`mt-element active focussed`}
                     dangerouslySetInnerHTML={{ __html: elm.html || '<p></p>' }}
                     contentEditable={true}
@@ -347,7 +357,7 @@ export class ElmEditor extends React.Component<Props, State> {
               return <div
                 key={`elm-${ index }`}
                 className={`mt-element${ selection.includes( elm._id ) ? ' active' : '' }`}
-                onClick={e => this.onElmClick( e, elm )}
+                onMouseDown={e => this.onElmDown( e, elm )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}
@@ -389,8 +399,9 @@ const Container = styled.div`
   border: 1px solid ${theme.light100.border };
   color: ${theme.light100.color };
   border-radius: 4px;
-
+  user-select: none;
   font-weight: thinner;
+
   b, strong {
     font-weight: bold;
   }
@@ -424,7 +435,7 @@ const Container = styled.div`
     > * { min-height: 10px; }
 
     &.focussed {
-
+      user-select: auto;
     }
 
     &.active {

@@ -208,7 +208,7 @@ export class Posts extends React.Component<Props, State> {
                   isAdmin={isAdmin}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}
                   onCreateElm={( elm => this.props.addElement( doc._id, elm ) )}
-                  onUpdateElm={( id, html, createParagraph, deselect ) => this.props.updateElement( doc._id, id, html, createParagraph, deselect )}
+                  onUpdateElm={( id, html, createElement, deselect ) => this.props.updateElement( doc._id, id, html, createElement, deselect )}
                   onDeleteElements={ids => this.props.deleteElements( doc._id, ids )}
                   onSelectionChanged={selection => this.props.setElmSelection( selection )}
                   selectedElements={this.props.posts.selection}

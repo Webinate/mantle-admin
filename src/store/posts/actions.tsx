@@ -135,24 +135,24 @@ export function addElement( docId: string, element: Partial<IDraftElement<'clien
   }
 }
 
-export function updateElement( docId: string, elementId: string, html: string, createParagraph: boolean, deselect: boolean ) {
+export function updateElement( docId: string, elementId: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await documents.editElement( docId, elementId, { html } );
       dispatch( ActionCreators.UpdateElement.create( resp ) );
-      if ( createParagraph ) {
+      if ( createElement ) {
         const index = getSelectedIndex( getState() );
-        const newElm = await documents.addElement( docId, { type: 'elm-paragraph' }, index );
+        const newElm = await documents.addElement( docId, createElement, index );
         dispatch( ActionCreators.AddElement.create( { elm: newElm, index: index } ) );
-        if ( deselect )
+        if ( deselect === 'deselect' )
           dispatch( ActionCreators.SetElmSelection.create( [] ) );
       }
       else {
         dispatch( ActionCreators.SetPostsBusy.create( false ) );
-        if ( deselect )
+        if ( deselect === 'deselect' )
           dispatch( ActionCreators.SetElmSelection.create( [] ) );
-        else
+        else if ( deselect === 'select' )
           dispatch( ActionCreators.SetElmSelection.create( [ resp._id ] ) );
       }
     }

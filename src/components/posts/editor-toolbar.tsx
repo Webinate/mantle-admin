@@ -10,6 +10,7 @@ type Props = {
   onCreateBlock: ( type: DraftElements, html: string ) => void;
   onInlineToggle: ( type: InlineType ) => void;
   onAddMedia: () => void;
+  onDelete: () => void;
   animate?: boolean;
   style: React.CSSProperties;
 }
@@ -49,7 +50,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
   constructor( props: Props ) {
     super( props );
 
-    this._iconStyles = { fontSize: '16px' };
+    this._iconStyles = { fontSize: '18px' };
 
     this._regularBlocks = [
       { label: 'Header 1', type: 'elm-header-1', html: '<h1></h1>' },
@@ -212,6 +213,21 @@ export default class EditorToolbar extends React.Component<Props, State> {
           </Icon>
         </div>
       </ButtonGroup>
+
+      <ButtonGroup>
+        <div onMouseDown={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.props.onDelete();
+        }}
+        >
+          <Icon style={iconStyle}>
+            <i className="icon icon-editor-trash" />
+          </Icon>
+        </div>
+      </ButtonGroup>
+
+
     </div>;
   }
 }
@@ -228,7 +244,7 @@ const ButtonGroup = styled.div`
       background: ${theme.light200.background };
     }
 
-    padding: 5px;
+    padding: 4px;
     display: inline-block;
   }
 `;

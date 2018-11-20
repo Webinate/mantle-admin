@@ -46,7 +46,7 @@ export type Props = {
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: ( templateId: string ) => void;
   onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
-  onUpdateElm: ( id: string, html: string, createParagraph: boolean, deselect: boolean ) => void;
+  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
   onDeleteElements: ( ids: string[] ) => void;
   onSelectionChanged: ( ids: string[] ) => void;
 }
