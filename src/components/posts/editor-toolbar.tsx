@@ -11,6 +11,7 @@ type Props = {
   onInlineToggle: ( type: InlineType ) => void;
   onAddMedia: () => void;
   onDelete: () => void;
+  onLink: () => void;
   animate?: boolean;
   style: React.CSSProperties;
 }
@@ -193,10 +194,9 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        <div onClick={e => {
-          this.props.onAddMedia();
-        }}
-        >
+        <div onMouseDown={e => {
+          this.props.onLink();
+        }}>
           <Icon style={iconStyle}>
             <i className="icon icon-editor-link" />
           </Icon>

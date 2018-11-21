@@ -5,6 +5,13 @@ import EditorToolbar from './editor-toolbar';
 import { IDraftElement, IDocument, ITemplate } from 'modepress';
 import { InlineType } from './editor-toolbar';
 
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import TextField from '@material-ui/core/TextField';
+
 export type Props = {
   elements: IDraftElement<'client'>[];
   selected: string[];
@@ -17,7 +24,9 @@ export type Props = {
 
 export type State = {
   initialized: boolean;
+  anchorOpen: boolean;
   selectedZone: string;
+  linkUrl: string;
 };
 
 /**
@@ -28,12 +37,17 @@ export class ElmEditor extends React.Component<Props, State> {
   private _firstElm: HTMLElement;
   private _lastFocussedElm: HTMLElement;
   private _keyProxy: any;
+  private _previousSelection: string[];
+  private _ranges: Range[] | null;
 
   constructor( props: Props ) {
     super( props );
     this._keyProxy = this.onWindowKeyDown.bind( this );
+    this._ranges = null;
     this.state = {
       initialized: false,
+      anchorOpen: false,
+      linkUrl: '',
       selectedZone: ( props.document.template as ITemplate<'client'> ).zones[ 0 ]
     };
   }
@@ -88,11 +102,11 @@ export class ElmEditor extends React.Component<Props, State> {
       'PARAM', 'SOURCE', 'TRACK', 'WBR', 'BASEFONT',
       'BGSOUND', 'FRAME', 'ISINDEX' ];
 
-    //Basic idea from: https://stackoverflow.com/questions/19790442/test-if-an-element-can-contain-text
+    // Basic idea from: https://stackoverflow.com/questions/19790442/test-if-an-element-can-contain-text
     function canContainText( node: Node ) {
-      if ( node.nodeType == 1 ) //is an element node
+      if ( node.nodeType === 1 ) // is an element node
         return !voidNodeTags.includes( node.nodeName );
-      else  //is not an element node
+      else  // is not an element node
         return false;
     };
 
@@ -159,22 +173,29 @@ export class ElmEditor extends React.Component<Props, State> {
       this._lastFocussedElm.classList.remove( 'cursor' );
 
     el.focus();
-
     let firstEditable: Node | null = this.getFirstEditable( this.getLastLeafNode( el ) );
-    const range = document.createRange();
 
-    if ( firstEditable && firstEditable.childNodes.length > 0 && firstEditable.childNodes[ 0 ].nodeType === 3 ) {
-      range.setStart( firstEditable!.childNodes[ 0 ], firstEditable!.childNodes[ 0 ].textContent!.length );
-      range.collapse( true );
+    if ( this._ranges ) {
+      this.restoreSelection( this._ranges );
+      document.execCommand( 'createLink', false, this.state.linkUrl );
+      this._ranges = null;
     }
     else {
-      range.selectNodeContents( el );
-      range.selectNodeContents( firstEditable || el );
-    }
+      const range = document.createRange();
 
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange( range );
+      if ( firstEditable && firstEditable.childNodes.length > 0 && firstEditable.childNodes[ 0 ].nodeType === 3 ) {
+        range.setStart( firstEditable!.childNodes[ 0 ], firstEditable!.childNodes[ 0 ].textContent!.length );
+        range.collapse( true );
+      }
+      else {
+        range.selectNodeContents( el );
+        range.selectNodeContents( firstEditable || el );
+      }
+
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange( range );
+    }
 
     if ( !this.elementInViewport( el ) )
       el.scrollIntoView();
@@ -326,6 +347,76 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
+  private saveSelection() {
+    const selection = window.getSelection();
+    if ( selection.getRangeAt && selection.rangeCount ) {
+      let ranges: Range[] = [];
+      for ( let i = 0, len = selection.rangeCount; i < len; ++i ) {
+        ranges.push( selection.getRangeAt( i ) );
+      }
+      return ranges;
+    }
+
+    return null;
+  }
+
+  private restoreSelection( savedSel: Range[] ) {
+    if ( savedSel ) {
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      for ( let i = 0, len = savedSel.length; i < len; ++i ) {
+        selection.addRange( savedSel[ i ] );
+      }
+    }
+  }
+
+  private renderAnchorModal() {
+    return <Dialog
+      open={this.state.anchorOpen}
+      onClose={() => this.setState( { anchorOpen: false } )}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogContent>
+        <DialogContentText>
+          Enter a URL in the field below
+        </DialogContentText>
+        <TextField
+          autoFocus
+          value={this.state.linkUrl}
+          onChange={e => this.setState( { linkUrl: e.currentTarget.value } )}
+          margin="dense"
+          id="mt-link-address"
+          placeholder="http://"
+          fullWidth
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={e => {
+            this._ranges = null;
+            this.setState( { anchorOpen: false } );
+          }}
+          color="primary"
+          id="mt-link-cancel"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          disabled={!this.state.linkUrl}
+          onClick={e => {
+            this.setState( { anchorOpen: false }, () => this.props.onSelectionChanged( this._previousSelection ) );
+          }}
+          color="primary"
+          id="mt-link-confirm"
+        >
+          Apply Link
+        </Button>
+      </DialogActions>
+    </Dialog>
+  }
+
   render() {
     if ( !this.state.initialized )
       return <div></div>;
@@ -334,8 +425,6 @@ export class ElmEditor extends React.Component<Props, State> {
     const selection = this.props.selected;
     const doc = this.props.document
     const template = doc.template as ITemplate<'client'>;
-    let firstIndex = -1;
-    let lastIndex = -1;
     const selectedZone = this.state.selectedZone;
     const zones = template.zones.concat( 'unassigned' );
     const unassigned: IDraftElement<'client'>[] = [];
@@ -349,11 +438,6 @@ export class ElmEditor extends React.Component<Props, State> {
     else
       elements = elements.filter( e => e.zone === selectedZone );
 
-    if ( selection.length > 0 ) {
-      firstIndex = elements.findIndex( e => selection[ 0 ] === e._id );
-      lastIndex = elements.findIndex( e => selection[ selection.length - 1 ] === e._id );
-    }
-
     return (
       <div>
         {zones.map( ( z, index ) => <Tab
@@ -364,13 +448,19 @@ export class ElmEditor extends React.Component<Props, State> {
           }}
           className={`mt-editor-tab ${ selectedZone === z ? 'active' : 'inactive' }`}>{z}
         </Tab> )}
-        <Container
-          firstIndex={firstIndex}
-          lastIndex={lastIndex}
-        >
+        <Container>
           <EditorToolbar
             onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html, zone: this.state.selectedZone } )}
             onAddMedia={() => { }}
+            onLink={() => {
+              if ( this.props.selected.length === 0 )
+                return;
+
+              this._previousSelection = this.props.selected.slice();
+              this._ranges = this.saveSelection();
+              this.props.onSelectionChanged( [] );
+              this.setState( { anchorOpen: true, linkUrl: '' } )
+            }}
             onDelete={() => this.props.onDeleteElm( this.props.selected )}
             onInlineToggle={styleStyle => this.toggleInline( styleStyle )}
             style={{ margin: '10px' }}
@@ -391,7 +481,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
                       setTimeout( () => this.activateElm( e ), 200 );
                     }}
-                    onBlur={e => this.updateElmHtml( elm, null, 'select' )}
+                    onBlur={e => this.updateElmHtml( elm, null, 'deselect' )}
                     className={`mt-element active focussed`}
                     dangerouslySetInnerHTML={{ __html: elm.html || '<p></p>' }}
                     contentEditable={true}
@@ -408,16 +498,13 @@ export class ElmEditor extends React.Component<Props, State> {
               />;
             } )}
           </div>
+          {this.renderAnchorModal()}
         </Container>
       </div>
     );
   }
 }
 
-export interface EditorStyleProps {
-  firstIndex: number;
-  lastIndex: number;
-}
 const Tab = styled.div`
   display: inline-block;
   padding: 5px;
@@ -479,29 +566,22 @@ const Container = styled.div`
     padding: 5px;
     outline: 0px solid transparent;
 
+    a {
+      text-decoration: underline;
+      color: ${theme.primary300.background };
+    }
+
     > * { min-height: 10px; }
 
     &.focussed {
       user-select: auto;
+      border: 1px dashed ${ theme.primary100.border };
     }
 
     &.active {
       background: ${ theme.light200.background };
       color: ${ theme.light200.color };
     }
-
-    ${ ( props: EditorStyleProps ) => props.firstIndex !== -1 ? `
-      &.active {
-        border-left: 1px dashed ${ theme.primary100.border };
-        border-right: 1px dashed ${ theme.primary100.border };
-      }
-      &:nth-child( ${ props.firstIndex + 1 } ) {
-        border-top: 1px dashed ${ theme.primary100.border };
-      }
-      &:nth-child( ${ props.lastIndex + 1 } ) {
-        border-bottom: 1px dashed ${ theme.primary100.border };
-      }
-    ` : `` }
 
     box-sizing: border-box;
   }
