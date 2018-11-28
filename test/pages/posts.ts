@@ -117,8 +117,7 @@ export default class PostsPage extends Page {
   }
 
   async updateElmContent( index: number, val: string ) {
-    const elements = await this.page.$$( '.mt-element' )
-    await elements[ index ].click();
+    await this.page.click( `.mt-element:nth-child(${ index + 1 })` );
     await this.page.$( '.mt-element.active.focussed.cursor' );
     await this.sleep( 500 );
     await this.page.keyboard.down( 'Control' );

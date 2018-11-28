@@ -165,7 +165,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
       <ButtonGroup>
         {listBlocks.map( ( listBlock, index ) => <div
           key={`elm-lists-${ index }`}
-          onClick={e => {
+          onMouseDown={e => {
             e.preventDefault();
             e.stopPropagation();
             this.props.onCreateBlock( listBlock.type, listBlock.html );
@@ -175,7 +175,9 @@ export default class EditorToolbar extends React.Component<Props, State> {
 
       <ButtonGroup>
         <div
-          onClick={e => {
+          onMouseDown={e => {
+            e.preventDefault();
+            e.stopPropagation();
             this.props.onCreateBlock( pBlock.type, pBlock.html );
           }}
         >{pBlock.label}
