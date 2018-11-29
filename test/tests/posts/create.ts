@@ -103,7 +103,7 @@ describe( 'Testing the creation of posts: ', function() {
 
   it( 'did edit content in the tiny editor', async () => {
     await postPage.updateElmContent( 0, 'Simple content babes' );
-    assert.equal( await postPage.getElmContent( 0 ), '<p>Simple content babes</p>' );
+    assert.equal( await postPage.elementsModule.htmlAt( 0 ), '<p>Simple content babes</p>' );
   } )
 
   it( 'did select a featured image', async () => {

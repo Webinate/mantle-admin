@@ -54,6 +54,7 @@ require( './tests/posts/categories' );
 require( './tests/posts/delete-posts' );
 require( './tests/posts/preview-post-comments' );
 require( './tests/posts/preview-post-permissions' );
+require( './tests/posts/post-elements-creation' );
 
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );

@@ -138,6 +138,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
           {blocks.map( ( block, index ) => (
             <MenuItem
               key={`bocks-${ index }`}
+              id={`mt-create-${ block.type }`}
               onClick={e => {
                 this._lastSelectedBlock = block;
                 this.setState( { anchorEl: undefined } );
@@ -153,6 +154,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
       <ButtonGroup>
         {inlines.map( ( inline, index ) => <div
           className={`mt-inline-btn ${ activeInlines.includes( inline.type ) ? 'active' : '' }`}
+          id={`mt-inline-${ inline.type }`}
           key={`elm-inline-${ index }`}
           onMouseDown={e => {
             e.preventDefault();
@@ -164,6 +166,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
 
       <ButtonGroup>
         {listBlocks.map( ( listBlock, index ) => <div
+          id={`mt-create-${ listBlock.type }-${ index }`}
           key={`elm-lists-${ index }`}
           onMouseDown={e => {
             e.preventDefault();
@@ -175,6 +178,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
 
       <ButtonGroup>
         <div
+          id="mt-create-paragraph"
           onMouseDown={e => {
             e.preventDefault();
             e.stopPropagation();
@@ -185,9 +189,11 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        <div onClick={e => {
-          this.props.onAddMedia();
-        }}
+        <div
+          id="mt-create-media"
+          onClick={e => {
+            this.props.onAddMedia();
+          }}
         >
           <Icon style={iconStyle}>
             <i className="icon icon-editor-img" />
@@ -196,9 +202,11 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        <div onMouseDown={e => {
-          this.props.onLink();
-        }}>
+        <div
+          id="mt-create-link"
+          onMouseDown={e => {
+            this.props.onLink();
+          }}>
           <Icon style={iconStyle}>
             <i className="icon icon-editor-link" />
           </Icon>
@@ -206,9 +214,11 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        <div onClick={e => {
-          this.props.onAddMedia();
-        }}
+        <div
+          id="mt-create-html"
+          onClick={e => {
+            this.props.onAddMedia();
+          }}
         >
           <Icon style={iconStyle}>
             <i className="icon icon-editor-html" />
@@ -217,11 +227,13 @@ export default class EditorToolbar extends React.Component<Props, State> {
       </ButtonGroup>
 
       <ButtonGroup>
-        <div onMouseDown={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.props.onDelete();
-        }}
+        <div
+          id="mt-delete-elms"
+          onMouseDown={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onDelete();
+          }}
         >
           <Icon style={iconStyle}>
             <i className="icon icon-editor-trash" />

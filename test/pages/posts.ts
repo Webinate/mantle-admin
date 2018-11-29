@@ -3,6 +3,7 @@ import Agent from '../utils/agent';
 import * as assert from 'assert';
 import CategoryModule from './modules/categories';
 import CommentsModule from './modules/comments';
+import ElementsModule from './modules/elements';
 import AppModule from './modules/app';
 import MediaModule from './modules/media-nav';
 
@@ -18,6 +19,7 @@ export default class PostsPage extends Page {
   public appModule: AppModule;
   public mediaModule: MediaModule;
   public commentsModule: CommentsModule;
+  public elementsModule: ElementsModule;
 
   constructor() {
     super();
@@ -38,6 +40,7 @@ export default class PostsPage extends Page {
     this.appModule = new AppModule( this.page );
     this.mediaModule = new MediaModule( this.page );
     this.commentsModule = new CommentsModule( this.page );
+    this.elementsModule = new ElementsModule( this.page );
   }
 
   /**
@@ -128,10 +131,6 @@ export default class PostsPage extends Page {
     await this.page.keyboard.press( 'Escape' );
     await this.doneLoading();
     await this.emptySelector( '.mt-element.active.focussed.cursor' );
-  }
-
-  async getElmContent( index: number ) {
-    return this.page.$eval( `.mt-element:nth-child(${ index + 1 })`, ( elm: HTMLElement ) => elm.innerHTML );
   }
 
   /**

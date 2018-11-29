@@ -28,4 +28,8 @@ export default class Module {
       await this.page.type( selector, val, { delay: 50 } );
     }
   }
+
+  sleep( milliseconds: number ) {
+    return this.page.waitFor( milliseconds );
+  }
 }

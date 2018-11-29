@@ -120,6 +120,6 @@ export default class Agent {
    * @param {string} response
    */
   updateCookie( response: Response ) {
-    this.cookie = response.headers.get( "set-cookie" ).split( ";" )[ 0 ];
+    this.cookie = response.headers.get( "set-cookie" )!.split( ";" )[ 0 ];
   }
 }
