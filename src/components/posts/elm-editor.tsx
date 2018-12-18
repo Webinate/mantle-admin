@@ -11,13 +11,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import TextField from '@material-ui/core/TextField';
+import { MediaModal } from '../../containers/media-modal';
 
 export type Props = {
   elements: IDraftElement<'client'>[];
   selected: string[];
   document: IDocument<'client'>;
   onSelectionChanged: ( ids: string[] ) => void;
-  onCreateElm: ( type: Partial<IDraftElement<'client'>> ) => void;
+  onCreateElm: ( type: Partial<IDraftElement<'client'>>, index?: number ) => void;
   onDeleteElm: ( ids: string[] ) => void;
   onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
 }
@@ -27,26 +28,30 @@ export type State = {
   anchorOpen: boolean;
   selectedZone: string;
   linkUrl: string;
+  showMediaPopup: boolean;
 };
 
 /**
  * The main application entry point
  */
 export class ElmEditor extends React.Component<Props, State> {
-  private _activeElm: HTMLElement;
+  private _activeElm: HTMLElement | null;
   private _firstElm: HTMLElement;
   private _lastFocussedElm: HTMLElement;
   private _keyProxy: any;
   private _previousSelection: string[];
   private _ranges: Range[] | null;
+  private _lastActiveIndex: number;
 
   constructor( props: Props ) {
     super( props );
     this._keyProxy = this.onWindowKeyDown.bind( this );
     this._ranges = null;
+    this._lastActiveIndex = 0;
     this.state = {
       initialized: false,
       anchorOpen: false,
+      showMediaPopup: false,
       linkUrl: '',
       selectedZone: ( props.document.template as ITemplate<'client'> ).zones[ 0 ]
     };
@@ -58,6 +63,14 @@ export class ElmEditor extends React.Component<Props, State> {
       this.setState( { selectedZone: nextTemplate.zones[ 0 ] } );
     if ( this._lastFocussedElm && next.selected.length === 0 && this.props.selected.length > 0 )
       this._lastFocussedElm.classList.remove( 'cursor' );
+
+    const elements = this.props.elements.map( elm => elm._id );
+    const selected = this.props.selected;
+    if ( selected.length > 0 ) {
+      const index = elements.indexOf( selected[ 0 ] );
+      if ( index !== -1 )
+        this._lastActiveIndex = index;
+    }
   }
 
   componentDidMount() {
@@ -130,8 +143,19 @@ export class ElmEditor extends React.Component<Props, State> {
     for ( let n = 0; n < node.childNodes.length; n++ ) {
       const child = node.childNodes[ n ];
       if ( child.nodeType === 8 || ( child.nodeType === 3 && !/\S/.test( child.nodeValue! ) ) ) {
-        node.removeChild( child );
-        n--;
+
+        // If next node is an element, then dont remove the text as it might
+        // be a space between nodes
+        if ( n + 1 < node.childNodes.length ) {
+          const nextChild = node.childNodes[ n + 1 ];
+          if ( nextChild.nodeType !== 8 && nextChild.nodeType !== 3 ) {
+            continue;
+          }
+        }
+        else {
+          node.removeChild( child );
+          n--;
+        }
       }
       else if ( child.nodeType === 1 ) {
         this.clean( child );
@@ -146,6 +170,8 @@ export class ElmEditor extends React.Component<Props, State> {
    * @param deselect If true, then nothing should be selected after update
    */
   private updateElmHtml( elm: IDraftElement<'client'>, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
+    if ( !this._activeElm )
+      return;
 
     this.clean( this._activeElm );
     const first = this._activeElm.firstElementChild as HTMLElement;
@@ -283,13 +309,15 @@ export class ElmEditor extends React.Component<Props, State> {
   }
 
   private onKeyUp( e: React.KeyboardEvent<HTMLElement> ) {
+    const activeElm = this._activeElm!;
+
     // Backkspace / Delete
     if ( e.keyCode === 8 || e.keyCode === 46 ) {
-      if ( this._activeElm.children.length === 0 || this._activeElm.children[ 0 ].tagName !== this._firstElm.tagName ) {
-        this.clear( this._activeElm );
+      if ( activeElm.children.length === 0 || activeElm.children[ 0 ].tagName !== this._firstElm.tagName ) {
+        this.clear( activeElm );
         this.clear( this._firstElm );
         this._firstElm = this._firstElm.cloneNode() as HTMLElement;
-        this._activeElm.append( this._firstElm );
+        activeElm.append( this._firstElm );
         this.focusLast( this._firstElm );
       }
     }
@@ -450,8 +478,8 @@ export class ElmEditor extends React.Component<Props, State> {
         </Tab> )}
         <Container>
           <EditorToolbar
-            onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html, zone: this.state.selectedZone } )}
-            onAddMedia={() => { }}
+            onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html, zone: this.state.selectedZone }, this._lastActiveIndex + 1 )}
+            onAddMedia={() => this.setState( { showMediaPopup: true } )}
             onLink={() => {
               if ( this.props.selected.length === 0 )
                 return;
@@ -471,6 +499,8 @@ export class ElmEditor extends React.Component<Props, State> {
           >
             {elements.map( ( elm, index ) => {
 
+              const isEditable = elm.type !== 'elm-image';
+
               if ( selection.length === 1 && selection[ 0 ] === elm._id )
                 return (
                   <div
@@ -479,14 +509,15 @@ export class ElmEditor extends React.Component<Props, State> {
                       if ( !e )
                         return;
 
-                      setTimeout( () => this.activateElm( e ), 200 );
+                      if ( isEditable )
+                        setTimeout( () => this.activateElm( e ), 200 );
                     }}
                     onBlur={e => this.updateElmHtml( elm, null, 'deselect' )}
                     className={`mt-element active focussed`}
                     dangerouslySetInnerHTML={{ __html: elm.html || '<p></p>' }}
-                    contentEditable={true}
-                    onKeyDown={e => this.onKeyDown( e )}
-                    onKeyUp={e => this.onKeyUp( e )}
+                    contentEditable={isEditable}
+                    onKeyDown={isEditable ? e => this.onKeyDown( e ) : undefined}
+                    onKeyUp={isEditable ? e => this.onKeyUp( e ) : undefined}
                   />
                 );
 
@@ -500,6 +531,20 @@ export class ElmEditor extends React.Component<Props, State> {
           </div>
           {this.renderAnchorModal()}
         </Container>
+
+        {this.state.showMediaPopup ?
+          <MediaModal
+            {...{} as any}
+            open={true}
+            onCancel={() => { this.setState( { showMediaPopup: false } ) }}
+            onSelect={file => this.setState( {
+              showMediaPopup: false
+            }, () => this.props.onCreateElm( {
+              type: 'elm-image',
+              html: `<figure><img src="${ file.publicURL }"></figure>`,
+              zone: this.state.selectedZone
+            }, this._lastActiveIndex + 1 ) )}
+          /> : undefined}
       </div>
     );
   }
@@ -532,10 +577,16 @@ const Container = styled.div`
   border: 1px solid ${theme.light100.border };
   color: ${theme.light100.color };
   border-radius: 4px;
-  font-weight: thinner;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 2px 1px -1px rgba(0, 0, 0, 0.12);
 
   b, strong {
     font-weight: bold;
+  }
+
+  img {
+    max-width:100%;
   }
 
   .mt-editor-container {

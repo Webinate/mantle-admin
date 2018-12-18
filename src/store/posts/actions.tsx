@@ -119,12 +119,12 @@ function getSelectedIndex( state: IRootState, ) {
   return index;
 }
 
-export function addElement( docId: string, element: Partial<IDraftElement<'client'>> ) {
+export function addElement( docId: string, element: Partial<IDraftElement<'client'>>, index?: number ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
 
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
-      const index = getSelectedIndex( getState() );
+      index = index !== undefined ? index : getSelectedIndex( getState() );
       const resp = await documents.addElement( docId, element, index );
       dispatch( ActionCreators.AddElement.create( { elm: resp, index: index } ) );
     }

@@ -9,17 +9,15 @@ import { IPost } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
-let admin: Agent, joe: Agent;
+let admin: Agent;
 let post: IPost<'client'>;
 let controller: PostsController;
-let newSlug = randomId();
 
 describe( 'Testing the creation of elements: ', function() {
 
   before( async () => {
     controller = ControllerFactory.get( 'posts' );
     admin = await utils.refreshAdminToken();
-    joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
 
     post = await controller.create( {
       title: 'Test Post',
@@ -41,7 +39,7 @@ describe( 'Testing the creation of elements: ', function() {
     assert.deepEqual( elements.length, 1 );
   } )
 
-  it( 'does create edit the first paragraph and creates a new one on enter', async () => {
+  it( 'does edit the first paragraph and creates a new one on enter', async () => {
     await postPage.elementsModule.activateAt( 0 );
     await postPage.elementsModule.typeAndPress( 'Paragraph 1' );
     await postPage.elementsModule.waitForActivation( 1 );
@@ -93,7 +91,7 @@ describe( 'Testing the creation of elements: ', function() {
 
   it( 'does not create a new paragraph when we press enter in a ul list', async () => {
     await postPage.elementsModule.clickNewList( 'ul' );
-    await postPage.elementsModule.waitForActivation( 4 );
+    await postPage.elementsModule.waitForActivation( 3 );
     await postPage.elementsModule.typeAndPress( 'First item' );
     await postPage.elementsModule.typeAndPress( 'Second item', 'Escape' );
     await postPage.elementsModule.doneLoading();
@@ -105,13 +103,14 @@ describe( 'Testing the creation of elements: ', function() {
     assert.deepEqual( elements[ 0 ], '<p>Paragraph 1</p>' );
     assert.deepEqual( elements[ 1 ], '<p>Paragraph 1 - a</p>' );
     assert.deepEqual( elements[ 2 ], '<p>Paragraph 1 - b</p>' );
-    assert.deepEqual( elements[ 3 ], '<p>Paragraph 2</p>' );
-    assert.deepEqual( elements[ 4 ], '<ul><li>First item</li><li>Second item</li></ul>' );
+    assert.deepEqual( elements[ 3 ], '<ul><li>First item</li><li>Second item</li></ul>' );
+    assert.deepEqual( elements[ 4 ], '<p>Paragraph 2</p>' );
+
   } )
 
   it( 'does not create a new paragraph when we press enter in a ol list', async () => {
     await postPage.elementsModule.clickNewList( 'ol' );
-    await postPage.elementsModule.waitForActivation( 5 );
+    await postPage.elementsModule.waitForActivation( 4 );
     await postPage.elementsModule.typeAndPress( 'First item' );
     await postPage.elementsModule.typeAndPress( 'Second item', 'Escape' );
     await postPage.elementsModule.doneLoading();
@@ -123,8 +122,20 @@ describe( 'Testing the creation of elements: ', function() {
     assert.deepEqual( elements[ 0 ], '<p>Paragraph 1</p>' );
     assert.deepEqual( elements[ 1 ], '<p>Paragraph 1 - a</p>' );
     assert.deepEqual( elements[ 2 ], '<p>Paragraph 1 - b</p>' );
-    assert.deepEqual( elements[ 3 ], '<p>Paragraph 2</p>' );
-    assert.deepEqual( elements[ 4 ], '<ul><li>First item</li><li>Second item</li></ul>' );
-    assert.deepEqual( elements[ 5 ], '<ol><li>First item</li><li>Second item</li></ol>' );
+    assert.deepEqual( elements[ 3 ], '<ul><li>First item</li><li>Second item</li></ul>' );
+    assert.deepEqual( elements[ 4 ], '<ol><li>First item</li><li>Second item</li></ol>' );
+    assert.deepEqual( elements[ 5 ], '<p>Paragraph 2</p>' );
+  } )
+
+  it( 'does create a header in the middle', async () => {
+    await postPage.elementsModule.activateAt( 0 );
+    await postPage.elementsModule.selectBlockType( 'header-3' );
+    await postPage.elementsModule.waitForActivation( 1 );
+    await postPage.elementsModule.typeAndPress( 'HEADING', 'Escape' );
+    await postPage.elementsModule.waitForNoFocus();
+
+    // Check order
+    const elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements[ 1 ], '<h3>HEADING</h3>' );
   } )
 } );

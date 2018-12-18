@@ -44,7 +44,6 @@ export default class EditorToolbar extends React.Component<Props, State> {
   private _regularBlocks: Blocks[];
   private _listBlocks: Blocks[];
   private _inlineStyles: Inline[];
-  private _lastSelectedBlock: Blocks | null;
   private _iconStyles: React.CSSProperties;
   private _onSelectionChange: any;
 
@@ -124,13 +123,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
         >Insert</div>
         <Menu
           id="mt-draft-blocks-menu"
-
-          onTransitionEnd={e => {
-            if ( this._lastSelectedBlock )
-              this.props.onCreateBlock( this._lastSelectedBlock.type, this._lastSelectedBlock.html );
-
-            this._lastSelectedBlock = null;
-          }}
+          transitionDuration={this.props.animate ? undefined : 0}
           anchorEl={this.state.anchorEl}
           open={Boolean( this.state.anchorEl )}
           onClose={() => this.setState( { anchorEl: undefined } )}
@@ -140,7 +133,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
               key={`bocks-${ index }`}
               id={`mt-create-${ block.type }`}
               onClick={e => {
-                this._lastSelectedBlock = block;
+                this.props.onCreateBlock( block.type, block.html );
                 this.setState( { anchorEl: undefined } );
               }}
             >

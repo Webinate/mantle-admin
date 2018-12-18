@@ -45,7 +45,7 @@ export type Props = {
   onCreate?: ( post: Partial<IPost<'client'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: ( templateId: string ) => void;
-  onCreateElm: ( elm: Partial<IDraftElement<'client'>> ) => void;
+  onCreateElm: ( elm: Partial<IDraftElement<'client'>>, index?: number ) => void;
   onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
   onDeleteElements: ( ids: string[] ) => void;
   onSelectionChanged: ( ids: string[] ) => void;
@@ -445,7 +445,7 @@ export default class PostForm extends React.Component<Props, State> {
         <ElmEditor
           elements={this.props.elements}
           document={doc}
-          onCreateElm={elm => this.props.onCreateElm( elm )}
+          onCreateElm={( elm, index ) => this.props.onCreateElm( elm, index )}
           onUpdateElm={( id, html, createParagraph, deselect ) => this.props.onUpdateElm( id, html, createParagraph, deselect )}
           onDeleteElm={ids => this.props.onDeleteElements( ids )}
           onSelectionChanged={uids => this.props.onSelectionChanged( uids )}
