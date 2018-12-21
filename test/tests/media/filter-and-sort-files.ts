@@ -27,6 +27,11 @@ describe( 'Testing the sorting and filtering of files: ', function() {
     await uploadFileToVolume( 'img-c.png', volume, 'File C' );
   } )
 
+  after( async () => {
+    const volumes = ControllerFactory.get( 'volumes' );
+    await volumes.remove( { _id: volume._id } );
+  } )
+
   it( 'does have three files uploaded & sorted by upload date', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();

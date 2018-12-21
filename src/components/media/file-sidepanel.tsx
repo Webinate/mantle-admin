@@ -8,6 +8,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import DeleteIcon from '@material-ui/icons/Delete';
 import UploadIcon from '@material-ui/icons/FileUpload';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import CompareIcon from '@material-ui/icons/CompareArrows';
 import { IFileEntry } from '../../../../../src';
 import { formatBytes } from '../../utils/component-utils';
 
@@ -16,6 +17,7 @@ export type Props = {
   selectedIds: string[];
   onDelete: () => void;
   onRename: () => void;
+  onReplaceFile?: ( file: File ) => void;
   onUploadFiles?: ( files: File[] ) => void;
   renderOptionalButtons?: () => undefined | null | JSX.Element;
 }
@@ -25,6 +27,7 @@ export type State = {
 
 export default class FileSidePanel extends React.Component<Props, State> {
   private _fileInput: HTMLInputElement | null;
+  private _fileReplaceInput: HTMLInputElement | null;
 
   constructor( props: Props ) {
     super( props );
@@ -32,6 +35,15 @@ export default class FileSidePanel extends React.Component<Props, State> {
 
   private onUpload() {
     this._fileInput!.click();
+  }
+
+  private onReplace() {
+    this._fileReplaceInput!.click();
+  }
+
+  private onFileReplaceChanged( e: React.ChangeEvent<HTMLInputElement> ) {
+    if ( e.currentTarget.files && this.props.onReplaceFile )
+      this.props.onReplaceFile( Array.from( e.currentTarget.files )[ 0 ] );
   }
 
   private onFilesChanged( e: React.ChangeEvent<HTMLInputElement> ) {
@@ -63,6 +75,14 @@ export default class FileSidePanel extends React.Component<Props, State> {
             id="mt-file-upload-input"
             type="file"
             onChange={e => this.onFilesChanged( e )}
+          />
+          <input
+            ref={e => this._fileReplaceInput = e}
+            multiple={false}
+            style={{ visibility: 'hidden', height: '0px', width: '4px' }}
+            id="mt-file-replace-input"
+            type="file"
+            onChange={e => this.onFileReplaceChanged( e )}
           />
           {selectedFile ? <Preview>
             <img src={this.getPreview( selectedFile )} />
@@ -133,6 +153,21 @@ export default class FileSidePanel extends React.Component<Props, State> {
               <ListItemText
                 inset
                 primary="Rename"
+              />
+            </ListItem>
+
+            <ListItem
+              button
+              disabled={!filesSelected}
+              onClick={e => this.onReplace()}
+              id="mt-replace-file"
+            >
+              <ListItemIcon>
+                <CompareIcon />
+              </ListItemIcon>
+              <ListItemText
+                inset
+                primary="Replace File Content"
               />
             </ListItem>
           </List>

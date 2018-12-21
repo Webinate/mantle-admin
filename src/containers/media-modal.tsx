@@ -2,7 +2,7 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
-import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
+import { createVolume, getVolumes, getVolume, deleteVolumes, upload, replaceFile, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { SortTypes } from '../components/media/directory-view';
 import { SortOrder } from '../components/media/volumes';
@@ -33,6 +33,7 @@ const dispatchToProps = {
   openDirectory,
   deleteVolumes,
   upload,
+  replaceFile,
   deleteFiles,
   editFile,
   editVolume
@@ -126,6 +127,7 @@ export class MediaModal extends React.Component<Props, State> {
         onDelete={() => this.onDelete( activeDir._id )}
         onSort={( sort, dir ) => this.onSort( sort, dir, activeDir._id )}
         onUploadFiles={files => { this.props.upload( activeDir._id, files ) }}
+        onReplaceFile={file => { this.props.replaceFile( activeDir._id, selectedUids[ 0 ], file ) }}
         activeVolume={this.props.media.selected}
         activeVolumeId={activeDir._id}
         loading={this.props.media.busy}

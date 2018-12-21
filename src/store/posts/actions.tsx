@@ -27,12 +27,18 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
  */
 export function getPosts( options: Partial<PostsGetAllOptions> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
-    const state = getState();
-    const newFilters = { ...state.posts.postFilters, ...options };
+    try {
+      const state = getState();
+      const newFilters = { ...state.posts.postFilters, ...options };
 
-    dispatch( ActionCreators.SetPostsBusy.create( true ) );
-    const resp = await posts.getAll( newFilters );
-    dispatch( ActionCreators.SetPosts.create( { page: resp, filters: newFilters } ) );
+      dispatch( ActionCreators.SetPostsBusy.create( true ) );
+      const resp = await posts.getAll( newFilters );
+      dispatch( ActionCreators.SetPosts.create( { page: resp, filters: newFilters } ) );
+    }
+    catch ( err ) {
+      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
+      dispatch( ActionCreators.SetPostsBusy.create( false ) );
+    }
   }
 }
 

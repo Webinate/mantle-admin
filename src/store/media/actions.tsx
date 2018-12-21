@@ -62,6 +62,28 @@ export function upload( volumeId: string, filesArr: File[] ) {
   }
 }
 
+export function replaceFile( volumeId: string, fileId: string, file: File ) {
+  return async function( dispatch: Function, getState: () => IRootState ) {
+    const state = getState();
+    const filesFilter: Partial<FilesGetOptions> = state.media.filesFilters ?
+      { ...state.media.filesFilters, ...{ index: 0 } } : { index: 0 };
+
+    try {
+      dispatch( ActionCreators.SetVolumesBusy.create( true ) );
+      await files.replaceFile( fileId, file );
+
+      const filePage = await files.getAll( volumeId, filesFilter );
+      dispatch( ActionCreators.SetFiles.create( { page: filePage, filters: filesFilter } ) );
+    }
+    catch ( err ) {
+      const filePage = await files.getAll( volumeId, filesFilter );
+      dispatch( ActionCreators.SetFiles.create( { page: filePage, filters: filesFilter } ) );
+      dispatch( ActionCreators.SetVolumesBusy.create( false ) );
+      dispatch( AppActions.serverResponse.create( err.message ) );
+    }
+  }
+}
+
 export function deleteFiles( volumeId: string, ids: string[] ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetVolumesBusy.create( true ) );

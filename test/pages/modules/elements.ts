@@ -89,6 +89,8 @@ export default class ElementsModule extends Module {
     return this.page.click( `.mt-element:nth-child(${ index + 1 })` );
   }
 
+
+
   async clickNewParagraph() {
     await this.page.click( `#mt-create-paragraph` );
     await this.doneLoading();
@@ -117,6 +119,10 @@ export default class ElementsModule extends Module {
 
   waitForActivation( index: number ) {
     return this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active.focussed.cursor` );
+  }
+
+  waitForSelected( index: number ) {
+    return this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active` );
   }
 
   waitForNoFocus() {

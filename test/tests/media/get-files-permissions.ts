@@ -28,6 +28,12 @@ describe( 'Testing the fetching of files & permissions: ', function() {
     await uploadFileToVolume( 'img-c.png', volume, 'File C' );
   } )
 
+  after( async () => {
+    const volumes = ControllerFactory.get( 'volumes' );
+    await volumes.remove( { _id: volume._id } );
+  } )
+
+
   it( 'does show 3 files for the user who uploaded then', async () => {
     await page.load( joe, `/dashboard/media/volume/${ volume._id }` );
     await page.doneLoading();

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
-import { IDraftElement, IDocument, ITemplate } from 'modepress';
+import { IDraftElement, IImageElement, IDocument, ITemplate } from 'modepress';
 import { InlineType } from './editor-toolbar';
 
 import Button from '@material-ui/core/Button';
@@ -36,7 +36,7 @@ export type State = {
  */
 export class ElmEditor extends React.Component<Props, State> {
   private _activeElm: HTMLElement | null;
-  private _firstElm: HTMLElement;
+  private _firstElm: HTMLElement | null;
   private _lastFocussedElm: HTMLElement;
   private _keyProxy: any;
   private _previousSelection: string[];
@@ -310,13 +310,14 @@ export class ElmEditor extends React.Component<Props, State> {
 
   private onKeyUp( e: React.KeyboardEvent<HTMLElement> ) {
     const activeElm = this._activeElm!;
+    const firstElm = this._firstElm!;
 
     // Backkspace / Delete
     if ( e.keyCode === 8 || e.keyCode === 46 ) {
-      if ( activeElm.children.length === 0 || activeElm.children[ 0 ].tagName !== this._firstElm.tagName ) {
+      if ( activeElm.children.length === 0 || activeElm.children[ 0 ].tagName !== firstElm.tagName ) {
         this.clear( activeElm );
-        this.clear( this._firstElm );
-        this._firstElm = this._firstElm.cloneNode() as HTMLElement;
+        this.clear( firstElm );
+        this._firstElm = firstElm.cloneNode() as HTMLElement;
         activeElm.append( this._firstElm );
         this.focusLast( this._firstElm );
       }
@@ -511,6 +512,10 @@ export class ElmEditor extends React.Component<Props, State> {
 
                       if ( isEditable )
                         setTimeout( () => this.activateElm( e ), 200 );
+                      else {
+                        this._activeElm = null;
+                        this._firstElm = null;
+                      }
                     }}
                     onBlur={e => this.updateElmHtml( elm, null, 'deselect' )}
                     className={`mt-element active focussed`}
@@ -541,9 +546,9 @@ export class ElmEditor extends React.Component<Props, State> {
               showMediaPopup: false
             }, () => this.props.onCreateElm( {
               type: 'elm-image',
-              html: `<figure><img src="${ file.publicURL }"></figure>`,
+              image: file._id,
               zone: this.state.selectedZone
-            }, this._lastActiveIndex + 1 ) )}
+            } as IImageElement<'client'>, this._lastActiveIndex + 1 ) )}
           /> : undefined}
       </div>
     );

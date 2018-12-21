@@ -91,6 +91,11 @@ export default class PostsPage extends Page {
     await this.emptySelector( '.mt-post-confirm' );
   }
 
+  async clickAddImg() {
+    await this.page.click( '#mt-create-media' );
+    await this.waitFor( '.mt-volume-table' );
+  }
+
   async isPreview() {
     const result = await this.page.$( '#mt-post-preview' );
     return result ? true : false;

@@ -29,6 +29,7 @@ export type Props = {
   style?: React.CSSProperties;
   onRename: ( name: string, id: string ) => void;
   onUploadFiles?: ( files: File[] ) => void;
+  onReplaceFile?: ( file: File ) => void;
   onDelete: () => void;
   getVolumes?: ( options: Partial<VolumesGetOptions> ) => void;
   openVolume?: ( volumeId: string ) => void;
@@ -244,6 +245,7 @@ export class MediaNavigator extends React.Component<Props, State> {
               onUploadFiles={this.props.onUploadFiles}
               onDelete={() => this.onDelete()}
               onRename={() => this.setState( { newName: '', showRenameForm: true } )}
+              onReplaceFile={this.props.onReplaceFile}
               renderOptionalButtons={this.props.renderOptionalButtons}
             />
           }

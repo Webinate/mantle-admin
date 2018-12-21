@@ -5,7 +5,7 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
-import { createVolume, getVolumes, getVolume, deleteVolumes, upload, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
+import { createVolume, getVolumes, getVolume, deleteVolumes, upload, replaceFile, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
@@ -31,6 +31,7 @@ const dispatchToProps = {
   openDirectory,
   deleteVolumes,
   upload,
+  replaceFile,
   deleteFiles,
   editFile,
   editVolume
@@ -122,6 +123,7 @@ export class Media extends React.Component<Props, State> {
                 onDelete={() => this.onDelete( props.match.params.id )}
                 onSort={( sort, dir ) => this.onSort( sort, dir, props.match.params.id )}
                 onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
+                onReplaceFile={file => { this.props.replaceFile( props.match.params.id, this.state.selectedUids[ 0 ], file ) }}
                 activeVolume={this.props.media.selected}
                 activeVolumeId={props.match.params.id}
                 loading={this.props.media.busy}

@@ -149,6 +149,17 @@ export default class CategoryModule extends Module {
     await this.doneLoading();
   }
 
+  async replaceFile( file: string ) {
+    const handle = await this.page.$( '#mt-file-replace-input' );
+    const filePath = resolve( __dirname + '/../../tests/media-files/' + file );
+
+    if ( !existsSync( filePath ) )
+      throw new Error( `File '${ filePath }' does not exist` );
+
+    await handle.uploadFile( filePath );
+    await this.doneLoading();
+  }
+
   async clickDeleteFiles() {
     await this.page.click( '#mt-delete-file' );
     await this.page.waitFor( '#mt-media-cancel-btn' );
