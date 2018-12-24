@@ -30,8 +30,9 @@ function generateFonts( callback ) {
     cssFontsUrl: '../fonts/',
     formatOptions: {
       svg: {
-        normalize: false,
-        round: 0
+        normalize: true,
+        centerHorizontally: true,
+        round: 2000000
       }
     },
     css: true,
