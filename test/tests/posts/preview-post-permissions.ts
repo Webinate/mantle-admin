@@ -25,16 +25,14 @@ describe( 'Preview posts available to regular users: ', function() {
       title: 'Test Public Post',
       author: adminUser!._id,
       slug: randomId(),
-      public: true,
-      content: 'This is a post\'s <b>content</b>'
+      public: true
     } );
 
     privatePost = await controller.create( {
       title: 'Test Private Post',
       author: adminUser!._id,
       slug: randomId(),
-      public: false,
-      content: 'This is a post\'s <b>content</b>'
+      public: false
     } );
 
     await postPage.load( admin );

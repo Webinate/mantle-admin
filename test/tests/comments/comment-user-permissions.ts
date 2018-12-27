@@ -30,8 +30,7 @@ describe( 'Show / Hide comment edit & delete buttons based on user: ', function(
       title: randomId(),
       slug: randomId(),
       public: true,
-      author: joeUser._id.toString(),
-      content: 'This is a post\'s content'
+      author: joeUser._id.toString()
     } );
 
     comment1 = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );

@@ -24,8 +24,7 @@ describe( 'Testing the interactions with categories in posts:', function() {
       brief: 'Oh my brief',
       tags: [ 'Tag 1', 'Tag 2' ],
       slug: randomId(),
-      public: false,
-      content: 'This is a post\'s content'
+      public: false
     } )
 
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );

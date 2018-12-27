@@ -32,16 +32,14 @@ describe( 'View comment posts: ', function() {
       title: randomId(),
       slug: randomId(),
       public: true,
-      author: joeUser._id.toString(),
-      content: 'This is post 1'
+      author: joeUser._id.toString()
     } );
 
     post2 = await controller.create( {
       title: randomId(),
       slug: randomId(),
       public: false,
-      author: adminUser._id.toString(),
-      content: 'This is post 2'
+      author: adminUser._id.toString()
     } );
 
     rootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post1._id, content: randomId() } );

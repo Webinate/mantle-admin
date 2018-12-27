@@ -27,8 +27,7 @@ describe( 'Preview posts available to regular users: ', function() {
       title: 'Test Public Post',
       author: adminUser!._id,
       slug: randomId(),
-      public: true,
-      content: 'This is a post\'s <b>content</b>'
+      public: true
     } );
 
     await postPage.load( admin );

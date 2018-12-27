@@ -26,8 +26,7 @@ describe( 'View & edit post created by backend: ', function() {
       brief: 'Oh my brief',
       tags: [ 'Tag 1', 'Tag 2' ],
       slug: randomId(),
-      public: false,
-      content: 'This is a post\'s content'
+      public: false
     } )
 
     await postPage.load( admin );

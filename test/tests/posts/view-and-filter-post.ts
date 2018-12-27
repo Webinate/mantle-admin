@@ -31,16 +31,14 @@ describe( 'View and filter posts created by backend: ', function() {
       title: 'AAAA',
       slug: randomId(),
       public: false,
-      author: joeUser._id.toString(),
-      content: 'This is a post\'s content'
+      author: joeUser._id.toString()
     } );
 
     postB = await controller.create( {
       title: 'zzzz',
       slug: randomId(),
       public: true,
-      author: adminUser._id.toString(),
-      content: 'This is a post\'s content'
+      author: adminUser._id.toString()
     } );
 
 

@@ -1,7 +1,7 @@
 import { ActionCreators, Action } from './actions';
 import { PostsGetAllOptions, IDocument, IDraftElement } from 'modepress';
 import { Page, IPost } from '../../../../../src';
-import { IPopulatedDraft } from '../../../../../src/types/models/i-draft';
+import { IDraft } from '../../../../../src/types/models/i-draft';
 
 // State
 export type State = {
@@ -45,7 +45,7 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.SetPost.type:
       let doc = action.payload.document as IDocument<'client'>;
-      let draft = doc.currentDraft as IPopulatedDraft<'client'>;
+      let draft = doc.currentDraft as IDraft<'client'>;
 
       partialState = {
         post: action.payload,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
-import { IPost, IUserEntry } from 'modepress';
+import { IPost, IUserEntry, IDocument, IDraft, ITemplate } from 'modepress';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -31,6 +31,8 @@ export default class PostPreview extends React.Component<Props, State> {
       return <CircularProgress className="mt-loading" />
 
     const post = this.props.post;
+    const doc = post.document as IDocument<'client'>;
+    const draft = doc.currentDraft as IDraft<'client'>;
 
     return <Container id="mt-post-preview">
       <div className="mt-preview-headers">
@@ -46,7 +48,7 @@ export default class PostPreview extends React.Component<Props, State> {
           </div>
           <div
             id="mt-preview-content"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: draft.html[ ( doc.template as ITemplate<'client'> ).defaultZone ] }}
           />
         </div>
       </div>

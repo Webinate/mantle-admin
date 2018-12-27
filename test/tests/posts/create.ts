@@ -5,7 +5,7 @@ import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IVolume, IPost, IDocument, IPopulatedDraft } from 'modepress';
+import { IVolume, IPost, IDocument, IDraft } from 'modepress';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
@@ -162,7 +162,7 @@ describe( 'Testing the creation of posts: ', function() {
     // Confirm the post is saved as it was created
     const post = await controller.getPost( { slug: postSlug } );
     const doc = post.document as IDocument<'client'>;
-    const draft = doc.currentDraft as IPopulatedDraft<'client'>;
+    const draft = doc.currentDraft as IDraft<'client'>;
     assert.equal( draft.elements[ 0 ].html, '<p>This is a post bruv</p>' );
 
     assert.equal( post.title, postSlug );
