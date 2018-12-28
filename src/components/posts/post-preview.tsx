@@ -15,6 +15,7 @@ export type Props = {
 }
 
 type State = {
+  activeZone: string;
 };
 
 export default class PostPreview extends React.Component<Props, State> {
@@ -23,6 +24,7 @@ export default class PostPreview extends React.Component<Props, State> {
     super( props );
 
     this.state = {
+      activeZone: ''
     }
   }
 
@@ -33,6 +35,8 @@ export default class PostPreview extends React.Component<Props, State> {
     const post = this.props.post;
     const doc = post.document as IDocument<'client'>;
     const draft = doc.currentDraft as IDraft<'client'>;
+    const zones = ( doc.template as ITemplate<'client'> ).zones;
+    const activeZone = this.state.activeZone || ( doc.template as ITemplate<'client'> ).defaultZone;
 
     return <Container id="mt-post-preview">
       <div className="mt-preview-headers">
@@ -46,9 +50,12 @@ export default class PostPreview extends React.Component<Props, State> {
             {post.author ? <span>by <span id="mt-preview-author">{( post.author as IUserEntry<'client'> ).username}</span></span> : undefined}
             <span id="mt-preview-date">{format( new Date( post.lastUpdated ), '[at] H:m [on] MMMM Do YYYY' )}</span>
           </div>
+          <div>
+            {zones.map( z => <Tab active={activeZone === z}>{z}</Tab> )}
+          </div>
           <div
             id="mt-preview-content"
-            dangerouslySetInnerHTML={{ __html: draft.html[ ( doc.template as ITemplate<'client'> ).defaultZone ] }}
+            dangerouslySetInnerHTML={{ __html: draft.html[ activeZone ] }}
           />
         </div>
       </div>
@@ -58,6 +65,14 @@ export default class PostPreview extends React.Component<Props, State> {
     </Container >
   }
 }
+interface TabProps extends React.HTMLAttributes<HTMLDivElement> {
+  active: boolean;
+}
+
+const Tab = styled.form`
+  border: 1px solid ${theme.light100.border };
+  background: ${( props: TabProps ) => props.active ? theme.light100.background : theme.light200.background };
+`
 
 const Container = styled.form`
 

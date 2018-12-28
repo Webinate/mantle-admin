@@ -14,7 +14,7 @@ import createHistory from 'history/createMemoryHistory';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { Controller } from '../../../src';
 import { IAuthReq, IClient } from '../../../src';
-import { serializers, decorators } from '../../../src';
+import { routers, decorators } from '../../../src';
 import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
@@ -39,34 +39,34 @@ export default class MainController extends Controller {
   async initialize( app: express.Express, db: Db ) {
     await Promise.all( [
       super.initialize( app, db ),
-      new serializers.auth( {
+      new routers.auth( {
         rootPath: apiUrl,
         accountRedirectURL: '/message',
         activateAccountUrl: '/auth/activate-account',
         passwordResetURL: '/reset-password'
       } ).initialize( app, db ),
-      new serializers.user( {
+      new routers.user( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.posts( {
+      new routers.posts( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.categories( {
+      new routers.categories( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.volume( {
+      new routers.volume( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.file( {
+      new routers.file( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.comments( {
+      new routers.comments( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.documents( {
+      new routers.documents( {
         rootPath: apiUrl
       } ).initialize( app, db ),
-      new serializers.templates( {
+      new routers.templates( {
         rootPath: apiUrl
       } ).initialize( app, db )
     ] );

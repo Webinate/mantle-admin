@@ -621,6 +621,9 @@ const Container = styled.div`
     border: 1px solid transparent;
     padding: 5px;
     outline: 0px solid transparent;
+    &:hover {
+      border: 1px dashed ${ theme.light200.border };
+    }
 
     a {
       text-decoration: underline;
