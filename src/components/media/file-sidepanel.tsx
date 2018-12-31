@@ -13,7 +13,7 @@ import { IFileEntry } from '../../../../../src';
 import { formatBytes } from '../../utils/component-utils';
 
 export type Props = {
-  selectedFile: IFileEntry<'client'> | null;
+  selectedFile: IFileEntry<'client' | 'expanded'> | null;
   selectedIds: string[];
   onDelete: () => void;
   onRename: () => void;
@@ -53,7 +53,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
     e.currentTarget.value = '';
   }
 
-  private getPreview( file: IFileEntry<'client'> ) {
+  private getPreview( file: IFileEntry<'client' | 'expanded'> ) {
     if ( file.mimeType === 'image/png' || file.mimeType === 'image/jpeg' || file.mimeType === 'image/jpg' || file.mimeType === 'image/gif' )
       return file.publicURL;
     else

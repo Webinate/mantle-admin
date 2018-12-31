@@ -7,8 +7,8 @@ import { ActionCreators as AppActions } from '../app/actions';
 // Action Creators
 export const ActionCreators = {
   SetCategoriesBusy: new ActionCreator<'categories-busy', boolean>( 'categories-busy' ),
-  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory<'client'>>>( 'categories-set-categories' ),
-  SetCategory: new ActionCreator<'categories-set-category', ICategory<'client'>>( 'categories-set-category' ),
+  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory<'client' | 'expanded'>>>( 'categories-set-categories' ),
+  SetCategory: new ActionCreator<'categories-set-category', ICategory<'client' | 'expanded'>>( 'categories-set-category' ),
   SetCategoryErr: new ActionCreator<'categories-set-err', string | null>( 'categories-set-err' )
 };
 

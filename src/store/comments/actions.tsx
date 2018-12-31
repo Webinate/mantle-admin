@@ -8,8 +8,8 @@ import { ActionCreators as AppActions } from '../app/actions';
 // Action Creators
 export const ActionCreators = {
   SetCommentsBusy: new ActionCreator<'comments-busy', boolean>( 'comments-busy' ),
-  SetComments: new ActionCreator<'comments-set-comments', { page: Page<IComment<'client'>>, filters: Partial<CommentGetAllOptions> }>( 'comments-set-comments' ),
-  SetComment: new ActionCreator<'comments-set-comment', IComment<'client'>>( 'comments-set-comment' )
+  SetComments: new ActionCreator<'comments-set-comments', { page: Page<IComment<'client' | 'expanded'>>, filters: Partial<CommentGetAllOptions> }>( 'comments-set-comments' ),
+  SetComment: new ActionCreator<'comments-set-comment', IComment<'client' | 'expanded'>>( 'comments-set-comment' )
 };
 
 // Action Types
@@ -26,7 +26,7 @@ export function getComments( options: Partial<CommentGetAllOptions>, postId?: st
     // Resets the array first
     dispatch( ActionCreators.SetCommentsBusy.create( true ) );
 
-    let resp: Page<IComment<'client'>>;
+    let resp: Page<IComment<'client' | 'expanded'>>;
 
     resp = await comments.getAll( newFilters );
 

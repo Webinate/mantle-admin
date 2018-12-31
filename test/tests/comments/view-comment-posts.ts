@@ -9,11 +9,11 @@ import { IPost, IComment, IUserEntry } from 'modepress';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent;
-let post1: IPost<'client'>;
-let post2: IPost<'client'>;
-let rootComment: IComment<'client'>,
-  rootReply: IComment<'client'>,
-  otherRootComment: IComment<'client'>;
+let post1: IPost<'expanded'>;
+let post2: IPost<'expanded'>;
+let rootComment: IComment<'expanded'>,
+  rootReply: IComment<'expanded'>,
+  otherRootComment: IComment<'expanded'>;
 
 describe( 'View comment posts: ', function() {
 
@@ -33,18 +33,18 @@ describe( 'View comment posts: ', function() {
       slug: randomId(),
       public: true,
       author: joeUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
     post2 = await controller.create( {
       title: randomId(),
       slug: randomId(),
       public: false,
       author: adminUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
-    rootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post1._id, content: randomId() } );
-    rootReply = await comments.create( { author: adminUser.username, user: adminUser._id, post: post1._id, parent: rootComment._id, content: randomId() } );
-    otherRootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post2._id, content: randomId() } );
+    rootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post1._id, content: randomId() } ) as IComment<'expanded'>;
+    rootReply = await comments.create( { author: adminUser.username, user: adminUser._id, post: post1._id, parent: rootComment._id, content: randomId() } ) as IComment<'expanded'>;
+    otherRootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post2._id, content: randomId() } ) as IComment<'expanded'>;
   } )
 
   after( async () => {
@@ -60,7 +60,7 @@ describe( 'View comment posts: ', function() {
     await commentPage.load( admin );
     await commentPage.commentModule.select( 2 );
     const details = await commentPage.commentModule.previewDetails();
-    assert.deepEqual( details.author, ( post1.author as IUserEntry<'client'> ).username );
+    assert.deepEqual( details.author, post1.author.username );
     assert.deepEqual( details.content, 'This is post 1' );
     assert.deepEqual( details.title, post1.title );
   } )
@@ -68,7 +68,7 @@ describe( 'View comment posts: ', function() {
   it( 'can view a different post preview', async () => {
     await commentPage.commentModule.select( 0 );
     const details = await commentPage.commentModule.previewDetails();
-    assert.deepEqual( details.author, ( post2.author as IUserEntry<'client'> ).username );
+    assert.deepEqual( details.author, post2.author.username );
     assert.deepEqual( details.content, 'This is post 2' );
     assert.deepEqual( details.title, post2.title );
   } )

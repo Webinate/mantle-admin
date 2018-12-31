@@ -14,14 +14,14 @@ import Drawer from './drawer';
 import { MediaModal } from '../containers/media-modal';
 
 type Props = {
-  activeUser: IUserEntry<'client'>;
-  selected: IUserEntry<'client'> | null;
+  activeUser: IUserEntry<'client' | 'expanded'>;
+  selected: IUserEntry<'client' | 'expanded'> | null;
   animated: boolean;
   resetPasswordRequest( username: string ): void;
   activateAccount( username: string ): void;
-  onDeleteRequested( username: IUserEntry<'client'> ): void;
+  onDeleteRequested( username: IUserEntry<'client' | 'expanded'> ): void;
   resendActivation( username: string ): void;
-  updateUserAvatar( userId: string, file: IFileEntry<'client'> ): void;
+  updateUserAvatar( userId: string, file: IFileEntry<'client' | 'expanded'> ): void;
 };
 
 type State = {
@@ -43,7 +43,7 @@ export default class UserProperties extends React.Component<Props, State> {
     };
   }
 
-  userCanInteract( user: IUserEntry<'client'> ) {
+  userCanInteract( user: IUserEntry<'client' | 'expanded'> ) {
     const activeUser = this.props.activeUser;
 
     // If admin

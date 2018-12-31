@@ -4,11 +4,11 @@ import { VolumesGetOptions, FilesGetOptions } from 'modepress';
 
 // State
 export type State = {
-  readonly volumePage: Page<IVolume<'client'>> | null;
+  readonly volumePage: Page<IVolume<'client' | 'expanded'>> | null;
   readonly volumeFilters: Partial<VolumesGetOptions>;
-  readonly filesPage: Page<IFileEntry<'client'>> | null;
+  readonly filesPage: Page<IFileEntry<'client' | 'expanded'>> | null;
   readonly filesFilters: Partial<FilesGetOptions>;
-  readonly selected: IVolume<'client'> | null;
+  readonly selected: IVolume<'client' | 'expanded'> | null;
   readonly busy: boolean;
   readonly volumeFormError: Error | null;
 };

@@ -63,7 +63,7 @@ const dispatchToProps = {
 const stateProps = returntypeof( mapStateToProps );
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
-  selectedPosts: IPost<'client'>[];
+  selectedPosts: IPost<'client' | 'expanded'>[];
   showDeleteModal: boolean;
   filtersOpen: boolean;
 };
@@ -74,7 +74,7 @@ type State = {
 @connectWrapper( mapStateToProps, dispatchToProps )
 export class Posts extends React.Component<Props, State> {
 
-  private _selectedPost: IPost<'client'> | null;
+  private _selectedPost: IPost<'client' | 'expanded'> | null;
 
   constructor( props: Props ) {
     super( props );
@@ -118,7 +118,7 @@ export class Posts extends React.Component<Props, State> {
     }
   }
 
-  private onDelete( post: IPost<'client'> ) {
+  private onDelete( post: IPost<'client' | 'expanded'> ) {
     this._selectedPost = post;
     this.setState( {
       showDeleteModal: true
@@ -193,7 +193,7 @@ export class Posts extends React.Component<Props, State> {
                 return null;
 
               if ( isAdmin || ( post && user._id === post._id ) ) {
-                const doc = post.document as IDocument<'client'>;
+                const doc = post.document as IDocument<'client' | 'expanded'>;
 
                 return <PostForm
                   id={props.match.params.postId}

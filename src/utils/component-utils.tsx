@@ -3,7 +3,7 @@ import { IUserEntry, IFileEntry } from '../../../../src';
 /**
  * Picks a random user avatar based on the given index
  */
-export function generateAvatarPic( avatar: IUserEntry<'client'> | null ) {
+export function generateAvatarPic( avatar: IUserEntry<'client' | 'expanded'> | null ) {
   if ( avatar === null )
     return '/images/avatar-blank.svg';
 
@@ -39,6 +39,6 @@ export function formatBytes( bytes: number, decimals = 2 ) {
 /**
  * Gets if the current user is an admin
  */
-export function isAdminUser( user: IUserEntry<'client'> | null ) {
+export function isAdminUser( user: IUserEntry<'client' | 'expanded'> | null ) {
   return user && user.privileges < 2 ? true : false;
 }

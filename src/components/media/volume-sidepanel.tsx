@@ -15,7 +15,7 @@ import FolderOpen from '@material-ui/icons/FolderOpen';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 
 export type Props = {
-  selectedVolume: IVolume<'client'> | null;
+  selectedVolume: IVolume<'client' | 'expanded'> | null;
   onDelete: () => void;
   onOpen: ( volumeId: string ) => void;
   onRename: () => void;

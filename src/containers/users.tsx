@@ -74,7 +74,7 @@ export class Users extends React.Component<Props, State> {
     //  this.setState( { selectedUsers: [] } );
   }
 
-  private onUserSelected( user: IUserEntry<'client'>, e: React.MouseEvent<HTMLDivElement> ) {
+  private onUserSelected( user: IUserEntry<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();
 

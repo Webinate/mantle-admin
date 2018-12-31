@@ -10,9 +10,9 @@ import { isAdminUser } from '../../utils/component-utils';
 // Action Creators
 export const ActionCreators = {
   SetVolumesBusy: new ActionCreator<'media-busy', boolean>( 'media-busy' ),
-  SetVolumes: new ActionCreator<'media-set-volumes', { page: Page<IVolume<'client'>>, filters: Partial<VolumesGetOptions> }>( 'media-set-volumes' ),
-  SetFiles: new ActionCreator<'media-set-files', { page: Page<IFileEntry<'client'>>, filters: Partial<FilesGetOptions> }>( 'media-set-files' ),
-  SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client'> | null>( 'media-selected-volume' ),
+  SetVolumes: new ActionCreator<'media-set-volumes', { page: Page<IVolume<'client' | 'expanded'>>, filters: Partial<VolumesGetOptions> }>( 'media-set-volumes' ),
+  SetFiles: new ActionCreator<'media-set-files', { page: Page<IFileEntry<'client' | 'expanded'>>, filters: Partial<FilesGetOptions> }>( 'media-set-files' ),
+  SelectedVolume: new ActionCreator<'media-selected-volume', IVolume<'client' | 'expanded'> | null>( 'media-selected-volume' ),
   VolumeFormError: new ActionCreator<'media-volume-form-error', Error>( 'media-volume-form-error' ),
 };
 

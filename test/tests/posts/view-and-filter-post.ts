@@ -11,8 +11,8 @@ import { UsersController } from '../../../../../src/controllers/users';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let postA: IPost<'client'>;
-let postB: IPost<'client'>;
+let postA: IPost<'expanded'>;
+let postB: IPost<'expanded'>;
 let controller: PostsController;
 
 describe( 'View and filter posts created by backend: ', function() {
@@ -32,14 +32,14 @@ describe( 'View and filter posts created by backend: ', function() {
       slug: randomId(),
       public: false,
       author: joeUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
     postB = await controller.create( {
       title: 'zzzz',
       slug: randomId(),
       public: true,
       author: adminUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
 
     await postPage.load( admin );

@@ -9,8 +9,8 @@ import { IPost, IComment } from 'modepress';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent, mary: Agent;
-let post: IPost<'client'>;;
-let comment1: IComment<'client'>, comment2: IComment<'client'>;
+let post: IPost<'expanded'>;;
+let comment1: IComment<'expanded'>, comment2: IComment<'expanded'>;
 
 describe( 'Show / Hide comment edit & delete buttons based on user: ', function() {
 
@@ -31,10 +31,10 @@ describe( 'Show / Hide comment edit & delete buttons based on user: ', function(
       slug: randomId(),
       public: true,
       author: joeUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
-    comment1 = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );
-    comment2 = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId() } );
+    comment1 = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
+    comment2 = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
     await commentPage.load( admin );
   } )
 

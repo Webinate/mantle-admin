@@ -10,12 +10,12 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  AddElement: new ActionCreator<'posts-add-elm', { elm: IDraftElement<'client'>, index?: number }>( 'posts-add-elm' ),
-  UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client'>>( 'posts-update-elm' ),
+  AddElement: new ActionCreator<'posts-add-elm', { elm: IDraftElement<'client' | 'expanded'>, index?: number }>( 'posts-add-elm' ),
+  UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client' | 'expanded'>>( 'posts-update-elm' ),
   RemoveElements: new ActionCreator<'posts-remove-elms', string[]>( 'posts-remove-elms' ),
-  SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
-  SetPost: new ActionCreator<'posts-set-post', IPost<'client'>>( 'posts-set-post' ),
-  SetTemplate: new ActionCreator<'posts-set-template', IDocument<'client'>>( 'posts-set-template' ),
+  SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client' | 'expanded'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
+  SetPost: new ActionCreator<'posts-set-post', IPost<'client' | 'expanded'>>( 'posts-set-post' ),
+  SetTemplate: new ActionCreator<'posts-set-template', IDocument<'client' | 'expanded'>>( 'posts-set-template' ),
   SetElmSelection: new ActionCreator<'posts-elm-set-selection', string[]>( 'posts-elm-set-selection' )
 };
 
@@ -66,7 +66,7 @@ export function createPost( post: Partial<IPost<'client'>> ) {
   }
 }
 
-export function deletePosts( toDelete: Partial<IPost<'client'>>[] ) {
+export function deletePosts( toDelete: Partial<IPost<'client' | 'expanded'>>[] ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
@@ -86,7 +86,7 @@ export function deletePosts( toDelete: Partial<IPost<'client'>>[] ) {
   }
 }
 
-export function editPost( post: Partial<IPost<'client'>> ) {
+export function editPost( post: Partial<IPost<'client' | 'expanded'>> ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
@@ -125,7 +125,7 @@ function getSelectedIndex( state: IRootState, ) {
   return index;
 }
 
-export function addElement( docId: string, element: Partial<IDraftElement<'client'>>, index?: number ) {
+export function addElement( docId: string, element: Partial<IDraftElement<'client' | 'expanded'>>, index?: number ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
 
@@ -141,7 +141,7 @@ export function addElement( docId: string, element: Partial<IDraftElement<'clien
   }
 }
 
-export function updateElement( docId: string, elementId: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
+export function updateElement( docId: string, elementId: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );

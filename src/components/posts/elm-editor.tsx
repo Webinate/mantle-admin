@@ -14,13 +14,13 @@ import TextField from '@material-ui/core/TextField';
 import { MediaModal } from '../../containers/media-modal';
 
 export type Props = {
-  elements: IDraftElement<'client'>[];
+  elements: IDraftElement<'client' | 'expanded'>[];
   selected: string[];
   document: IDocument<'client'>;
   onSelectionChanged: ( ids: string[] ) => void;
-  onCreateElm: ( type: Partial<IDraftElement<'client'>>, index?: number ) => void;
+  onCreateElm: ( type: Partial<IDraftElement<'client' | 'expanded'>>, index?: number ) => void;
   onDeleteElm: ( ids: string[] ) => void;
-  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
+  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
 }
 
 export type State = {
@@ -169,7 +169,7 @@ export class ElmEditor extends React.Component<Props, State> {
    * @param createElement Should we create a paragraph when done updating
    * @param deselect If true, then nothing should be selected after update
    */
-  private updateElmHtml( elm: IDraftElement<'client'>, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
+  private updateElmHtml( elm: IDraftElement<'client' | 'expanded'>, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
     if ( !this._activeElm )
       return;
 
@@ -257,7 +257,7 @@ export class ElmEditor extends React.Component<Props, State> {
   /**
    * Select the active elements
    */
-  private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client'> ) {
+  private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client' | 'expanded'> ) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -456,7 +456,7 @@ export class ElmEditor extends React.Component<Props, State> {
     const template = doc.template as ITemplate<'client'>;
     const selectedZone = this.state.selectedZone;
     const zones = template.zones.concat( 'unassigned' );
-    const unassigned: IDraftElement<'client'>[] = [];
+    const unassigned: IDraftElement<'client' | 'expanded'>[] = [];
 
     for ( const elm of elements )
       if ( !zones.includes( elm.zone ) || elm.zone === 'unassigned' )

@@ -7,9 +7,9 @@ import * as format from 'date-fns/format';
 import { generateAvatarPic } from '../utils/component-utils';
 
 type Props = {
-  users: IUserEntry<'client'>[];
+  users: IUserEntry<'client' | 'expanded'>[];
   selected: string[];
-  onUserSelected: ( user: IUserEntry<'client'>, e: React.MouseEvent<HTMLDivElement> ) => void;
+  onUserSelected: ( user: IUserEntry<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement> ) => void;
 };
 
 interface SCompProps extends React.HTMLProps<HTMLDivElement> {

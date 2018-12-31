@@ -20,7 +20,7 @@ export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
   multiselect?: boolean;
-  volumes: Page<IVolume<'client'>>;
+  volumes: Page<IVolume<'client' | 'expanded'>>;
   loading: boolean;
   selectedUids: string[];
   activeFilters: Partial<VolumesGetOptions>;
@@ -63,7 +63,7 @@ export class Volumes extends React.Component<Props, State> {
     this.props.onSelectionChanged( volumes );
   }
 
-  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IVolume<'client'> ) {
+  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IVolume<'client' | 'expanded'> ) {
     const selected = this.props.selectedUids;
 
     if ( !this.props.multiselect ) {

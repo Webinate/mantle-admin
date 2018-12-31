@@ -54,10 +54,10 @@ type State = {
   addCategoryMode: boolean;
   deleteMode: boolean;
   editMode: boolean;
-  newCategory: Partial<ICategory<'client'>>;
+  newCategory: Partial<ICategory<'client' | 'expanded'>>;
   autoSlug: string;
   pristineForm: boolean;
-  selectedCategory: ICategory<'client'> | null;
+  selectedCategory: ICategory<'client' | 'expanded'> | null;
 }
 
 @connectWrapper( mapStateToProps, dispatchToProps )
@@ -82,15 +82,15 @@ export class CategoryEditor extends React.Component<Props, State> {
     return cleanValue;
   }
 
-  private expandCategory( c: ICategory<'client'>, flatCategories: ICategory<'client'>[] ) {
+  private expandCategory( c: ICategory<'client' | 'expanded'>, flatCategories: ICategory<'client' | 'expanded'>[] ) {
     flatCategories.push( c );
     for ( const child of c.children )
       this.expandCategory( child as ICategory<'client'>, flatCategories );
   }
 
-  private renderNewCategoryForm( categories: ICategory<'client'>[] ) {
+  private renderNewCategoryForm( categories: ICategory<'client' | 'expanded'>[] ) {
     const isLoading = this.props.categories.busy;
-    const flatCategories: ICategory<'client'>[] = [];
+    const flatCategories: ICategory<'client' | 'expanded'>[] = [];
     for ( const c of categories )
       this.expandCategory( c, flatCategories );
 
@@ -219,7 +219,7 @@ export class CategoryEditor extends React.Component<Props, State> {
       this.setState( { deleteMode: false } )
   }
 
-  private renderCategory( cat: ICategory<'client'>, catIndex: number ): JSX.Element {
+  private renderCategory( cat: ICategory<'expanded'>, catIndex: number ): JSX.Element {
     const selected = this.props.selected.find( i => i === cat._id ) ? true : false;
 
     const checkboxStyle: React.CSSProperties = {
@@ -267,19 +267,19 @@ export class CategoryEditor extends React.Component<Props, State> {
         />
 
         <CategoryChildren>
-          {cat.children.map( ( child, subIndex ) => this.renderCategory( child as ICategory<'client'>, subIndex ) )}
+          {cat.children.map( ( child, subIndex ) => this.renderCategory( child, subIndex ) )}
         </CategoryChildren>
       </div>
     );
   }
 
-  private renderAllCategories( categories: ICategory<'client'>[] ) {
+  private renderAllCategories( categories: ICategory<'client' | 'expanded'>[] ) {
     return (
       <div>
         <ActiveCategories className="mt-category-root">
           {
             categories.map( ( c, catIndex ) => {
-              return this.renderCategory( c, catIndex );
+              return this.renderCategory( c as ICategory<'expanded'>, catIndex );
             } )}
         </ActiveCategories>
 
@@ -349,7 +349,7 @@ export class CategoryEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const categories: ICategory<'client'>[] = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
+    const categories: ICategory<'client' | 'expanded'>[] = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
     return (
       <Container className="mt-category-container">
         <div>

@@ -6,11 +6,11 @@ import { IDraft } from '../../../../../src/types/models/i-draft';
 // State
 export type State = {
   readonly postFilters: Partial<PostsGetAllOptions>;
-  readonly postPage: Page<IPost<'client'>> | null;
-  readonly post: IPost<'client'> | null;
+  readonly postPage: Page<IPost<'client' | 'expanded'>> | null;
+  readonly post: IPost<'client' | 'expanded'> | null;
   readonly busy: boolean;
   readonly selection: string[];
-  readonly draftElements: IDraftElement<'client'>[] | null;
+  readonly draftElements: IDraftElement<'client' | 'expanded'>[] | null;
 };
 
 export const initialState: State = {
@@ -40,12 +40,12 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.SetTemplate.type:
-      partialState = { post: { ...state.post!, document: action.payload } };
+      partialState = { post: { ...state.post!, document: action.payload } as IPost<'expanded'> };
       break;
 
     case ActionCreators.SetPost.type:
       let doc = action.payload.document as IDocument<'client'>;
-      let draft = doc.currentDraft as IDraft<'client'>;
+      let draft = doc.currentDraft as IDraft<'client' | 'expanded'>;
 
       partialState = {
         post: action.payload,
@@ -55,7 +55,7 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.AddElement.type:
-      let elements: IDraftElement<'client'>[];
+      let elements: IDraftElement<'client' | 'expanded'>[];
       if ( action.payload.index !== undefined ) {
         state.draftElements!.splice( action.payload.index, 0, action.payload.elm );
         elements = [ ...state.draftElements! ];

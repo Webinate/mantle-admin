@@ -32,27 +32,27 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 export type Props = {
-  activeUser: IUserEntry<'client'>;
+  activeUser: IUserEntry<'client' | 'expanded'>;
   isAdmin: boolean;
   id?: string;
-  post: Partial<IPost<'client'>>;
-  elements: IDraftElement<'client'>[];
+  post: Partial<IPost<'client' | 'expanded'>>;
+  elements: IDraftElement<'client' | 'expanded'>[];
   templates: TemplateState;
   categoriesLoading: boolean;
   animated: boolean;
   selectedElements: string[];
-  onUpdate?: ( post: Partial<IPost<'client'>> ) => void;
-  onCreate?: ( post: Partial<IPost<'client'>> ) => void;
+  onUpdate?: ( post: Partial<IPost<'client' | 'expanded'>> ) => void;
+  onCreate?: ( post: Partial<IPost<'client' | 'expanded'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: ( templateId: string ) => void;
-  onCreateElm: ( elm: Partial<IDraftElement<'client'>>, index?: number ) => void;
-  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
+  onCreateElm: ( elm: Partial<IDraftElement<'client' | 'expanded'>>, index?: number ) => void;
+  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
   onDeleteElements: ( ids: string[] ) => void;
   onSelectionChanged: ( ids: string[] ) => void;
 }
 
 export type State = {
-  editable: Partial<IPost<'client'>>;
+  editable: Partial<IPost<'client' | 'expanded'>>;
   currentTagText: string;
   slugWasEdited: boolean;
   showMediaPopup: boolean;
@@ -60,7 +60,7 @@ export type State = {
 }
 
 export default class PostForm extends React.Component<Props, State> {
-  private _editableRef: Partial<IPost<'client'>>;
+  private _editableRef: Partial<IPost<'client' | 'expanded'>>;
 
   constructor( props: Props ) {
     super( props );
@@ -434,7 +434,7 @@ export default class PostForm extends React.Component<Props, State> {
                 canEdit={this.props.isAdmin}
                 onChange={user => {
                   this.setState( {
-                    editable: { ...this.state.editable, author: user ? user : '' }
+                    editable: { ...this.state.editable, author: user ? user : '' } as IPost<'client'>
                   } );
                 }}
                 user={this.state.editable.author ? this.state.editable.author as IUserEntry<'client'> : null}
@@ -470,7 +470,7 @@ export default class PostForm extends React.Component<Props, State> {
           onCancel={() => { this.setState( { showMediaPopup: false } ) }}
           onSelect={file => this.setState( {
             showMediaPopup: false,
-            editable: { ...this.state.editable, featuredImage: file }
+            editable: { ...this.state.editable, featuredImage: file } as IPost<'expanded'>
           } )}
         /> : undefined}
     </Form>;

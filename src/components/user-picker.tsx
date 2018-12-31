@@ -15,9 +15,9 @@ import MenuList from '@material-ui/core/MenuList';
 import Paper from '@material-ui/core/Paper';
 
 type Props = {
-  user: IUserEntry<'client'> | null;
+  user: IUserEntry<'client' | 'expanded'> | null;
   canEdit?: boolean;
-  onChange: ( user: IUserEntry<'client'> | null ) => void;
+  onChange: ( user: IUserEntry<'client' | 'expanded'> | null ) => void;
   labelStyle?: React.CSSProperties;
   labelPosition?: 'right' | 'left';
   imageSize?: number;
@@ -26,7 +26,7 @@ type Props = {
 type State = {
   elm: Element | null;
   open: boolean;
-  users: IUserEntry<'client'>[];
+  users: IUserEntry<'client' | 'expanded'>[];
   username: string;
 };
 

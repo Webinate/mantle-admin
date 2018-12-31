@@ -9,7 +9,7 @@ import { uploadFileToVolume } from '../../../test/utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent, mary: Agent;
-let volume: IVolume<'client'>;
+let volume: IVolume<'expanded'>;
 
 describe( 'Testing the fetching of files & permissions: ', function() {
 
@@ -21,7 +21,7 @@ describe( 'Testing the fetching of files & permissions: ', function() {
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await users.getUser( { username: joe.username } );
 
-    volume = await volumes.create( { name: 'test', user: userEntry!._id.toString() } );
+    volume = await volumes.create( { name: 'test', user: userEntry!._id.toString() } ) as IVolume<'expanded'>;
 
     await uploadFileToVolume( 'img-a.png', volume, 'File A' );
     await uploadFileToVolume( 'img-b.png', volume, 'File B' );

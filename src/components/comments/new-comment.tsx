@@ -10,7 +10,7 @@ import theme from '../../theme/mui-theme';
 export type Props = {
   enabled: boolean;
   commentMode?: boolean;
-  auth: IUserEntry<'client'>;
+  auth: IUserEntry<'client' | 'expanded'>;
   onNewComment: ( comment: string ) => void;
   onCancel?: () => void;
 }

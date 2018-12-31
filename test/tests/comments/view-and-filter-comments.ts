@@ -9,8 +9,8 @@ import { IPost, IComment } from 'modepress';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent;
-let post: IPost<'client'>;;
-let comment1: IComment<'client'>, comment2: IComment<'client'>;
+let post: IPost<'expanded'>;;
+let comment1: IComment<'expanded'>, comment2: IComment<'expanded'>;
 
 describe( 'View and filter comments created by backend: ', function() {
 
@@ -30,10 +30,10 @@ describe( 'View and filter comments created by backend: ', function() {
       slug: randomId(),
       public: true,
       author: joeUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
-    comment1 = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );
-    comment2 = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId() } );
+    comment1 = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
+    comment2 = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
 
     // Update the first so that its the most edited one
     await comments.update( comment1._id.toString(), { content: comment1.content } );

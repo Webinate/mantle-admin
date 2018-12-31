@@ -10,7 +10,7 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent;
-let post: IPost<'client'>;
+let post: IPost<'expanded'>;
 let controller: PostsController;
 
 describe( 'Testing the creation of links in elements: ', function() {
@@ -23,7 +23,7 @@ describe( 'Testing the creation of links in elements: ', function() {
       title: 'Anchor test',
       slug: randomId(),
       public: false
-    } )
+    } ) as IPost<'expanded'>
 
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
   } )

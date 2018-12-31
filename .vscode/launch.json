@@ -33,7 +33,7 @@
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
-      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "program": "${workspaceRoot}/../../node_modules/mocha/bin/_mocha",
       "stopOnEntry": false,
       "args": [
         "--compilers ts:ts-node/register",
@@ -46,9 +46,15 @@
         "--runningClientTests=true",
         "--debug=true",
         "--clientsFolder=../../clients/",
-        "--remotes.local.url=http://localhost:8001",
         "--remotes.local.path=../../clients/modepress-admin/test/media-uploads"
+        // // Uncomment these to run from the modepress root folder
+        // "./clients/modepress-admin/test/index.js",
+        // "--config=./config.json",
+        // "--clientsFolder=./clients/",
+        // "--remotes.local.url=http://localhost:8001",
+        // "--remotes.local.path=test/test-server/media"
       ],
+      // "cwd": "${workspaceRoot}/../../",
       "cwd": "${workspaceRoot}",
       "preLaunchTask": null,
       "runtimeExecutable": null,

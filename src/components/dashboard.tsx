@@ -13,7 +13,7 @@ import { generateAvatarPic } from '../utils/component-utils';
 import { IUserEntry } from '../../../../src';
 
 type Props = {
-  activeUser: IUserEntry<'client'>;
+  activeUser: IUserEntry<'client' | 'expanded'>;
   title: string;
   onHome: () => void;
   onLogOut: () => void;
@@ -141,7 +141,6 @@ const Head = styled.div`
     float: right;
     color: inherit;
     margin: 10px 10px 0 0;
-    textAlign: right;
   }
 
   .mt-user-menu {

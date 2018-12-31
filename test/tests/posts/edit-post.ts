@@ -10,7 +10,7 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let post: IPost<'client'>;
+let post: IPost<'expanded'>;
 let controller: PostsController;
 let newSlug = randomId();
 
@@ -27,7 +27,7 @@ describe( 'View & edit post created by backend: ', function() {
       tags: [ 'Tag 1', 'Tag 2' ],
       slug: randomId(),
       public: false
-    } )
+    } ) as IPost<'expanded'>
 
     await postPage.load( admin );
   } )

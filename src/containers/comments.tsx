@@ -45,7 +45,7 @@ type State = {
   sortAscending: boolean;
   selectedUid: string | null;
   selectedPostUid: string | null;
-  user: IUserEntry<'client'> | null;
+  user: IUserEntry<'client' | 'expanded'> | null;
 };
 
 /**
@@ -92,7 +92,7 @@ export class Comments extends React.Component<Props, State> {
     } )
   }
 
-  private onUserChange( user: IUserEntry<'client'> | null ) {
+  private onUserChange( user: IUserEntry<'client' | 'expanded'> | null ) {
     this.setState( { user: user }, () => {
       this.props.getAll( { user: user ? user.username : '' } );
     } )

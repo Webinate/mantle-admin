@@ -19,8 +19,8 @@ export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
   multiselect?: boolean;
-  volume: IVolume<'client'>;
-  files: Page<IFileEntry<'client'>> | null;
+  volume: IVolume<'client' | 'expanded'>;
+  files: Page<IFileEntry<'client' | 'expanded'>> | null;
   loading: boolean;
   selectedUids: string[];
   activeFilters: Partial<FilesGetOptions>;
@@ -57,14 +57,14 @@ export class DirectoryView extends React.Component<Props, State> {
     this.props.onSelectionChanged( volumes );
   }
 
-  private getPreview( file: IFileEntry<'client'> ) {
+  private getPreview( file: IFileEntry<'client' | 'expanded'> ) {
     if ( file.mimeType === 'image/png' || file.mimeType === 'image/jpeg' || file.mimeType === 'image/jpg' || file.mimeType === 'image/gif' )
       return file.publicURL;
     else
       return '/images/harddrive.svg';
   }
 
-  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IFileEntry<'client'> ) {
+  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IFileEntry<'client' | 'expanded'> ) {
     const selected = this.props.selectedUids;
 
     if ( !this.props.multiselect ) {

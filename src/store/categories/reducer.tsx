@@ -3,8 +3,8 @@ import { Page, ICategory } from '../../../../../src';
 
 // State
 export type State = {
-  readonly categoryPage: Page<ICategory<'client'>> | null;
-  readonly category: ICategory<'client'> | null;
+  readonly categoryPage: Page<ICategory<'client' | 'expanded'>> | null;
+  readonly category: ICategory<'client' | 'expanded'> | null;
   readonly busy: boolean;
   readonly error: string | null;
 };

@@ -5,8 +5,8 @@ import { IRootState } from '..';
 
 // Action Creators
 export const ActionCreators = {
-  GetAll: new ActionCreator<'templates-get-all', Page<ITemplate<'client'>>>( 'templates-get-all' ),
-  GetOne: new ActionCreator<'templates-get', ITemplate<'client'>>( 'templates-get' ),
+  GetAll: new ActionCreator<'templates-get-all', Page<ITemplate<'client' | 'expanded'>>>( 'templates-get-all' ),
+  GetOne: new ActionCreator<'templates-get', ITemplate<'client' | 'expanded'>>( 'templates-get' ),
   SetBusy: new ActionCreator<'templates-set-busy', boolean>( 'templates-set-busy' ),
 };
 

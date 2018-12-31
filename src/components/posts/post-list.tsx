@@ -19,13 +19,13 @@ import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';
 export type Props = {
   animated: boolean;
   loading: boolean;
-  posts: Page<IPost<'client'>> | null;
+  posts: Page<IPost<'client' | 'expanded'>> | null;
   getPosts: ( options: Partial<PostsGetAllOptions> ) => void;
   postFilters: Partial<PostsGetAllOptions>;
-  onPostSelected: ( post: IPost<'client'>[] ) => void
-  onEdit: ( post: IPost<'client'> ) => void;
-  onDelete: ( post: IPost<'client'> ) => void;
-  selected: IPost<'client'>[];
+  onPostSelected: ( post: IPost<'client' | 'expanded'>[] ) => void
+  onEdit: ( post: IPost<'client' | 'expanded'> ) => void;
+  onDelete: ( post: IPost<'client' | 'expanded'> ) => void;
+  selected: IPost<'client' | 'expanded'>[];
   filtersOpen: boolean;
 }
 
@@ -35,7 +35,7 @@ type SortType = 'title' | 'created' | 'modified';
 export type State = {
   showDeleteModal: boolean;
   sortAscending: boolean;
-  user: IUserEntry<'client'> | null;
+  user: IUserEntry<'client' | 'expanded'> | null;
   visibility: VisibilityType;
   sortBy: SortType;
   visibilityOpen: boolean;
@@ -65,7 +65,7 @@ export default class PostList extends React.Component<Props, State> {
       this.props.onPostSelected( [] );
   }
 
-  private onPostSelected( post: IPost<'client'>, e: React.MouseEvent<HTMLDivElement> ) {
+  private onPostSelected( post: IPost<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement> ) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -111,7 +111,7 @@ export default class PostList extends React.Component<Props, State> {
     } )
   }
 
-  private onUserChange( user: IUserEntry<'client'> | null ) {
+  private onUserChange( user: IUserEntry<'client' | 'expanded'> | null ) {
     this.setState( { user: user }, () => {
       this.props.getPosts( { author: user ? user.username : '' } );
     } )

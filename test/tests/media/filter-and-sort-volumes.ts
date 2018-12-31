@@ -11,7 +11,7 @@ import { uploadFileToVolume } from '../../utils/file';
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
 let volumes: VolumesController;
-let volA: IVolume<'client'>, volB: IVolume<'client'>, volC: IVolume<'client'>;
+let volA: IVolume<'expanded'>, volB: IVolume<'expanded'>, volC: IVolume<'expanded'>;
 
 describe( 'Testing the sorting and filtering of volumes: ', function() {
 
@@ -22,9 +22,9 @@ describe( 'Testing the sorting and filtering of volumes: ', function() {
     const users = ControllerFactory.get( 'users' );
     const userEntry = await users.getUser( { username: joe.username } );
     const files = ControllerFactory.get( 'files' );
-    volA = await volumes.create( { name: 'A', user: userEntry._id.toString() } );
-    volB = await volumes.create( { name: 'B', user: userEntry._id.toString() } );
-    volC = await volumes.create( { name: 'C', user: userEntry._id.toString() } );
+    volA = await volumes.create( { name: 'A', user: userEntry._id.toString() } ) as IVolume<'expanded'>;
+    volB = await volumes.create( { name: 'B', user: userEntry._id.toString() } ) as IVolume<'expanded'>;
+    volC = await volumes.create( { name: 'C', user: userEntry._id.toString() } ) as IVolume<'expanded'>;
 
     await uploadFileToVolume( 'img-a.png', volB );
   } )

@@ -102,17 +102,21 @@ export default class PostsPage extends Page {
   }
 
   async previewDetails() {
-    const result: {
+    let result: {
       avatar: string;
       author: string;
       title: string;
-      content: string;
-    } = await this.page.$eval( '#mt-post-preview', elm => {
+      zones: string[];
+      contents: string[];
+    } | null = null;
+
+    result = await this.page.$eval( '#mt-post-preview', elm => {
       return {
         avatar: ( elm.querySelector( '.mt-preview-author-avatar img' ) as HTMLImageElement ).src,
         author: ( elm.querySelector( '#mt-preview-author' ) as HTMLDivElement ).textContent,
         title: ( elm.querySelector( '#mt-preview-title' ) as HTMLDivElement ).textContent,
-        content: ( elm.querySelector( '#mt-preview-content' ) as HTMLDivElement ).innerHTML
+        zones: Array.from( elm.querySelectorAll( '.mt-zone-header h2' ) || [] ).map( c => c.innerHTML ),
+        contents: Array.from( elm.querySelectorAll( '.mt-preview-content-col' ) || [] ).map( c => c.innerHTML )
       }
     } );
 

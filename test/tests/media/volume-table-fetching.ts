@@ -12,7 +12,7 @@ import { uploadFileToVolume } from '../../utils/file';
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
 let volumes: VolumesController;
-let volume: IVolume<'client'>;
+let volume: IVolume<'expanded'>;
 
 describe( 'Testing the fetching of volumes: ', function() {
 
@@ -25,7 +25,7 @@ describe( 'Testing the fetching of volumes: ', function() {
     volume = await volumes.create( {
       name: randomId(),
       user: userEntry!._id.toString()
-    } );
+    } ) as IVolume<'expanded'>;
 
     await uploadFileToVolume( 'img-a.png', volume );
   } )

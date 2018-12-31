@@ -10,7 +10,7 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let singlePost: IPost<'client'>, multiPost1: IPost<'client'>, multiPost2: IPost<'client'>;
+let singlePost: IPost<'expanded'>, multiPost1: IPost<'expanded'>, multiPost2: IPost<'expanded'>;
 let controller: PostsController;
 
 describe( 'Testing the Deletion of posts: ', function() {
@@ -23,17 +23,17 @@ describe( 'Testing the Deletion of posts: ', function() {
     multiPost1 = await controller.create( {
       title: randomId(),
       slug: randomId()
-    } );
+    } ) as IPost<'expanded'>;
 
     multiPost2 = await controller.create( {
       title: randomId(),
       slug: randomId()
-    } );
+    } ) as IPost<'expanded'>;
 
     singlePost = await controller.create( {
       title: randomId(),
       slug: randomId()
-    } );
+    } ) as IPost<'expanded'>;
   } )
 
   it( 'Post is available in post dashboard & visible to admin', async () => {

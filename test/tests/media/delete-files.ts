@@ -10,7 +10,7 @@ import { uploadFileToVolume } from '../../utils/file';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
-let volume: IVolume<'client'>;
+let volume: IVolume<'expanded'>;
 const randomName = randomId();
 
 describe( 'Testing the deletion of files: ', function() {
@@ -22,7 +22,7 @@ describe( 'Testing the deletion of files: ', function() {
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await users.getUser( { username: joe.username } );
 
-    volume = await volumes.create( { name: randomName, user: userEntry._id } );
+    volume = await volumes.create( { name: randomName, user: userEntry._id } ) as IVolume<'expanded'>;
 
     await uploadFileToVolume( 'img-a.png', volume, 'File A' );
     await uploadFileToVolume( 'img-b.png', volume, 'File B' );

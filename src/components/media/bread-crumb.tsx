@@ -7,7 +7,7 @@ import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  volume: IVolume<'client'>;
+  volume: IVolume<'client' | 'expanded'>;
   onVolumeSelected: () => void;
 }
 

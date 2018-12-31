@@ -21,7 +21,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   media: state.media,
   open: ownProps.open,
   onCancel: ownProps.onCancel as () => void,
-  onSelect: ownProps.onSelect as ( file: IFileEntry<'client'> ) => void
+  onSelect: ownProps.onSelect as ( file: IFileEntry<'client' | 'expanded'> ) => void
 } );
 
 // Map actions to props (This binds the actions to the dispatch fucntion)

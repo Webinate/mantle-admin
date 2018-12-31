@@ -18,9 +18,9 @@ import Button from '@material-ui/core/Button/Button';
 export type Props = {
   animated: boolean;
   multiselect?: boolean;
-  activeVolume?: IVolume<'client'> | null;
-  volumes?: Page<IVolume<'client'>> | null;
-  files?: Page<IFileEntry<'client'>> | null;
+  activeVolume?: IVolume<'client' | 'expanded'> | null;
+  volumes?: Page<IVolume<'client' | 'expanded'>> | null;
+  files?: Page<IFileEntry<'client' | 'expanded'>> | null;
   loading: boolean;
   selectedIds: string[];
   activeVolumeId?: string;
@@ -156,8 +156,8 @@ export class MediaNavigator extends React.Component<Props, State> {
 
     const numToDelete = this.props.selectedIds.length;
     const volumePage = this.props.volumes;
-    let selectedFile: IFileEntry<'client'> | null = null;
-    let selectedVolume: IVolume<'client'> | null = null;
+    let selectedFile: IFileEntry<'client' | 'expanded'> | null = null;
+    let selectedVolume: IVolume<'client' | 'expanded'> | null = null;
     const filesPage = this.props.files;
 
     if ( volumePage ) {
@@ -187,8 +187,8 @@ export class MediaNavigator extends React.Component<Props, State> {
     const mediaSelected = this.props.selectedIds.length > 0;
     const selectedUids = this.props.selectedIds;
     let activeView: JSX.Element | null = null;
-    let selectedFile: IFileEntry<'client'> | null = null;
-    let selectedVolume: IVolume<'client'> | null = null;
+    let selectedFile: IFileEntry<'client' | 'expanded'> | null = null;
+    let selectedVolume: IVolume<'client' | 'expanded'> | null = null;
 
     if ( volumePage ) {
       selectedVolume = selectedUids.length > 0 ?

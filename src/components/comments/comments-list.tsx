@@ -15,11 +15,11 @@ import Button from '@material-ui/core/Button/Button';
 import NewComment from './new-comment';
 
 export type Props = {
-  page: Page<IComment<'client'>> | null;
+  page: Page<IComment<'client' | 'expanded'>> | null;
   loading: boolean;
   selectable?: boolean;
   heightFromContents?: boolean;
-  auth: IUserEntry<'client'>;
+  auth: IUserEntry<'client' | 'expanded'>;
   style?: React.CSSProperties;
   selectedUids?: string[];
   onCommentSelected?: ( comment: IComment<'client'> ) => void;
@@ -110,11 +110,11 @@ export class CommentsList extends React.Component<Props, State> {
     );
   }
 
-  private flattenComments( comment: IComment<'client'>, flat: IComment<'client'>[] ) {
+  private flattenComments( comment: IComment<'client' | 'expanded'>, flat: IComment<'client' | 'expanded'>[] ) {
     flat.push( comment );
 
     for ( const child of comment.children )
-      this.flattenComments( child as IComment<'client'>, flat );
+      this.flattenComments( child as IComment<'client' | 'expanded'>, flat );
   }
 
   render() {

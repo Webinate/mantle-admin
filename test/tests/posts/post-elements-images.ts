@@ -10,8 +10,8 @@ import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent;
-let post: IPost<'client'>;
-let volume: IVolume<'client'>;
+let post: IPost<'expanded'>;
+let volume: IVolume<'expanded'>;
 
 describe( 'Testing the creation of image elements: ', function() {
 
@@ -25,10 +25,10 @@ describe( 'Testing the creation of image elements: ', function() {
       title: 'Image test',
       slug: randomId(),
       public: false
-    } )
+    } ) as IPost<'expanded'>
 
     const userEntry = await users.getUser( { username: admin.username } );
-    volume = await volumes.create( { name: randomId(), user: userEntry._id.toString() } );
+    volume = await volumes.create( { name: randomId(), user: userEntry._id.toString() } ) as IVolume<'expanded'>;
 
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
   } )

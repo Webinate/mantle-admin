@@ -7,7 +7,7 @@ import { IVolume } from 'modepress';
 
 let users = new UsersPage();
 let joe: Agent, mary: Agent, admin: Agent;
-let volume: IVolume<'client'>;
+let volume: IVolume<'expanded'>;
 
 describe( 'Update profile picture: ', function() {
   before( async () => {
@@ -19,7 +19,7 @@ describe( 'Update profile picture: ', function() {
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await usersCtrl.getUser( { username: joe.username } );
 
-    volume = await volumes.create( { name: 'test', user: userEntry._id.toString() } );
+    volume = await volumes.create( { name: 'test', user: userEntry._id.toString() } ) as IVolume<'expanded'>;
   } )
 
   it( 'it should not allow a regular user to change another\'s profile pic', async () => {

@@ -9,7 +9,7 @@ import { randomId } from '../../utils/misc';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;
-let volume: IVolume<'client'>;
+let volume: IVolume<'expanded'>;
 const randomName = randomId();
 
 describe( 'Testing the uploading of a file: ', function() {
@@ -21,7 +21,7 @@ describe( 'Testing the uploading of a file: ', function() {
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await users.getUser( { username: joe.username } );
 
-    volume = await volumes.create( { name: randomName, user: userEntry._id.toString() } );
+    volume = await volumes.create( { name: randomName, user: userEntry._id.toString() } ) as IVolume<'expanded'>;
   } )
 
   it( 'does open a volume & the url is correct', async () => {

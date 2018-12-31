@@ -6,8 +6,8 @@ import { ActionCreators as AppActions, Action as AppAction } from '../app/action
 // State
 export type State = {
   readonly commentFilters: Partial<CommentGetAllOptions>;
-  readonly commentPage: Page<IComment<'client'>> | null;
-  readonly comment: IComment<'client'> | null;
+  readonly commentPage: Page<IComment<'client' | 'expanded'>> | null;
+  readonly comment: IComment<'client' | 'expanded'> | null;
   readonly busy: boolean;
 };
 

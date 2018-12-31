@@ -12,8 +12,8 @@ let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
 let controller: PostsController;
 let postSlug = randomId();
-let volume: IVolume<'client'>;
-let createdPost: IPost<'client'>;
+let volume: IVolume<'expanded'>;
+let createdPost: IPost<'expanded'>;
 
 describe( 'Testing the creation of posts: ', function() {
 
@@ -25,7 +25,7 @@ describe( 'Testing the creation of posts: ', function() {
     const usersCtrl = ControllerFactory.get( 'users' );
     const volumes = ControllerFactory.get( 'volumes' );
     const userEntry = await usersCtrl.getUser( { username: admin.username } );
-    volume = await volumes.create( { name: randomId(), user: userEntry._id.toString() } );
+    volume = await volumes.create( { name: randomId(), user: userEntry._id.toString() } ) as IVolume<'expanded'>;
 
     await postPage.load( admin );
   } )
@@ -48,7 +48,7 @@ describe( 'Testing the creation of posts: ', function() {
     // Now check that post was created
     const path = await postPage.pathname();
     const id = path.split( '/' ).pop();
-    createdPost = await controller.getPost( { id } );
+    createdPost = await controller.getPost( { id } ) as IPost<'expanded'>;
     assert( createdPost );
   } )
 

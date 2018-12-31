@@ -3,8 +3,8 @@ import { ITemplate, Page } from 'modepress';
 
 // State
 export type State = {
-  readonly template: ITemplate<'client'> | null;
-  readonly templatesPage: Page<ITemplate<'client'>> | null;
+  readonly template: ITemplate<'client' | 'expanded'> | null;
+  readonly templatesPage: Page<ITemplate<'client' | 'expanded'>> | null;
   readonly busy: boolean;
 };
 

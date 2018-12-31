@@ -102,7 +102,7 @@ export class Utils {
     this.page = await this.browser.newPage();
     await this.page.setViewport( { width: 1024, height: 768 } );
     this.config = JSON.parse( fs.readFileSync( args.config ).toString() );
-    this.modepress = JSON.parse( fs.readFileSync( './modepress.json' ).toString() );
+    this.modepress = JSON.parse( fs.readFileSync( __dirname + '/../modepress.json' ).toString() );
     this.host = this.getHost();
 
     this.loadSensitiveProps( this.config, path.dirname( args.config ) );

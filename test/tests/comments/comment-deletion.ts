@@ -9,13 +9,13 @@ import { IPost, IComment } from 'modepress';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent;
-let post: IPost<'client'>;;
+let post: IPost<'expanded'>;;
 let
-  joesComment: IComment<'client'>,
-  joesOtherComment: IComment<'client'>,
-  joesParentComment: IComment<'client'>,
-  adminsNestedComment: IComment<'client'>,
-  adminsComment: IComment<'client'>;
+  joesComment: IComment<'expanded'>,
+  joesOtherComment: IComment<'expanded'>,
+  joesParentComment: IComment<'expanded'>,
+  adminsNestedComment: IComment<'expanded'>,
+  adminsComment: IComment<'expanded'>;
 
 describe( 'Test the deletion of comments:', function() {
 
@@ -35,12 +35,12 @@ describe( 'Test the deletion of comments:', function() {
       slug: randomId(),
       public: true,
       author: joeUser._id.toString()
-    } );
+    } ) as IPost<'expanded'>;
 
-    joesComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );
-    joesOtherComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );
-    joesParentComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } );
-    adminsNestedComment = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId(), parent: joesParentComment._id } );
+    joesComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
+    joesOtherComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
+    joesParentComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post._id, content: randomId() } ) as IComment<'expanded'>;
+    adminsNestedComment = await comments.create( { author: adminUser.username, user: adminUser._id, post: post._id, content: randomId(), parent: joesParentComment._id } ) as IComment<'expanded'>;
     await commentPage.load( admin );
   } )
 

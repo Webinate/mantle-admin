@@ -20,10 +20,10 @@ const args = yargs.argv;
 export async function hydrate( req: IAuthReq ) {
   const actions: Action[] = [];
 
-  let user: IUserEntry<'client'> | null = null;
+  let user: IUserEntry<'expanded'> | null = null;
 
   if ( req._user )
-    user = await controllers.users.getUser( { id: req._user._id.toString() } );
+    user = await controllers.users.getUser( { id: req._user._id.toString() } ) as IUserEntry<'expanded'>;
 
   // Get the user
   actions.push( ActionCreators.setUser.create( user ) );

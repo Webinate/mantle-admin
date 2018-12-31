@@ -4,7 +4,7 @@ import { IUserEntry, Page } from '../../../../../src';
 
 // State
 export type State = {
-  readonly userPage: Page<IUserEntry<'client'>> | null;
+  readonly userPage: Page<IUserEntry<'client' | 'expanded'>> | null;
   readonly busy: boolean;
 };
 

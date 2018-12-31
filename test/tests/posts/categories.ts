@@ -9,7 +9,7 @@ import { IPost } from 'modepress';
 
 let postPage = new PostsPage();
 let admin: Agent;
-let post: IPost<'client'>;
+let post: IPost<'expanded'>;
 let rootCat = randomId();
 let childCat = randomId();
 let childDeeperCat = randomId();
@@ -25,7 +25,7 @@ describe( 'Testing the interactions with categories in posts:', function() {
       tags: [ 'Tag 1', 'Tag 2' ],
       slug: randomId(),
       public: false
-    } )
+    } ) as IPost<'expanded'>;
 
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
     await postPage.waitFor( '#mt-post-title' );

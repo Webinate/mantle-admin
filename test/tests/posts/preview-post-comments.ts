@@ -9,7 +9,7 @@ import { IPost } from 'modepress';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent, mary: Agent;
-let publicPost: IPost<'client'>;
+let publicPost: IPost<'expanded'>;
 let commentText = randomId();
 let replyText = randomId();
 
@@ -28,7 +28,7 @@ describe( 'Preview posts available to regular users: ', function() {
       author: adminUser!._id,
       slug: randomId(),
       public: true
-    } );
+    } ) as IPost<'expanded'>;
 
     await postPage.load( admin );
   } )

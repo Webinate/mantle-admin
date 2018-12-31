@@ -8,7 +8,7 @@ import * as format from 'date-fns/format';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  post: IPost<'client'>;
+  post: IPost<'client' | 'expanded'>;
   id?: string;
   loading: boolean;
   renderComments?: () => undefined | null | JSX.Element;
@@ -36,9 +36,10 @@ export default class PostPreview extends React.Component<Props, State> {
     const doc = post.document as IDocument<'client'>;
     const draft = doc.currentDraft as IDraft<'client'>;
     const zones = ( doc.template as ITemplate<'client'> ).zones;
-    const activeZone = this.state.activeZone || ( doc.template as ITemplate<'client'> ).defaultZone;
 
     return <Container id="mt-post-preview">
+
+
       <div className="mt-preview-headers">
         <div className="mt-preview-author-avatar">
           <Avatar src={generateAvatarPic( post.author as IUserEntry<'client'> )} />
@@ -50,32 +51,41 @@ export default class PostPreview extends React.Component<Props, State> {
             {post.author ? <span>by <span id="mt-preview-author">{( post.author as IUserEntry<'client'> ).username}</span></span> : undefined}
             <span id="mt-preview-date">{format( new Date( post.lastUpdated ), '[at] H:m [on] MMMM Do YYYY' )}</span>
           </div>
-          <div>
-            {zones.map( z => <Tab active={activeZone === z}>{z}</Tab> )}
-          </div>
-          <div
-            id="mt-preview-content"
-            dangerouslySetInnerHTML={{ __html: draft.html[ activeZone ] }}
-          />
         </div>
       </div>
+
+      <div className="mt-preview-content">
+        {zones.length > 1 ? zones.map( z => <div>
+          <div className="mt-zone-header">
+            <h2>{z}</h2>
+            <div className="mt-content-divider" />
+          </div>
+          <div
+            className="mt-preview-content-col"
+            dangerouslySetInnerHTML={{ __html: draft.html[ z ] }}
+          />
+        </div>
+        ) :
+          <div
+            className="mt-preview-content-col"
+            dangerouslySetInnerHTML={{ __html: draft.html[ zones[ 0 ] ] }}
+          />
+        }
+      </div>
+
       <div id="mt-preview-comments">
         {this.props.renderComments ? this.props.renderComments() : undefined}
       </div>
     </Container >
   }
 }
-interface TabProps extends React.HTMLAttributes<HTMLDivElement> {
-  active: boolean;
-}
-
-const Tab = styled.form`
-  border: 1px solid ${theme.light100.border };
-  background: ${( props: TabProps ) => props.active ? theme.light100.background : theme.light200.background };
-`
 
 const Container = styled.form`
 
+  .mt-preview-content {
+    background: ${theme.light100.background };
+    border: 1px solid ${theme.light100.border };
+  }
 
   h1 {
     margin: 0 0 10px 0;
@@ -101,8 +111,7 @@ const Container = styled.form`
 
   .mt-preview-headers {
     display: flex;
-    background: ${theme.light100.background };
-    border: 1px solid ${theme.light100.border };
+
     margin: 10px 10px 0 10px;
     padding: 10px;
     margin: 10px 10px 0 10px;
@@ -113,6 +122,32 @@ const Container = styled.form`
       &:first-child {
         max-width: 50px;
       }
+    }
+  }
+
+  .mt-preview-content {
+    display: flex;
+    margin: 10px 10px 0 10px;
+    overflow: auto;
+
+    h2 {
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+    }
+
+    > div {
+      flex: 1;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    .mt-content-divider {
+      border-bottom: 1px solid ${theme.light100.border };
+      margin: 0 auto 10px auto;
+    }
+
+    img {
+      max-width: 100%;
     }
   }
 

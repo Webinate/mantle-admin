@@ -8,8 +8,8 @@ import { ActionCreators as AppActions } from '../app/actions';
 // Action Creators
 export const ActionCreators = {
   SetUsersBusy: new ActionCreator<'users-busy', boolean>( 'users-busy' ),
-  SetUsers: new ActionCreator<'users-set-users', Page<IUserEntry<'client'>> | null>( 'users-set-users' ),
-  UpdateUser: new ActionCreator<'users-update-user', IUserEntry<'client'>>( 'users-update-user' ),
+  SetUsers: new ActionCreator<'users-set-users', Page<IUserEntry<'client' | 'expanded'>> | null>( 'users-set-users' ),
+  UpdateUser: new ActionCreator<'users-update-user', IUserEntry<'client' | 'expanded'>>( 'users-update-user' ),
   RemoveUser: new ActionCreator<'users-remove-user', string>( 'users-remove-user' )
 };
 
