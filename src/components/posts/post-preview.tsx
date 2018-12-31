@@ -55,7 +55,7 @@ export default class PostPreview extends React.Component<Props, State> {
       </div>
 
       <div className="mt-preview-content">
-        {zones.length > 1 ? zones.map( z => <div>
+        {zones.length > 1 ? zones.map( z => <div key={`zone-${ z }`}>
           <div className="mt-zone-header">
             <h2>{z}</h2>
             <div className="mt-content-divider" />

@@ -55,12 +55,14 @@ export default class CommentsModule extends Module {
         title: elm.querySelector( '#mt-preview-title' ).textContent,
         author: elm.querySelector( '#mt-preview-author' ).textContent,
         date: elm.querySelector( '#mt-preview-date' ).textContent,
-        content: elm.querySelector( '#mt-preview-content' ).innerHTML
+        zones: Array.from( elm.querySelectorAll( '.mt-zone-header h2' ) || [] ).map( c => c.innerHTML ),
+        contents: Array.from( elm.querySelectorAll( '.mt-preview-content-col' ) || [] ).map( c => c.innerHTML )
       }
     } ) as Promise<{
       img: string;
       author: string;
-      content: string;
+      zones: string[];
+      contents: string[];
       date: string;
       title: string;
     }>;

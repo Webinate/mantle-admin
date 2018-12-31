@@ -21,6 +21,7 @@ describe( 'View comment posts: ', function() {
     const controller = ControllerFactory.get( 'posts' );
     const users = ControllerFactory.get( 'users' );
     const comments = ControllerFactory.get( 'comments' );
+    const docs = ControllerFactory.get( 'documents' );
 
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
@@ -42,6 +43,9 @@ describe( 'View comment posts: ', function() {
       author: adminUser._id.toString()
     } ) as IPost<'expanded'>;
 
+    docs.updateElement( { id: post1.document._id }, post1.document.currentDraft.elements[ 0 ]._id, { html: '<p>This is post 1</p>' } );
+    docs.updateElement( { id: post2.document._id }, post2.document.currentDraft.elements[ 0 ]._id, { html: '<p>This is post 2</p>' } );
+
     rootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post1._id, content: randomId() } ) as IComment<'expanded'>;
     rootReply = await comments.create( { author: adminUser.username, user: adminUser._id, post: post1._id, parent: rootComment._id, content: randomId() } ) as IComment<'expanded'>;
     otherRootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post2._id, content: randomId() } ) as IComment<'expanded'>;
@@ -61,7 +65,7 @@ describe( 'View comment posts: ', function() {
     await commentPage.commentModule.select( 2 );
     const details = await commentPage.commentModule.previewDetails();
     assert.deepEqual( details.author, post1.author.username );
-    assert.deepEqual( details.content, 'This is post 1' );
+    assert.deepEqual( details.contents[ 0 ], '<p>This is post 1</p>' );
     assert.deepEqual( details.title, post1.title );
   } )
 
@@ -69,7 +73,7 @@ describe( 'View comment posts: ', function() {
     await commentPage.commentModule.select( 0 );
     const details = await commentPage.commentModule.previewDetails();
     assert.deepEqual( details.author, post2.author.username );
-    assert.deepEqual( details.content, 'This is post 2' );
+    assert.deepEqual( details.contents[ 0 ], '<p>This is post 2</p>' );
     assert.deepEqual( details.title, post2.title );
   } )
 
