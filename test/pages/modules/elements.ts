@@ -89,7 +89,21 @@ export default class ElementsModule extends Module {
     return this.page.click( `.mt-element:nth-child(${ index + 1 })` );
   }
 
+  async getTabs() {
+    const tabs: string[] = await this.page.$$eval( `.mt-editor-tab`, ( tabElm ) => Array.from( tabElm ).map( ( elm: HTMLElement ) => elm.innerText ) );
+    return tabs;
+  }
 
+  async clickTab( tab: string ) {
+    const tabs = await this.getTabs();
+    const elms = await this.page.$$( '.mt-editor-tab' );
+    await elms[ tabs.indexOf( tab ) ].click();
+  }
+
+  async getActiveTab() {
+    const activeTab: string = await this.page.$eval( `.mt-editor-tab.active`, ( elm: HTMLElement ) => elm.innerText );
+    return activeTab;
+  }
 
   async clickNewParagraph() {
     await this.page.click( `#mt-create-paragraph` );

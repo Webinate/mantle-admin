@@ -178,6 +178,28 @@ export default class PostsPage extends Page {
   }
 
   /**
+   * Gets the available templates to use
+   */
+  async getTemplates() {
+    const templates: string[] = await this.page.$$eval( `.mt-template-item-name`, nodes => Array.from( nodes ).map( ( e: HTMLElement ) => e.innerText.trim() ) );
+    return templates;
+  }
+
+  async selectTemplate( type: string ) {
+    const templates = await this.getTemplates();
+    const index = templates.indexOf( type );
+    const elms = await this.page.$$( `.mt-template-item-switch` );
+    await elms[ index ].click();
+    await this.page.click( `#mt-apply-template` );
+    await this.doneLoading();
+  }
+
+  async getTemplateWarnings() {
+    const warningExists = await this.page.$( `#mt-template-changes-warning` );
+    return warningExists ? true : false;
+  }
+
+  /**
    * Gets or sets the post title
    */
   title( val?: string ) { return this.input( '#mt-post-title', val ) }

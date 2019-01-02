@@ -39,6 +39,7 @@
         "--compilers ts:ts-node/register",
         "-t",
         "50000",
+        "--exit",
         "./test/index.js",
         "--config=../../config.json",
         "--logging=false",

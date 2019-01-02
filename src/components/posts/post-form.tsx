@@ -354,11 +354,13 @@ export default class PostForm extends React.Component<Props, State> {
                 {templates.templatesPage.data.map( t => (
                   <ListItem
                     key={t._id}
+                    className="mt-template-item"
                   >
-                    <ListItemText primary={t.name} />
+                    <ListItemText className="mt-template-item-name" primary={t.name} />
                     <ListItemSecondaryAction>
                       <Switch
                         color="primary"
+                        className="mt-template-item-switch"
                         onChange={e => this.setState( { activeTemplate: t._id } )}
                         checked={templateId === t._id}
                       />
@@ -372,6 +374,7 @@ export default class PostForm extends React.Component<Props, State> {
           <Button
             color="primary"
             variant="contained"
+            id="mt-apply-template"
             fullWidth={true}
             disabled={this.state.activeTemplate === curTemplate._id}
             onClick={e => this.props.onTemplateChanged( this.state.activeTemplate )}
@@ -384,7 +387,7 @@ export default class PostForm extends React.Component<Props, State> {
             color: theme.error.background,
             margin: '20px 0 0 0'
           }}
-            id="mt-changes-warning"
+            id="mt-template-changes-warning"
           >
             Note: You have unsaved changes, these will be overritten if you apply a new template
           </div> : undefined}

@@ -91,8 +91,8 @@ export function editPost( post: Partial<IPost<'client' | 'expanded'>> ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await posts.update( post._id as string, post );
+      dispatch( ActionCreators.SetPost.create( resp ) );
       dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
-      dispatch( ActionCreators.SetPostsBusy.create( false ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
