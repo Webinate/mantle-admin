@@ -61,6 +61,7 @@ require( './tests/posts/post-elements-delete-elm' );
 require( './tests/posts/post-elements-delete-elm' );
 require( './tests/posts/post-elements-images' );
 require( './tests/posts/change-template' );
+require( './tests/posts/post-elements-copy-paste' );
 
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );
