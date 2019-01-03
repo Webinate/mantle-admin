@@ -6,7 +6,6 @@ import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost, IVolume } from 'modepress';
-import { PostsController } from '../../../../../src/controllers/posts';
 import { uploadFileToVolume } from '../../utils/file';
 
 let postPage = new PostsPage();
@@ -54,6 +53,37 @@ describe( 'Testing the copy/paste of image elements: ', function() {
 
   it( 'does have a set of elements to copy from', async () => {
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    const elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 5 );
+  } )
+
+  it( 'can select, copy to clipboard and delete the current selection', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    await postPage.page.keyboard.down( 'Shift' );
+    await postPage.elementsModule.clickAt( 0 );
+    await postPage.elementsModule.clickAt( 4 );
+    await postPage.page.keyboard.up( 'Shift' );
+    await postPage.elementsModule.waitForSelected( 4 );
+    const numSelected = await postPage.elementsModule.numSelectedElms();
+    assert.deepEqual( numSelected, 5 );
+
+    await postPage.page.keyboard.down( 'Control' );
+    await postPage.page.keyboard.press( 'C' );
+    await postPage.page.keyboard.up( 'Control' );
+
+    await postPage.elementsModule.clickDelete();
+    await postPage.elementsModule.doneLoading();
+
+    const elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 0 );
+  } )
+
+  it( 'can paste the units from clipboard', async () => {
+    await postPage.page.keyboard.down( 'Control' );
+    await postPage.page.keyboard.press( 'V' );
+    await postPage.page.keyboard.up( 'Control' );
+    await postPage.doneLoading();
+
     const elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 5 );
   } )

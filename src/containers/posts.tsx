@@ -57,7 +57,8 @@ const dispatchToProps = {
   getAllTemplates,
   changeTemplate,
   deleteElements,
-  setElmSelection: PostCreators.SetElmSelection.create
+  setElmSelection: PostCreators.SetElmSelection.create,
+  setFocussedElm: PostCreators.SetFocussedElm.create
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -207,11 +208,16 @@ export class Posts extends React.Component<Props, State> {
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}
-                  onCreateElm={( ( elm, index ) => this.props.addElement( doc._id, elm, index ) )}
+                  onCreateElm={( ( elms, index ) => this.props.addElement( doc._id, elms, index ) )}
                   onUpdateElm={( id, html, createElement, deselect ) => this.props.updateElement( doc._id, id, html, createElement, deselect )}
                   onDeleteElements={ids => this.props.deleteElements( doc._id, ids )}
-                  onSelectionChanged={selection => this.props.setElmSelection( selection )}
+                  onSelectionChanged={( selection, focus ) => {
+                    this.props.setElmSelection( selection );
+                    if ( focus && selection.length > 0 )
+                      this.props.setFocussedElm( selection[ 0 ] );
+                  }}
                   selectedElements={this.props.posts.selection}
+                  focussedId={this.props.posts.focussedId}
                 />
               }
               else {

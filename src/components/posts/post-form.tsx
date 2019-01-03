@@ -41,14 +41,15 @@ export type Props = {
   categoriesLoading: boolean;
   animated: boolean;
   selectedElements: string[];
+  focussedId: string;
   onUpdate?: ( post: Partial<IPost<'client' | 'expanded'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client' | 'expanded'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: ( templateId: string ) => void;
-  onCreateElm: ( elm: Partial<IDraftElement<'client' | 'expanded'>>, index?: number ) => void;
+  onCreateElm: ( elms: Partial<IDraftElement<'client' | 'expanded'>>[], index?: number ) => void;
   onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
   onDeleteElements: ( ids: string[] ) => void;
-  onSelectionChanged: ( ids: string[] ) => void;
+  onSelectionChanged: ( ids: string[], focus: boolean ) => void;
 }
 
 export type State = {
@@ -448,11 +449,12 @@ export default class PostForm extends React.Component<Props, State> {
         <ElmEditor
           elements={this.props.elements}
           document={doc}
-          onCreateElm={( elm, index ) => this.props.onCreateElm( elm, index )}
+          onCreateElm={( elms, index ) => this.props.onCreateElm( elms, index )}
           onUpdateElm={( id, html, createParagraph, deselect ) => this.props.onUpdateElm( id, html, createParagraph, deselect )}
           onDeleteElm={ids => this.props.onDeleteElements( ids )}
-          onSelectionChanged={uids => this.props.onSelectionChanged( uids )}
+          onSelectionChanged={( uids, focus ) => this.props.onSelectionChanged( uids, focus )}
           selected={this.props.selectedElements}
+          focussedId={this.props.focussedId}
         />
         {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
 

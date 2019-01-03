@@ -16,9 +16,10 @@ import { MediaModal } from '../../containers/media-modal';
 export type Props = {
   elements: IDraftElement<'client' | 'expanded'>[];
   selected: string[];
+  focussedId: string;
   document: IDocument<'client'>;
-  onSelectionChanged: ( ids: string[] ) => void;
-  onCreateElm: ( type: Partial<IDraftElement<'client' | 'expanded'>>, index?: number ) => void;
+  onSelectionChanged: ( ids: string[], focus: boolean ) => void;
+  onCreateElm: ( type: Partial<IDraftElement<'client' | 'expanded'>>[], index?: number ) => void;
   onDeleteElm: ( ids: string[] ) => void;
   onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
 }
@@ -64,8 +65,8 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( this._lastFocussedElm && next.selected.length === 0 && this.props.selected.length > 0 )
       this._lastFocussedElm.classList.remove( 'cursor' );
 
-    const elements = this.props.elements.map( elm => elm._id );
-    const selected = this.props.selected;
+    const elements = next.elements.map( elm => elm._id );
+    const selected = next.selected;
     if ( selected.length > 0 ) {
       const index = elements.indexOf( selected[ 0 ] );
       if ( index !== -1 )
@@ -87,8 +88,22 @@ export class ElmEditor extends React.Component<Props, State> {
   }
 
   private onWindowKeyDown( e: KeyboardEvent ) {
+    // CTRL + C
+    if ( e.ctrlKey && e.keyCode === 67 ) {
+      this.copyElementsToLocalStorage( true );
+    }
+    // CTRL + x
+    else if ( e.ctrlKey && e.keyCode === 88 ) {
+      this.copyElementsToLocalStorage( false );
+    }
+    // CTRL + V
+    else if ( e.ctrlKey && e.keyCode === 86 && this.hasClipboard() ) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.pasteElementsFromLocalStorage();
+    }
     // Delete
-    if ( e.keyCode === 46 && this.props.selected.length > 1 )
+    if ( e.keyCode === 46 && this.props.focussedId === '' && this.props.selected.length > 0 )
       this.props.onDeleteElm( this.props.selected );
   }
 
@@ -163,6 +178,34 @@ export class ElmEditor extends React.Component<Props, State> {
     }
   }
 
+  private copyElementsToLocalStorage( copy: boolean ) {
+    let selectedElms = this.props.elements.filter( e => this.props.selected.includes( e._id ) );
+    localStorage.setItem( "elm-editor-clip", JSON.stringify( { copy, elms: selectedElms } ) );
+  }
+
+  private hasClipboard() {
+    const result = localStorage.getItem( "elm-editor-clip" );
+    return result && result !== '' ? true : false;
+  }
+
+  private pasteElementsFromLocalStorage() {
+    try {
+      const selectedElementsJson: { copy: boolean; elms: Partial<IDraftElement<'client'>>[] } = JSON.parse(
+        localStorage.getItem( "elm-editor-clip" )! );
+
+      const refinedElms = selectedElementsJson.elms.map( e => {
+        delete e._id;
+        delete e.parent;
+        e.zone = this.state.selectedZone;
+        return e;
+      } );
+
+      this.props.onCreateElm( refinedElms );
+      localStorage.setItem( "elm-editor-clip", '' );
+    }
+    catch ( err ) { }
+  }
+
   /**
    * Updates an element and then optionally creates a new paragraph
    * @param elm The element to update
@@ -186,9 +229,9 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( elm.html !== html )
       this.props.onUpdateElm( elm._id, html, createElement, deselect );
     else if ( createElement )
-      this.props.onCreateElm( { type: 'elm-paragraph', zone: this.state.selectedZone } );
+      this.props.onCreateElm( [ { type: 'elm-paragraph', zone: this.state.selectedZone } ] );
     else if ( deselect )
-      this.props.onSelectionChanged( [] );
+      this.props.onSelectionChanged( [], false );
   }
 
   /**
@@ -261,17 +304,17 @@ export class ElmEditor extends React.Component<Props, State> {
     e.preventDefault();
     e.stopPropagation();
 
-    if ( this.props.selected.length === 1 )
-      this.updateElmHtml( this.props.elements.find( e => e._id === this.props.selected[ 0 ] )!, null, 'none' );
+    if ( this.props.focussedId !== '' && elm._id !== this.props.focussedId )
+      this.updateElmHtml( this.props.elements.find( e => e._id === this.props.focussedId )!, null, 'none' );
 
     if ( !e.ctrlKey && !e.shiftKey ) {
-      this.props.onSelectionChanged( [ elm._id ] );
+      this.props.onSelectionChanged( [ elm._id ], false );
     }
     else if ( e.ctrlKey ) {
       if ( this.props.selected.indexOf( elm._id ) === -1 )
-        this.props.onSelectionChanged( this.props.selected.concat( elm._id ) );
+        this.props.onSelectionChanged( this.props.selected.concat( elm._id ), false );
       else
-        this.props.onSelectionChanged( this.props.selected.filter( i => i !== elm._id ) );
+        this.props.onSelectionChanged( this.props.selected.filter( i => i !== elm._id ), false );
     }
     else {
       const elements = this.props.elements.map( elm => elm._id );
@@ -280,7 +323,7 @@ export class ElmEditor extends React.Component<Props, State> {
       let firstIndex = Math.min( elements.indexOf( elm._id ), selected.length > 0 ? elements.indexOf( selected[ 0 ] ) : 0 );
       let lastIndex = Math.max( elements.indexOf( elm._id ), selected.length > 0 ? selected.indexOf( selected[ 0 ] ) : 0 );
 
-      this.props.onSelectionChanged( elements.slice( firstIndex, lastIndex + 1 ) );
+      this.props.onSelectionChanged( elements.slice( firstIndex, lastIndex + 1 ), false );
     }
   }
 
@@ -435,7 +478,7 @@ export class ElmEditor extends React.Component<Props, State> {
           variant="contained"
           disabled={!this.state.linkUrl}
           onClick={e => {
-            this.setState( { anchorOpen: false }, () => this.props.onSelectionChanged( this._previousSelection ) );
+            this.setState( { anchorOpen: false }, () => this.props.onSelectionChanged( this._previousSelection, true ) );
           }}
           color="primary"
           id="mt-link-confirm"
@@ -457,6 +500,7 @@ export class ElmEditor extends React.Component<Props, State> {
     const selectedZone = this.state.selectedZone;
     const zones = template.zones.concat( 'unassigned' );
     const unassigned: IDraftElement<'client' | 'expanded'>[] = [];
+    const focussedId = this.props.focussedId;
 
     for ( const elm of elements )
       if ( !zones.includes( elm.zone ) || elm.zone === 'unassigned' )
@@ -472,14 +516,14 @@ export class ElmEditor extends React.Component<Props, State> {
         {zones.map( ( z, index ) => <Tab
           key={`tab-${ index }`}
           onClick={e => {
-            this.props.onSelectionChanged( [] );
+            this.props.onSelectionChanged( [], false );
             this.setState( { selectedZone: z } )
           }}
           className={`mt-editor-tab ${ selectedZone === z ? 'active' : 'inactive' }`}>{z}
         </Tab> )}
         <Container>
           <EditorToolbar
-            onCreateBlock={( type, html ) => this.props.onCreateElm( { type, html, zone: this.state.selectedZone }, this._lastActiveIndex + 1 )}
+            onCreateBlock={( type, html ) => this.props.onCreateElm( [ { type, html, zone: this.state.selectedZone } ], this._lastActiveIndex + 1 )}
             onAddMedia={() => this.setState( { showMediaPopup: true } )}
             onLink={() => {
               if ( this.props.selected.length === 0 )
@@ -487,7 +531,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
               this._previousSelection = this.props.selected.slice();
               this._ranges = this.saveSelection();
-              this.props.onSelectionChanged( [] );
+              this.props.onSelectionChanged( [], false );
               this.setState( { anchorOpen: true, linkUrl: '' } )
             }}
             onDelete={() => this.props.onDeleteElm( this.props.selected )}
@@ -502,7 +546,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
               const isEditable = elm.type !== 'elm-image';
 
-              if ( selection.length === 1 && selection[ 0 ] === elm._id )
+              if ( focussedId === elm._id )
                 return (
                   <div
                     key={`elm-${ index }`}
@@ -530,6 +574,7 @@ export class ElmEditor extends React.Component<Props, State> {
                 key={`elm-${ index }`}
                 className={`mt-element${ selection.includes( elm._id ) ? ' active' : '' }`}
                 onMouseDown={e => this.onElmDown( e, elm )}
+                onDoubleClick={e => this.props.onSelectionChanged( [ elm._id ], true )}
                 dangerouslySetInnerHTML={{ __html: elm.html }}
               />;
             } )}
@@ -544,11 +589,11 @@ export class ElmEditor extends React.Component<Props, State> {
             onCancel={() => { this.setState( { showMediaPopup: false } ) }}
             onSelect={file => this.setState( {
               showMediaPopup: false
-            }, () => this.props.onCreateElm( {
+            }, () => this.props.onCreateElm( [ {
               type: 'elm-image',
               image: file._id,
               zone: this.state.selectedZone
-            } as IImageElement<'client'>, this._lastActiveIndex + 1 ) )}
+            } as IImageElement<'client'> ], this._lastActiveIndex + 1 ) )}
           /> : undefined}
       </div>
     );

@@ -10,13 +10,14 @@ import { push } from 'react-router-redux';
 // Action Creators
 export const ActionCreators = {
   SetPostsBusy: new ActionCreator<'posts-busy', boolean>( 'posts-busy' ),
-  AddElement: new ActionCreator<'posts-add-elm', { elm: IDraftElement<'client' | 'expanded'>, index?: number }>( 'posts-add-elm' ),
+  AddElement: new ActionCreator<'posts-add-elm', { elms: IDraftElement<'client' | 'expanded'>[], index?: number }>( 'posts-add-elm' ),
   UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client' | 'expanded'>>( 'posts-update-elm' ),
   RemoveElements: new ActionCreator<'posts-remove-elms', string[]>( 'posts-remove-elms' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client' | 'expanded'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
   SetPost: new ActionCreator<'posts-set-post', IPost<'client' | 'expanded'>>( 'posts-set-post' ),
   SetTemplate: new ActionCreator<'posts-set-template', IDocument<'client' | 'expanded'>>( 'posts-set-template' ),
-  SetElmSelection: new ActionCreator<'posts-elm-set-selection', string[]>( 'posts-elm-set-selection' )
+  SetElmSelection: new ActionCreator<'posts-elm-set-selection', string[]>( 'posts-elm-set-selection' ),
+  SetFocussedElm: new ActionCreator<'posts-elm-set-focus', string>( 'posts-elm-set-focus' )
 };
 
 // Action Types
@@ -125,14 +126,15 @@ function getSelectedIndex( state: IRootState, ) {
   return index;
 }
 
-export function addElement( docId: string, element: Partial<IDraftElement<'client' | 'expanded'>>, index?: number ) {
+export function addElement( docId: string, elements: Partial<IDraftElement<'client' | 'expanded'>>[], index?: number ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
 
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       index = index !== undefined ? index : getSelectedIndex( getState() );
-      const resp = await documents.addElement( docId, element, index );
-      dispatch( ActionCreators.AddElement.create( { elm: resp, index: index } ) );
+
+      const resp = await Promise.all( elements.map( e => documents.addElement( docId, e, index ) ) );
+      dispatch( ActionCreators.AddElement.create( { elms: resp, index: index } ) );
     }
     catch ( err ) {
       dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
@@ -150,7 +152,7 @@ export function updateElement( docId: string, elementId: string, html: string, c
       if ( createElement ) {
         const index = getSelectedIndex( getState() );
         const newElm = await documents.addElement( docId, createElement, index );
-        dispatch( ActionCreators.AddElement.create( { elm: newElm, index: index } ) );
+        dispatch( ActionCreators.AddElement.create( { elms: [ newElm ], index: index } ) );
         if ( deselect === 'deselect' )
           dispatch( ActionCreators.SetElmSelection.create( [] ) );
       }
@@ -159,7 +161,7 @@ export function updateElement( docId: string, elementId: string, html: string, c
         if ( deselect === 'deselect' )
           dispatch( ActionCreators.SetElmSelection.create( [] ) );
         else if ( deselect === 'select' )
-          dispatch( ActionCreators.SetElmSelection.create( [ resp._id ] ) );
+          dispatch( ActionCreators.SetFocussedElm.create( resp._id ) );
       }
     }
     catch ( err ) {

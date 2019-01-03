@@ -78,7 +78,7 @@ export default class ElementsModule extends Module {
   }
 
   async activateAt( index: number ) {
-    await this.page.click( `.mt-element:nth-child(${ index + 1 })` );
+    await this.page.click( `.mt-element:nth-child(${ index + 1 })`, { clickCount: 2 } );
     await this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active.focussed.cursor` );
 
     // Give the browser a moment to create the focus

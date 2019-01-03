@@ -10,6 +10,7 @@ export type State = {
   readonly post: IPost<'client' | 'expanded'> | null;
   readonly busy: boolean;
   readonly selection: string[];
+  readonly focussedId: string;
   readonly draftElements: IDraftElement<'client' | 'expanded'>[] | null;
 };
 
@@ -18,6 +19,7 @@ export const initialState: State = {
   postPage: null,
   post: null,
   busy: false,
+  focussedId: '',
   selection: [],
   draftElements: null
 };
@@ -57,30 +59,39 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.AddElement.type:
       let elements: IDraftElement<'client' | 'expanded'>[];
       if ( action.payload.index !== undefined ) {
-        state.draftElements!.splice( action.payload.index, 0, action.payload.elm );
+        state.draftElements!.splice( action.payload.index, 0, ...action.payload.elms );
         elements = [ ...state.draftElements! ];
       }
       else
-        elements = state.draftElements!.concat( action.payload.elm );
+        elements = state.draftElements!.concat( action.payload.elms );
 
       partialState = {
         draftElements: elements,
-        selection: [ action.payload.elm._id ],
+        selection: [ action.payload.elms[ action.payload.elms.length - 1 ]._id ],
+        focussedId: action.payload.elms.length === 1 ? action.payload.elms[ 0 ]._id : '',
         busy: false,
         post: state.post!
+      };
+      break;
+
+    case ActionCreators.SetFocussedElm.type:
+      partialState = {
+        focussedId: action.payload
       };
       break;
 
     case ActionCreators.UpdateElement.type:
       partialState = {
         draftElements: state.draftElements!.map( elm => elm._id === action.payload._id ? action.payload : elm ),
+        focussedId: '',
         post: state.post!
       };
       break;
 
     case ActionCreators.SetElmSelection.type:
       partialState = {
-        selection: action.payload
+        selection: action.payload,
+        focussedId: action.payload.length === 0 ? '' : state.focussedId
       };
       break;
 
@@ -88,6 +99,7 @@ export default function reducer( state: State = initialState, action: Action ): 
       partialState = {
         draftElements: state.draftElements!.filter( elm => !action.payload.includes( elm._id ) ),
         selection: [],
+        focussedId: '',
         busy: false,
         post: state.post!
       };
