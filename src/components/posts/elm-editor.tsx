@@ -90,11 +90,15 @@ export class ElmEditor extends React.Component<Props, State> {
   private onWindowKeyDown( e: KeyboardEvent ) {
     // CTRL + C
     if ( e.ctrlKey && e.keyCode === 67 ) {
-      this.copyElementsToLocalStorage( true );
+      if ( this.props.selected.length > 0 )
+        this.copyElementsToLocalStorage( true );
+      else
+        localStorage.setItem( 'elm-editor-clip', '' );
     }
     // CTRL + x
-    else if ( e.ctrlKey && e.keyCode === 88 ) {
+    else if ( e.ctrlKey && e.keyCode === 88 && this.props.selected.length > 0 ) {
       this.copyElementsToLocalStorage( false );
+      this.props.onDeleteElm( this.props.selected );
     }
     // CTRL + V
     else if ( e.ctrlKey && e.keyCode === 86 && this.hasClipboard() ) {
@@ -180,20 +184,20 @@ export class ElmEditor extends React.Component<Props, State> {
 
   private copyElementsToLocalStorage( copy: boolean ) {
     let selectedElms = this.props.elements.filter( e => this.props.selected.includes( e._id ) );
-    localStorage.setItem( "elm-editor-clip", JSON.stringify( { copy, elms: selectedElms } ) );
+    localStorage.setItem( 'elm-editor-clip', JSON.stringify( selectedElms ) );
   }
 
   private hasClipboard() {
-    const result = localStorage.getItem( "elm-editor-clip" );
+    const result = localStorage.getItem( 'elm-editor-clip' );
     return result && result !== '' ? true : false;
   }
 
   private pasteElementsFromLocalStorage() {
     try {
-      const selectedElementsJson: { copy: boolean; elms: Partial<IDraftElement<'client'>>[] } = JSON.parse(
-        localStorage.getItem( "elm-editor-clip" )! );
+      const selectedElementsJson: Partial<IDraftElement<'client'>>[] = JSON.parse(
+        localStorage.getItem( 'elm-editor-clip' )! );
 
-      const refinedElms = selectedElementsJson.elms.map( e => {
+      const refinedElms = selectedElementsJson.map( e => {
         delete e._id;
         delete e.parent;
         e.zone = this.state.selectedZone;
@@ -201,7 +205,6 @@ export class ElmEditor extends React.Component<Props, State> {
       } );
 
       this.props.onCreateElm( refinedElms );
-      localStorage.setItem( "elm-editor-clip", '' );
     }
     catch ( err ) { }
   }

@@ -85,6 +85,14 @@ export default class ElementsModule extends Module {
     await this.sleep( 500 );
   }
 
+  async selectRange( startIndex: number, endIndex: number ) {
+    await this.page.keyboard.down( 'Shift' );
+    await this.clickAt( startIndex );
+    await this.clickAt( endIndex );
+    await this.page.keyboard.up( 'Shift' );
+    await this.waitForSelected( endIndex );
+  }
+
   clickAt( index: number ) {
     return this.page.click( `.mt-element:nth-child(${ index + 1 })` );
   }

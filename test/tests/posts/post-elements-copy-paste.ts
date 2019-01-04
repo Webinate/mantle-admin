@@ -59,11 +59,7 @@ describe( 'Testing the copy/paste of image elements: ', function() {
 
   it( 'can select, copy to clipboard and delete the current selection', async () => {
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
-    await postPage.page.keyboard.down( 'Shift' );
-    await postPage.elementsModule.clickAt( 0 );
-    await postPage.elementsModule.clickAt( 4 );
-    await postPage.page.keyboard.up( 'Shift' );
-    await postPage.elementsModule.waitForSelected( 4 );
+    await postPage.elementsModule.selectRange( 0, 4 );
     const numSelected = await postPage.elementsModule.numSelectedElms();
     assert.deepEqual( numSelected, 5 );
 
@@ -85,6 +81,50 @@ describe( 'Testing the copy/paste of image elements: ', function() {
     await postPage.doneLoading();
 
     const elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 5 );
+  } )
+
+  it( 'does removes the units when cutting', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    await postPage.elementsModule.selectRange( 0, 4 );
+    await postPage.page.keyboard.down( 'Control' );
+    await postPage.page.keyboard.press( 'X' );
+    await postPage.page.keyboard.up( 'Control' );
+    await postPage.doneLoading();
+
+    const elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 0 );
+  } )
+
+  it( 'can paste units after a reload', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+
+    await postPage.page.keyboard.down( 'Control' );
+    await postPage.page.keyboard.press( 'V' );
+    await postPage.page.keyboard.up( 'Control' );
+    await postPage.doneLoading();
+
+    const elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 5 );
+  } )
+
+  it( 'can paste units into another tab', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+
+    let elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 5 );
+
+    await postPage.elementsModule.clickTab( 'Unassigned' );
+
+    elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 0 );
+
+    await postPage.page.keyboard.down( 'Control' );
+    await postPage.page.keyboard.press( 'V' );
+    await postPage.page.keyboard.up( 'Control' );
+    await postPage.doneLoading();
+
+    elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 5 );
   } )
 } );
