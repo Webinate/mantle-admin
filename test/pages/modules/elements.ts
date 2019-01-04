@@ -21,6 +21,20 @@ export default class ElementsModule extends Module {
     return this.page.click( '#mt-create-link' );
   }
 
+  async clickAddHtml() {
+    await this.page.click( '#mt-create-html' );
+    await this.doneLoading();
+  }
+
+  async htmlEditorIsActive() {
+    const result = await this.page.$( `.active.focussed textarea` );
+    return result ? true : false;
+  }
+
+  htmlEditorText( val?: string ) {
+    return this.input( `.active.focussed textarea`, val );
+  }
+
   async setLinkUrl( url: string ) {
     await this.input( '#mt-link-address', url );
     await this.page.click( '#mt-link-confirm' );
@@ -77,9 +91,12 @@ export default class ElementsModule extends Module {
     return result.length;
   }
 
-  async activateAt( index: number ) {
+  async activateAt( index: number, waitForFocus = true ) {
     await this.page.click( `.mt-element:nth-child(${ index + 1 })`, { clickCount: 2 } );
-    await this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active.focussed.cursor` );
+    if ( waitForFocus )
+      await this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active.focussed.cursor` );
+    else
+      await this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active` );
 
     // Give the browser a moment to create the focus
     await this.sleep( 500 );
@@ -141,6 +158,10 @@ export default class ElementsModule extends Module {
 
   waitForActivation( index: number ) {
     return this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active.focussed.cursor` );
+  }
+
+  waitForHtmlEditor( index: number ) {
+    return this.page.waitFor( `.mt-element:nth-child(${ index + 1 }).active textarea` );
   }
 
   waitForSelected( index: number ) {

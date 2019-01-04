@@ -210,7 +210,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
         <div
           id="mt-create-html"
           onClick={e => {
-            this.props.onAddMedia();
+            this.props.onCreateBlock( 'elm-html', '<div></div>' )
           }}
         >
           <Icon style={iconStyle}>

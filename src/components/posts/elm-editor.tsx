@@ -30,6 +30,7 @@ export type State = {
   selectedZone: string;
   linkUrl: string;
   showMediaPopup: boolean;
+  html: string;
 };
 
 /**
@@ -53,6 +54,7 @@ export class ElmEditor extends React.Component<Props, State> {
       initialized: false,
       anchorOpen: false,
       showMediaPopup: false,
+      html: '',
       linkUrl: '',
       selectedZone: ( props.document.template as ITemplate<'client'> ).zones[ 0 ]
     };
@@ -60,17 +62,29 @@ export class ElmEditor extends React.Component<Props, State> {
 
   componentWillReceiveProps( next: Props ) {
     const nextTemplate = next.document.template as ITemplate<'client'>;
+
     if ( next.document !== this.props.document )
       this.setState( { selectedZone: nextTemplate.zones[ 0 ] } );
+
     if ( this._lastFocussedElm && next.selected.length === 0 && this.props.selected.length > 0 )
       this._lastFocussedElm.classList.remove( 'cursor' );
 
     const elements = next.elements.map( elm => elm._id );
     const selected = next.selected;
+
     if ( selected.length > 0 ) {
       const index = elements.indexOf( selected[ 0 ] );
       if ( index !== -1 )
         this._lastActiveIndex = index;
+    }
+
+    if ( next.focussedId !== this.props.focussedId && next.focussedId !== '' ) {
+      const elm = this.props.elements.find( e => e._id === next.focussedId )!;
+      if ( elm.type === 'elm-html' ) {
+        this._activeElm = null;
+        this._firstElm = null;
+        this.setState( { html: elm.html } );
+      }
     }
   }
 
@@ -90,18 +104,18 @@ export class ElmEditor extends React.Component<Props, State> {
   private onWindowKeyDown( e: KeyboardEvent ) {
     // CTRL + C
     if ( e.ctrlKey && e.keyCode === 67 ) {
-      if ( this.props.selected.length > 0 )
+      if ( this.props.selected.length > 0 && this.props.focussedId === '' )
         this.copyElementsToLocalStorage( true );
       else
         localStorage.setItem( 'elm-editor-clip', '' );
     }
     // CTRL + x
-    else if ( e.ctrlKey && e.keyCode === 88 && this.props.selected.length > 0 ) {
+    else if ( e.ctrlKey && e.keyCode === 88 && this.props.focussedId === '' ) {
       this.copyElementsToLocalStorage( false );
       this.props.onDeleteElm( this.props.selected );
     }
     // CTRL + V
-    else if ( e.ctrlKey && e.keyCode === 86 && this.hasClipboard() ) {
+    else if ( e.ctrlKey && e.keyCode === 86 && this.hasClipboard() && this.props.focussedId === '' ) {
       e.stopPropagation();
       e.preventDefault();
       this.pasteElementsFromLocalStorage();
@@ -216,6 +230,12 @@ export class ElmEditor extends React.Component<Props, State> {
    * @param deselect If true, then nothing should be selected after update
    */
   private updateElmHtml( elm: IDraftElement<'client' | 'expanded'>, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
+
+    if ( elm.type === 'elm-html' ) {
+      this.props.onUpdateElm( elm._id, this.state.html, createElement, deselect );
+      return;
+    }
+
     if ( !this._activeElm )
       return;
 
@@ -307,8 +327,10 @@ export class ElmEditor extends React.Component<Props, State> {
     e.preventDefault();
     e.stopPropagation();
 
-    if ( this.props.focussedId !== '' && elm._id !== this.props.focussedId )
-      this.updateElmHtml( this.props.elements.find( e => e._id === this.props.focussedId )!, null, 'none' );
+    if ( this.props.focussedId !== '' && elm._id !== this.props.focussedId ) {
+      const currentlyFocussedElm = this.props.elements.find( e => e._id === this.props.focussedId )!;
+      this.updateElmHtml( currentlyFocussedElm, null, 'deselect' );
+    }
 
     if ( !e.ctrlKey && !e.shiftKey ) {
       this.props.onSelectionChanged( [ elm._id ], false );
@@ -382,7 +404,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( selection.length === 0 )
       return null;
 
-    const activeElm = elements.find( e => e._id === selection[ selection.length - 1 ] );
+    const activeElm = elements.find( e => e._id === this.props.focussedId );
     if ( !activeElm )
       return null;
 
@@ -549,7 +571,21 @@ export class ElmEditor extends React.Component<Props, State> {
 
               const isEditable = elm.type !== 'elm-image';
 
-              if ( focussedId === elm._id )
+              if ( focussedId === elm._id && elm.type === 'elm-html' ) {
+                return ( <div
+                  key={`elm-${ index }`}
+                  className={`mt-element active focussed`}
+                >
+                  <textarea
+                    autoFocus={true}
+                    onChange={e => this.setState( { html: e.currentTarget.value } )}
+                    onBlur={e => this.updateElmHtml( elm, null, 'deselect' )}
+                    value={this.state.html}
+                    onKeyUp={e => this.onKeyUp( e )}
+                  />
+                </div> );
+              }
+              else if ( focussedId === elm._id )
                 return (
                   <div
                     key={`elm-${ index }`}
@@ -671,6 +707,18 @@ const Container = styled.div`
     outline: 0px solid transparent;
     &:hover {
       border: 1px dashed ${ theme.light200.border };
+    }
+
+    textarea {
+      width: 100%;
+      resize: none;
+      min-height: 60px;
+      border: none;
+      font-family: 'monospace';
+      color: ${ theme.light100.color };
+      &:active {
+        border: none;
+      }
     }
 
     a {
