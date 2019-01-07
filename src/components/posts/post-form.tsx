@@ -135,12 +135,14 @@ export default class PostForm extends React.Component<Props, State> {
         <div className="mt-panel-inner">
           <div className="mt-panel-publish">
             <div>
-              <IconButton
-                id="mt-post-preview-btn"
-                onClick={e => this.props.onRequestPreview()}
-              >
-                <VisibilityIcon />
-              </IconButton>
+              <Tooltip title="Preview Post" placement="left">
+                <IconButton
+                  id="mt-post-preview-btn"
+                  onClick={e => this.props.onRequestPreview()}
+                >
+                  <VisibilityIcon />
+                </IconButton>
+              </Tooltip>
             </div>
             <div>
               <Button
@@ -166,7 +168,6 @@ export default class PostForm extends React.Component<Props, State> {
               control={
                 <Switch
                   color="primary"
-
                   checked={this.state.editable.public ? true : false}
                   onChange={e => {
                     this.setState( {

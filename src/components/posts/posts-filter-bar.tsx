@@ -3,11 +3,12 @@ import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
-import FontCancel from '@material-ui/icons/ArrowBack';
+import FontCancel from '@material-ui/icons/ChevronLeft';
 import FilterIcon from '@material-ui/icons/FilterList';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
+import theme from '../../theme/mui-theme';
 
 export type Props = {
   inPostsRoot: boolean;
@@ -43,7 +44,7 @@ export default class PostFilterBar extends React.Component<Props, State> {
       return (
         <Button
           id="mt-to-post-list"
-          style={{ margin: '5px 0 0 0' }}
+          style={{ margin: '5px 0 0 0', color: theme.primary200.background }}
           onClick={e => this.props.onCancel()}
         >
           <FontCancel style={buttonIconStyle} />
