@@ -30,7 +30,7 @@ describe( 'Test changing of post template: ', function() {
       public: false
     } ) as IPost<'expanded'>;
 
-    await docs.updateElement( { id: post.document._id }, post.document.currentDraft.elements[ 0 ]._id, {
+    await docs.updateElement( { id: post.document._id }, post.document.elements[ 0 ]._id, {
       html: '<p>HELLO WORLD</p>'
     } );
   } )

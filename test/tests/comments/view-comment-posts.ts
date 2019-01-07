@@ -43,8 +43,8 @@ describe( 'View comment posts: ', function() {
       author: adminUser._id.toString()
     } ) as IPost<'expanded'>;
 
-    docs.updateElement( { id: post1.document._id }, post1.document.currentDraft.elements[ 0 ]._id, { html: '<p>This is post 1</p>' } );
-    docs.updateElement( { id: post2.document._id }, post2.document.currentDraft.elements[ 0 ]._id, { html: '<p>This is post 2</p>' } );
+    docs.updateElement( { id: post1.document._id }, post1.document.elements[ 0 ]._id, { html: '<p>This is post 1</p>' } );
+    docs.updateElement( { id: post2.document._id }, post2.document.elements[ 0 ]._id, { html: '<p>This is post 2</p>' } );
 
     rootComment = await comments.create( { author: joeUser.username, user: joeUser._id, post: post1._id, content: randomId() } ) as IComment<'expanded'>;
     rootReply = await comments.create( { author: adminUser.username, user: adminUser._id, post: post1._id, parent: rootComment._id, content: randomId() } ) as IComment<'expanded'>;

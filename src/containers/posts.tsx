@@ -213,7 +213,7 @@ export class Posts extends React.Component<Props, State> {
                   templates={templates}
                   onTemplateChanged={( templateId ) => this.props.changeTemplate( doc._id, templateId )}
                   post={post}
-                  elements={this.props.posts.draftElements!}
+                  elements={this.props.posts.elements!}
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}
                   onRequestPreview={() => this.setState( { previewMode: true } )}

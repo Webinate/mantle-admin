@@ -37,7 +37,7 @@ describe( 'Testing the copy/paste of image elements: ', function() {
     await uploadFileToVolume( 'img-a.png', volume, 'File A' );
     const uploads = await files.getFiles( { volumeId: volume._id } );
 
-    await docs.updateElement( { id: post.document._id }, post.document.currentDraft.elements[ 0 ]._id, { html: '<p>THIS IS A TEST</p>' } );
+    await docs.updateElement( { id: post.document._id }, post.document.elements[ 0 ]._id, { html: '<p>THIS IS A TEST</p>' } );
     await docs.addElement( { id: post.document._id }, { type: 'elm-header-1', html: '<h1>HEADER 1</h1>', zone: 'main' } );
     await docs.addElement( { id: post.document._id }, { type: 'elm-header-2', html: '<h1>HEADER 2</h1>', zone: 'main' } );
     await docs.addElement( { id: post.document._id }, { type: 'elm-header-3', html: '<h1>HEADER 3</h1>', zone: 'main' } );

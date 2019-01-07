@@ -51,7 +51,7 @@ describe( 'Preview posts available to regular users: ', function() {
 
 
     // Add an element to the public post#
-    await docs.updateElement( { id: publicPost.document._id }, publicPost.document.currentDraft.elements[ 0 ]._id, { html: 'This is a post\'s <b>content</b>' } );
+    await docs.updateElement( { id: publicPost.document._id }, publicPost.document.elements[ 0 ]._id, { html: 'This is a post\'s <b>content</b>' } );
     await docs.changeTemplate( { id: multiZonePost.document._id as string }, templatePage.data[ 1 ]._id );
 
     await docs.addElement( { id: multiZonePost.document._id },

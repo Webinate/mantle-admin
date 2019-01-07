@@ -120,7 +120,7 @@ export function changeTemplate( docId: string, templateId: string ) {
 
 function getSelectedIndex( state: IRootState, ) {
   const selection = state.posts.selection;
-  const elements = state.posts.draftElements || [];
+  const elements = state.posts.elements || [];
   const index = selection.length > 0 ? elements.findIndex(
     el => el._id === selection[ selection.length - 1 ] ) + 1 : undefined;
   return index;

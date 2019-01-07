@@ -1,7 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import { PostsGetAllOptions, IDocument, IDraftElement } from 'modepress';
 import { Page, IPost } from '../../../../../src';
-import { IDraft } from '../../../../../src/types/models/i-draft';
 
 // State
 export type State = {
@@ -11,7 +10,7 @@ export type State = {
   readonly busy: boolean;
   readonly selection: string[];
   readonly focussedId: string;
-  readonly draftElements: IDraftElement<'client' | 'expanded'>[] | null;
+  readonly elements: IDraftElement<'client' | 'expanded'>[] | null;
 };
 
 export const initialState: State = {
@@ -21,7 +20,7 @@ export const initialState: State = {
   busy: false,
   focussedId: '',
   selection: [],
-  draftElements: null
+  elements: null
 };
 
 // Reducer
@@ -47,11 +46,10 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.SetPost.type:
       let doc = action.payload.document as IDocument<'client'>;
-      let draft = doc.currentDraft as IDraft<'client' | 'expanded'>;
 
       partialState = {
         post: action.payload,
-        draftElements: [ ...draft.elements ],
+        elements: [ ...doc.elements ],
         busy: false
       };
       break;
@@ -59,14 +57,14 @@ export default function reducer( state: State = initialState, action: Action ): 
     case ActionCreators.AddElement.type:
       let elements: IDraftElement<'client' | 'expanded'>[];
       if ( action.payload.index !== undefined ) {
-        state.draftElements!.splice( action.payload.index, 0, ...action.payload.elms );
-        elements = [ ...state.draftElements! ];
+        state.elements!.splice( action.payload.index, 0, ...action.payload.elms );
+        elements = [ ...state.elements! ];
       }
       else
-        elements = state.draftElements!.concat( action.payload.elms );
+        elements = state.elements!.concat( action.payload.elms );
 
       partialState = {
-        draftElements: elements,
+        elements: elements,
         selection: [ action.payload.elms[ action.payload.elms.length - 1 ]._id ],
         focussedId: action.payload.elms.length === 1 ? action.payload.elms[ 0 ]._id : '',
         busy: false,
@@ -82,7 +80,7 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.UpdateElement.type:
       partialState = {
-        draftElements: state.draftElements!.map( elm => elm._id === action.payload._id ? action.payload : elm ),
+        elements: state.elements!.map( elm => elm._id === action.payload._id ? action.payload : elm ),
         focussedId: '',
         post: state.post!
       };
@@ -97,7 +95,7 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.RemoveElements.type:
       partialState = {
-        draftElements: state.draftElements!.filter( elm => !action.payload.includes( elm._id ) ),
+        elements: state.elements!.filter( elm => !action.payload.includes( elm._id ) ),
         selection: [],
         focussedId: '',
         busy: false,

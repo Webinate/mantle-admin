@@ -161,9 +161,8 @@ describe( 'Testing the creation of posts: ', function() {
 
     // Confirm the post is saved as it was created
     const post = await controller.getPost( { slug: postSlug } );
-    const doc = post.document as IDocument<'client'>;
-    const draft = doc.currentDraft as IDraft<'client'>;
-    assert.equal( draft.elements[ 0 ].html, '<p>This is a post bruv</p>' );
+    const doc = post.document as IDocument<'expanded'>;
+    assert.equal( doc.elements[ 0 ].html, '<p>This is a post bruv</p>' );
 
     assert.equal( post.title, postSlug );
     assert.equal( post.slug, postSlug );
