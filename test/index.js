@@ -63,6 +63,7 @@ require( './tests/posts/post-elements-images' );
 require( './tests/posts/change-template' );
 require( './tests/posts/post-elements-copy-paste' );
 require( './tests/posts/post-elements-add-html' );
+require( './tests/posts/post-preview' );
 
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );

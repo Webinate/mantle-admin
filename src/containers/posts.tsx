@@ -67,6 +67,7 @@ type State = {
   selectedPosts: IPost<'client' | 'expanded'>[];
   showDeleteModal: boolean;
   filtersOpen: boolean;
+  previewMode: boolean;
 };
 
 /**
@@ -83,7 +84,8 @@ export class Posts extends React.Component<Props, State> {
     this.state = {
       selectedPosts: [],
       showDeleteModal: false,
-      filtersOpen: false
+      filtersOpen: false,
+      previewMode: false
     }
   }
 
@@ -101,6 +103,8 @@ export class Posts extends React.Component<Props, State> {
   componentWillReceiveProps( next: Props ) {
     if ( next.location.pathname !== this.props.location.pathname ) {
       const inPostsRoot = matchPath( next.location.pathname, { exact: true, path: '/dashboard/posts' } );
+
+      this.setState( { previewMode: false } );
 
       if ( inPostsRoot ) {
         this.props.getPosts( {
@@ -184,7 +188,12 @@ export class Posts extends React.Component<Props, State> {
             onFilterToggle={val => this.setState( { filtersOpen: val } )}
             inPostsRoot={inPostsRoot ? true : false}
             filtersOpen={this.state.filtersOpen}
-            onCancel={() => this.props.push( '/dashboard/posts' )}
+            onCancel={() => {
+              if ( this.state.previewMode )
+                this.setState( { previewMode: false } );
+              else
+                this.props.push( '/dashboard/posts' )
+            }}
           />}>
         </ContentHeader>
         <PostsContainer>
@@ -193,7 +202,7 @@ export class Posts extends React.Component<Props, State> {
               if ( !post )
                 return null;
 
-              if ( isAdmin || ( post && user._id === post._id ) ) {
+              if ( !this.state.previewMode && ( isAdmin || ( post && user._id === post._id ) ) ) {
                 const doc = post.document as IDocument<'client' | 'expanded'>;
 
                 return <PostForm
@@ -207,6 +216,7 @@ export class Posts extends React.Component<Props, State> {
                   elements={this.props.posts.draftElements!}
                   onUpdate={post => this.props.editPost( post )}
                   isAdmin={isAdmin}
+                  onRequestPreview={() => this.setState( { previewMode: true } )}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}
                   onCreateElm={( ( elms, index ) => this.props.addElement( doc._id, elms, index ) )}
                   onUpdateElm={( id, html, createElement, deselect ) => this.props.updateElement( doc._id, id, html, createElement, deselect )}

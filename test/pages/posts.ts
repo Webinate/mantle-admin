@@ -101,6 +101,17 @@ export default class PostsPage extends Page {
     return result ? true : false;
   }
 
+  async gotoPreviewMode( val: boolean ) {
+    if ( val ) {
+      await this.page.click( '#mt-post-preview-btn' );
+      await this.page.waitFor( '#mt-post-preview' );
+    }
+    else {
+      await this.page.click( '#mt-to-post-list' );
+      await this.page.waitFor( '#mt-post-preview-btn' );
+    }
+  }
+
   async previewDetails() {
     let result: {
       avatar: string;

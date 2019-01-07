@@ -85,6 +85,7 @@ const Container = styled.form`
   .mt-preview-content {
     background: ${theme.light100.background };
     border: 1px solid ${theme.light100.border };
+    border-radius: 5px;
   }
 
   h1 {
@@ -111,8 +112,6 @@ const Container = styled.form`
 
   .mt-preview-headers {
     display: flex;
-
-    margin: 10px 10px 0 10px;
     padding: 10px;
     margin: 10px 10px 0 10px;
     border-radius: 10px;
@@ -127,7 +126,7 @@ const Container = styled.form`
 
   .mt-preview-content {
     display: flex;
-    margin: 10px 10px 0 10px;
+    margin: 10px 20px 0 20px;
     overflow: auto;
 
     h2 {
@@ -137,7 +136,7 @@ const Container = styled.form`
 
     > div {
       flex: 1;
-      padding: 0 20px;
+      padding: 20px;
       box-sizing: border-box;
     }
 

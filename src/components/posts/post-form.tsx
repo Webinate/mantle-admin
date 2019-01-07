@@ -11,6 +11,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import Icon from '@material-ui/core/Icon';
 import RemoveIcon from '@material-ui/icons/Delete';
 import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument } from 'modepress';
@@ -42,6 +43,7 @@ export type Props = {
   animated: boolean;
   selectedElements: string[];
   focussedId: string;
+  onRequestPreview: () => void;
   onUpdate?: ( post: Partial<IPost<'client' | 'expanded'>> ) => void;
   onCreate?: ( post: Partial<IPost<'client' | 'expanded'>> ) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
@@ -131,19 +133,33 @@ export default class PostForm extends React.Component<Props, State> {
     return <ExpansionPanel expanded={true} className="mt-update-panel">
       <ExpansionPanelDetails>
         <div className="mt-panel-inner">
-          <Button
-            variant="contained"
-            className="mt-post-confirm"
-            onClick={e => {
-              if ( this.props.post && this.props.onUpdate )
-                this.props.onUpdate( this.state.editable );
-              else if ( this.props.onCreate )
-                this.props.onCreate( this.state.editable );
-            }}
-            color="primary"
-            fullWidth={true}
-            disabled={!this.isPostValid()}
-          >Update</Button>
+          <div className="mt-panel-publish">
+            <div>
+              <IconButton
+                id="mt-post-preview-btn"
+                onClick={e => this.props.onRequestPreview()}
+              >
+                <VisibilityIcon />
+              </IconButton>
+            </div>
+            <div>
+              <Button
+                variant="contained"
+                className="mt-post-confirm"
+                onClick={e => {
+                  if ( this.props.post && this.props.onUpdate )
+                    this.props.onUpdate( this.state.editable );
+                  else if ( this.props.onCreate )
+                    this.props.onCreate( this.state.editable );
+                }}
+                color="primary"
+                fullWidth={true}
+                disabled={!this.isPostValid()}
+              >Update</Button>
+            </div>
+
+          </div>
+
 
           <FormControl className="mt-visibility-toggle">
             <FormControlLabel
@@ -517,6 +533,20 @@ const Form = styled.form`
     &:active, &:focus {
       border: 1px solid ${theme.primary100.border };
       outline: none;
+    }
+  }
+
+  .mt-panel-publish {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > div {
+      flex: 1;
+    }
+
+    > div:nth-child( 1 ) {
+      max-width: 60px;
     }
   }
 
