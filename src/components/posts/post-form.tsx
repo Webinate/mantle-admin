@@ -36,7 +36,7 @@ export type Props = {
   activeUser: IUserEntry<'client' | 'expanded'>;
   isAdmin: boolean;
   id?: string;
-  post: Partial<IPost<'client' | 'expanded'>>;
+  post: Partial<IPost<'expanded'>>;
   elements: IDraftElement<'client' | 'expanded'>[];
   templates: TemplateState;
   categoriesLoading: boolean;

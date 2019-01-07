@@ -14,7 +14,7 @@ export const ActionCreators = {
   UpdateElement: new ActionCreator<'posts-update-elm', IDraftElement<'client' | 'expanded'>>( 'posts-update-elm' ),
   RemoveElements: new ActionCreator<'posts-remove-elms', string[]>( 'posts-remove-elms' ),
   SetPosts: new ActionCreator<'posts-set-posts', { page: Page<IPost<'client' | 'expanded'>>, filters: Partial<PostsGetAllOptions> }>( 'posts-set-posts' ),
-  SetPost: new ActionCreator<'posts-set-post', IPost<'client' | 'expanded'>>( 'posts-set-post' ),
+  SetPost: new ActionCreator<'posts-set-post', IPost<'expanded'>>( 'posts-set-post' ),
   SetTemplate: new ActionCreator<'posts-set-template', IDocument<'client' | 'expanded'>>( 'posts-set-template' ),
   SetElmSelection: new ActionCreator<'posts-elm-set-selection', string[]>( 'posts-elm-set-selection' ),
   SetFocussedElm: new ActionCreator<'posts-elm-set-focus', string>( 'posts-elm-set-focus' )
@@ -47,7 +47,7 @@ export function getPost( id: string ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
     const resp = await posts.getOne( { id } );
-    dispatch( ActionCreators.SetPost.create( resp ) );
+    dispatch( ActionCreators.SetPost.create( resp as IPost<'expanded'> ) );
   }
 }
 
@@ -92,7 +92,7 @@ export function editPost( post: Partial<IPost<'client' | 'expanded'>> ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
       const resp = await posts.update( post._id as string, post );
-      dispatch( ActionCreators.SetPost.create( resp ) );
+      dispatch( ActionCreators.SetPost.create( resp as IPost<'expanded'> ) );
       dispatch( AppActions.serverResponse.create( `Post '${ resp.title }' updated` ) );
     }
     catch ( err ) {

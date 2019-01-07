@@ -1,4 +1,4 @@
-import { PostsGetAllOptions, CommentGetAllOptions, CategoriesGetManyOptions } from 'modepress';
+import { PostsGetAllOptions, CommentGetAllOptions, CategoriesGetManyOptions, IPost } from 'modepress';
 import { RedirectError } from './errors';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
@@ -42,7 +42,7 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     if ( !isAdmin && !post.public )
       throw new RedirectError( '/dashboard/posts' );
 
-    actions.push( PostActions.SetPost.create( post ) );
+    actions.push( PostActions.SetPost.create( post as IPost<'expanded'> ) );
     actions.push( CategoryActions.SetCategories.create( postReply[ 1 ] ) );
     actions.push( CommentActions.SetComments.create( { page: postReply[ 2 ], filters: initialCommentFilter } ) );
     actions.push( TemplatesActions.GetAll.create( postReply[ 3 ] ) );

@@ -6,7 +6,7 @@ import { Page, IPost } from '../../../../../src';
 export type State = {
   readonly postFilters: Partial<PostsGetAllOptions>;
   readonly postPage: Page<IPost<'client' | 'expanded'>> | null;
-  readonly post: IPost<'client' | 'expanded'> | null;
+  readonly post: IPost<'expanded'> | null;
   readonly busy: boolean;
   readonly selection: string[];
   readonly focussedId: string;
@@ -45,7 +45,7 @@ export default function reducer( state: State = initialState, action: Action ): 
       break;
 
     case ActionCreators.SetPost.type:
-      let doc = action.payload.document as IDocument<'client'>;
+      let doc = action.payload.document as IDocument<'expanded'>;
 
       partialState = {
         post: action.payload,
