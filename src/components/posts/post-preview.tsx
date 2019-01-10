@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
-import { IPost, IUserEntry, IDocument, IDraft, ITemplate } from 'modepress';
+import { IPost, IUserEntry } from 'modepress';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -8,7 +8,7 @@ import * as format from 'date-fns/format';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  post: IPost<'client' | 'expanded'>;
+  post: IPost<'expanded'>;
   id?: string;
   loading: boolean;
   renderComments?: () => undefined | null | JSX.Element;
@@ -33,13 +33,10 @@ export default class PostPreview extends React.Component<Props, State> {
       return <CircularProgress className="mt-loading" />
 
     const post = this.props.post;
-    const doc = post.document as IDocument<'client'>;
-    const draft = doc.currentDraft as IDraft<'client'>;
-    const zones = ( doc.template as ITemplate<'client'> ).zones;
+    const draft = post.latestDraft;
+    const zones = post.document.template.zones;
 
     return <Container id="mt-post-preview">
-
-
       <div className="mt-preview-headers">
         <div className="mt-preview-author-avatar">
           <Avatar src={generateAvatarPic( post.author as IUserEntry<'client'> )} />
@@ -62,13 +59,13 @@ export default class PostPreview extends React.Component<Props, State> {
           </div>
           <div
             className="mt-preview-content-col"
-            dangerouslySetInnerHTML={{ __html: draft.html[ z ] }}
+            dangerouslySetInnerHTML={{ __html: draft!.html[ z ] }}
           />
         </div>
         ) :
           <div
             className="mt-preview-content-col"
-            dangerouslySetInnerHTML={{ __html: draft.html[ zones[ 0 ] ] }}
+            dangerouslySetInnerHTML={{ __html: draft ? draft.html[ zones[ 0 ] ] : '' }}
           />
         }
       </div>

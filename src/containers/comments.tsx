@@ -103,12 +103,12 @@ export class Comments extends React.Component<Props, State> {
     const isBusy = this.props.commentState.busy;
     const isAdmin = isAdminUser( this.props.user );
     const animated = this.props.app.debugMode ? false : true;
-    let selectedPost: IPost<'client'> | null = null;
+    let selectedPost: IPost<'expanded'> | null = null;
 
     if ( page && this.state.selectedUid ) {
-      const comment = page.data.find( c => ( c.post as IPost<'client'> )._id === this.state.selectedPostUid )!;
+      const comment = page.data.find( c => ( c.post as IPost<'expanded'> )._id === this.state.selectedPostUid )!;
       if ( comment )
-        selectedPost = comment.post as IPost<'client'>;
+        selectedPost = comment.post as IPost<'expanded'>;
     }
 
     return (
