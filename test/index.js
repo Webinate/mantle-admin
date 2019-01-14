@@ -52,8 +52,6 @@ require( './tests/posts/create' );
 require( './tests/posts/edit-post' );
 require( './tests/posts/categories' );
 require( './tests/posts/delete-posts' );
-require( './tests/posts/preview-post-comments' );
-require( './tests/posts/preview-post-permissions' );
 require( './tests/posts/post-elements-creation' );
 require( './tests/posts/post-elements-add-link' );
 require( './tests/posts/post-elements-set-styles' );
@@ -63,7 +61,10 @@ require( './tests/posts/post-elements-images' );
 require( './tests/posts/change-template' );
 require( './tests/posts/post-elements-copy-paste' );
 require( './tests/posts/post-elements-add-html' );
+
 require( './tests/posts/post-preview' );
+require( './tests/posts/preview-post-comments' );
+require( './tests/posts/preview-post-permissions' );
 
 require( './tests/media/create-volumes' );
 require( './tests/media/filter-and-sort-volumes' );

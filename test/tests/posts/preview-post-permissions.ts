@@ -59,6 +59,10 @@ describe( 'Preview posts available to regular users: ', function() {
 
     await docs.addElement( { id: multiZonePost.document._id },
       { zone: 'right', html: 'Right', type: 'elm-paragraph' } );
+
+    // Publish the posts so we can see them in preview
+    await controller.update( publicPost._id, { public: true } );
+    await controller.update( multiZonePost._id, { public: true } );
   } )
 
   after( async () => {

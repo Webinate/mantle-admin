@@ -51,6 +51,21 @@ describe( 'Testing the view preview button for admins: ', function() {
     assert.deepEqual( await postPage.isPreview(), true );
   } )
 
+  it( 'has 2 empty zones as its not ', async () => {
+    const previewDetails = await postPage.previewDetails();
+    assert.deepEqual( previewDetails.author, admin.username );
+    assert.deepEqual( previewDetails.title, 'Test Post' );
+    assert.deepEqual( previewDetails.zones.length, 2 );
+    assert.deepEqual( previewDetails.contents[ 0 ], '' );
+    assert.deepEqual( previewDetails.contents[ 1 ], '' );
+  } )
+
+  it( 'does create a draft after we update the post', async () => {
+    await postPage.clickBack( true );
+    await postPage.clickUpdate();
+    await postPage.gotoPreviewMode( true );
+  } )
+
   it( 'does have valid a valid preview', async () => {
     const previewDetails = await postPage.previewDetails();
     assert.deepEqual( previewDetails.author, admin.username );

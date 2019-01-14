@@ -86,9 +86,12 @@ export default class PostsPage extends Page {
   /**
    * Clicks the back button
    */
-  async clickBack() {
+  async clickBack( fromPreview: boolean = false ) {
     await this.page.click( '#mt-to-post-list' );
-    await this.emptySelector( '.mt-post-confirm' );
+    if ( fromPreview )
+      await this.waitFor( '.mt-post-confirm' );
+    else
+      await this.emptySelector( '.mt-post-confirm' );
   }
 
   async clickAddImg() {

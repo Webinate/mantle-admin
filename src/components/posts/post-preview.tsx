@@ -59,7 +59,7 @@ export default class PostPreview extends React.Component<Props, State> {
           </div>
           <div
             className="mt-preview-content-col"
-            dangerouslySetInnerHTML={{ __html: draft!.html[ z ] }}
+            dangerouslySetInnerHTML={{ __html: draft ? draft.html[ z ] : '' }}
           />
         </div>
         ) :

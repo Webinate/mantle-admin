@@ -56,7 +56,7 @@ describe( 'Preview posts available to regular users: ', function() {
     assert.deepEqual( comments[ 1 ].author, joe.username );
   } )
 
-  it( 'prevents oher user\'s from editing and deleting comments', async () => {
+  it( 'prevents other user\'s from editing and deleting comments', async () => {
     await postPage.load( mary, `/dashboard/posts/edit/${ publicPost._id }` );
     assert.deepEqual( await postPage.commentsModule.canDelete( 0 ), false );
     assert.deepEqual( await postPage.commentsModule.canEdit( 0 ), false );
