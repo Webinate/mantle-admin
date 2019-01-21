@@ -56,9 +56,9 @@ export default class UsersPage extends Page {
   }
 
   async clickDrawer( headerName: string ) {
-    const headers = await this.page.$$( '.mt-user-properties .mt-drawer-header' );
+    const headers = await this.page.$$( '.mt-user-properties .mt-panel-header' );
     for ( const header of headers ) {
-      const text = await header.executionContext().evaluate( elm => elm.querySelector( 'h3' ).textContent, header );
+      const text = await header.executionContext().evaluate( elm => elm.textContent, header );
       if ( text === headerName ) {
         await this.sleep( 150 );
         await header.executionContext().evaluate( elm => elm.scrollIntoView(), header );

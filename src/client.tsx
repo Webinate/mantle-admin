@@ -17,6 +17,10 @@ const store = createStore( props as IRootState, history );
 const mountNode = document.getElementById( 'application' );
 const theme = createMuiTheme( Theme );
 
+const state: IRootState = store.getState();
+console.log( `Welcome to Mantle` );
+console.log( `Debug Mode: ${ state.app.debugMode }` );
+
 export const app = hydrate(
   <Provider store={store}>
     <MuiThemeProvider theme={theme}>

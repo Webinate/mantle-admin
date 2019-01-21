@@ -5,13 +5,19 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Icon from '@material-ui/core/Icon';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Avatar from '@material-ui/core/Avatar';
 import DatePicker from 'material-ui-pickers/DatePicker';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic, isAdminUser } from '../utils/component-utils';
-import Drawer from './drawer';
 import { MediaModal } from '../containers/media-modal';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+import SettingsIcon from '@material-ui/icons/Settings';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 type Props = {
   activeUser: IUserEntry<'client' | 'expanded'>;
@@ -59,12 +65,12 @@ export default class UserProperties extends React.Component<Props, State> {
     const selected = this.props.selected;
 
     if ( !selected )
-      return <Properties />;
+      return <Properties animated={this.props.animated} />;
 
     const isAdmin = isAdminUser( this.props.activeUser );
 
     return (
-      <Properties className="mt-user-properties">
+      <Properties className="mt-user-properties" animated={this.props.animated}>
 
         <ImgContainer>
           {isAdmin || selected._id === this.props.activeUser._id ? <Button
@@ -81,122 +87,131 @@ export default class UserProperties extends React.Component<Props, State> {
             style={{ display: 'inline-flex', width: 200, height: 200 }}
           />
         </ImgContainer>
+
         <DetailsContainer>
-          <Drawer
-            title="User Details"
-            animate={this.props.animated}
-            open={this.state.detailsOpen}
-            onHeaderClick={() => this.setState( { detailsOpen: !this.state.detailsOpen } )}
-          >
-            <Field>
-              <TextField
-                className="mt-props-username"
-                value={selected.username}
-                helperText="Username"
-              />
-            </Field>
-            {this.userCanInteract( selected ) ? <Field>
-              <TextField
-                className="mt-props-email"
-                helperText="Email"
-                value={selected.email}
-              />
-            </Field> : undefined}
-            <Field>
-              <DatePicker
-                helperText="Joined On"
-                className="mt-joined-on"
-                value={new Date( selected.createdOn )}
-                onChange={e => { }}
-                format={'MMMM Do, YYYY'}
-              />
-            </Field>
-            {this.userCanInteract( selected ) ? <Field>
-              <DatePicker
-                helperText="Last Active"
-                className="mt-last-active"
-                value={new Date( selected.lastLoggedIn )}
-                onChange={e => { }}
-                format={'MMMM Do, YYYY'}
-              />
-            </Field> : undefined}
-          </Drawer>
+          <ExpansionPanel defaultExpanded={true} className="mt-tags-panel">
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+              <h3><Icon className="mt-panel-icon"><VerifiedUserIcon /></Icon> <span className="mt-panel-header">User Details</span></h3>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <div style={{ flex: 1 }}>
+                <Field>
+                  <TextField
+                    className="mt-props-username"
+                    value={selected.username}
+                    helperText="Username"
+                    fullWidth={true}
+                  />
+                </Field>
+                {this.userCanInteract( selected ) ? <Field>
+                  <TextField
+                    className="mt-props-email"
+                    helperText="Email"
+                    value={selected.email}
+                    fullWidth={true}
+                  />
+                </Field> : undefined}
+                <Field>
+                  <DatePicker
+                    helperText="Joined On"
+                    className="mt-joined-on"
+                    value={new Date( selected.createdOn )}
+                    onChange={e => { }}
+                    fullWidth={true}
+                    format={'MMMM Do, YYYY'}
+                  />
+                </Field>
+                {this.userCanInteract( selected ) ? <Field>
+                  <DatePicker
+                    helperText="Last Active"
+                    className="mt-last-active"
+                    fullWidth={true}
+                    value={new Date( selected.lastLoggedIn )}
+                    onChange={e => { }}
+                    format={'MMMM Do, YYYY'}
+                  />
+                </Field> : undefined}
+              </div>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
           {this.userCanInteract( selected ) ?
-            <Drawer
-              title="Account Settings"
-              animate={this.props.animated}
-              className="mt-account-settings"
-              onHeaderClick={() => this.setState( { accountsOpen: !this.state.accountsOpen } )}
-              open={this.state.accountsOpen}
-            >
-              <InlineField>
-                <div className="mt-inline-label">Send password reset request</div>
-                <div className="mt-inline-input">
-                  <Tooltip placement="top-start" title="Email user">
-                    <IconButton
-                      onClick={() => this.props.resetPasswordRequest( selected.username )}
-                    >
-                      <Icon style={{ color: theme.primary200.background }} className="icon icon-mark-unread mt-reset-password" />
-                    </IconButton>
-                  </Tooltip>
+            <ExpansionPanel className="mt-tags-panel">
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-account-settings" />}>
+                <h3><Icon className="mt-panel-icon"><SettingsIcon /></Icon> <span className="mt-panel-header">Account Settings</span></h3>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <div style={{ flex: 1 }}>
+                  <InlineField>
+                    <div className="mt-inline-label">Send password reset request</div>
+                    <div className="mt-inline-input">
+                      <Tooltip placement="top-start" title="Email user">
+                        <IconButton
+                          onClick={() => this.props.resetPasswordRequest( selected.username )}
+                        >
+                          <Icon style={{ color: theme.primary200.background }} className="icon icon-mark-unread mt-reset-password" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </InlineField>
+
+                  {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
+                    <InlineField>
+                      <div className="mt-inline-label">Resend activation email</div>
+                      <div className="mt-inline-input">
+                        <Tooltip placement="top-start" title="Resent activation code">
+                          <IconButton
+                            onClick={e => this.props.resendActivation( this.props.selected!.username )}
+                          >
+                            <Icon
+                              style={{ color: theme.primary200.background }}
+                              className="icon icon-mark-unread mt-resend-activation" />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </InlineField> : undefined}
+
+                  {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
+                    <InlineField>
+                      <div className="mt-inline-label">Activate Account</div>
+                      <div className="mt-inline-input">
+
+                        <Tooltip placement="top-start" title="Activates the user">
+                          <IconButton
+                            onClick={e => this.props.activateAccount( this.props.selected!.username )}
+                          >
+                            <Icon
+                              style={{ color: theme.primary200.background }}
+                              className="icon icon-done mt-activate-account" />
+                          </IconButton>
+                        </Tooltip>
+
+                      </div>
+                    </InlineField> : undefined}
                 </div>
-              </InlineField>
-
-              {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
-                <InlineField>
-                  <div className="mt-inline-label">Resend activation email</div>
-                  <div className="mt-inline-input">
-                    <Tooltip placement="top-start" title="Resent activation code">
-                      <IconButton
-                        onClick={e => this.props.resendActivation( this.props.selected!.username )}
-                      >
-                        <Icon
-                          style={{ color: theme.primary200.background }}
-                          className="icon icon-mark-unread mt-resend-activation" />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                </InlineField> : undefined}
-
-              {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
-                <InlineField>
-                  <div className="mt-inline-label">Activate Account</div>
-                  <div className="mt-inline-input">
-
-                    <Tooltip placement="top-start" title="Activates the user">
-                      <IconButton
-                        onClick={e => this.props.activateAccount( this.props.selected!.username )}
-                      >
-                        <Icon
-                          style={{ color: theme.primary200.background }}
-                          className="icon icon-done mt-activate-account" />
-                      </IconButton>
-                    </Tooltip>
-
-                  </div>
-                </InlineField> : undefined}
-
-            </Drawer>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
             : undefined}
-          {this.userCanInteract( selected ) ? <Drawer
-            title="Remove Account"
-            animate={this.props.animated}
-            className="mt-remove-account"
-            onHeaderClick={() => this.setState( { removeOpen: !this.state.removeOpen } )}
-            open={this.state.removeOpen}
-          >
-            <div className="mt-warning-message">
-              Are you absolutely sure you want to remove this account - this is irreversible?
-              <br />
-              <Button
-                variant="contained"
-                style={{ background: theme.error.background, color: theme.error.color }}
-                className="mt-remove-acc-btn"
-                onClick={e => this.props.onDeleteRequested( selected )}
-              >Delete Account</Button>
-            </div>
-          </Drawer> : undefined}
+
+          {this.userCanInteract( selected ) ? <ExpansionPanel>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-remove-account" />}>
+              <h3><Icon className="mt-panel-icon"><DeleteIcon /></Icon> <span className="mt-panel-header">Remove Account</span></h3>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+
+
+              <div className="mt-warning-message">
+                Are you absolutely sure you want to remove this account - this is irreversible?
+                <br />
+                <Button
+                  variant="contained"
+                  style={{ background: theme.error.background, color: theme.error.color }}
+                  className="mt-remove-acc-btn"
+                  onClick={e => this.props.onDeleteRequested( selected )}
+                >Delete Account</Button>
+              </div>
+            </ExpansionPanelDetails>
+          </ExpansionPanel> : undefined}
         </DetailsContainer>
 
         {this.state.showMediaPopup ?
@@ -211,13 +226,27 @@ export default class UserProperties extends React.Component<Props, State> {
   }
 }
 
+interface UserPropsStyleProps extends React.HTMLAttributes<HTMLElement> {
+  animated: boolean;
+}
+
 const Properties = styled.div`
   height: 100%;
   overflow: auto;
   position: relative;
   box-sizing: border-box;
-  background: ${theme.light100.background };
   white-space: normal;
+  ${ ( props: UserPropsStyleProps ) => !props.animated ? '* { transition: none !important; }' : '' }
+
+  h3 {
+    margin: 0;
+  }
+
+  .mt-panel-icon {
+    margin: 0 10px 0 0;
+    color: ${theme.additionalColors.light };
+    vertical-align: middle;
+  }
 
   .mt-warning-message {
     text-align: center;
@@ -232,28 +261,28 @@ const Properties = styled.div`
 `;
 
 const Field = styled.div`
-margin: 5px 0;
-&:last-child {
-  margin-bottom: 20px;
-}
-> div > label, > div > div > label {
-  color: ${ theme.light100.softColor };
-}
+  margin: 0 0 15px 0;
+  &:last-child {
+    margin-bottom: 20px;
+  }
+  > div > label, > div > div > label {
+    color: ${ theme.light100.softColor };
+  }
 `;
 
 const InlineField = styled.div`
-margin: 15px 5px;
-box-sizing: border-box;
-display: table;
-white-space: normal;
-width: 100%;
+  margin: 15px 5px;
+  box-sizing: border-box;
+  display: table;
+  white-space: normal;
+  width: 100%;
 
-> div {
-  width: 50%;
-  display: table-cell;
-  vertical-align: middle;
-}
-.mt-inline-input { text-align: right; }
+  > div {
+    width: 50%;
+    display: table-cell;
+    vertical-align: middle;
+  }
+  .mt-inline-input { text-align: right; }
 `;
 
 
@@ -262,7 +291,6 @@ const ImgContainer = styled.div`
   box-sizing: border-box;
   text-align: center;
   padding: 20px;
-  background: linear-gradient(-45deg, ${theme.secondary200.background }, ${ theme.primary100.background });
   position: relative;
   overflow: hidden;
 `;
@@ -271,6 +299,15 @@ const ImgContainer = styled.div`
 const DetailsContainer = styled.div`
   height: calc( 100% - 250px);
   overflow: auto;
+
+  > div {
+    margin-left: 10px;
+    margin-right: 10px;
+
+    &:first-child {
+      margin-top: 10px;
+    }
+  }
 
   > h3 {
     margin: 0 0 6px 0;
