@@ -4,7 +4,7 @@ import { controllers } from '../../../../src';
 import { ActionCreators as MediaActions } from '../store/media/actions';
 import { matchPath } from 'react-router';
 import { RedirectError } from './errors';
-import { VolumesGetOptions, FilesGetOptions } from '';
+import { VolumesGetOptions, FilesGetOptions } from 'mantle';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
   const volumesView = matchPath<any>( req.url, { path: '/dashboard/media/volumes/:id' } );

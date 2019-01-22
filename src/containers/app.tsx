@@ -7,7 +7,7 @@ import { push } from 'react-router-redux';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import AuthScreen from '../components/auth-screen';
 import Dashboard from '../components/dashboard';
-import ContentHeader from '../components/content-header';
+import { Home } from './home';
 import { Users } from './users';
 import { Posts } from './posts';
 import { Comments } from './comments';
@@ -143,7 +143,7 @@ export class App extends React.Component<Props, State> {
             >
               <Switch>
                 <Route path="/dashboard" exact={true} render={props => {
-                  return <ContentHeader title="Home" busy={false} />
+                  return <Home {...{} as any} />
                 }} />
                 <Route path="/dashboard/posts" render={props => {
                   return <Posts {...{ location: props.location } as any} />

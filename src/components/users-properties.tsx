@@ -253,9 +253,10 @@ const Properties = styled.div`
     margin: 20px 0;
     color: ${theme.error.background };
     font-weight: bold;
+    flex: 1;
 
     > button {
-      margin: 10px 0;
+      margin: 25px 0 0 0;
     }
   }
 `;
