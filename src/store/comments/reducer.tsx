@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { CommentGetAllOptions } from 'modepress';
+import { CommentGetAllOptions } from 'mantle';
 import { Page, IComment } from '../../../../../src';
 import { ActionCreators as AppActions, Action as AppAction } from '../app/actions';
 

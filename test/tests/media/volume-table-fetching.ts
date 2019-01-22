@@ -4,9 +4,9 @@ import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import { IVolume } from 'modepress';
-import { VolumesController } from 'modepress/src/controllers/volumes';
-import ControllerFactory from 'modepress/src/core/controller-factory';
+import { IVolume } from 'mantle';
+import { VolumesController } from 'mantle/src/controllers/volumes';
+import ControllerFactory from 'mantle/src/core/controller-factory';
 import { uploadFileToVolume } from '../../utils/file';
 
 let page = new MediaPage();

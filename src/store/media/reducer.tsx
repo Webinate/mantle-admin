@@ -1,6 +1,6 @@
 import { ActionCreators, Action } from './actions';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
-import { VolumesGetOptions, FilesGetOptions } from 'modepress';
+import { VolumesGetOptions, FilesGetOptions } from 'mantle';
 
 // State
 export type State = {

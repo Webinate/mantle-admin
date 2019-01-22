@@ -8,8 +8,8 @@ A small React app for managing a Mantle Server
 ## Installation
 
 1) Make sure the requirements are installed and running
-2) Create a folder for the project inside the modepress/clients folder.
-For example modepress/clients/mantle-admin
+2) Create a folder for the project inside the mantle/clients folder.
+For example mantle/clients/mantle-admin
 
 ```
 mkdir mantle-admin
@@ -27,13 +27,13 @@ sudo su
 If you want the latest stable version:
 
 ```
-curl -o- https://raw.githubusercontent.com/Webinate/modepress-admin/master/install-script.sh | bash
+curl -o- https://raw.githubusercontent.com/Webinate/mantle-admin/master/install-script.sh | bash
 ```
 
 OR if you want the dev build
 
 ```
-curl -o- https://raw.githubusercontent.com/Webinate/modepress-admin/dev/install-script-dev.sh | bash
+curl -o- https://raw.githubusercontent.com/Webinate/mantle-admin/dev/install-script-dev.sh | bash
 ```
 
 This downloads the latest mantle-admin project into the current folder.
@@ -45,4 +45,4 @@ npm install
 npm run build
 ```
 
-6) Now edit the ./modepress.json to work with your server
+6) Now edit the ./mantle.json to work with your server

@@ -5,7 +5,7 @@ import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost, IComment } from 'modepress';
+import { IPost, IComment } from 'mantle';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent;

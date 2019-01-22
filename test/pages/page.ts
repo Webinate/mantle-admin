@@ -1,7 +1,7 @@
 import utils from '../utils';
 import { Browser, Page as PuppeteerPage } from 'puppeteer';
 import Agent from '../utils/agent';
-import { IConfig } from 'modepress/src';
+import { IConfig } from 'mantle/src';
 
 /**
  * Base class for all page tests

@@ -1,4 +1,4 @@
-import { PostsGetAllOptions, CommentGetAllOptions, CategoriesGetManyOptions, IPost } from 'modepress';
+import { PostsGetAllOptions, CommentGetAllOptions, CategoriesGetManyOptions, IPost } from 'mantle';
 import { RedirectError } from './errors';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';

@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { PostsGetAllOptions, IDocument, IDraftElement } from 'modepress';
+import { PostsGetAllOptions, IDocument, IDraftElement } from 'mantle';
 import { Page, IPost } from '../../../../../src';
 
 // State

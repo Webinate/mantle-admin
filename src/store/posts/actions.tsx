@@ -2,7 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { Page, IPost, IDraftElement, IDocument } from '../../../../../src';
 import * as posts from '../../../../../src/lib-frontend/posts';
 import * as documents from '../../../../../src/lib-frontend/documents';
-import { PostsGetAllOptions } from 'modepress';
+import { PostsGetAllOptions } from 'mantle';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { push } from 'react-router-redux';

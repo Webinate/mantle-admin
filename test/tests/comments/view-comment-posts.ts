@@ -1,11 +1,11 @@
-import CommentsPage from 'modepress/clients/modepress-admin/test/pages/comments';
+import CommentsPage from 'mantle/clients/mantle-admin/test/pages/comments';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from 'mantle/clients/mantle-admin/test/utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
-import { randomId } from 'modepress/clients/modepress-admin/test/utils/misc';
-import ControllerFactory from 'modepress/src/core/controller-factory';
-import { IPost, IComment, IUserEntry } from 'modepress';
+import Agent from 'mantle/clients/mantle-admin/test/utils/agent';
+import { randomId } from 'mantle/clients/mantle-admin/test/utils/misc';
+import ControllerFactory from 'mantle/src/core/controller-factory';
+import { IPost, IComment, IUserEntry } from 'mantle';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent;

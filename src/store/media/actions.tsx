@@ -2,7 +2,7 @@ import { ActionCreator } from '../actions-creator';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
 import * as volumes from '../../../../../src/lib-frontend/volumes';
 import * as files from '../../../../../src/lib-frontend/files';
-import { FilesGetOptions, VolumesGetOptions } from 'modepress';
+import { FilesGetOptions, VolumesGetOptions } from 'mantle';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { isAdminUser } from '../../utils/component-utils';

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Volumes } from './volumes';
 import { IVolume, Page, IFileEntry } from '../../../../../src';
-import { VolumesGetOptions } from 'modepress';
-import { FilesGetOptions } from 'modepress';
+import { VolumesGetOptions } from 'mantle';
+import { FilesGetOptions } from 'mantle';
 import SplitPanel from '../split-panel';
 import VolumeSidePanel from './volume-sidepanel';
 import { DirectoryView, SortTypes, SortOrder } from './directory-view';

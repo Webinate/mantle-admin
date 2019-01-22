@@ -13,7 +13,7 @@ import { IVolume, Page } from '../../../../../src';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
-import { VolumesGetOptions } from 'modepress';
+import { VolumesGetOptions } from 'mantle';
 
 export type SortTypes = 'name' | 'created' | 'memory';
 export type SortOrder = 'asc' | 'desc';

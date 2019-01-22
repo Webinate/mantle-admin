@@ -7,7 +7,7 @@ import postHandler from './posts';
 import commentHandler from './comments';
 import mediaHandler from './media';
 import userHandler from './users';
-import { controllers } from 'modepress';
+import { controllers } from 'mantle';
 
 const yargs = require( 'yargs' );
 const args = yargs.argv;

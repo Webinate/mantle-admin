@@ -3,8 +3,8 @@ import * as assert from 'assert';
 import utils from '../../../test/utils';
 import { } from 'mocha';
 import Agent from '../../../test/utils/agent';
-import { IVolume } from 'modepress';
-import ControllerFactory from 'modepress/src/core/controller-factory';
+import { IVolume } from 'mantle';
+import ControllerFactory from 'mantle/src/core/controller-factory';
 import { uploadFileToVolume } from '../../../test/utils/file';
 
 let page = new MediaPage();

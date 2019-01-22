@@ -1,8 +1,8 @@
 import { } from 'mocha';
-import { IVolume, IUserEntry } from 'modepress';
+import { IVolume, IUserEntry } from 'mantle';
 import { resolve } from 'path';
 import { statSync } from 'fs';
-import ControllerFactory from 'modepress/src/core/controller-factory';
+import ControllerFactory from 'mantle/src/core/controller-factory';
 
 export class File {
   name: string;

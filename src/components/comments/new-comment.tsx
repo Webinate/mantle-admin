@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
-import { IUserEntry } from 'modepress';
+import { IUserEntry } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import CommentIcon from '@material-ui/icons/Comment';

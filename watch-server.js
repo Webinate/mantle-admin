@@ -17,7 +17,7 @@ const startup = require( '../../src/core/initialization/startup' );
 const webpack = require( 'webpack' );
 
 // Get the server details
-const modepressJson = JSON.parse( fs.readFileSync( './clients/modepress-admin/modepress.json', { encoding: 'utf8' } ) );
+const mantleJson = JSON.parse( fs.readFileSync( './clients/mantle-admin/mantle.json', { encoding: 'utf8' } ) );
 
 async function start() {
 
@@ -25,12 +25,12 @@ async function start() {
   await startup.initialize();
 
   browserSync.init( {
-    proxy: 'localhost:' + modepressJson.server.port,
-    port: modepressJson.server.port
+    proxy: 'localhost:' + mantleJson.server.port,
+    port: mantleJson.server.port
   } );
 
   // Set the directory to the client
-  process.chdir( './clients/modepress-admin' );
+  process.chdir( './clients/mantle-admin' );
 
   // returns a Compiler instance
   const compiler = webpack( require( './webpack.config.js' ) );
@@ -57,7 +57,7 @@ async function start() {
 
       // Remove any cached files in the server
       Object.keys( require.cache ).forEach( function( id ) {
-        if ( /modepress-admin[\\\/]*src/.test( id ) ) {
+        if ( /mantle-admin[\\\/]*src/.test( id ) ) {
           delete require.cache[ id ];
         }
       } )

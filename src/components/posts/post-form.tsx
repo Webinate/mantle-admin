@@ -14,7 +14,7 @@ import AddIcon from '@material-ui/icons/Add';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import Icon from '@material-ui/core/Icon';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument } from 'modepress';
+import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument } from 'mantle';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';

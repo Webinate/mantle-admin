@@ -11,7 +11,7 @@ import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Create';
-import { PostsGetAllOptions } from 'modepress';
+import { PostsGetAllOptions } from 'mantle';
 import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';

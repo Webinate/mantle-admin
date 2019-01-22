@@ -4,7 +4,7 @@ import { controllers } from '../../../../src';
 import { ActionCreators as MediaActions } from '../store/media/actions';
 import { matchPath } from 'react-router';
 import { RedirectError } from './errors';
-import { VolumesGetOptions, FilesGetOptions } from 'modepress';
+import { VolumesGetOptions, FilesGetOptions } from '';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
   const volumesView = matchPath<any>( req.url, { path: '/dashboard/media/volumes/:id' } );

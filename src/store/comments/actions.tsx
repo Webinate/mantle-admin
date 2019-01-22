@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { Page, IComment } from '../../../../../src';
-import { CommentGetAllOptions } from 'modepress';
+import { CommentGetAllOptions } from 'mantle';
 import * as comments from '../../../../../src/lib-frontend/comments';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';

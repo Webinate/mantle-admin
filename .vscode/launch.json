@@ -2,13 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Modepress Admin Dev Server",
+      "name": "Mantle Admin Dev Server",
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
       "stopOnEntry": false,
       "args": [
-        "./clients/modepress-admin/watch-server.js",
+        "./clients/mantle-admin/watch-server.js",
         "--config=./config.json",
         "--numThreads=1",
         "--runningTests=true",
@@ -29,7 +29,7 @@
       "outFiles": []
     },
     {
-      "name": "Modepress Admin Tests",
+      "name": "Mantle Admin Tests",
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
@@ -47,9 +47,9 @@
         "--runningClientTests=true",
         "--debug=true",
         "--clientsFolder=../../clients/",
-        "--remotes.local.path=../../clients/modepress-admin/test/media-uploads"
-        // // Uncomment these to run from the modepress root folder
-        // "./clients/modepress-admin/test/index.js",
+        "--remotes.local.path=../../clients/mantle-admin/test/media-uploads"
+        // // Uncomment these to run from the mantle root folder
+        // "./clients/mantle-admin/test/index.js",
         // "--config=./config.json",
         // "--clientsFolder=./clients/",
         // "--remotes.local.url=http://localhost:8001",

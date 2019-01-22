@@ -4,8 +4,8 @@ import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from 'modepress/src/core/controller-factory';
-import { IPost } from 'modepress';
+import ControllerFactory from 'mantle/src/core/controller-factory';
+import { IPost } from 'mantle';
 
 let postPage = new PostsPage();
 let admin: Agent;

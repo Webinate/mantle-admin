@@ -4,7 +4,7 @@ import utils from '../../utils';
 import { } from 'mocha';
 import { randomId } from '../../utils/misc';
 import Agent from '../../utils/agent';
-import ControllerFactory from 'modepress/src/core/controller-factory';
+import ControllerFactory from 'mantle/src/core/controller-factory';
 
 let page = new MediaPage();
 let admin: Agent, joe: Agent;

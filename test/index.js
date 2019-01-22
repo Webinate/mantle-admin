@@ -12,7 +12,7 @@ require( "ts-node" ).register( {
 } );
 
 if ( !args.config || !fs.existsSync( args.config ) ) {
-  console.log( "Please specify a modepress --config file to use in the command line" );
+  console.log( "Please specify a mantle --config file to use in the command line" );
   process.exit();
 }
 

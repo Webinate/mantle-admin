@@ -1,6 +1,6 @@
 import utils from '../../utils';
 import { Page } from 'puppeteer';
-import { IConfig } from 'modepress/src';
+import { IConfig } from 'mantle/src';
 
 export default class Module {
   public page: Page;

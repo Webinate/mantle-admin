@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IComment, Page, IUserEntry, CommentGetAllOptions } from 'modepress';
+import { IComment, Page, IUserEntry, CommentGetAllOptions } from 'mantle';
 import Pager from '../../components/pager';
 import { default as styled } from '../../theme/styled';
 import Avatar from '@material-ui/core/Avatar';

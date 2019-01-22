@@ -12,21 +12,21 @@ version() {
 echo "Downloading latest version from github $(version)"
 
 #download latest
-wget https://github.com/Webinate/modepress-admin/archive/v$(version).zip
-unzip -o "v$(version).zip" "modepress-admin-$(version)/*"
+wget https://github.com/Webinate/mantle-admin/archive/v$(version).zip
+unzip -o "v$(version).zip" "mantle-admin-$(version)/*"
 
 # Moves the server folder to the current directory
-cp -r modepress-admin-$(version)/* .
+cp -r mantle-admin-$(version)/* .
 
-# Remove modepress-admin folder
-if [ -d "modepress-admin-$(version)" ]; then
-	rm modepress-admin-$(version) -R
+# Remove mantle-admin folder
+if [ -d "mantle-admin-$(version)" ]; then
+	rm mantle-admin-$(version) -R
 fi
 
 # Remove the zip file
 rm "v$(version).zip"
 
 # All done
-echo "Modepress Admin Tool v$(version) successfully downloaded"
+echo "Mantle Admin Tool v$(version) successfully downloaded"
 exit
 } # this ensures the entire script is downloaded #

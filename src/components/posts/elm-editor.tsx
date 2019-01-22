@@ -2,7 +2,7 @@ import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
-import { IDraftElement, IImageElement, IDocument, ITemplate } from 'modepress';
+import { IDraftElement, IImageElement, IDocument, ITemplate } from 'mantle';
 import { InlineType } from './editor-toolbar';
 
 import Button from '@material-ui/core/Button';

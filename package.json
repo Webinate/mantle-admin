@@ -1,22 +1,22 @@
 {
-  "name": "modepress-admin",
+  "name": "mantle-admin",
   "version": "0.6.9",
-  "description": "An admin panel for the Modepress server",
+  "description": "An admin panel for the Mantle server",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Webinate/modepress-admin.git"
+    "url": "git+https://github.com/Webinate/mantle-admin.git"
   },
   "author": "Mathew Henson",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Webinate/modepress-admin/issues"
+    "url": "https://github.com/Webinate/mantle-admin/issues"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=development gulp build",
     "build-analyze": "cross-env NODE_ENV=development gulp build --analyze=true",
     "build-prod": "npm run clean && cross-env NODE_ENV=production gulp build-prod",
-    "watch-server": "cd ../../ && node \"./clients/modepress-admin/watch-server.js\" --config=config.json --logging=true --inspect=true --runningTests=true",
+    "watch-server": "cd ../../ && node \"./clients/mantle-admin/watch-server.js\" --config=config.json --logging=true --inspect=true --runningTests=true",
     "clean": "rimraf dist",
     "patch": "npm version patch --no-git-tag-version",
     "major": "npm version major --no-git-tag-version",
@@ -25,9 +25,9 @@
     "statics": "gulp statics",
     "start-dev": "cd ../../ && ts-node src/main.ts --config=config.json --numThreads=1 --logging=true --inspect=true",
     "start-server": "cd ../../ && ts-node src/main.ts --config=config.json --logging=true --inspect=true",
-    "test": "mocha -t 100000 ./test/index.js --config=../../config.json --logging=false --runningTests=true --clientsFolder=../../clients/ --remotes.local.url=http://localhost:8001 --remotes.local.path=../../clients/modepress-ssr/test/media-uploads"
+    "test": "mocha -t 100000 ./test/index.js --config=../../config.json --logging=false --runningTests=true --clientsFolder=../../clients/ --remotes.local.url=http://localhost:8001 --remotes.local.path=../../clients/mantle-ssr/test/media-uploads"
   },
-  "homepage": "https://github.com/Webinate/modepress-admin#readme",
+  "homepage": "https://github.com/Webinate/mantle-admin#readme",
   "devDependencies": {
     "browser-sync": "^2.18.13",
     "gulp": "github:gulpjs/gulp#4.0",
@@ -67,7 +67,7 @@
     "gulp-typescript": "~3.2.2",
     "history": "~4.6.3",
     "material-ui-pickers": "1.0.0-rc.11",
-    "modepress": "file:..\\..",
+    "mantle": "file:..\\..",
     "node-fetch": "^1.7.3",
     "react": "16.4.1",
     "react-dom": "16.4.1",

@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
-import { IVolume } from 'modepress';
+import { IVolume } from 'mantle';
 import { VolumesController } from '../../../../../src/controllers/volumes';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { uploadFileToVolume } from '../../utils/file';

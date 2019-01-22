@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
-import { IPost, IUserEntry } from 'modepress';
+import { IPost, IUserEntry } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import CircularProgress from '@material-ui/core/CircularProgress';

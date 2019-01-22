@@ -1,11 +1,11 @@
-import PostsPage from 'modepress/clients/modepress-admin/test/pages/posts';
+import PostsPage from 'mantle/clients/mantle-admin/test/pages/posts';
 import * as assert from 'assert';
-import utils from 'modepress/clients/modepress-admin/test/utils';
+import utils from 'mantle/clients/mantle-admin/test/utils';
 import { } from 'mocha';
-import Agent from 'modepress/clients/modepress-admin/test/utils/agent';
-import { randomId } from 'modepress/clients/modepress-admin/test/utils/misc';
-import ControllerFactory from 'modepress/src/core/controller-factory';
-import { IPost } from 'modepress';
+import Agent from 'mantle/clients/mantle-admin/test/utils/agent';
+import { randomId } from 'mantle/clients/mantle-admin/test/utils/misc';
+import ControllerFactory from 'mantle/src/core/controller-factory';
+import { IPost } from 'mantle';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent, mary: Agent;

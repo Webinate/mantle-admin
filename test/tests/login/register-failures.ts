@@ -1,7 +1,7 @@
 import AuthPage from '../../pages/auth';
 import * as assert from 'assert';
 import { } from 'mocha';
-import { IUserEntry } from 'modepress/src';
+import { IUserEntry } from 'mantle/src';
 let auth = new AuthPage();
 
 describe( 'Register failures: ', function() {

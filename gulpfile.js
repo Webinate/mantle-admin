@@ -77,7 +77,7 @@ function buildClient( callback ) {
 }
 
 /**
- * Starts a child process that runs the modepress server
+ * Starts a child process that runs the mantle server
  */
 function runServer() {
   let prc = spawn.spawn( 'node', [ "./dist/main.js", "--config=./config.json", "--numThreads=1", "--logging=true" ], { cwd: '../../' } );

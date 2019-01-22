@@ -5,7 +5,7 @@ import { default as styled } from '../theme/styled';
 import ContentHeader from '../components/content-header';
 import { getComments, editComment, deleteComment, createComment } from '../store/comments/actions';
 import FilterBar from '../components/comments/filter-bar';
-import { IUserEntry, IPost } from 'modepress';
+import { IUserEntry, IPost } from 'mantle';
 import { isAdminUser } from '../utils/component-utils';
 import { CommentsList } from '../components/comments/comments-list';
 import MenuItem from '@material-ui/core/MenuItem';

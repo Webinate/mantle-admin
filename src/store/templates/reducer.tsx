@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { ITemplate, Page } from 'modepress';
+import { ITemplate, Page } from 'mantle';
 
 // State
 export type State = {

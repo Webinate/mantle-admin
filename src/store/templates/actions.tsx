@@ -1,6 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import * as templates from '../../../../../src/lib-frontend/templates';
-import { ITemplate, Page } from 'modepress';
+import { ITemplate, Page } from 'mantle';
 import { IRootState } from '..';
 
 // Action Creators

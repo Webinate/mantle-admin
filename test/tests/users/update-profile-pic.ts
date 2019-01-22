@@ -2,8 +2,8 @@ import UsersPage from '../../pages/users';
 import * as assert from 'assert';
 import utils from '../../utils';
 import Agent from '../../utils/agent';
-import ControllerFactory from 'modepress/src/core/controller-factory';
-import { IVolume } from 'modepress';
+import ControllerFactory from 'mantle/src/core/controller-factory';
+import { IVolume } from 'mantle';
 
 let users = new UsersPage();
 let joe: Agent, mary: Agent, admin: Agent;

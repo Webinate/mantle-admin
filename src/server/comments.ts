@@ -1,9 +1,9 @@
 import { RedirectError } from '../../src/server/errors';
 import { ActionCreators as CommentActions } from '../store/comments/actions';
-import { IAuthReq, CommentGetAllOptions } from 'modepress';
+import { IAuthReq, CommentGetAllOptions } from 'mantle';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';
-import { controllers } from 'modepress';
+import { controllers } from 'mantle';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
   const isAdmin = req._user && req._user.privileges < 2 ? true : false;

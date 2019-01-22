@@ -32,7 +32,7 @@ export default class HTML extends React.Component<Props, State> {
     const content = (
       <html>
         <head>
-          <title>Modepress Example</title>
+          <title>Mantle Example</title>
           <meta charSet="utf-8" />
           <meta name="description" content="" />
           <meta name="HandheldFriendly" content="True" />

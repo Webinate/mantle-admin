@@ -3,7 +3,7 @@ import { Browser, Page } from 'puppeteer';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yargs from 'yargs';
-import { IConfig, IClient, IServer, IAdminUser } from 'modepress';
+import { IConfig, IClient, IServer, IAdminUser } from 'mantle';
 import Agent from './utils/agent';
 
 let args = yargs.argv;
@@ -13,7 +13,7 @@ export class Utils {
   public admin: Agent;
   public browser: Browser;
   public page: Page;
-  public modepress: IClient;
+  public mantle: IClient;
   public config: IConfig;
   public host: string;
 
@@ -43,7 +43,7 @@ export class Utils {
    * Gets the host of the server
    */
   public getHost() {
-    const server = this.modepress.server as IServer;
+    const server = this.mantle.server as IServer;
     return `http://${ server.host }:${ server.port }`;
   }
 
@@ -102,7 +102,7 @@ export class Utils {
     this.page = await this.browser.newPage();
     await this.page.setViewport( { width: 1024, height: 768 } );
     this.config = JSON.parse( fs.readFileSync( args.config ).toString() );
-    this.modepress = JSON.parse( fs.readFileSync( __dirname + '/../modepress.json' ).toString() );
+    this.mantle = JSON.parse( fs.readFileSync( __dirname + '/../mantle.json' ).toString() );
     this.host = this.getHost();
 
     this.loadSensitiveProps( this.config, path.dirname( args.config ) );

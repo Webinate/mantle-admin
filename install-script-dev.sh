@@ -7,15 +7,15 @@ set -e
 echo "Downloading dev version from github"
 
 #download latest
-wget https://github.com/Webinate/modepress-admin/archive/dev.zip
-unzip -o "dev.zip" "modepress-admin-dev/*"
+wget https://github.com/Webinate/mantle-admin/archive/dev.zip
+unzip -o "dev.zip" "mantle-admin-dev/*"
 
 # Moves the server folder to the current directory
-cp -r modepress-admin-dev/* .
+cp -r mantle-admin-dev/* .
 
-# Remove modepress-admin folder
-if [ -d "modepress-admin-dev" ]; then
-	rm modepress-admin-dev -R
+# Remove mantle-admin folder
+if [ -d "mantle-admin-dev" ]; then
+	rm mantle-admin-dev -R
 fi
 
 # Remove the zip file
@@ -23,6 +23,6 @@ rm "dev.zip"
 
 
 # All done
-echo "Modepress Admin Tool successfully downloaded"
+echo "mantle Admin Tool successfully downloaded"
 exit
 } # this ensures the entire script is downloaded #
