@@ -74,20 +74,20 @@ export class Home extends React.Component<Props, State> {
 
   private renderLatestPost( post: IPost<'expanded'> ) {
     return (
-      <Card style={{ maxWidth: '600px' }}>
+      <Card>
         <CardHeader
           avatar={<Avatar src={generateAvatarPic( post.author )} />}
           title={post.title || ''}
           subheader={format( new Date( post.createdOn ), 'MMM Do, YYYY' )}
         />
-        <CardMedia
+        {post && post.featuredImage ? <CardMedia
           style={{
             height: 0,
             paddingTop: '56.25%'
           }}
           title={post.brief}
-          image={post && post.featuredImage ? post.featuredImage.publicURL : '../images/rocks.svg'}
-        />
+          image={post.featuredImage.publicURL}
+        /> : undefined}
         <CardActions disableActionSpacing>
           <IconButton
             onClick={e => this.props.push( '/dashboard/posts/edit/' + post._id )}
