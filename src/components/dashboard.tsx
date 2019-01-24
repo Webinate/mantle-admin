@@ -37,7 +37,7 @@ export default class Dashboard extends React.Component<Props, State> {
   }
 
   render() {
-    const headerHeight = 60;
+    const headerHeight = 50;
 
     return (
       <DashboardOuter className="mt-dashboard">
@@ -54,7 +54,7 @@ export default class Dashboard extends React.Component<Props, State> {
               }}
             >
               <Avatar
-                style={{ background: theme.primary300.background }}
+                style={{ background: theme.primary300.background, height: '36px', width: '36px' }}
                 src={generateAvatarPic( this.props.activeUser )}
               />
             </div>
@@ -122,9 +122,9 @@ const DashboardOuter = styled.div`
 `;
 
 const Head = styled.div`
-  background: ${theme.secondary200.background };
-  color: ${theme.secondary200.color };
-  border-bottom: 1px solid ${theme.secondary200.border! };
+  background: ${theme.primary200.background };
+  color: ${theme.primary200.color };
+  border-bottom: 1px solid ${theme.primary200.border! };
   box-sizing: border-box;
 
   > * {
@@ -133,14 +133,14 @@ const Head = styled.div`
   }
 
   > h1 {
-    margin: 9px 0 0 0;
+    margin: 3px 0 0 0;
     font-weight: 300;
   }
 
   .mt-right-menu {
     float: right;
     color: inherit;
-    margin: 10px 10px 0 0;
+    margin: 6px 10px 0 0;
   }
 
   .mt-user-menu {

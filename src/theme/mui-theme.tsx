@@ -37,7 +37,7 @@ export default {
 
   // Purples
   primary100: { color: '#fff', softColor: '#eee', background: p100, border: '#6d6993' },
-  primary200: { color: '#fff', softColor: '#eee', background: p200, border: '#ccc' },
+  primary200: { color: '#fff', softColor: '#eee', background: p200, border: '#545076' },
   primary300: { color: '#fff', softColor: '#eee', background: p300, border: '#36334e' },
 
   // Reds

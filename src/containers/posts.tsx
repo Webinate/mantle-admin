@@ -91,13 +91,22 @@ export class Posts extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.getAllTemplates();
-    this.props.getPosts( {
-      index: 0,
-      sortOrder: this.props.posts.postFilters.sortOrder,
-      visibility: this.props.posts.postFilters.visibility,
-      author: '',
-      sort: this.props.posts.postFilters.sort
-    } );
+    const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
+
+    if ( inPostsRoot ) {
+      this.props.getPosts( {
+        index: 0,
+        sortOrder: this.props.posts.postFilters.sortOrder,
+        visibility: this.props.posts.postFilters.visibility,
+        author: '',
+        sort: this.props.posts.postFilters.sort
+      } );
+    }
+    else {
+      const matches = matchPath<{ postId: string }>( this.props.location.pathname, { exact: true, path: '/dashboard/posts/edit/:postId' } );
+      this.props.getPost( matches!.params.postId );
+      this.props.getCategories();
+    }
   }
 
   componentWillReceiveProps( next: Props ) {
