@@ -237,14 +237,14 @@ export default class PostList extends React.Component<Props, State> {
               onMouseDown={e => { this.onPostSelected( post, e ) }}
             >
               {!multipleSelected ? <IconButton
-                style={{ top: 0, right: '30px', position: 'absolute' }}
+                style={{ top: -5, right: '60px', position: 'absolute' }}
                 className="mt-post-button mt-post-edit"
                 onClick={e => this.props.onEdit( post )}
               ><EditIcon style={{ color: theme.primary200.background }} /></IconButton> : undefined
               }
               {!multipleSelected ?
                 <IconButton
-                  style={{ top: 0, right: 0, position: 'absolute' }}
+                  style={{ top: -5, right: 6, position: 'absolute' }}
                   className="mt-post-button mt-post-delete"
                   onClick={e => this.props.onDelete( post )}
                 ><DeleteIcon style={{ color: theme.primary200.background }} /></IconButton> : undefined
@@ -263,7 +263,7 @@ export default class PostList extends React.Component<Props, State> {
               <div className="mt-post-info">
                 <Avatar
                   src={generateAvatarPic( post.author as IUserEntry<'client'> )}
-                  style={{ width: 40, height: 40, float: 'right', margin: '5px 0 0 0' }}
+                  style={{ width: 36, height: 36, float: 'right', margin: '10px 0 0 0' }}
                 />
                 <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
               </div>
@@ -348,6 +348,8 @@ const Post = styled.div`
 
   .mt-post-info {
     clear: both;
+    padding: 0 5px;
+
     > h3 {
       display: inline-block;
       width: 70%;
@@ -355,16 +357,18 @@ const Post = styled.div`
   }
 
   .mt-post-dates {
-    padding: 5px 0 0 0;
+    padding: 5px 5px 0 5px;
     border-top: 1px solid #ccc;
     display: flex;
+
     > div {
       flex: 1;
+      font-size: 12px;
 
       > div:first-child {
-        font-size: 12px;
         opacity: 0.7;
         margin: 0 0 2px 0;
+        font-size: 10px;
       }
 
       &:last-child {
@@ -380,7 +384,14 @@ const Post = styled.div`
 
   .mt-post-button {
     opacity: 0;
+    top: 0;
+    transition: opacity 0.3s, top 0.3s;
     transform: translateY(-15px);
+    background: ${theme.light100.background };
+
+    &:hover {
+      background: ${theme.light200.background } !important;
+    }
   }
 
   .mt-post-featured-thumb {
