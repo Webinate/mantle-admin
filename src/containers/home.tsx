@@ -5,7 +5,6 @@ import { default as styled } from '../theme/styled';
 import { push } from 'react-router-redux';
 import { getHomeElements } from '../store/home/actions';
 import ContentHeader from '../components/content-header';
-// import theme from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -74,11 +73,13 @@ export class Home extends React.Component<Props, State> {
 
   private renderLatestPost( post: IPost<'expanded'> ) {
     return (
-      <Card>
+      <Card className="mt-latest-post">
         <CardHeader
-          avatar={<Avatar src={generateAvatarPic( post.author )} />}
-          title={post.title || ''}
-          subheader={format( new Date( post.createdOn ), 'MMM Do, YYYY' )}
+          className="mt-post-header"
+          avatar={<Avatar className="mt-avatar" src={generateAvatarPic( post.author )} />}
+          title={<span className="mt-post-header-title">{post.title || ''}</span>}
+          subheader={<span>By <span className="mt-post-header-author">{post.author ? post.author.username : ''}</span> on <span className="mt-post-header-date">{format( new Date( post.createdOn ), 'MMM Do, YYYY' )}</span>
+          </span>}
         />
         {post && post.featuredImage ? <CardMedia
           style={{
@@ -90,12 +91,13 @@ export class Home extends React.Component<Props, State> {
         /> : undefined}
         <CardActions disableActionSpacing>
           <IconButton
+            className="mt-edit-latest"
             onClick={e => this.props.push( '/dashboard/posts/edit/' + post._id )}
-            aria-label="Share"
           >
             <VisibilityIcon />
           </IconButton>
           <IconButton
+            className="mt-post-expand-btn"
             onClick={e => this.setState( { postExpanded: !this.state.postExpanded } )}
             aria-expanded={this.state.postExpanded}
             aria-label="Show more"
@@ -104,11 +106,15 @@ export class Home extends React.Component<Props, State> {
             {this.state.postExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </CardActions>
-        <Collapse in={this.state.postExpanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            {post.document.template.zones.map( zone => <div key={zone}>
-              <h2>{zone}</h2>
-              <div dangerouslySetInnerHTML={{ __html: post.latestDraft ? post.latestDraft.html[ zone ] : '' }} />
+        <Collapse
+          timeout={this.props.app.debugMode ? 0 : 'auto'}
+          in={this.state.postExpanded}
+          unmountOnExit
+        >
+          <CardContent className="mt-latest-post-content">
+            {post.document.template.zones.map( zone => <div key={zone} className="mt-zone">
+              <h2 className="mt-zone-header">{zone}</h2>
+              <div className="mt-zone-content" dangerouslySetInnerHTML={{ __html: post.latestDraft ? post.latestDraft.html[ zone ] : '' }} />
             </div>
             )}
           </CardContent>
@@ -127,21 +133,22 @@ export class Home extends React.Component<Props, State> {
           return (
             <ListItem
               key={p._id}
-              button
+              className="mt-recent-post"
             >
               <ListItemAvatar>
                 <Avatar alt={p.author ? p.author.username : 'Author'} src={generateAvatarPic( p.author )} />
               </ListItemAvatar>
               <ListItemText
-                primary={p.title}
+                primary={<span className="mt-recent-post-title">{p.title}</span>}
                 secondary={
-                  <React.Fragment>
-                    {p.brief}
-                  </React.Fragment>
+                  <span>
+                    By <span className="mt-recent-post-author">{p.author ? p.author.username : ''}</span> on <span className="mt-recent-post-date">{format( new Date( p.createdOn ), 'MMM Do, YYYY' )}</span>
+                  </span>
                 }
               />
               <ListItemSecondaryAction>
                 <IconButton
+                  className="mt-edit-post-btn"
                   onClick={e => this.props.push( '/dashboard/posts/edit/' + p._id )}
                   aria-label="Delete"
                 >
@@ -159,7 +166,7 @@ export class Home extends React.Component<Props, State> {
     const home = this.props.home;
     const isBusy = home.busy;
 
-    return <Container>
+    return <Container className="mt-home-container">
       <ContentHeader
         title="Home"
         busy={isBusy}
@@ -191,6 +198,7 @@ export class Home extends React.Component<Props, State> {
                   action={
                     <Tooltip title="Create a new post">
                       <Button
+                        className="mt-create-post"
                         onClick={e => this.props.createPost( { title: 'New Post', slug: randomId() } )}
                         variant="fab"
                         mini

@@ -81,3 +81,5 @@ require( './tests/comments/view-and-filter-comments' );
 require( './tests/comments/view-comment-posts' );
 require( './tests/comments/comment-user-permissions' );
 require( './tests/comments/comment-deletion' );
+require( './tests/home/latest-post' );
+require( './tests/home/recent-posts' );

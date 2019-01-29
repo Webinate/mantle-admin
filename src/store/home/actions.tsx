@@ -18,12 +18,17 @@ export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
 export function getHomeElements() {
   return async function( dispatch: Function, getState: () => IRootState ) {
     dispatch( ActionCreators.SetPostsBusy.create( true ) );
-    const postsPage = await posts.getAll( { sort: 'created', sortOrder: 'desc' } );
-    if ( postsPage.data.length > 0 ) {
-      const post = await posts.getOne( { id: postsPage.data[ 0 ]._id } );
+    const [ postsByCreationDate, postsByModifiedDate ] = await Promise.all( [
+      posts.getAll( { sort: 'created', sortOrder: 'desc', limit: 5 } ),
+      posts.getAll( { sort: 'modified', sortOrder: 'desc', limit: 5 } )
+    ] );
+
+    if ( postsByCreationDate.data.length > 0 ) {
+      const latestPost = await posts.getOne( { id: postsByCreationDate.data[ 0 ]._id } );
+
       dispatch( ActionCreators.SetPost.create( {
-        post: post as IPost<'expanded'>,
-        posts: postsPage.data as IPost<'expanded'>[]
+        post: latestPost as IPost<'expanded'>,
+        posts: postsByModifiedDate.data as IPost<'expanded'>[]
       } ) );
     }
     else
