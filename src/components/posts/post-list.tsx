@@ -385,12 +385,13 @@ const Post = styled.div`
   .mt-post-button {
     opacity: 0;
     top: 0;
-    transition: opacity 0.3s, top 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
     transform: translateY(-15px);
     background: ${theme.light100.background };
 
     &:hover {
       background: ${theme.light200.background } !important;
+      transform: translateY(0px);
     }
   }
 
