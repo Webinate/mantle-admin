@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { IUserEntry } from '../../../../src';
+import { IUserEntry } from '../../../../../src';
 import Avatar from '@material-ui/core/Avatar';
-import { default as styled } from '../theme/styled';
-import { default as theme } from '../theme/mui-theme';
+import { default as styled } from '../../theme/styled';
+import { default as theme } from '../../theme/mui-theme';
 import * as format from 'date-fns/format';
-import { generateAvatarPic } from '../utils/component-utils';
+import { generateAvatarPic } from '../../utils/component-utils';
 
 type Props = {
   users: IUserEntry<'client' | 'expanded'>[];

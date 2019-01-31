@@ -2,14 +2,13 @@ import * as React from 'react';
 import { IUserEntry } from '../../../../src';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
-import { getUsers, removeUser, update } from '../store/users/actions';
+import { getUsers, removeUser, update, create } from '../store/users/actions';
 import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
-import UsersList from '../components/users-list';
+import UsersList from '../components/users/users-list';
 import ContentHeader from '../components/content-header';
 import Pager from '../components/pager';
-import UserProperties from '../components/users-properties';
-import SplitPanel from '../components/split-panel';
+import UserProperties from '../components/users/users-properties';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -19,6 +18,10 @@ import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import SearchIcon from '@material-ui/icons/Search';
+import AddIcon from '@material-ui/icons/Add';
+import { default as styled } from '../theme/styled';
+import NewUserForm from '../components/users/new-user-form';
+import FontCancel from '@material-ui/icons/ArrowBack';
 
 // Map state to props
 const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
@@ -35,7 +38,8 @@ const dispatchToProps = {
   activate: activate,
   removeUser: removeUser,
   resendActivation: resendActivation,
-  update
+  update,
+  create
 }
 
 const stateProps = returntypeof( mapStateToProps );
@@ -46,6 +50,7 @@ type State = {
   dialogue: null | string;
   dialogueHeader: string;
   dialogueConfirmBtn: string;
+  newUserForm: boolean;
 };
 
 /**
@@ -59,6 +64,7 @@ export class Users extends React.Component<Props, State> {
     this.state = {
       selectedUids: [],
       userFilter: '',
+      newUserForm: false,
       dialogueHeader: '',
       dialogue: null,
       dialogueConfirmBtn: 'Ok'
@@ -130,75 +136,39 @@ export class Users extends React.Component<Props, State> {
     );
   }
 
-  render() {
+  private renderUserList( selected: IUserEntry<'expanded' | 'client'> | null ) {
+    const animated = this.props.app.debugMode ? false : true;
     const page = ( typeof ( this.props.userState.userPage! ) === 'string' ? null : this.props.userState.userPage! );
     const isBusy = this.props.userState.busy;
-    const selectedUids = this.state.selectedUids;
-    const selected = selectedUids.length > 0 ?
-      ( this.props.userState.userPage!.data.find( u => u._id === selectedUids[ selectedUids.length - 1 ] ) || null ) : null;
 
     return (
-      <div style={{ height: '100%' }}>
-        <ContentHeader
-          title="Users"
-          busy={isBusy}
-          renderFilters={() => {
-            return <div>
-              <TextField
-                className="users-filter"
-                style={{ verticalAlign: 'middle' }}
-                placeholder="Filter username or email"
-                id="mt-users-filter"
-                value={this.state.userFilter}
-                onKeyDown={e => {
-                  if ( e.keyCode === 13 ) {
-                    this.setState( { selectedUids: [] }, () => {
-                      this.props.getUsers( 0, this.state.userFilter )
-                    } );
-                  }
-                }}
-                onChange={( e ) => this.setState( { userFilter: e.currentTarget.value } )}
-              />
-              <IconButton
-                id="mt-users-search-button"
-                onClick={e => {
-                  this.setState( { selectedUids: [] }, () => {
-                    this.props.getUsers( 0, this.state.userFilter )
-                  } );
-                }}
-                style={{ verticalAlign: 'middle' }}
-              >
-                <SearchIcon style={{ color: theme.primary200.background }} />
-              </IconButton>
-            </div>
-          }}>
-        </ContentHeader>
-        <SplitPanel
-          collapsed={selected ? 'none' : 'right'}
-          ratio={0.7}
-          delay={this.props.app.debugMode ? 0 : 0.7}
-          style={{ height: 'calc(100% - 50px)' }}
-          first={() => {
-            return page ?
-              <Pager
-                limit={page.limit}
-                loading={isBusy}
-                onPage={index => this.props.getUsers( index )}
-                index={page.index}
-                total={page.count}
-                contentProps={{ onMouseDown: e => this.setState( { selectedUids: [] } ) }
-                }
-              >
-                <UsersList
-                  users={page.data}
-                  selected={this.state.selectedUids}
-                  onUserSelected={( user, e ) => this.onUserSelected( user, e )}
-                />
-              </Pager>
-              : undefined
-          }}
-          second={() => <UserProperties
-            animated={this.props.app.debugMode ? false : true}
+      <SplitPanel animated={animated}>
+        <div>
+          {page ? <Pager
+            limit={page.limit}
+            loading={isBusy}
+            onPage={index => this.props.getUsers( index )}
+            index={page.index}
+            total={page.count}
+            contentProps={{ onMouseDown: e => this.setState( { selectedUids: [] } ) }
+            }
+          >
+            <UsersList
+              users={page.data}
+              selected={this.state.selectedUids}
+              onUserSelected={( user, e ) => this.onUserSelected( user, e )}
+            />
+          </Pager> : undefined}
+        </div>
+        {selected ? <div
+          className="mt-selected"
+          ref={animated ? e => {
+            if ( e )
+              setTimeout( () => e.style.maxWidth = '400px', 30 );
+          } : undefined}
+        >
+          <UserProperties
+            animated={animated}
             resetPasswordRequest={username => { this.props.requestPasswordReset( username ) }}
             activateAccount={username => { this.props.activate( username ) }}
             resendActivation={username => { this.props.resendActivation( username ) }}
@@ -213,13 +183,116 @@ export class Users extends React.Component<Props, State> {
             }}
             selected={selected}
           />
-          }
+        </div> : undefined}
+      </SplitPanel>
+    );
+  }
+
+  private renderListHeader() {
+    const isAdmin = this.props.auth.user && this.props.auth.user.privileges < 2 ? true : false;
+    const isBusy = this.props.userState.busy;
+
+    return (
+      <div>
+        <TextField
+          className="users-filter"
+          style={{ verticalAlign: 'middle' }}
+          placeholder="Filter username or email"
+          id="mt-users-filter"
+          value={this.state.userFilter}
+          onKeyDown={e => {
+            if ( e.keyCode === 13 ) {
+              this.setState( { selectedUids: [] }, () => {
+                this.props.getUsers( 0, this.state.userFilter )
+              } );
+            }
+          }}
+          onChange={( e ) => this.setState( { userFilter: e.currentTarget.value } )}
         />
+        <IconButton
+          id="mt-users-search-button"
+          onClick={e => {
+            this.setState( { selectedUids: [] }, () => {
+              this.props.getUsers( 0, this.state.userFilter )
+            } );
+          }}
+          style={{ verticalAlign: 'middle' }}
+        >
+          <SearchIcon style={{ color: theme.primary200.background }} />
+        </IconButton>
+        {isAdmin ? <Button
+          variant="contained"
+          onClick={e => this.setState( { newUserForm: true } )}
+          id="mt-add-user"
+          disabled={isBusy}
+          color="primary"
+        >
+          <AddIcon />
+          Add User
+        </Button> : undefined}
+      </div>
+    );
+  }
+
+  private renderFormHeader() {
+    return (
+      <div>
+        <Button
+          style={{ margin: '5px 0 0 0' }}
+          onClick={e => this.setState( { newUserForm: false } )}
+          id="mt-cancel-new-user"
+        >
+          <FontCancel />
+          Back
+        </Button>
+      </div>
+    );
+
+  }
+
+  render() {
+    const isBusy = this.props.userState.busy;
+    const selectedUids = this.state.selectedUids;
+    const selected = selectedUids.length > 0 ?
+      ( this.props.userState.userPage!.data.find( u => u._id === selectedUids[ selectedUids.length - 1 ] ) || null ) : null;
+
+    return (
+      <div style={{ height: '100%' }}>
+        <ContentHeader
+          title="Users"
+          busy={isBusy}
+          renderFilters={() => this.state.newUserForm ? this.renderFormHeader() : this.renderListHeader()}>
+        </ContentHeader>
+
+        {this.state.newUserForm ? <NewUserForm
+          serverError={'There was an error babe'}
+          onUserCreated={newUser => this.props.create( newUser, () => this.setState( { newUserForm: false } ) )}
+          onCancel={() => this.setState( { newUserForm: false } )}
+        /> : this.renderUserList( selected )}
+
         {this.state.dialogue ?
           this.renderModal( () => {
             this.props.removeUser( selected!.username )
           } ) : undefined}
-      </div >
+      </div>
     );
   }
 };
+
+interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
+  animated: boolean;
+}
+
+const SplitPanel = styled.div`
+  height: calc(100% - 50px);
+  box-sizing: border-box;
+  display: flex;
+
+  > div {
+    flex: 1;
+    &.mt-selected {
+      max-width: ${ ( props: PanelProps ) => props.animated ? '0px' : '400px' };
+      transition: ${ ( props: PanelProps ) => props.animated ? 'max-width 0.5s' : 'none' };
+    }
+  }
+`;

@@ -2,6 +2,7 @@ import Page from './page';
 import Agent from '../utils/agent';
 import AppModule from './modules/app';
 import MediaModule from './modules/media-nav';
+import * as assert from 'assert';
 
 export default class UsersPage extends Page {
   public appModule: AppModule;
@@ -26,6 +27,8 @@ export default class UsersPage extends Page {
 
     this.appModule = new AppModule( this.page );
     this.mediaModule = new MediaModule( this.page );
+
+    assert( await this.$( '.mt-user-list' ) );
   }
 
   async selectUser( email: string ) {
@@ -49,6 +52,40 @@ export default class UsersPage extends Page {
   async selectProfilePic() {
     await this.page.click( '#mt-upload-profile' );
     await this.page.waitFor( '.mt-volume-table' );
+  }
+
+  async hasAddUserButton() {
+    return await this.page.$( '#mt-add-user' ) ? true : false;
+  }
+
+  async clickCancelNewUser() {
+    await this.page.click( '#mt-cancel-new-user' );
+    await this.page.waitFor( '#mt-add-user' );
+  }
+
+  async clickAddNewUser() {
+    await this.page.click( '#mt-add-user' );
+    await this.page.waitFor( '#mt-cancel-new-user' );
+  }
+
+  newUserUsername( val?: string ) {
+    return this.input( '#mt-new-username', val );
+  }
+
+  newUserPassord( val?: string ) {
+    return this.input( '#mt-new-password', val );
+  }
+
+  newUserEmail( val?: string ) {
+    return this.input( '#mt-new-email', val );
+  }
+
+  async isNewUserAddBtnDisabled() {
+    return await this.page.$( '#mt-confirm-add-user[disabled]' ) ? true : false;
+  }
+
+  clickNewUserAddBtn() {
+    return this.page.click( '#mt-confirm-add-user' );
   }
 
   async getUserProfileImg(): Promise<string> {
