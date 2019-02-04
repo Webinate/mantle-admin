@@ -174,6 +174,7 @@ export class Users extends React.Component<Props, State> {
             resendActivation={username => { this.props.resendActivation( username ) }}
             updateUserAvatar={( userId, file ) => this.props.update( userId, { avatarFile: file._id } )}
             activeUser={this.props.auth.user!}
+            updateUserDetails={user => this.props.update( user._id!, user as IUserEntry<'client'> )}
             onDeleteRequested={( user ) => {
               this.setState( {
                 dialogueHeader: 'Remove User',

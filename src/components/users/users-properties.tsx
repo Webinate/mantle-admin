@@ -23,6 +23,7 @@ type Props = {
   activeUser: IUserEntry<'client' | 'expanded'>;
   selected: IUserEntry<'client' | 'expanded'> | null;
   animated: boolean;
+  updateUserDetails: ( user: Partial<IUserEntry<'client' | 'expanded'>> ) => void;
   resetPasswordRequest( username: string ): void;
   activateAccount( username: string ): void;
   onDeleteRequested( username: IUserEntry<'client' | 'expanded'> ): void;
@@ -35,6 +36,7 @@ type State = {
   accountsOpen: boolean;
   removeOpen: boolean;
   showMediaPopup: boolean;
+  user: IUserEntry<'client' | 'expanded'> | null;
 }
 
 export default class UserProperties extends React.Component<Props, State> {
@@ -45,8 +47,14 @@ export default class UserProperties extends React.Component<Props, State> {
       detailsOpen: true,
       accountsOpen: false,
       removeOpen: false,
-      showMediaPopup: false
+      showMediaPopup: false,
+      user: props.selected ? { ...props.selected } : null
     };
+  }
+
+  componentWillReceiveProps( next: Props ) {
+    if ( next.selected !== this.props.selected )
+      this.setState( { user: next.selected ? { ...next.selected } : null } );
   }
 
   userCanInteract( user: IUserEntry<'client' | 'expanded'> ) {
@@ -99,6 +107,7 @@ export default class UserProperties extends React.Component<Props, State> {
                   <TextField
                     className="mt-props-username"
                     value={selected.username}
+                    disabled={true}
                     helperText="Username"
                     fullWidth={true}
                   />
@@ -107,7 +116,8 @@ export default class UserProperties extends React.Component<Props, State> {
                   <TextField
                     className="mt-props-email"
                     helperText="Email"
-                    value={selected.email}
+                    onChange={isAdmin ? e => this.setState( { user: { ...this.state.user!, email: e.currentTarget.value } } ) : undefined}
+                    value={this.state.user!.email}
                     fullWidth={true}
                   />
                 </Field> : undefined}
@@ -115,8 +125,8 @@ export default class UserProperties extends React.Component<Props, State> {
                   <DatePicker
                     helperText="Joined On"
                     className="mt-joined-on"
-                    value={new Date( selected.createdOn )}
-                    onChange={e => { }}
+                    value={new Date( this.state.user!.createdOn )}
+                    onChange={( e: Date ) => this.setState( { user: { ...this.state.user!, createdOn: e.getTime() } } )}
                     fullWidth={true}
                     format={'MMMM Do, YYYY'}
                   />
@@ -124,12 +134,28 @@ export default class UserProperties extends React.Component<Props, State> {
                 {this.userCanInteract( selected ) ? <Field>
                   <DatePicker
                     helperText="Last Active"
+                    disabled={true}
                     className="mt-last-active"
                     fullWidth={true}
                     value={new Date( selected.lastLoggedIn )}
-                    onChange={e => { }}
+                    onChange={( e: Date ) => { }}
                     format={'MMMM Do, YYYY'}
                   />
+                </Field> : undefined}
+                {isAdmin ? <Field>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth={true}
+                    onClick={e => {
+                      const changes = this.state.user!;
+                      this.props.updateUserDetails( {
+                        createdOn: changes.createdOn,
+                        email: changes.email,
+                        _id: changes._id
+                      } )
+                    }}
+                  >Update Details</Button>
                 </Field> : undefined}
               </div>
             </ExpansionPanelDetails>
