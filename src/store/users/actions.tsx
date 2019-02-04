@@ -48,6 +48,7 @@ export function create( token: Partial<IUserEntry<'client'>>, onComplete: () => 
       await createUser( token );
       const resp = await getAll( { index: 0, search: '' } );
       dispatch( ActionCreators.SetUsers.create( resp ) );
+      onComplete();
     }
     catch ( err ) {
       dispatch( ActionCreators.SetUsersBusy.create( false ) );
