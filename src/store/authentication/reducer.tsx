@@ -57,7 +57,7 @@ export default function reducer( state: State = initialState, action: Action | U
 
     case UserActions.UpdateUser.type:
       partialState = {
-        user: action.payload
+        user: !state.user || action.payload._id === state.user._id ? action.payload : state.user
       };
       break;
 

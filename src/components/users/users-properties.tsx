@@ -128,6 +128,7 @@ export default class UserProperties extends React.Component<Props, State> {
                     value={new Date( this.state.user!.createdOn )}
                     onChange={( e: Date ) => this.setState( { user: { ...this.state.user!, createdOn: e.getTime() } } )}
                     fullWidth={true}
+                    disabled={isAdmin ? false : true}
                     format={'MMMM Do, YYYY'}
                   />
                 </Field>
