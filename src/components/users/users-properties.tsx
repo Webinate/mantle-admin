@@ -116,6 +116,7 @@ export default class UserProperties extends React.Component<Props, State> {
                   <TextField
                     className="mt-props-email"
                     helperText="Email"
+                    id="mt-user-email"
                     disabled={isAdmin ? false : true}
                     onChange={isAdmin ? e => this.setState( { user: { ...this.state.user!, email: e.currentTarget.value } } ) : undefined}
                     value={isAdmin ? this.state.user!.email : this.props.activeUser.email}
@@ -126,6 +127,7 @@ export default class UserProperties extends React.Component<Props, State> {
                   <DatePicker
                     helperText="Joined On"
                     className="mt-joined-on"
+
                     value={new Date( this.state.user!.createdOn )}
                     onChange={( e: Date ) => this.setState( { user: { ...this.state.user!, createdOn: e.getTime() } } )}
                     fullWidth={true}
@@ -147,6 +149,7 @@ export default class UserProperties extends React.Component<Props, State> {
                 {isAdmin ? <Field>
                   <Button
                     variant="contained"
+                    id="mt-save-user-details"
                     color="primary"
                     fullWidth={true}
                     onClick={e => {

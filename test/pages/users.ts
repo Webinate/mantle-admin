@@ -58,6 +58,23 @@ export default class UsersPage extends Page {
     return await this.page.$( '#mt-add-user' ) ? true : false;
   }
 
+  async hasSaveDetailsButton() {
+    return await this.page.$( '#mt-save-user-details' ) ? true : false;
+  }
+
+  async clickSaveDetails() {
+    await this.page.click( '#mt-save-user-details' );
+    await this.doneLoading();
+  }
+
+  getJoinedDate() {
+    return this.input( '.mt-joined-on input' );
+  }
+
+  userDetailsEmail( val?: string ) {
+    return this.input( '#mt-user-email', val );
+  }
+
   async clickCancelNewUser() {
     await this.page.click( '#mt-cancel-new-user' );
     await this.page.waitFor( '#mt-add-user' );
