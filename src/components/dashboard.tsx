@@ -8,7 +8,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
-import Stage from './stage';
 import { generateAvatarPic } from '../utils/component-utils';
 import { IUserEntry } from '../../../../src';
 
@@ -102,16 +101,17 @@ export default class Dashboard extends React.Component<Props, State> {
           </IconButton>
           <h1>{this.props.title}</h1>
         </Head>
-        <Stage
-          rightOpen={false}
+        <div
+          className="mt-dash-content"
           style={{ height: `calc(100% - ${ headerHeight }px)` }}
-          renderLeft={() => <Menu>{this.props.renderLeft && this.props.renderLeft()}</Menu>}
-          leftStyle={{ boxShadow: '0px 5px 10px 1px rgba(0,0,0,0.2)', position: 'relative', zIndex: 1 }}
         >
-          <Content>
+          <div className="mt-left-menu">
+            <Menu>{this.props.renderLeft && this.props.renderLeft()}</Menu>
+          </div>
+          <div>
             {this.props.children}
-          </Content>
-        </Stage>
+          </div>
+        </div>
       </DashboardOuter>
     )
   }
@@ -119,6 +119,26 @@ export default class Dashboard extends React.Component<Props, State> {
 
 const DashboardOuter = styled.div`
   height: 100%;
+
+  .mt-left-menu {
+    box-shadow: 0px 5px 10px 1px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+    max-width: 225px;
+    min-width: 200px;
+  }
+
+  .mt-dash-content {
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+    display: flex;
+    background: ${ theme.light200.background } !important;
+
+    > div {
+      flex: 1;
+    }
+  }
 `;
 
 const Head = styled.div`
@@ -173,11 +193,4 @@ const Menu = styled.div`
     border-left: 8px solid ${ theme.primary200.background };
     left: 0;
   }
-`;
-
-const Content = styled.div`
-  height: 100%;
-  overflow: auto;
-  box-sizing: border-box;
-  background: ${ theme.light200.background } !important;
 `;

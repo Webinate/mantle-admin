@@ -116,8 +116,9 @@ export default class UserProperties extends React.Component<Props, State> {
                   <TextField
                     className="mt-props-email"
                     helperText="Email"
+                    disabled={isAdmin ? false : true}
                     onChange={isAdmin ? e => this.setState( { user: { ...this.state.user!, email: e.currentTarget.value } } ) : undefined}
-                    value={this.state.user!.email}
+                    value={isAdmin ? this.state.user!.email : this.props.activeUser.email}
                     fullWidth={true}
                   />
                 </Field> : undefined}
