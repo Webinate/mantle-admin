@@ -5,7 +5,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Icon from '@material-ui/core/Icon';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Avatar from '@material-ui/core/Avatar';
@@ -147,6 +151,25 @@ export default class UserProperties extends React.Component<Props, State> {
                   />
                 </Field> : undefined}
                 {isAdmin ? <Field>
+                  <FormControl
+                    fullWidth={true}>
+                    <Select
+                      className="mt-user-type"
+                      fullWidth={true}
+                      value={this.state.user!.privileges}
+                      onChange={e => this.setState( { user: { ...this.state.user!, privileges: parseInt( e.target.value ) } } )}
+                      inputProps={{
+                        fullWidth: true
+                      }}
+                    >
+                      <MenuItem id="mt-type-super" value={1} disabled={true}>Super Admin</MenuItem>
+                      <MenuItem id="mt-type-admin" value={2}>Admin</MenuItem>
+                      <MenuItem id="mt-type-user" value={3}>User</MenuItem>
+                    </Select>
+                    <FormHelperText>User Type</FormHelperText>
+                  </FormControl>
+                </Field> : undefined}
+                {isAdmin ? <Field>
                   <Button
                     variant="contained"
                     id="mt-save-user-details"
@@ -157,6 +180,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       this.props.updateUserDetails( {
                         createdOn: changes.createdOn,
                         email: changes.email,
+                        privileges: changes.privileges,
                         _id: changes._id
                       } )
                     }}

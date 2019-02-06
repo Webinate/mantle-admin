@@ -36,6 +36,18 @@ describe( 'Testing the editing of user details: ', function() {
     assert.deepEqual( await users.hasSaveDetailsButton(), true );
   } );
 
+  it( 'should hide user type from regular users', async () => {
+    await users.load( joe );
+    await users.selectUser( joe.email );
+    assert.deepEqual( await users.hasUserTypeField(), false );
+  } );
+
+  it( 'should show user type for admin users', async () => {
+    await users.load( admin );
+    await users.selectUser( joe.email );
+    assert.deepEqual( await users.hasUserTypeField(), true );
+  } );
+
   it( 'should have valid fields', async () => {
     await users.load( admin );
     await users.selectUser( joe.email );
@@ -63,5 +75,18 @@ describe( 'Testing the editing of user details: ', function() {
     // Revert back
     await users.userDetailsEmail( joe.email );
     await users.clickSaveDetails();
+  } );
+
+  it( 'should allow an admin to edit a user type manually', async () => {
+    await users.load( admin );
+    await users.selectUser( joe.email );
+
+    assert.deepEqual( await users.getUserType(), '3' );
+    await users.selectUserType( 'admin' );
+    await users.clickSaveDetails();
+
+    await users.load( admin );
+    await users.selectUser( joe.email );
+    assert.deepEqual( await users.getUserType(), '2' );
   } );
 } );

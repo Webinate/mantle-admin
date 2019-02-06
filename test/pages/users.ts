@@ -62,6 +62,10 @@ export default class UsersPage extends Page {
     return await this.page.$( '#mt-save-user-details' ) ? true : false;
   }
 
+  async hasUserTypeField() {
+    return await this.page.$( '.mt-user-type input' ) ? true : false;
+  }
+
   async clickSaveDetails() {
     await this.page.click( '#mt-save-user-details' );
     await this.doneLoading();
@@ -73,6 +77,17 @@ export default class UsersPage extends Page {
 
   userDetailsEmail( val?: string ) {
     return this.input( '#mt-user-email', val );
+  }
+
+  getUserType() {
+    return this.input( '.mt-user-type input' );
+  }
+
+  async selectUserType( val: 'admin' | 'super' | 'user' ) {
+    await this.page.click( '.mt-user-type' );
+    await this.page.waitFor( '#mt-type-' + val );
+    await this.page.click( '#mt-type-' + val );
+    await this.emptySelector( '#mt-type-' + val )
   }
 
   async clickCancelNewUser() {
