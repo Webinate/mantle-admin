@@ -3,6 +3,7 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import { } from 'mocha';
 import Agent from '../../utils/agent';
+import { format } from 'date-fns';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'mantle';
@@ -55,6 +56,9 @@ describe( 'View & edit post created by backend: ', function() {
     assert.deepEqual( await postPage.getSlug(), post.slug );
     assert.deepEqual( await postPage.isPublic(), false );
     assert.deepEqual( await postPage.user(), 'Not set ' );
+    // Check the dates are today
+    assert.deepEqual( await postPage.getCreatedOn(), format( new Date(), 'MMM Do, YYYY' ) );
+    assert.deepEqual( await postPage.getLastModified(), format( new Date(), 'MMM Do, YYYY' ) );
   } )
 
   it( 'can update post details', async () => {
@@ -85,5 +89,17 @@ describe( 'View & edit post created by backend: ', function() {
     const posts = await postPage.getPosts();
     assert( posts.length > 0 );
     assert.equal( posts[ 0 ].name, 'Test Post EDITED' );
+  } )
+
+  it( 'can change creation date', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    await postPage.waitFor( '#mt-post-title' );
+    await postPage.setPreviousMonth();
+
+    await postPage.clickUpdate();
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+
+    // Check the dates are not equal
+    assert.notDeepEqual( await postPage.getCreatedOn(), format( new Date(), 'MMM Do, YYYY' ) );
   } )
 } );

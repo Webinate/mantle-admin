@@ -176,6 +176,18 @@ export default class PostsPage extends Page {
     }
   }
 
+  async setPreviousMonth() {
+    const datePickerOkBtn = 'div[role=dialog] button[aria-label=OK]';
+    const buttons = '.mt-picker-content div[role=presentation] button';
+
+    await this.page.click( '#mt-edit-created-date' );
+    await this.page.click( '#mt-date-prev-month' );
+    const allDayButtons = await this.page.$$( buttons );
+    await allDayButtons[ parseInt( ( allDayButtons.length / 2 ).toString() ) ].click();
+    await this.page.click( datePickerOkBtn );
+    await this.emptySelector( datePickerOkBtn );
+  }
+
   async user( val?: string ) {
     if ( val === undefined ) {
       return this.page.$eval( '.my-user-picker-label', elm => elm.textContent )
@@ -222,6 +234,22 @@ export default class PostsPage extends Page {
    * Gets or sets the post brief
    */
   brief( val?: string ) { return this.textfield( '#mt-post-desc', val, true ) }
+
+  /**
+   * Gets the post creation date
+   */
+  async getCreatedOn() {
+    const date = await this.page.$eval( '#mt-post-created-date', e => e.textContent );
+    return date;
+  }
+
+  /**
+   * Gets the post last modified date
+   */
+  async getLastModified() {
+    const date = await this.page.$eval( '#mt-post-updated-date', e => e.textContent );
+    return date;
+  }
 
   /**
    * Gets or sets the post brief

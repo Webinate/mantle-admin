@@ -12,6 +12,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
 import Icon from '@material-ui/core/Icon';
 import RemoveIcon from '@material-ui/icons/Delete';
 import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument } from 'mantle';
@@ -31,6 +33,9 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import EditIcon from '@material-ui/icons/Edit';
+import { DatePickerWrapperProps } from 'material-ui-pickers/DatePicker/DatePickerWrapper';
+import DatePicker from 'material-ui-pickers/DatePicker';
 
 export type Props = {
   activeUser: IUserEntry<'client' | 'expanded'>;
@@ -64,6 +69,7 @@ export type State = {
 
 export default class PostForm extends React.Component<Props, State> {
   private _editableRef: Partial<IPost<'client' | 'expanded'>>;
+  private _datePicker: React.Component<DatePickerWrapperProps, any, any> | null;
 
   constructor( props: Props ) {
     super( props );
@@ -130,6 +136,8 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   private renderUpdateBox() {
+    const isAdmin = this.props.isAdmin;
+
     return <ExpansionPanel expanded={true} className="mt-update-panel">
       <ExpansionPanelDetails>
         <div className="mt-panel-inner">
@@ -186,10 +194,26 @@ export default class PostForm extends React.Component<Props, State> {
             <Dates>
               <div>Created: </div>
               <div>
-                {format( new Date( this.props.post.createdOn! ), 'MMM Do, YYYY' )}
+                {isAdmin ? <span
+                  onClick={e => ( this._datePicker! as any ).open( e )}
+                ><EditIcon id="mt-edit-created-date" /></span> : undefined}
+
+                {isAdmin ? <DatePicker
+                  leftArrowIcon={<ChevronLeft id="mt-date-prev-month" />}
+                  rightArrowIcon={<ChevronRight id="mt-date-next-month" />}
+                  dialogContentClassName="mt-picker-content"
+                  ref={e => this._datePicker = e}
+                  className="mt-created-on-picker"
+                  style={{ display: 'none' }}
+                  value={new Date( this.state.editable.createdOn! )}
+                  onChange={( e: Date ) => this.setState( { editable: { ...this.state.editable, createdOn: e.getTime() } } )}
+                /> : undefined}
+                <span id="mt-post-created-date">{
+                  format( new Date( this.state.editable.createdOn! ), 'MMM Do, YYYY' )
+                }</span>
               </div>
               <div>Updated: </div>
-              <div>
+              <div id="mt-post-updated-date">
                 {format( new Date( this.props.post.lastUpdated! ), 'MMM Do, YYYY' )}
               </div>
             </Dates> : undefined}
@@ -515,6 +539,17 @@ const Form = styled.form`
 
   .mt-panel-inner {
     width: 100%;
+  }
+
+  #mt-edit-created-date {
+    color: ${ theme.primary100.background };
+    font-size: 16px;
+    margin: 0 10px 0 0;
+    vertical-align: middle;
+    cursor: pointer;
+    &:hover {
+      color: ${ theme.primary200.background };
+    }
   }
 
   #mt-post-title {
