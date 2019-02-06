@@ -675,7 +675,12 @@ const Container = styled.div`
   }
 
   img {
-    max-width:100%;
+    max-width: 100%;
+    max-height: 400px;
+  }
+
+  figure {
+    margin: 0;
   }
 
   .mt-editor-container {
