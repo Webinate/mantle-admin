@@ -27,8 +27,8 @@ export default class ImageEditor extends React.Component<Props, State> {
   }
 
   private onBlur() {
-    const thisStyle = this.state.style;
-    const propStyle = this.props.style;
+    const thisStyle = this.state.style || {};
+    const propStyle = this.props.style || {};
     let hasChanged = false;
 
     if ( thisStyle[ 'max-width' ] !== propStyle[ 'max-width' ] )
