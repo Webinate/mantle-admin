@@ -99,6 +99,25 @@ export default class PostsPage extends Page {
     await this.waitFor( '.mt-volume-table' );
   }
 
+  async hasImageEditor() {
+    return await this.$( '.mt-elements-panel' ) ? true : false
+  }
+
+  async imageWidth( val?: string ) {
+    return this.input( '#mt-image-width', val );
+  }
+
+  async imageHeight( val?: string ) {
+    return this.input( '#mt-image-height', val );
+  }
+
+  async imageFloat( val: 'left' | 'right' | 'none' ) {
+    await this.page.click( '.mt-image-float' );
+    await this.page.waitFor( `#mt-image-float-${ val }` );
+    await this.page.click( `#mt-image-float-${ val }` );
+    await this.emptySelector( `#mt-image-float-${ val }` );
+  }
+
   async isPreview() {
     const result = await this.page.$( '#mt-post-preview' );
     return result ? true : false;

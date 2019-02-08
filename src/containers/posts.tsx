@@ -228,7 +228,7 @@ export class Posts extends React.Component<Props, State> {
                   onRequestPreview={() => this.setState( { previewMode: true } )}
                   renderAfterForm={() => this.renderComment( props.match.params.postId )}
                   onCreateElm={( ( elms, index ) => this.props.addElement( doc._id, elms, index ) )}
-                  onUpdateElm={( id, html, createElement, deselect ) => this.props.updateElement( doc._id, id, html, createElement, deselect )}
+                  onUpdateElm={( id, token, createElement, deselect ) => this.props.updateElement( doc._id, id, token, createElement, deselect )}
                   onDeleteElements={ids => this.props.deleteElements( doc._id, ids )}
                   onSelectionChanged={( selection, focus ) => {
                     this.props.setElmSelection( selection );

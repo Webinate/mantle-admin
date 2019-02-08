@@ -16,7 +16,7 @@ import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import Icon from '@material-ui/core/Icon';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument } from 'mantle';
+import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument, IImageElement } from 'mantle';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
@@ -36,6 +36,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import EditIcon from '@material-ui/icons/Edit';
 import { DatePickerWrapperProps } from 'material-ui-pickers/DatePicker/DatePickerWrapper';
 import DatePicker from 'material-ui-pickers/DatePicker';
+import ImageEditor from './element-editors/image-editor';
 
 export type Props = {
   activeUser: IUserEntry<'client' | 'expanded'>;
@@ -54,7 +55,7 @@ export type Props = {
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: ( templateId: string ) => void;
   onCreateElm: ( elms: Partial<IDraftElement<'client' | 'expanded'>>[], index?: number ) => void;
-  onUpdateElm: ( id: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
+  onUpdateElm: ( id: string, token: Partial<IDraftElement<'client'>>, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) => void;
   onDeleteElements: ( ids: string[] ) => void;
   onSelectionChanged: ( ids: string[], focus: boolean ) => void;
 }
@@ -76,6 +77,7 @@ export default class PostForm extends React.Component<Props, State> {
     this._editableRef = { ...props.post };
     const doc = props.post.document as IDocument<'client'>;
     const template = doc.template as ITemplate<'client'>;
+
     this.state = {
       editable: this._editableRef,
       currentTagText: '',
@@ -439,6 +441,41 @@ export default class PostForm extends React.Component<Props, State> {
     </ExpansionPanel>
   }
 
+  private renderElementProperties() {
+    if ( this.props.selectedElements.length === 0 )
+      return null;
+
+    const element = this.props.elements.find( e => e._id === this.props.selectedElements[ 0 ] ) as IDraftElement<'expanded'>;
+    let editor: { title: string; editor: JSX.Element } | null = null;
+
+    if ( element.type === 'elm-image' ) {
+      const image = element as IImageElement<'expanded'>;
+      editor = {
+        title: 'Image Properties', editor: <ImageEditor
+          style={image.style}
+          selectedElement={element}
+          onChange={style => {
+            this.props.onUpdateElm( image._id, { style } as IImageElement<'client'>, null, 'none' )
+          }}
+        />
+      };
+    }
+
+    if ( !editor )
+      return null;
+
+    return <ExpansionPanel className="mt-elements-panel" defaultExpanded={true}>
+      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
+        <h3>{editor.title}</h3>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+        <div className="mt-panel-inner">
+          {editor.editor}
+        </div>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
+  }
+
   render() {
     const doc = this.state.editable.document as IDocument<'client'>;
 
@@ -491,7 +528,7 @@ export default class PostForm extends React.Component<Props, State> {
           elements={this.props.elements}
           document={doc}
           onCreateElm={( elms, index ) => this.props.onCreateElm( elms, index )}
-          onUpdateElm={( id, html, createParagraph, deselect ) => this.props.onUpdateElm( id, html, createParagraph, deselect )}
+          onUpdateElm={( id, html, createParagraph, deselect ) => this.props.onUpdateElm( id, { html }, createParagraph, deselect )}
           onDeleteElm={ids => this.props.onDeleteElements( ids )}
           onSelectionChanged={( uids, focus ) => this.props.onSelectionChanged( uids, focus )}
           selected={this.props.selectedElements}
@@ -502,6 +539,7 @@ export default class PostForm extends React.Component<Props, State> {
       </div>
       <div>
         {this.renderUpdateBox()}
+        {this.renderElementProperties()}
         {this.renderTags()}
         {this.renderMeta()}
         {this.renderFeaturedImg()}

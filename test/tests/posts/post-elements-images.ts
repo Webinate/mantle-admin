@@ -6,7 +6,6 @@ import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost, IVolume } from 'mantle';
-import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent;
@@ -81,5 +80,27 @@ describe( 'Testing the creation of image elements: ', function() {
     const filesPage = await files.getFiles( { volumeId: volume._id } );
     assert.deepEqual( elements[ 1 ], `<figure><img src="${ filesPage.data[ 0 ].publicURL }"></figure>` );
     assert( filesPage.data[ 0 ].publicURL.endsWith( 'img-b.png' ) );
+  } )
+
+  it( 'does show image editor panel when an image is selected', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    assert.deepEqual( await postPage.hasImageEditor(), false );
+    await postPage.elementsModule.clickAt( 1 );
+    assert.deepEqual( await postPage.hasImageEditor(), true );
+  } )
+
+  it( 'does allow editing style options of an image', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
+    await postPage.elementsModule.clickAt( 1 );
+    await postPage.imageWidth( '100px' );
+    await postPage.imageHeight( '100px' );
+    await postPage.imageFloat( 'left' );
+    await postPage.doneLoading();
+
+    const files = ControllerFactory.get( 'files' );
+    const filesPage = await files.getFiles( { volumeId: volume._id } );
+
+    const figureHtml = await postPage.$eval( '.mt-element figure', e => e.outerHTML );
+    assert.deepEqual( figureHtml, `<figure style="max-width:100px;max-height:100px;float:left"><img src="${ filesPage.data[ 0 ].publicURL }"></figure>` );
   } )
 } );

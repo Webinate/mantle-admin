@@ -143,11 +143,11 @@ export function addElement( docId: string, elements: Partial<IDraftElement<'clie
   }
 }
 
-export function updateElement( docId: string, elementId: string, html: string, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
+export function updateElement( docId: string, elementId: string, token: Partial<IDraftElement<'client'>>, createElement: Partial<IDraftElement<'client' | 'expanded'>> | null, deselect: 'select' | 'deselect' | 'none' ) {
   return async function( dispatch: Function, getState: () => IRootState ) {
     try {
       dispatch( ActionCreators.SetPostsBusy.create( true ) );
-      const resp = await documents.editElement( docId, elementId, { html } );
+      const resp = await documents.editElement( docId, elementId, token );
       dispatch( ActionCreators.UpdateElement.create( resp ) );
       if ( createElement ) {
         const index = getSelectedIndex( getState() );

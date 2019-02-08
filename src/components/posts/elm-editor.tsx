@@ -4,7 +4,6 @@ import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
 import { IDraftElement, IImageElement, IDocument, ITemplate } from 'mantle';
 import { InlineType } from './editor-toolbar';
-
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -39,6 +38,7 @@ export type State = {
 export class ElmEditor extends React.Component<Props, State> {
   private _activeElm: HTMLElement | null;
   private _firstElm: HTMLElement | null;
+  private _createEditor: boolean;
   private _lastFocussedElm: HTMLElement;
   private _keyProxy: any;
   private _previousSelection: string[];
@@ -50,6 +50,7 @@ export class ElmEditor extends React.Component<Props, State> {
     this._keyProxy = this.onWindowKeyDown.bind( this );
     this._ranges = null;
     this._lastActiveIndex = 0;
+    this._createEditor = false;
     this.state = {
       initialized: false,
       anchorOpen: false,
@@ -81,8 +82,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( next.focussedId !== this.props.focussedId && next.focussedId !== '' ) {
       const elm = this.props.elements.find( e => e._id === next.focussedId )!;
       if ( elm.type === 'elm-html' ) {
-        this._activeElm = null;
-        this._firstElm = null;
+        this._createEditor = false;
         this.setState( { html: elm.html } );
       }
     }
@@ -121,8 +121,14 @@ export class ElmEditor extends React.Component<Props, State> {
       this.pasteElementsFromLocalStorage();
     }
     // Delete
-    if ( e.keyCode === 46 && this.props.focussedId === '' && this.props.selected.length > 0 )
+    else if ( e.keyCode === 46 && this.props.focussedId === '' && this.props.selected.length > 0 )
       this.props.onDeleteElm( this.props.selected );
+    // Escape
+    else if ( e.keyCode === 27 ) {
+      const selected = this.getSelectedElement();
+      if ( selected )
+        this.updateElmHtml( selected, null, 'deselect' );
+    }
   }
 
   private getLastLeafNode( source: Node ) {
@@ -236,9 +242,13 @@ export class ElmEditor extends React.Component<Props, State> {
       return;
     }
 
-    if ( !this._activeElm )
+    if ( !this._createEditor || !this._activeElm ) {
+      if ( deselect )
+        this.props.onSelectionChanged( [], false );
       return;
+    }
 
+    // Clean the nodes
     this.clean( this._activeElm );
     const first = this._activeElm.firstElementChild as HTMLElement;
     const firstInnerChild = first.firstElementChild;
@@ -248,6 +258,7 @@ export class ElmEditor extends React.Component<Props, State> {
     if ( lastInnerChild && lastInnerChild.parentNode && lastInnerChild instanceof HTMLBRElement )
       first.removeChild( lastInnerChild );
 
+    // Get the html string
     let html = first.outerHTML;
     if ( elm.html !== html )
       this.props.onUpdateElm( elm._id, html, createElement, deselect );
@@ -327,6 +338,7 @@ export class ElmEditor extends React.Component<Props, State> {
     e.preventDefault();
     e.stopPropagation();
 
+    // If its mouse down on a different unit then update it
     if ( this.props.focussedId !== '' && elm._id !== this.props.focussedId ) {
       const currentlyFocussedElm = this.props.elements.find( e => e._id === this.props.focussedId )!;
       this.updateElmHtml( currentlyFocussedElm, null, 'deselect' );
@@ -365,7 +377,8 @@ export class ElmEditor extends React.Component<Props, State> {
   private activateElm( elm: HTMLElement ) {
     this._activeElm = elm;
     this._firstElm = elm.firstElementChild as HTMLElement;
-    this.focusLast( this._firstElm );
+    if ( this._createEditor )
+      this.focusLast( this._firstElm );
   }
 
   /**
@@ -389,12 +402,6 @@ export class ElmEditor extends React.Component<Props, State> {
         activeElm.append( this._firstElm );
         this.focusLast( this._firstElm );
       }
-    }
-    // Escape
-    if ( e.keyCode === 27 ) {
-      const selected = this.getSelectedElement();
-      if ( selected )
-        this.updateElmHtml( selected, null, 'deselect' );
     }
   }
 
@@ -594,11 +601,11 @@ export class ElmEditor extends React.Component<Props, State> {
                         return;
 
                       if ( isEditable )
-                        setTimeout( () => this.activateElm( e ), 200 );
-                      else {
-                        this._activeElm = null;
-                        this._firstElm = null;
-                      }
+                        this._createEditor = true;
+                      else
+                        this._createEditor = false;
+
+                      setTimeout( () => this.activateElm( e ), 200 );
                     }}
                     onBlur={e => this.updateElmHtml( elm, null, 'deselect' )}
                     className={`mt-element active focussed`}
@@ -712,6 +719,12 @@ const Container = styled.div`
     outline: 0px solid transparent;
     &:hover {
       border: 1px dashed ${ theme.light200.border };
+    }
+
+    &::after {
+      content: '';
+      clear: both;
+      display: block;
     }
 
     textarea {
