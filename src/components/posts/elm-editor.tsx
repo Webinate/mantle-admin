@@ -377,7 +377,7 @@ export class ElmEditor extends React.Component<Props, State> {
   private activateElm( elm: HTMLElement ) {
     this._activeElm = elm;
     this._firstElm = elm.firstElementChild as HTMLElement;
-    if ( this._createEditor )
+    if ( this._createEditor && this._firstElm )
       this.focusLast( this._firstElm );
   }
 
