@@ -448,6 +448,9 @@ export default class PostForm extends React.Component<Props, State> {
     const element = this.props.elements.find( e => e._id === this.props.selectedElements[ 0 ] ) as IDraftElement<'expanded'>;
     let editor: { title: string; editor: JSX.Element } | null = null;
 
+    if ( !element )
+      return null;
+
     if ( element.type === 'elm-image' ) {
       const image = element as IImageElement<'expanded'>;
       editor = {
