@@ -41,16 +41,20 @@ export class ElmEditor extends React.Component<Props, State> {
   private _createEditor: boolean;
   private _lastFocussedElm: HTMLElement;
   private _keyProxy: any;
+  private _mouseDownProxy: any;
   private _previousSelection: string[];
   private _ranges: Range[] | null;
   private _lastActiveIndex: number;
+  private _canPaste: boolean;
 
   constructor( props: Props ) {
     super( props );
     this._keyProxy = this.onWindowKeyDown.bind( this );
+    this._mouseDownProxy = this.onWinMouseDown.bind( this );
     this._ranges = null;
     this._lastActiveIndex = 0;
     this._createEditor = false;
+    this._canPaste = false;
     this.state = {
       initialized: false,
       anchorOpen: false,
@@ -95,27 +99,33 @@ export class ElmEditor extends React.Component<Props, State> {
       this.setState( { initialized: true } );
 
     window.addEventListener( 'keydown', this._keyProxy );
+    window.addEventListener( 'mousedown', this._mouseDownProxy );
   }
 
   componentWillUnmount() {
     window.removeEventListener( 'keydown', this._keyProxy );
+    window.removeEventListener( 'mousedown', this._mouseDownProxy );
+  }
+
+  private onWinMouseDown( e: MouseEvent ) {
+    this._canPaste = false;
   }
 
   private onWindowKeyDown( e: KeyboardEvent ) {
     // CTRL + C
-    if ( e.ctrlKey && e.keyCode === 67 ) {
+    if ( this._canPaste && e.ctrlKey && e.keyCode === 67 ) {
       if ( this.props.selected.length > 0 && this.props.focussedId === '' )
         this.copyElementsToLocalStorage( true );
       else
         localStorage.setItem( 'elm-editor-clip', '' );
     }
     // CTRL + x
-    else if ( e.ctrlKey && e.keyCode === 88 && this.props.focussedId === '' ) {
+    else if ( this._canPaste && e.ctrlKey && e.keyCode === 88 && this.props.focussedId === '' ) {
       this.copyElementsToLocalStorage( false );
       this.props.onDeleteElm( this.props.selected );
     }
     // CTRL + V
-    else if ( e.ctrlKey && e.keyCode === 86 && this.hasClipboard() && this.props.focussedId === '' ) {
+    else if ( this._canPaste && e.ctrlKey && e.keyCode === 86 && this.hasClipboard() && this.props.focussedId === '' ) {
       e.stopPropagation();
       e.preventDefault();
       this.pasteElementsFromLocalStorage();
@@ -337,6 +347,8 @@ export class ElmEditor extends React.Component<Props, State> {
   private onElmDown( e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client' | 'expanded'> ) {
     e.preventDefault();
     e.stopPropagation();
+
+    this._canPaste = true;
 
     // If its mouse down on a different unit then update it
     if ( this.props.focussedId !== '' && elm._id !== this.props.focussedId ) {
@@ -573,6 +585,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
           <div
             className={`mt-editor-container`}
+            onClick={e => this._canPaste = true}
           >
             {elements.map( ( elm, index ) => {
 

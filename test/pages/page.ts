@@ -136,6 +136,24 @@ export default class Page {
     }
   }
 
+  async keyboardCut() {
+    await this.page.keyboard.down( 'Control' );
+    await this.page.keyboard.press( 'X' );
+    await this.page.keyboard.up( 'Control' );
+  }
+
+  async keyboardCopy() {
+    await this.page.keyboard.down( 'Control' );
+    await this.page.keyboard.press( 'C' );
+    await this.page.keyboard.up( 'Control' );
+  }
+
+  async keyboardPaste() {
+    await this.page.keyboard.down( 'Control' );
+    await this.page.keyboard.press( 'V' );
+    await this.page.keyboard.up( 'Control' );
+  }
+
   $eval( selector: string, callback: ( element: Element, ...args: any[] ) => any ) { return this.page.$eval( selector, callback ) }
   $( selector: string ) { return this.page.$( selector ) }
   $$( selector: string ) { return this.page.$$( selector ) }

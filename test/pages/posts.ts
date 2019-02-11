@@ -75,6 +75,10 @@ export default class PostsPage extends Page {
       return this.page.click( '.mt-templates-panel .mt-panel-expand' );
   }
 
+  focusOnEditor() {
+    return this.page.click( '.mt-editor-container' );
+  }
+
   /**
    * Clicks the confirm btn to save or update
    */

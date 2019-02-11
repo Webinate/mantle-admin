@@ -69,9 +69,7 @@ describe( 'Testing the copy/paste of image elements: ', function() {
     const numSelected = await postPage.elementsModule.numSelectedElms();
     assert.deepEqual( numSelected, 5 );
 
-    await postPage.page.keyboard.down( 'Control' );
-    await postPage.page.keyboard.press( 'C' );
-    await postPage.page.keyboard.up( 'Control' );
+    await postPage.keyboardCopy();
 
     await postPage.elementsModule.clickDelete();
     await postPage.elementsModule.doneLoading();
@@ -81,9 +79,7 @@ describe( 'Testing the copy/paste of image elements: ', function() {
   } )
 
   it( 'can paste the units from clipboard', async () => {
-    await postPage.page.keyboard.down( 'Control' );
-    await postPage.page.keyboard.press( 'V' );
-    await postPage.page.keyboard.up( 'Control' );
+    await postPage.keyboardPaste();
     await postPage.doneLoading();
 
     const elements = await postPage.elementsModule.htmlArray();
@@ -93,9 +89,7 @@ describe( 'Testing the copy/paste of image elements: ', function() {
   it( 'does removes the units when cutting', async () => {
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
     await postPage.elementsModule.selectRange( 0, 4 );
-    await postPage.page.keyboard.down( 'Control' );
-    await postPage.page.keyboard.press( 'X' );
-    await postPage.page.keyboard.up( 'Control' );
+    await postPage.keyboardCut();
     await postPage.doneLoading();
 
     const elements = await postPage.elementsModule.htmlArray();
@@ -105,12 +99,14 @@ describe( 'Testing the copy/paste of image elements: ', function() {
   it( 'can paste units after a reload', async () => {
     await postPage.load( admin, `/dashboard/posts/edit/${ post._id }` );
 
-    await postPage.page.keyboard.down( 'Control' );
-    await postPage.page.keyboard.press( 'V' );
-    await postPage.page.keyboard.up( 'Control' );
+    let elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 0 );
+
+    await postPage.focusOnEditor();
+    await postPage.keyboardPaste();
     await postPage.doneLoading();
 
-    const elements = await postPage.elementsModule.htmlArray();
+    elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 5 );
   } )
 
@@ -125,13 +121,24 @@ describe( 'Testing the copy/paste of image elements: ', function() {
     elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 0 );
 
-    await postPage.page.keyboard.down( 'Control' );
-    await postPage.page.keyboard.press( 'V' );
-    await postPage.page.keyboard.up( 'Control' );
+    await postPage.focusOnEditor();
+    await postPage.keyboardPaste();
     await postPage.doneLoading();
 
     elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 5 );
+  } )
+
+  it( 'do not allow pasting units unless editor or element is focussed', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post2._id }` );
+    let elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 1 );
+
+    await postPage.keyboardPaste();
+    await postPage.doneLoading();
+
+    elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 1 );
   } )
 
   it( 'can paste units into a different post', async () => {
@@ -139,9 +146,8 @@ describe( 'Testing the copy/paste of image elements: ', function() {
     let elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 1 );
 
-    await postPage.page.keyboard.down( 'Control' );
-    await postPage.page.keyboard.press( 'V' );
-    await postPage.page.keyboard.up( 'Control' );
+    await postPage.elementsModule.clickAt( 0 );
+    await postPage.keyboardPaste();
     await postPage.doneLoading();
 
     elements = await postPage.elementsModule.htmlArray();
