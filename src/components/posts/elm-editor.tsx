@@ -762,5 +762,7 @@ const Container = styled.div`
   .mt-editor-container {
     padding: 10px;
     box-sizing: border-box;
+    max-height: 600px;
+    overflow: auto;
   }
 `;
