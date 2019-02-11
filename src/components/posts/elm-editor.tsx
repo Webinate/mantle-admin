@@ -80,7 +80,7 @@ export class ElmEditor extends React.Component<Props, State> {
     }
 
     if ( next.focussedId !== this.props.focussedId && next.focussedId !== '' ) {
-      const elm = this.props.elements.find( e => e._id === next.focussedId )!;
+      const elm = next.elements.find( e => e._id === next.focussedId )!;
       if ( elm.type === 'elm-html' ) {
         this._createEditor = false;
         this.setState( { html: elm.html } );

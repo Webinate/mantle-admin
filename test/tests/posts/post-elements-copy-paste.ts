@@ -11,6 +11,7 @@ import { uploadFileToVolume } from '../../utils/file';
 let postPage = new PostsPage();
 let admin: Agent;
 let post: IPost<'expanded'>;
+let post2: IPost<'expanded'>;
 let volume: IVolume<'expanded'>;
 
 describe( 'Testing the copy/paste of image elements: ', function() {
@@ -29,7 +30,11 @@ describe( 'Testing the copy/paste of image elements: ', function() {
       public: false
     } ) as IPost<'expanded'>;
 
-
+    post2 = await posts.create( {
+      title: 'Image test 2',
+      slug: randomId(),
+      public: false
+    } ) as IPost<'expanded'>;
 
     const userEntry = await users.getUser( { username: admin.username } );
     volume = await volumes.create( { name: randomId(), user: userEntry._id.toString() } ) as IVolume<'expanded'>;
@@ -49,6 +54,7 @@ describe( 'Testing the copy/paste of image elements: ', function() {
     const posts = ControllerFactory.get( 'posts' );
     await volumes.remove( { _id: volume._id } );
     await posts.removePost( post._id.toString() );
+    await posts.removePost( post2._id.toString() );
   } )
 
   it( 'does have a set of elements to copy from', async () => {
@@ -126,5 +132,19 @@ describe( 'Testing the copy/paste of image elements: ', function() {
 
     elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements.length, 5 );
+  } )
+
+  it( 'can paste units into a different post', async () => {
+    await postPage.load( admin, `/dashboard/posts/edit/${ post2._id }` );
+    let elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 1 );
+
+    await postPage.page.keyboard.down( 'Control' );
+    await postPage.page.keyboard.press( 'V' );
+    await postPage.page.keyboard.up( 'Control' );
+    await postPage.doneLoading();
+
+    elements = await postPage.elementsModule.htmlArray();
+    assert.deepEqual( elements.length, 6 );
   } )
 } );
