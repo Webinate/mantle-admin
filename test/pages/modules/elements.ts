@@ -2,6 +2,8 @@ import Module from "./module";
 import App from "./app";
 import { Page } from 'puppeteer';
 
+export type ElementType = 'header-1' | 'header-2' | 'header-3' | 'header-4' | 'header-5' | 'header-6' | 'code' | 'paragraph';
+
 /**
  * A module for interacting with elements
  */
@@ -79,7 +81,7 @@ export default class ElementsModule extends Module {
     await this.doneLoading();
   }
 
-  async selectBlockType( type: 'header-1' | 'header-2' | 'header-3' | 'header-4' | 'header-5' | 'header-6' | 'code' | 'paragraph' ) {
+  async selectBlockType( type: ElementType ) {
     await this.page.click( '#mt-draft-blocks' );
     await this.page.waitFor( `#mt-create-elm-${ type }` );
     await this.page.click( `#mt-create-elm-${ type }` );
@@ -175,6 +177,11 @@ export default class ElementsModule extends Module {
   async typeAndPress( val: string, key: string = 'Enter' ) {
     await this.page.keyboard.type( val, { delay: 60 } );
     await this.page.keyboard.press( key );
+    await this.doneLoading()
+  }
+
+  async pressEscape() {
+    await this.page.keyboard.press( 'Escape' );
     await this.doneLoading()
   }
 }

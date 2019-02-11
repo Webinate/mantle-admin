@@ -7,6 +7,7 @@ import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
 import { IPost } from 'mantle';
 import { PostsController } from '../../../../../src/controllers/posts';
+import { ElementType } from '../../pages/modules/elements';
 
 let postPage = new PostsPage();
 let admin: Agent;
@@ -137,5 +138,53 @@ describe( 'Testing the creation of elements: ', function() {
     // Check order
     const elements = await postPage.elementsModule.htmlArray();
     assert.deepEqual( elements[ 1 ], '<h3>HEADING</h3>' );
+  } )
+
+  it( 'does allow empty blocks from the menu and they\'re valid html', async () => {
+    const toTest: { type: ElementType, code: string }[] = [
+      { type: 'header-1', code: 'h1' },
+      { type: 'header-2', code: 'h2' },
+      { type: 'header-3', code: 'h3' },
+      { type: 'header-4', code: 'h4' },
+      { type: 'header-5', code: 'h5' },
+      { type: 'header-6', code: 'h6' },
+      { type: 'code', code: 'pre' },
+      { type: 'paragraph', code: 'p' } ];
+
+    for ( let i = 0, l = toTest.length; i < l; i++ ) {
+      await postPage.elementsModule.activateAt( 0 );
+      await postPage.elementsModule.selectBlockType( toTest[ i ].type );
+      await postPage.elementsModule.waitForActivation( 1 );
+      await postPage.elementsModule.pressEscape();
+      await postPage.elementsModule.waitForNoFocus();
+
+      // Check order
+      const elements = await postPage.elementsModule.htmlArray();
+      assert.deepEqual( elements[ 1 ], `<${ toTest[ i ].code }></${ toTest[ i ].code }>` );
+    }
+  } )
+
+  it( 'does allow blocks with text from the menu and they\'re valid html', async () => {
+    const toTest: { type: ElementType, code: string }[] = [
+      { type: 'header-1', code: 'h1' },
+      { type: 'header-2', code: 'h2' },
+      { type: 'header-3', code: 'h3' },
+      { type: 'header-4', code: 'h4' },
+      { type: 'header-5', code: 'h5' },
+      { type: 'header-6', code: 'h6' },
+      { type: 'code', code: 'pre' },
+      { type: 'paragraph', code: 'p' } ];
+
+    for ( let i = 0, l = toTest.length; i < l; i++ ) {
+      await postPage.elementsModule.activateAt( 0 );
+      await postPage.elementsModule.selectBlockType( toTest[ i ].type );
+      await postPage.elementsModule.waitForActivation( 1 );
+      await postPage.elementsModule.typeAndPress( 'test', 'Escape' );
+      await postPage.elementsModule.waitForNoFocus();
+
+      // Check order
+      const elements = await postPage.elementsModule.htmlArray();
+      assert.deepEqual( elements[ 1 ], `<${ toTest[ i ].code }>test</${ toTest[ i ].code }>` );
+    }
   } )
 } );

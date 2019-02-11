@@ -54,7 +54,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
 
     this._regularBlocks = [
       { label: 'Header 1', type: 'elm-header-1', html: '<h1></h1>' },
-      { label: 'Header 2', type: 'elm-header-2', html: '<h1></h1>' },
+      { label: 'Header 2', type: 'elm-header-2', html: '<h2></h2>' },
       { label: 'Header 3', type: 'elm-header-3', html: '<h3></h3>' },
       { label: 'Header 4', type: 'elm-header-4', html: '<h4></h4>' },
       { label: 'Header 5', type: 'elm-header-5', html: '<h5></h5>' },
