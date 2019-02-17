@@ -14,7 +14,7 @@ export type State = {
 };
 
 export const initialState: State = {
-  postFilters: { index: 0 },
+  postFilters: { index: 0, sort: 'created' },
   postPage: null,
   post: null,
   busy: false,
