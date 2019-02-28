@@ -177,7 +177,7 @@ export class Posts extends React.Component<Props, State> {
     const page = this.props.posts.postPage;
     const post = this.props.posts.post;
     const isBusy = this.props.posts.busy;
-    const isAdmin = this.props.user && this.props.user.privileges < 2 ? true : false;
+    const isAdmin = this.props.user && this.props.user.privileges !== 'regular' ? true : false;
     const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
     const user = this.props.user!;
     const templates = this.props.templates;

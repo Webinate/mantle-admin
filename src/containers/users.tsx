@@ -190,7 +190,7 @@ export class Users extends React.Component<Props, State> {
   }
 
   private renderListHeader() {
-    const isAdmin = this.props.auth.user && this.props.auth.user.privileges < 2 ? true : false;
+    const isAdmin = this.props.auth.user && this.props.auth.user.privileges !== 'regular' ? true : false;
     const isBusy = this.props.userState.busy;
 
     return (

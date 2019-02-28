@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry, IFileEntry } from '../../../../../src';
+import { IUserEntry, IFileEntry, UserPrivilege } from 'mantle';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -65,7 +65,7 @@ export default class UserProperties extends React.Component<Props, State> {
     const activeUser = this.props.activeUser;
 
     // If admin
-    if ( activeUser.privileges < 2 )
+    if ( activeUser.privileges === 'admin' || activeUser.privileges === 'super' )
       return true;
 
     // If the same user
@@ -157,14 +157,14 @@ export default class UserProperties extends React.Component<Props, State> {
                       className="mt-user-type"
                       fullWidth={true}
                       value={this.state.user!.privileges}
-                      onChange={e => this.setState( { user: { ...this.state.user!, privileges: parseInt( e.target.value ) } } )}
+                      onChange={e => this.setState( { user: { ...this.state.user!, privileges: e.target.value as UserPrivilege } } )}
                       inputProps={{
                         fullWidth: true
                       }}
                     >
-                      <MenuItem id="mt-type-super" value={1} disabled={true}>Super Admin</MenuItem>
-                      <MenuItem id="mt-type-admin" value={2}>Admin</MenuItem>
-                      <MenuItem id="mt-type-user" value={3}>User</MenuItem>
+                      <MenuItem id="mt-type-super" value={'super'} disabled={true}>Super Admin</MenuItem>
+                      <MenuItem id="mt-type-admin" value={'admin'}>Admin</MenuItem>
+                      <MenuItem id="mt-type-user" value={'regular'}>User</MenuItem>
                     </Select>
                     <FormHelperText>User Type</FormHelperText>
                   </FormControl>
@@ -210,7 +210,7 @@ export default class UserProperties extends React.Component<Props, State> {
                     </div>
                   </InlineField>
 
-                  {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
+                  {selected.registerKey !== '' && isAdmin ?
                     <InlineField>
                       <div className="mt-inline-label">Resend activation email</div>
                       <div className="mt-inline-input">
@@ -226,7 +226,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       </div>
                     </InlineField> : undefined}
 
-                  {selected.registerKey !== '' && this.props.activeUser.privileges < 2 ?
+                  {selected.registerKey !== '' && isAdmin ?
                     <InlineField>
                       <div className="mt-inline-label">Activate Account</div>
                       <div className="mt-inline-input">

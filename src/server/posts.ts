@@ -10,7 +10,7 @@ import { matchPath } from 'react-router';
 import { controllers } from '../../../../src';
 
 export default async function( req: IAuthReq, actions: Action[] ) {
-  const isAdmin = req._user && req._user.privileges < 2 ? true : false;
+  const isAdmin = req._user && req._user.privileges !== 'regular' ? true : false;
   const matchesEdit = matchPath<any>( req.url, { path: '/dashboard/posts/edit/:id' } );
   const initialCategoryFilter: Partial<CategoriesGetManyOptions> = {
     expanded: true,

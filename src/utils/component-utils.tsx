@@ -40,5 +40,5 @@ export function formatBytes( bytes: number, decimals = 2 ) {
  * Gets if the current user is an admin
  */
 export function isAdminUser( user: IUserEntry<'client' | 'expanded'> | null ) {
-  return user && user.privileges < 2 ? true : false;
+  return user && user.privileges !== 'regular' ? true : false;
 }
