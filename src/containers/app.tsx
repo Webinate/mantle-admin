@@ -28,13 +28,13 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
 
 // Map state to props
-const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
+const mapStateToProps = (state: IRootState, ownProps: any) => ({
   userState: state.users,
   auth: state.authentication,
   routing: state.router,
   location: ownProps,
   app: state.app
-} );
+});
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
@@ -43,144 +43,195 @@ const dispatchToProps = {
   register: register,
   logout: logout,
   closeSnackbar: AppActions.serverResponse.create
-}
-
-const stateProps = returntypeof( mapStateToProps );
-type Props = typeof stateProps & typeof dispatchToProps;
-type State = {
 };
+
+const stateProps = returntypeof(mapStateToProps);
+type Props = typeof stateProps & typeof dispatchToProps;
+type State = {};
 
 /**
  * The main application entry point
  */
-@connectWrapper( mapStateToProps, dispatchToProps )
+@connectWrapper(mapStateToProps, dispatchToProps)
 export class App extends React.Component<Props, State> {
-
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
   }
 
   private logOut() {
-    this.setState( { menuOpen: false } );
+    this.setState({ menuOpen: false });
     this.props.logout();
   }
 
-  private goTo( path: string ) {
-    this.setState( { menuOpen: false } );
-    this.props.push( path );
+  private goTo(path: string) {
+    this.setState({ menuOpen: false });
+    this.props.push(path);
   }
 
   // Remove the server-side injected CSS.
   componentDidMount() {
-    const jssStyles = document.getElementById( 'material-styles-server-side' );
-    if ( jssStyles && jssStyles.parentNode ) {
-      jssStyles.parentNode.removeChild( jssStyles );
+    const jssStyles = document.getElementById('material-styles-server-side');
+    if (jssStyles && jssStyles.parentNode) {
+      jssStyles.parentNode.removeChild(jssStyles);
     }
   }
 
-  getAuthScreen( formType: 'login' | 'register' ) {
-    return <AuthScreen
-      loading={this.props.auth.busy}
-      error={this.props.auth.error}
-      activeComponent={formType}
-      onLogin={( user, pass ) => this.props.login( { username: user, password: pass, rememberMe: true } )}
-      onActivationReset={( user ) => { }}
-      onPasswordReset={( user ) => { }}
-      onRegister={( user, email, password ) => this.props.register( { username: user, password: password, email: email } )}
-    />;
+  getAuthScreen(formType: 'login' | 'register') {
+    return (
+      <AuthScreen
+        loading={this.props.auth.busy}
+        error={this.props.auth.error}
+        activeComponent={formType}
+        onLogin={(user, pass) => this.props.login({ username: user, password: pass, rememberMe: true })}
+        onActivationReset={user => {}}
+        onPasswordReset={user => {}}
+        onRegister={(user, email, password) =>
+          this.props.register({ username: user, password: password, email: email })
+        }
+      />
+    );
   }
 
   render() {
     const iconStyle: React.CSSProperties = { color: 'inherit' };
     const items = [
-      { label: 'Home', icon: <HomeIcon style={iconStyle} />, exact: true, path: '/dashboard', onClick: () => this.goTo( '/dashboard' ) },
-      { label: 'Posts', icon: <PostsIcon style={iconStyle} />, exact: false, path: '/dashboard/posts', onClick: () => this.goTo( '/dashboard/posts' ) },
-      { label: 'Users', icon: <GroupIcon style={iconStyle} />, exact: false, path: '/dashboard/users', onClick: () => this.goTo( '/dashboard/users' ) },
-      { label: 'Comments', icon: <CommentIcon style={iconStyle} />, exact: false, path: '/dashboard/comments', onClick: () => this.goTo( '/dashboard/comments' ) },
-      { label: 'Media', icon: <MediaLibIcon style={iconStyle} />, exact: false, path: '/dashboard/media', onClick: () => this.goTo( '/dashboard/media' ) }
+      {
+        label: 'Home',
+        icon: <HomeIcon style={iconStyle} />,
+        exact: true,
+        path: '/dashboard',
+        onClick: () => this.goTo('/dashboard')
+      },
+      {
+        label: 'Posts',
+        icon: <PostsIcon style={iconStyle} />,
+        exact: false,
+        path: '/dashboard/posts',
+        onClick: () => this.goTo('/dashboard/posts')
+      },
+      {
+        label: 'Users',
+        icon: <GroupIcon style={iconStyle} />,
+        exact: false,
+        path: '/dashboard/users',
+        onClick: () => this.goTo('/dashboard/users')
+      },
+      {
+        label: 'Comments',
+        icon: <CommentIcon style={iconStyle} />,
+        exact: false,
+        path: '/dashboard/comments',
+        onClick: () => this.goTo('/dashboard/comments')
+      },
+      {
+        label: 'Media',
+        icon: <MediaLibIcon style={iconStyle} />,
+        exact: false,
+        path: '/dashboard/media',
+        onClick: () => this.goTo('/dashboard/media')
+      }
     ];
 
     return (
       <div>
         <CssBaseline />
         <Route path="/" exact={true} render={props => <Redirect to="/dashboard" />} />
-        <Route path="/dashboard" render={props => {
-          return (
-            <Dashboard
-              animated={this.props.app.debugMode ? false : true}
-              activeUser={this.props.auth.user!}
-              title={'Mantle'}
-              renderRight={() => <h3>Properties</h3>}
-              renderLeft={() => {
-                return (
-                  <List
-                    component="nav"
-                    style={{ padding: '0' }}>
-                    {items.map( ( i, index ) => {
-                      const selected = matchPath( props.location.pathname, { path: i.path, exact: i.exact } );
+        <Route
+          path="/dashboard"
+          render={props => {
+            return (
+              <Dashboard
+                animated={this.props.app.debugMode ? false : true}
+                activeUser={this.props.auth.user!}
+                title={'Mantle'}
+                renderRight={() => <h3>Properties</h3>}
+                renderLeft={() => {
+                  return (
+                    <List component="nav" style={{ padding: '0' }}>
+                      {items.map((i, index) => {
+                        const selected = matchPath(props.location.pathname, { path: i.path, exact: i.exact });
 
-                      return <ListItem
-                        button
-                        className={selected ? 'selected' : ''}
-                        key={`menu-item-${ index }`}
-                        onClick={e => i.onClick()}
-                      >
-                        <ListItemIcon>
-                          <Icon>{i.icon}</Icon>
-                        </ListItemIcon>
-                        <ListItemText
-                          primaryTypographyProps={{ color: 'inherit' }}
-                          primary={i.label} />
-                      </ListItem>
-                    } )
-                    }
-                  </List>
-                );
-              }}
-
-              onHome={() => this.goTo( '/dashboard' )}
-              onLogOut={() => this.logOut()}
-            >
-              <Switch>
-                <Route path="/dashboard" exact={true} render={props => {
-                  return <Home {...{ location: props.location } as any} />
-                }} />
-                <Route path="/dashboard/posts" render={props => {
-                  return <Posts {...{ location: props.location } as any} />
-                }} />
-                <Route path="/dashboard/users" render={props => {
-                  return <Users {...{} as any} />
-                }} />
-                <Route path="/dashboard/comments" render={props => {
-                  return <Comments {...{ location: props.location } as any} />
-                }} />
-                <Route path="/dashboard/media" render={props => {
-                  return <Media {...{ location: props.location } as any} />
-                }} />
-                <Route render={props => <h1>Not Found</h1>} />
-              </Switch>
-            </Dashboard>
-          );
-        }} />
-        <Route path="/login" render={props => this.getAuthScreen( 'login' )} />
-        <Route path="/register" render={props => this.getAuthScreen( 'register' )} />
+                        return (
+                          <ListItem
+                            button
+                            className={selected ? 'selected' : ''}
+                            key={`menu-item-${index}`}
+                            onClick={e => i.onClick()}
+                          >
+                            <ListItemIcon>
+                              <Icon>{i.icon}</Icon>
+                            </ListItemIcon>
+                            <ListItemText primaryTypographyProps={{ color: 'inherit' }} primary={i.label} />
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  );
+                }}
+                onHome={() => this.goTo('/dashboard')}
+                onLogOut={() => this.logOut()}
+              >
+                <Switch>
+                  <Route
+                    path="/dashboard"
+                    exact={true}
+                    render={props => {
+                      return <Home {...{ location: props.location } as any} />;
+                    }}
+                  />
+                  <Route
+                    path="/dashboard/posts"
+                    render={props => {
+                      return <Posts {...{ location: props.location } as any} />;
+                    }}
+                  />
+                  <Route
+                    path="/dashboard/users"
+                    render={props => {
+                      return <Users {...{} as any} />;
+                    }}
+                  />
+                  <Route
+                    path="/dashboard/comments"
+                    render={props => {
+                      return <Comments {...{ location: props.location } as any} />;
+                    }}
+                  />
+                  <Route
+                    path="/dashboard/media"
+                    render={props => {
+                      return <Media {...{ location: props.location } as any} />;
+                    }}
+                  />
+                  <Route render={props => <h1>Not Found</h1>} />
+                </Switch>
+              </Dashboard>
+            );
+          }}
+        />
+        <Route path="/login" render={props => this.getAuthScreen('login')} />
+        <Route path="/register" render={props => this.getAuthScreen('register')} />
 
         <Snackbar
-          className={`mt-response-message ${ this.props.app.response ? 'mt-snack-open' : 'mt-snack-closed' }`}
+          className={`mt-response-message ${this.props.app.response ? 'mt-snack-open' : 'mt-snack-closed'}`}
           autoHideDuration={20000}
           open={this.props.app.response ? true : false}
           onClose={() => {
-            this.props.closeSnackbar( null )
+            this.props.closeSnackbar(null);
           }}
-          action={[ <Button
-            key="close-1"
-            variant="contained"
-            id="mt-close-snackbar-btn"
-            onClick={e => this.props.closeSnackbar( null )}
-          >close</Button> ]}
+          action={[
+            <Button
+              key="close-1"
+              variant="contained"
+              id="mt-close-snackbar-btn"
+              onClick={e => this.props.closeSnackbar(null)}
+            >
+              close
+            </Button>
+          ]}
           message={<span id="mt-close-snackbar-msg">{this.props.app.response || ''}</span>}
         />
       </div>
     );
   }
-};
+}

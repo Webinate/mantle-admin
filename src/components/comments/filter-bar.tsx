@@ -9,22 +9,21 @@ export type Props = {
   filtersOpen: boolean;
   isAdminUser: boolean;
   commentsSelected: boolean;
-  onSearch: ( term: string ) => void;
-  onFilterToggle: ( val: boolean ) => void;
-}
+  onSearch: (term: string) => void;
+  onFilterToggle: (val: boolean) => void;
+};
 
 type State = {
   searchFilter: string;
 };
 
 export default class FilterBar extends React.Component<Props, State> {
-
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
 
     this.state = {
       searchFilter: ''
-    }
+    };
   }
 
   render() {
@@ -35,15 +34,14 @@ export default class FilterBar extends React.Component<Props, State> {
           id="mt-comments-filter"
           value={this.state.searchFilter}
           onKeyDown={e => {
-            if ( e.keyCode === 13 )
-              this.props.onSearch( this.state.searchFilter );
+            if (e.keyCode === 13) this.props.onSearch(this.state.searchFilter);
           }}
-          onChange={( e ) => this.setState( { searchFilter: e.currentTarget.value } )}
+          onChange={e => this.setState({ searchFilter: e.currentTarget.value })}
         />
         <IconButton
           className="mt-comments-search"
           color="primary"
-          onClick={e => this.props.onSearch( this.state.searchFilter )}
+          onClick={e => this.props.onSearch(this.state.searchFilter)}
         >
           <SearchIcon />
         </IconButton>
@@ -51,12 +49,12 @@ export default class FilterBar extends React.Component<Props, State> {
           <IconButton
             color="primary"
             className="mt-comments-filter"
-            onClick={e => this.props.onFilterToggle( !this.props.filtersOpen )}
+            onClick={e => this.props.onFilterToggle(!this.props.filtersOpen)}
           >
             <FilterIcon />
           </IconButton>
         </Tooltip>
       </div>
-    )
+    );
   }
 }

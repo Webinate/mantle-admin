@@ -11,32 +11,31 @@ export type Props = {
   enabled: boolean;
   commentMode?: boolean;
   auth: IUserEntry<'client' | 'expanded'>;
-  onNewComment: ( comment: string ) => void;
+  onNewComment: (comment: string) => void;
   onCancel?: () => void;
-}
+};
 
 type State = {
   comment: string;
 };
 
 export default class NewComment extends React.Component<Props, State> {
-
   static defaultProps: Partial<Props> = {
     commentMode: false
-  }
+  };
 
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this.state = {
       comment: ''
-    }
+    };
   }
 
   render() {
     return (
       <Container>
         <div>
-          <Avatar src={generateAvatarPic( this.props.auth )} />
+          <Avatar src={generateAvatarPic(this.props.auth)} />
         </div>
         <div>
           <textarea
@@ -45,55 +44,56 @@ export default class NewComment extends React.Component<Props, State> {
             value={this.state.comment}
             autoFocus={this.props.commentMode ? true : undefined}
             onClick={e => e.stopPropagation()}
-            onChange={( e ) => {
+            onChange={e => {
               e.currentTarget.style.height = '1px';
-              e.currentTarget.style.height = ( 20 + e.currentTarget.scrollHeight ) + 'px';
-              this.setState( { comment: e.currentTarget.value } )
+              e.currentTarget.style.height = 20 + e.currentTarget.scrollHeight + 'px';
+              this.setState({ comment: e.currentTarget.value });
             }}
           />
-          {
-            this.props.commentMode ?
-              <div className="mt-comment-form-actions">
-                <span
-                  id="mt-reply-comment-cancel-btn"
-                  onClick={e => {
-                    e.stopPropagation();
-                    if ( this.props.onCancel )
-                      this.props.onCancel()
-                  }}
-                >Cancel</span>
-                <span
-                  id="mt-reply-comment-add-btn"
-                  onClick={e => {
-                    if ( this.state.comment.trim() === '' )
-                      return;
+          {this.props.commentMode ? (
+            <div className="mt-comment-form-actions">
+              <span
+                id="mt-reply-comment-cancel-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  if (this.props.onCancel) this.props.onCancel();
+                }}
+              >
+                Cancel
+              </span>
+              <span
+                id="mt-reply-comment-add-btn"
+                onClick={e => {
+                  if (this.state.comment.trim() === '') return;
 
-                    e.stopPropagation();
-                    this.props.onNewComment( this.state.comment );
-                    this.setState( { comment: '' } );
-                  }}
-                >Reply</span>
-              </div> :
-              <div className="mt-comment-form-actions">
-                <IconButton
-                  id="mt-new-comment-add-btn"
-                  disabled={!this.props.enabled}
-                  onClick={e => {
-                    if ( this.state.comment.trim() === '' )
-                      return;
+                  e.stopPropagation();
+                  this.props.onNewComment(this.state.comment);
+                  this.setState({ comment: '' });
+                }}
+              >
+                Reply
+              </span>
+            </div>
+          ) : (
+            <div className="mt-comment-form-actions">
+              <IconButton
+                id="mt-new-comment-add-btn"
+                disabled={!this.props.enabled}
+                onClick={e => {
+                  if (this.state.comment.trim() === '') return;
 
-                    this.props.onNewComment( this.state.comment );
-                    this.setState( { comment: '' } );
-                  }}
-                  style={{ height: '40px', width: '40px' }}>
-                  <CommentIcon style={{ fontSize: '18px' }} />
-                </IconButton>
-              </div>
-          }
-
+                  this.props.onNewComment(this.state.comment);
+                  this.setState({ comment: '' });
+                }}
+                style={{ height: '40px', width: '40px' }}
+              >
+                <CommentIcon style={{ fontSize: '18px' }} />
+              </IconButton>
+            </div>
+          )}
         </div>
       </Container>
-    )
+    );
   }
 }
 
@@ -108,17 +108,19 @@ const Container = styled.div`
     }
   }
 
-  #mt-new-comment-cancel-btn, #mt-reply-comment-cancel-btn,
-    #mt-new-comment-add-btn, #mt-reply-comment-add-btn {
+  #mt-new-comment-cancel-btn,
+  #mt-reply-comment-cancel-btn,
+  #mt-new-comment-add-btn,
+  #mt-reply-comment-add-btn {
     font-size: 12px;
     cursor: pointer;
     font-weight: 400;
     margin: 0 0 0 5px;
     line-height: 30px;
-    color: ${theme.primary200.background };
+    color: ${theme.primary200.background};
 
     &:hover {
-      color: ${theme.primary300.background };
+      color: ${theme.primary300.background};
     }
   }
 
@@ -131,17 +133,18 @@ const Container = styled.div`
     padding: 10px;
     box-sizing: border-box;
     border-radius: 5px;
-    border: 1px solid ${theme.light100.border };
+    border: 1px solid ${theme.light100.border};
     resize: none;
     font-weight: lighter;
     margin: 0 0 5px 0;
 
     &::placeholder {
-      color: ${theme.light100.softColor };
+      color: ${theme.light100.softColor};
     }
 
-    &:active, &:focus {
-      border: 1px solid ${theme.primary100.border };
+    &:active,
+    &:focus {
+      border: 1px solid ${theme.primary100.border};
       outline: none;
     }
   }

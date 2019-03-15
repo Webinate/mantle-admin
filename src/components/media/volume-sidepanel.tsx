@@ -17,16 +17,15 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 export type Props = {
   selectedVolume: IVolume<'client' | 'expanded'> | null;
   onDelete: () => void;
-  onOpen: ( volumeId: string ) => void;
+  onOpen: (volumeId: string) => void;
   onRename: () => void;
-}
+};
 
-export type State = {
-}
+export type State = {};
 
 export default class VolumeSidePanel extends React.Component<Props, State> {
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
   }
 
   render() {
@@ -34,33 +33,31 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
 
     return (
       <Container id="mt-volume-info">
-        {volume ? <div>
-          <Tooltip title={( volume.user as IUserEntry<'client'> ).username}>
-            <Avatar
-              src={generateAvatarPic( ( volume.user as IUserEntry<'client'> ) )}
-              style={{ height: 40, width: 40 }}
-            />
-          </Tooltip>
-        </div> : null}
+        {volume ? (
+          <div>
+            <Tooltip title={(volume.user as IUserEntry<'client'>).username}>
+              <Avatar src={generateAvatarPic(volume.user as IUserEntry<'client'>)} style={{ height: 40, width: 40 }} />
+            </Tooltip>
+          </div>
+        ) : null}
         <Divider style={{ margin: '5px auto 0 auto' }} />
-        <List
-          component="nav"
-        >
-          {volume ? <ListItem button id="mt-open-volume" onClick={e => this.props.onOpen( volume._id )}>
-            <ListItemIcon>
-              <FolderOpen />
-            </ListItemIcon>
-            <ListItemText inset primary={`Open ${ volume.name }`} />
-          </ListItem> : undefined}
+        <List component="nav">
+          {volume ? (
+            <ListItem button id="mt-open-volume" onClick={e => this.props.onOpen(volume._id)}>
+              <ListItemIcon>
+                <FolderOpen />
+              </ListItemIcon>
+              <ListItemText inset primary={`Open ${volume.name}`} />
+            </ListItem>
+          ) : (
+            undefined
+          )}
 
           <ListItem button id="mt-rename-volume" disabled={!volume} onClick={e => this.props.onRename()}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
-            <ListItemText
-              inset
-              primary="Rename"
-            />
+            <ListItemText inset primary="Rename" />
           </ListItem>
 
           <ListItem button id="mt-delete-volume" onClick={e => this.props.onDelete()}>
@@ -70,14 +67,13 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
             <ListItemText inset primary="Delete Volumes" />
           </ListItem>
         </List>
-
       </Container>
     );
   }
 }
 
 const Container = styled.div`
-  background: ${theme.light100.background };
+  background: ${theme.light100.background};
   height: 100%;
   box-sizing: border-box;
   overflow: auto;

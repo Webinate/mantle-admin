@@ -19,10 +19,10 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action | AppAction ): State {
+export default function reducer(state: State = initialState, action: Action | AppAction): State {
   let partialState: Partial<State> | undefined;
 
-  switch ( action.type ) {
+  switch (action.type) {
     case ActionCreators.SetCommentsBusy.type:
       partialState = { busy: action.payload };
       break;
@@ -48,7 +48,8 @@ export default function reducer( state: State = initialState, action: Action | A
       };
       break;
 
-    default: return state;
+    default:
+      return state;
   }
 
   return { ...state, ...partialState } as State;

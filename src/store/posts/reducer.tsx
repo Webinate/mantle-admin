@@ -24,10 +24,10 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action ): State {
+export default function reducer(state: State = initialState, action: Action): State {
   let partialState: Partial<State> | undefined;
 
-  switch ( action.type ) {
+  switch (action.type) {
     case ActionCreators.SetPosts.type:
       partialState = {
         postPage: action.payload.page,
@@ -49,24 +49,22 @@ export default function reducer( state: State = initialState, action: Action ): 
 
       partialState = {
         post: action.payload,
-        elements: [ ...doc.elements ],
+        elements: [...doc.elements],
         busy: false
       };
       break;
 
     case ActionCreators.AddElement.type:
       let elements: IDraftElement<'client' | 'expanded'>[];
-      if ( action.payload.index !== undefined ) {
-        state.elements!.splice( action.payload.index, 0, ...action.payload.elms );
-        elements = [ ...state.elements! ];
-      }
-      else
-        elements = state.elements!.concat( action.payload.elms );
+      if (action.payload.index !== undefined) {
+        state.elements!.splice(action.payload.index, 0, ...action.payload.elms);
+        elements = [...state.elements!];
+      } else elements = state.elements!.concat(action.payload.elms);
 
       partialState = {
         elements: elements,
-        selection: [ action.payload.elms[ action.payload.elms.length - 1 ]._id ],
-        focussedId: action.payload.elms.length === 1 ? action.payload.elms[ 0 ]._id : '',
+        selection: [action.payload.elms[action.payload.elms.length - 1]._id],
+        focussedId: action.payload.elms.length === 1 ? action.payload.elms[0]._id : '',
         busy: false,
         post: state.post!
       };
@@ -80,7 +78,7 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.UpdateElement.type:
       partialState = {
-        elements: state.elements!.map( elm => elm._id === action.payload._id ? action.payload : elm ),
+        elements: state.elements!.map(elm => (elm._id === action.payload._id ? action.payload : elm)),
         focussedId: '',
         post: state.post!
       };
@@ -95,7 +93,7 @@ export default function reducer( state: State = initialState, action: Action ): 
 
     case ActionCreators.RemoveElements.type:
       partialState = {
-        elements: state.elements!.filter( elm => !action.payload.includes( elm._id ) ),
+        elements: state.elements!.filter(elm => !action.payload.includes(elm._id)),
         selection: [],
         focussedId: '',
         busy: false,
@@ -103,7 +101,8 @@ export default function reducer( state: State = initialState, action: Action ): 
       };
       break;
 
-    default: return state;
+    default:
+      return state;
   }
 
   return { ...state, ...partialState } as State;

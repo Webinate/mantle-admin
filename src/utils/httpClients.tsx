@@ -4,91 +4,87 @@ export class ClientError extends Error {
   public response: Response;
   public code: number;
 
-  constructor( message: string, code: number, response: Response ) {
-    super( message );
+  constructor(message: string, code: number, response: Response) {
+    super(message);
     this.response = response;
     this.code = code;
   }
 }
 
-export async function getJson<T>( url: string ) {
-  const resp = await get( url );
-  return await resp.json() as T;
+export async function getJson<T>(url: string) {
+  const resp = await get(url);
+  return (await resp.json()) as T;
 }
 
-export async function get( url: string ) {
-  const resp = await fetch( url, {
+export async function get(url: string) {
+  const resp = await fetch(url, {
     credentials: 'include',
-    headers: new Headers( {
+    headers: new Headers({
       'content-type': 'application/json'
-    } )
-  } );
+    })
+  });
 
-  if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, resp );
+  if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
 
   return resp;
 }
 
-export async function postJson<T>( url: string, data: any ) {
-  const resp = await post( url, data );
-  return await resp.json() as T;
+export async function postJson<T>(url: string, data: any) {
+  const resp = await post(url, data);
+  return (await resp.json()) as T;
 }
 
-export async function post( url: string, data: any ) {
-  const resp = await fetch( url, {
+export async function post(url: string, data: any) {
+  const resp = await fetch(url, {
     method: 'post',
-    body: JSON.stringify( data ),
+    body: JSON.stringify(data),
     credentials: 'include',
-    headers: new Headers( {
+    headers: new Headers({
       'content-type': 'application/json'
-    } )
-  } );
+    })
+  });
 
-  if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, resp );
+  if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
 
   return resp;
 }
 
-export async function delJson<T>( url: string, data: any ) {
-  const resp = await del( url, data );
-  return await resp.json() as T;
+export async function delJson<T>(url: string, data: any) {
+  const resp = await del(url, data);
+  return (await resp.json()) as T;
 }
 
-export async function del( url: string, data?: any ) {
-  const resp = await fetch( url, {
+export async function del(url: string, data?: any) {
+  const resp = await fetch(url, {
     method: 'delete',
-    body: data ? JSON.stringify( data ) : undefined,
+    body: data ? JSON.stringify(data) : undefined,
     credentials: 'include',
-    headers: new Headers( {
+    headers: new Headers({
       'content-type': 'application/json'
-    } )
-  } );
+    })
+  });
 
-  if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, resp );
+  if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
 
   return resp;
 }
 
-export async function putJson<T>( url: string, data: any ) {
-  const resp = await put( url, data );
-  return await resp.json() as T;
+export async function putJson<T>(url: string, data: any) {
+  const resp = await put(url, data);
+  return (await resp.json()) as T;
 }
 
-export async function put( url: string, data?: any ) {
-  const resp = await fetch( url, {
+export async function put(url: string, data?: any) {
+  const resp = await fetch(url, {
     method: 'put',
-    body: data ? JSON.stringify( data ) : undefined,
+    body: data ? JSON.stringify(data) : undefined,
     credentials: 'include',
-    headers: new Headers( {
+    headers: new Headers({
       'content-type': 'application/json'
-    } )
-  } );
+    })
+  });
 
-  if ( resp.status >= 400 && resp.status <= 500 )
-    throw new ClientError( resp.statusText, resp.status, resp );
+  if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
 
   return resp;
 }

@@ -4,14 +4,9 @@ import { routerMiddleware } from 'react-router-redux';
 import { History } from 'history';
 import { default as rootReducer } from '../store';
 
-export default function configureStore( initialState: any, history: History ) {
-
+export default function configureStore(initialState: any, history: History) {
   // Build the middleware for intercepting and dispatching navigation actions
-  const middleware = routerMiddleware( history )
+  const middleware = routerMiddleware(history);
 
-  return createStore(
-    rootReducer,
-    initialState,
-    compose( applyMiddleware( middleware, thunk ) )
-  );
+  return createStore(rootReducer, initialState, compose(applyMiddleware(middleware, thunk)));
 }

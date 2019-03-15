@@ -6,20 +6,20 @@ import CloudIcon from '@material-ui/icons/CloudCircle';
 import Button from '@material-ui/core/Button';
 
 export type Props = {
-  volume: Partial<IVolume<'client'>>
-  onChange: ( props: Partial<IVolume<'client'>> ) => void;
-}
+  volume: Partial<IVolume<'client'>>;
+  onChange: (props: Partial<IVolume<'client'>>) => void;
+};
 
 export default class VolumeType extends React.Component<Props> {
   private _volumeOptions: {
     icon: JSX.Element;
     heading: string;
     description: string;
-    type: 'google' | 'local'
+    type: 'google' | 'local';
   }[];
 
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this._volumeOptions = [
       { icon: <StorageIcon />, type: 'local', heading: 'Local Storage', description: 'This is local storage' },
       { icon: <CloudIcon />, type: 'google', heading: 'Google Storage', description: 'This is google storage' }
@@ -29,14 +29,14 @@ export default class VolumeType extends React.Component<Props> {
   render() {
     return (
       <VolumeTypes>
-        {this._volumeOptions.map( ( options, index ) => {
+        {this._volumeOptions.map((options, index) => {
           return (
-            <div className="mt-volume-types" key={`type=${ index }`}>
+            <div className="mt-volume-types" key={`type=${index}`}>
               <div>
                 <Button
                   variant="fab"
                   color={this.props.volume.type === options.type ? 'primary' : undefined}
-                  onClick={e => this.props.onChange( { type: options.type } )}
+                  onClick={e => this.props.onChange({ type: options.type })}
                 >
                   {options.icon}
                 </Button>
@@ -47,7 +47,7 @@ export default class VolumeType extends React.Component<Props> {
               </div>
             </div>
           );
-        } )}
+        })}
       </VolumeTypes>
     );
   }

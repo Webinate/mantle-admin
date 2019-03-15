@@ -24,70 +24,62 @@ export type Props = {
   loading: boolean;
   selectedUids: string[];
   activeFilters: Partial<VolumesGetOptions>;
-  onSelectionChanged: ( uids: string[] ) => void;
-  getVolumes: ( options: Partial<VolumesGetOptions> ) => void;
-  onSort: ( sortBy: SortTypes, sortDir: SortOrder ) => void;
-  openVolume: ( volumeId: string ) => void;
-}
+  onSelectionChanged: (uids: string[]) => void;
+  getVolumes: (options: Partial<VolumesGetOptions>) => void;
+  onSort: (sortBy: SortTypes, sortDir: SortOrder) => void;
+  openVolume: (volumeId: string) => void;
+};
 
-export type State = {
-}
+export type State = {};
 
 export class Volumes extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
     multiselect: true
-  }
+  };
 
   private _container: HTMLElement;
 
-  constructor( props: Props ) {
-    super( props );
-    this.state = {
-    };
+  constructor(props: Props) {
+    super(props);
+    this.state = {};
   }
 
-  componentWillReceiveProps( next: Props ) {
-    if ( next.volumes !== this.props.volumes )
-      this.props.onSelectionChanged( [] );
+  componentWillReceiveProps(next: Props) {
+    if (next.volumes !== this.props.volumes) this.props.onSelectionChanged([]);
   }
 
-  private changeOrder( sort: SortTypes ) {
+  private changeOrder(sort: SortTypes) {
     let order: SortOrder = 'desc';
-    if ( this.props.activeFilters.sort === sort && this.props.activeFilters.sortOrder === 'desc' )
-      order = 'asc';
+    if (this.props.activeFilters.sort === sort && this.props.activeFilters.sortOrder === 'desc') order = 'asc';
 
-    this.props.onSort( sort, order );
+    this.props.onSort(sort, order);
   }
 
-  private onSelectionChange( volumes: string[] ) {
-    this.props.onSelectionChanged( volumes );
+  private onSelectionChange(volumes: string[]) {
+    this.props.onSelectionChanged(volumes);
   }
 
-  private onSelection( e: React.MouseEvent<HTMLElement>, volume: IVolume<'client' | 'expanded'> ) {
+  private onSelection(e: React.MouseEvent<HTMLElement>, volume: IVolume<'client' | 'expanded'>) {
     const selected = this.props.selectedUids;
 
-    if ( !this.props.multiselect ) {
-      this.onSelectionChange( [ volume._id ] );
+    if (!this.props.multiselect) {
+      this.onSelectionChange([volume._id]);
       return;
     }
 
-    if ( !e.ctrlKey && !e.shiftKey ) {
-      this.onSelectionChange( [ volume._id ] );
-    }
-    else if ( e.ctrlKey ) {
-      if ( selected.indexOf( volume._id ) === -1 )
-        this.onSelectionChange( selected.concat( volume._id ) );
-      else
-        this.onSelectionChange( selected.filter( i => i !== volume._id ) );
-    }
-    else {
+    if (!e.ctrlKey && !e.shiftKey) {
+      this.onSelectionChange([volume._id]);
+    } else if (e.ctrlKey) {
+      if (selected.indexOf(volume._id) === -1) this.onSelectionChange(selected.concat(volume._id));
+      else this.onSelectionChange(selected.filter(i => i !== volume._id));
+    } else {
       const volumePage = this.props.volumes!;
-      const allIds = volumePage.data.map( v => v._id );
+      const allIds = volumePage.data.map(v => v._id);
 
-      let firstIndex = Math.min( allIds.indexOf( volume._id ), selected.length > 0 ? allIds.indexOf( selected[ 0 ] ) : 0 );
-      let lastIndex = Math.max( allIds.indexOf( volume._id ), selected.length > 0 ? allIds.indexOf( selected[ 0 ] ) : 0 );
+      let firstIndex = Math.min(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
+      let lastIndex = Math.max(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
 
-      this.onSelectionChange( allIds.slice( firstIndex, lastIndex + 1 ) );
+      this.onSelectionChange(allIds.slice(firstIndex, lastIndex + 1));
     }
   }
 
@@ -108,14 +100,13 @@ export class Volumes extends React.Component<Props, State> {
         limit={volumes.limit}
         total={volumes.count}
         loading={this.props.loading}
-        onPage={( index ) => {
-          if ( this._container )
-            this._container.scrollTop = 0;
+        onPage={index => {
+          if (this._container) this._container.scrollTop = 0;
 
-          this.props.getVolumes( { index: index } )
+          this.props.getVolumes({ index: index });
         }}
       >
-        <Container innerRef={elm => this._container = elm}>
+        <Container innerRef={elm => (this._container = elm)}>
           <Table className="mt-volume-table">
             <TableHeader>
               <TableRow>
@@ -129,104 +120,82 @@ export class Volumes extends React.Component<Props, State> {
                     checked={allSelected}
                     style={{ display: this.props.multiselect ? '' : 'none' }}
                     onClick={e => {
-                      if ( allSelected )
-                        this.onSelectionChange( [] );
-                      else
-                        this.onSelectionChange( volumes.data.map( v => v._id ) );
+                      if (allSelected) this.onSelectionChange([]);
+                      else this.onSelectionChange(volumes.data.map(v => v._id));
                     }}
                   />
                 </TableCell>
-                <TableCell
-                  padding="checkbox"
-                />
-                {
-                  headers.map( ( h, index ) => {
-                    return (
-                      <TableCell
-                        key={`header-${ index }`}
-                        sortDirection={filters.sort === h.property ? filters.sortOrder : false}
+                <TableCell padding="checkbox" />
+                {headers.map((h, index) => {
+                  return (
+                    <TableCell
+                      key={`header-${index}`}
+                      sortDirection={filters.sort === h.property ? filters.sortOrder : false}
+                    >
+                      <TableSortLabel
+                        active={filters.sort === h.property}
+                        direction={filters.sortOrder}
+                        className={`mt-volume-header-${h.property}`}
+                        onClick={e => this.changeOrder(h.property)}
                       >
-                        <TableSortLabel
-                          active={filters.sort === h.property}
-                          direction={filters.sortOrder}
-                          className={`mt-volume-header-${ h.property }`}
-                          onClick={( e ) => this.changeOrder( h.property )}
-                        >
-                          {h.label}
-                        </TableSortLabel>
-                      </TableCell>
-                    );
-                  } )
-                }
+                        {h.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {
-                volumes.data.map( ( volume, index ) => {
-                  return (
-                    <TableRow
-                      className="mt-volume-row"
-                      hover
-                      style={{ cursor: 'pointer' }}
-                      role="checkbox"
-                      key={`vol-row-${ index }`}
-                      onDoubleClick={e => this.props.openVolume( volume._id )}
-                      onClick={e => {
-                        this.onSelection( e, volume )
-                      }}
-                    >
-                      <TableCell
-                        padding="checkbox"
-                      >
-                        <Checkbox
-                          onClick={e => {
-                            e.stopPropagation();
+              {volumes.data.map((volume, index) => {
+                return (
+                  <TableRow
+                    className="mt-volume-row"
+                    hover
+                    style={{ cursor: 'pointer' }}
+                    role="checkbox"
+                    key={`vol-row-${index}`}
+                    onDoubleClick={e => this.props.openVolume(volume._id)}
+                    onClick={e => {
+                      this.onSelection(e, volume);
+                    }}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        onClick={e => {
+                          e.stopPropagation();
 
-                            if ( selected.indexOf( volume._id ) !== -1 )
-                              this.onSelectionChange( selected.filter( v => v !== volume._id ) );
-                            else
-                              this.onSelectionChange( selected.concat( volume._id ) );
-                          }}
-                          className="mt-vol-checkbox"
-                          checked={selected.indexOf( volume._id ) !== -1}
-                        />
-                      </TableCell>
-                      <TableCell
-                        padding="checkbox"
-                        className={`mt-vol-type mt-volume-type-${ volume.type }`}
-                      >
-                        {volume.type === 'google' ? (
-                          <Tooltip title="Google volume">
-                            <img src="/images/server.svg" />
-                          </Tooltip>
-                        ) : (
-                            <Tooltip title="Local volume">
-                              <img src="/images/harddrive.svg" />
-                            </Tooltip>
-                          )}
-                      </TableCell>
-                      <TableCell
-                        scope="row"
-                        component="th"
-                        className="mt-volume-name"
-                      >
-                        {volume.name}
-                      </TableCell>
-                      <TableCell
-                        className="mt-volume-memoryaloc"
-                      >
-                        {formatBytes( volume.memoryUsed! )} / {formatBytes( volume.memoryAllocated! )}
-                      </TableCell>
-                      <TableCell
-                        className="mt-volume-created"
-                      >
-                        {format( new Date( volume.created! ), 'MMM Do, YYYY' )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                } )
-              }
+                          if (selected.indexOf(volume._id) !== -1)
+                            this.onSelectionChange(selected.filter(v => v !== volume._id));
+                          else this.onSelectionChange(selected.concat(volume._id));
+                        }}
+                        className="mt-vol-checkbox"
+                        checked={selected.indexOf(volume._id) !== -1}
+                      />
+                    </TableCell>
+                    <TableCell padding="checkbox" className={`mt-vol-type mt-volume-type-${volume.type}`}>
+                      {volume.type === 'google' ? (
+                        <Tooltip title="Google volume">
+                          <img src="/images/server.svg" />
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title="Local volume">
+                          <img src="/images/harddrive.svg" />
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                    <TableCell scope="row" component="th" className="mt-volume-name">
+                      {volume.name}
+                    </TableCell>
+                    <TableCell className="mt-volume-memoryaloc">
+                      {formatBytes(volume.memoryUsed!)} / {formatBytes(volume.memoryAllocated!)}
+                    </TableCell>
+                    <TableCell className="mt-volume-created">
+                      {format(new Date(volume.created!), 'MMM Do, YYYY')}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </Container>
@@ -237,7 +206,7 @@ export class Volumes extends React.Component<Props, State> {
 
 const Container = styled.div`
   table {
-    background: ${theme.light100.background };
+    background: ${theme.light100.background};
     user-select: none;
     table-layout: fixed;
     width: 100%;
@@ -251,7 +220,10 @@ const Container = styled.div`
     width: 70px;
   }
 
-  td:first-child, td:nth-child(2), th:first-child, th:nth-child(2) {
+  td:first-child,
+  td:nth-child(2),
+  th:first-child,
+  th:nth-child(2) {
     width: 70px;
     padding: 0;
   }

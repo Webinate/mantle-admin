@@ -2,7 +2,18 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import ContentHeader from '../components/content-header';
-import { getPosts, getPost, createPost, deletePosts, editPost, addElement, changeTemplate, updateElement, deleteElements, ActionCreators as PostCreators } from '../store/posts/actions';
+import {
+  getPosts,
+  getPost,
+  createPost,
+  deletePosts,
+  editPost,
+  addElement,
+  changeTemplate,
+  updateElement,
+  deleteElements,
+  ActionCreators as PostCreators
+} from '../store/posts/actions';
 import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
 import { getComments, createComment, editComment, deleteComment } from '../store/comments/actions';
 import { getAllTemplates } from '../store/templates/actions';
@@ -25,7 +36,7 @@ import PostPreview from '../components/posts/post-preview';
 import { randomId } from '../utils/misc';
 
 // Map state to props
-const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
+const mapStateToProps = (state: IRootState, ownProps: any) => ({
   posts: state.posts,
   comments: state.comments,
   categories: state.categories,
@@ -35,7 +46,7 @@ const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
   templates: state.templates,
   categoriesLoading: state.categories.busy,
   location: ownProps.location as Location
-} );
+});
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
@@ -59,9 +70,9 @@ const dispatchToProps = {
   deleteElements,
   setElmSelection: PostCreators.SetElmSelection.create,
   setFocussedElm: PostCreators.SetFocussedElm.create
-}
+};
 
-const stateProps = returntypeof( mapStateToProps );
+const stateProps = returntypeof(mapStateToProps);
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   selectedPosts: IPost<'client' | 'expanded'>[];
@@ -73,104 +84,109 @@ type State = {
 /**
  * The main application entry point
  */
-@connectWrapper( mapStateToProps, dispatchToProps )
+@connectWrapper(mapStateToProps, dispatchToProps)
 export class Posts extends React.Component<Props, State> {
-
   private _selectedPost: IPost<'client' | 'expanded'> | null;
 
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this._selectedPost = null;
     this.state = {
       selectedPosts: [],
       showDeleteModal: false,
       filtersOpen: false,
       previewMode: false
-    }
+    };
   }
 
   componentDidMount() {
     this.props.getAllTemplates();
-    const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
+    const inPostsRoot = matchPath(this.props.location.pathname, { exact: true, path: '/dashboard/posts' });
 
-    if ( inPostsRoot ) {
-      this.props.getPosts( {
+    if (inPostsRoot) {
+      this.props.getPosts({
         index: 0,
         sortOrder: this.props.posts.postFilters.sortOrder,
         visibility: this.props.posts.postFilters.visibility,
         author: '',
         sort: this.props.posts.postFilters.sort
-      } );
-    }
-    else {
-      const matches = matchPath<{ postId: string }>( this.props.location.pathname, { exact: true, path: '/dashboard/posts/edit/:postId' } );
-      this.props.getPost( matches!.params.postId );
+      });
+    } else {
+      const matches = matchPath<{ postId: string }>(this.props.location.pathname, {
+        exact: true,
+        path: '/dashboard/posts/edit/:postId'
+      });
+      this.props.getPost(matches!.params.postId);
       this.props.getCategories();
     }
   }
 
-  componentWillReceiveProps( next: Props ) {
-    if ( next.location.pathname !== this.props.location.pathname ) {
-      const inPostsRoot = matchPath( next.location.pathname, { exact: true, path: '/dashboard/posts' } );
+  componentWillReceiveProps(next: Props) {
+    if (next.location.pathname !== this.props.location.pathname) {
+      const inPostsRoot = matchPath(next.location.pathname, { exact: true, path: '/dashboard/posts' });
 
-      this.setState( { previewMode: false } );
+      this.setState({ previewMode: false });
 
-      if ( inPostsRoot ) {
-        this.props.getPosts( {
+      if (inPostsRoot) {
+        this.props.getPosts({
           index: 0,
           sortOrder: this.props.posts.postFilters.sortOrder,
           visibility: this.props.posts.postFilters.visibility,
           author: '',
           sort: this.props.posts.postFilters.sort
-        } );
-      }
-      else {
-        const matches = matchPath<{ postId: string }>( next.location.pathname, { exact: true, path: '/dashboard/posts/edit/:postId' } );
-        this.props.getPost( matches!.params.postId );
+        });
+      } else {
+        const matches = matchPath<{ postId: string }>(next.location.pathname, {
+          exact: true,
+          path: '/dashboard/posts/edit/:postId'
+        });
+        this.props.getPost(matches!.params.postId);
         this.props.getCategories();
       }
     }
   }
 
-  private onDelete( post: IPost<'client' | 'expanded'> ) {
+  private onDelete(post: IPost<'client' | 'expanded'>) {
     this._selectedPost = post;
-    this.setState( {
+    this.setState({
       showDeleteModal: true
-    } );
+    });
   }
 
   private onDeleteMultiple() {
     this._selectedPost = null;
-    this.setState( {
+    this.setState({
       showDeleteModal: true
-    } );
+    });
   }
 
-  private onSearch( term: string ) {
-    this.props.getPosts( { index: 0, keyword: term } );
+  private onSearch(term: string) {
+    this.props.getPosts({ index: 0, keyword: term });
   }
 
-  private renderComment( postId: string ) {
+  private renderComment(postId: string) {
     const commentsPage = this.props.comments.commentPage;
     const user = this.props.user!;
 
-    return <div>
-      <NewComment
-        auth={user}
-        enabled={!this.props.comments.busy}
-        onNewComment={comment => this.props.createComment( postId, { content: comment } )}
-      />
-      <CommentsList
-        page={commentsPage}
-        selectable={false}
-        onReply={( post, parent, comment ) => this.props.createComment( post, comment, parent )}
-        auth={this.props.user!}
-        onEdit={( id, token ) => this.props.editComment( id, token )}
-        loading={this.props.comments.busy}
-        getAll={options => this.props.getComments( { ...options, postId: postId } )}
-        onDelete={id => this.props.deleteComment( id )}
-      />
-    </div>
+    return (
+      <div>
+        <NewComment
+          auth={user}
+          enabled={!this.props.comments.busy}
+          onNewComment={comment => this.props.createComment(postId, { content: comment })}
+        />
+        <CommentsList
+          page={commentsPage}
+          selectable={false}
+          onReply={(post, parent, comment) => this.props.createComment(post, comment, parent)}
+          auth={this.props.user!}
+          onEdit={(id, token) => this.props.editComment(id, token)}
+          loading={this.props.comments.busy}
+          getAll={options => this.props.getComments({ ...options, postId: postId })}
+          onDelete={id => this.props.deleteComment(id)}
+        />
+      </div>
+    );
   }
 
   render() {
@@ -178,7 +194,7 @@ export class Posts extends React.Component<Props, State> {
     const post = this.props.posts.post;
     const isBusy = this.props.posts.busy;
     const isAdmin = this.props.user && this.props.user.privileges !== 'regular' ? true : false;
-    const inPostsRoot = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/posts' } );
+    const inPostsRoot = matchPath(this.props.location.pathname, { exact: true, path: '/dashboard/posts' });
     const user = this.props.user!;
     const templates = this.props.templates;
 
@@ -187,131 +203,146 @@ export class Posts extends React.Component<Props, State> {
         <ContentHeader
           title="Posts"
           busy={isBusy}
-          renderFilters={() => <PostFilterBar
-            loading={isBusy}
-            onSearch={term => this.onSearch( term )}
-            postsSelected={this.state.selectedPosts.length > 0 ? false : true}
-            onNew={() => this.props.createPost( { title: 'New Post', slug: randomId() } )}
-            onDelete={() => this.onDeleteMultiple()}
-            isAdminUser={isAdmin ? false : true}
-            onFilterToggle={val => this.setState( { filtersOpen: val } )}
-            inPostsRoot={inPostsRoot ? true : false}
-            filtersOpen={this.state.filtersOpen}
-            onCancel={() => {
-              if ( this.state.previewMode )
-                this.setState( { previewMode: false } );
-              else
-                this.props.push( '/dashboard/posts' )
-            }}
-          />}>
-        </ContentHeader>
+          renderFilters={() => (
+            <PostFilterBar
+              loading={isBusy}
+              onSearch={term => this.onSearch(term)}
+              postsSelected={this.state.selectedPosts.length > 0 ? false : true}
+              onNew={() => this.props.createPost({ title: 'New Post', slug: randomId() })}
+              onDelete={() => this.onDeleteMultiple()}
+              isAdminUser={isAdmin ? false : true}
+              onFilterToggle={val => this.setState({ filtersOpen: val })}
+              inPostsRoot={inPostsRoot ? true : false}
+              filtersOpen={this.state.filtersOpen}
+              onCancel={() => {
+                if (this.state.previewMode) this.setState({ previewMode: false });
+                else this.props.push('/dashboard/posts');
+              }}
+            />
+          )}
+        />
         <PostsContainer>
           <Switch>
-            <Route path="/dashboard/posts/edit/:postId" exact={true} render={props => {
-              if ( !post )
-                return null;
+            <Route
+              path="/dashboard/posts/edit/:postId"
+              exact={true}
+              render={props => {
+                if (!post) return null;
 
-              if ( !this.state.previewMode && ( isAdmin || ( post && user._id === post._id ) ) ) {
-                const doc = post.document as IDocument<'client' | 'expanded'>;
+                if (!this.state.previewMode && (isAdmin || (post && user._id === post._id))) {
+                  const doc = post.document as IDocument<'client' | 'expanded'>;
 
-                return <PostForm
-                  id={props.match.params.postId}
-                  animated={this.props.app.debugMode ? false : true}
-                  activeUser={user}
-                  categoriesLoading={this.props.categoriesLoading}
-                  templates={templates}
-                  onTemplateChanged={( templateId ) => this.props.changeTemplate( doc._id, templateId )}
-                  post={post}
-                  elements={this.props.posts.elements!}
-                  onUpdate={post => this.props.editPost( post )}
-                  isAdmin={isAdmin}
-                  onRequestPreview={() => this.setState( { previewMode: true } )}
-                  renderAfterForm={() => this.renderComment( props.match.params.postId )}
-                  onCreateElm={( ( elms, index ) => this.props.addElement( doc._id, elms, index ) )}
-                  onUpdateElm={( id, token, createElement, deselect ) => this.props.updateElement( doc._id, id, token, createElement, deselect )}
-                  onDeleteElements={ids => this.props.deleteElements( doc._id, ids )}
-                  onSelectionChanged={( selection, focus ) => {
-                    this.props.setElmSelection( selection );
-                    if ( focus && selection.length > 0 )
-                      this.props.setFocussedElm( selection[ 0 ] );
-                  }}
-                  selectedElements={this.props.posts.selection}
-                  focussedId={this.props.posts.focussedId}
-                />
-              }
-              else {
-                return <PostPreview
-                  post={post}
-                  loading={isBusy}
-                  id={props.match.params.postId}
-                  renderComments={() => this.renderComment( props.match.params.postId )}
-                />
-              }
-            }}
+                  return (
+                    <PostForm
+                      id={props.match.params.postId}
+                      animated={this.props.app.debugMode ? false : true}
+                      activeUser={user}
+                      categoriesLoading={this.props.categoriesLoading}
+                      templates={templates}
+                      onTemplateChanged={templateId => this.props.changeTemplate(doc._id, templateId)}
+                      post={post}
+                      elements={this.props.posts.elements!}
+                      onUpdate={post => this.props.editPost(post)}
+                      isAdmin={isAdmin}
+                      onRequestPreview={() => this.setState({ previewMode: true })}
+                      renderAfterForm={() => this.renderComment(props.match.params.postId)}
+                      onCreateElm={(elms, index) => this.props.addElement(doc._id, elms, index)}
+                      onUpdateElm={(id, token, createElement, deselect) =>
+                        this.props.updateElement(doc._id, id, token, createElement, deselect)
+                      }
+                      onDeleteElements={ids => this.props.deleteElements(doc._id, ids)}
+                      onSelectionChanged={(selection, focus) => {
+                        this.props.setElmSelection(selection);
+                        if (focus && selection.length > 0) this.props.setFocussedElm(selection[0]);
+                      }}
+                      selectedElements={this.props.posts.selection}
+                      focussedId={this.props.posts.focussedId}
+                    />
+                  );
+                } else {
+                  return (
+                    <PostPreview
+                      post={post}
+                      loading={isBusy}
+                      id={props.match.params.postId}
+                      renderComments={() => this.renderComment(props.match.params.postId)}
+                    />
+                  );
+                }
+              }}
             />
-            <Route path="/dashboard/posts" exact={true} render={props => {
-              return <PostList
-                filtersOpen={this.state.filtersOpen}
-                postFilters={this.props.posts.postFilters}
-                posts={page}
-                loading={isBusy}
-                animated={this.props.app.debugMode ? false : true}
-                selected={this.state.selectedPosts}
-                onEdit={post => this.props.push( `/dashboard/posts/edit/${ post._id }` )}
-                onDelete={post => this.onDelete( post )}
-                onPostSelected={selected => {
-                  this.setState( { selectedPosts: selected } )
-                }}
-                getPosts={( options ) => this.props.getPosts( options )}
-              />;
-            }} />
+            <Route
+              path="/dashboard/posts"
+              exact={true}
+              render={props => {
+                return (
+                  <PostList
+                    filtersOpen={this.state.filtersOpen}
+                    postFilters={this.props.posts.postFilters}
+                    posts={page}
+                    loading={isBusy}
+                    animated={this.props.app.debugMode ? false : true}
+                    selected={this.state.selectedPosts}
+                    onEdit={post => this.props.push(`/dashboard/posts/edit/${post._id}`)}
+                    onDelete={post => this.onDelete(post)}
+                    onPostSelected={selected => {
+                      this.setState({ selectedPosts: selected });
+                    }}
+                    getPosts={options => this.props.getPosts(options)}
+                  />
+                );
+              }}
+            />
           </Switch>
         </PostsContainer>
 
-        {this.state.showDeleteModal ? <Dialog
-          open={true}
-        >
-          <DialogTitle id="form-dialog-title">Delete Post?</DialogTitle>
-          <DialogContent className="mt-post-del-dialog">
-            <DialogContentText className="mt-post-del-dialog-body">
-              {this._selectedPost ?
-                `Are you sure you want to delete the post '${ this._selectedPost.title }'?` :
-                `Are you sure you want to delete these [${ this.state.selectedPosts.length }] posts?`}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
-              className="mt-cancel-delpost"
-              onClick={e => {
-                this._selectedPost = null;
-                this.setState( {
-                  showDeleteModal: false
-                } )
-              }}
-            >Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              style={{ verticalAlign: 'middle' }}
-              className="mt-confirm-delpost"
-              onClick={e => {
-                if ( this._selectedPost )
-                  this.props.removePost( [ this._selectedPost ] );
-                else
-                  this.props.removePost( this.state.selectedPosts );
+        {this.state.showDeleteModal ? (
+          <Dialog open={true}>
+            <DialogTitle id="form-dialog-title">Delete Post?</DialogTitle>
+            <DialogContent className="mt-post-del-dialog">
+              <DialogContentText className="mt-post-del-dialog-body">
+                {this._selectedPost
+                  ? `Are you sure you want to delete the post '${this._selectedPost.title}'?`
+                  : `Are you sure you want to delete these [${this.state.selectedPosts.length}] posts?`}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
+                className="mt-cancel-delpost"
+                onClick={e => {
+                  this._selectedPost = null;
+                  this.setState({
+                    showDeleteModal: false
+                  });
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ verticalAlign: 'middle' }}
+                className="mt-confirm-delpost"
+                onClick={e => {
+                  if (this._selectedPost) this.props.removePost([this._selectedPost]);
+                  else this.props.removePost(this.state.selectedPosts);
 
-                this.setState( { showDeleteModal: false } )
-                this._selectedPost = null;
-              }}
-            >Yes</Button>
-          </DialogActions>
-        </Dialog> : undefined}
-      </div >
+                  this.setState({ showDeleteModal: false });
+                  this._selectedPost = null;
+                }}
+              >
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
+        ) : (
+          undefined
+        )}
+      </div>
     );
   }
-};
+}
 
 const PostsContainer = styled.div`
   overflow: auto;

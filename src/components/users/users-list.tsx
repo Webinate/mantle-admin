@@ -9,7 +9,7 @@ import { generateAvatarPic } from '../../utils/component-utils';
 type Props = {
   users: IUserEntry<'client' | 'expanded'>[];
   selected: string[];
-  onUserSelected: ( user: IUserEntry<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement> ) => void;
+  onUserSelected: (user: IUserEntry<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 interface SCompProps extends React.HTMLProps<HTMLDivElement> {
@@ -23,26 +23,27 @@ export default class UsersList extends React.Component<Props, any> {
     const users = this.props.users;
     return (
       <div className="mt-user-list">
-        {users.map( ( user, index ) => {
-          selected = selectedUsers.indexOf( user._id ) === -1 ? false : true;
+        {users.map((user, index) => {
+          selected = selectedUsers.indexOf(user._id) === -1 ? false : true;
 
-          return <User
-            key={`user-${ index }`}
-            selected={selected}
-            onMouseDown={e => this.props.onUserSelected( user, e )}
-          >
-            <Avatar
-              src={generateAvatarPic( user )}
-              style={{ height: 80, width: 80, float: 'left' }}
-            />
-            <Details selected={selected}>
-              <div><strong className="mt-user-name">{user.username}</strong></div>
-              <div className="mt-user-email">{user.email}</div>
-              <div><i>Joined: {format( new Date( user.createdOn ), 'MMMM Do, YYYY' )}</i></div>
-              <div><i>Last Active: {format( new Date( user.lastLoggedIn ), 'MMMM Do, YYYY' )}</i></div>
-            </Details>
-          </User>
-        } )}
+          return (
+            <User key={`user-${index}`} selected={selected} onMouseDown={e => this.props.onUserSelected(user, e)}>
+              <Avatar src={generateAvatarPic(user)} style={{ height: 80, width: 80, float: 'left' }} />
+              <Details selected={selected}>
+                <div>
+                  <strong className="mt-user-name">{user.username}</strong>
+                </div>
+                <div className="mt-user-email">{user.email}</div>
+                <div>
+                  <i>Joined: {format(new Date(user.createdOn), 'MMMM Do, YYYY')}</i>
+                </div>
+                <div>
+                  <i>Last Active: {format(new Date(user.lastLoggedIn), 'MMMM Do, YYYY')}</i>
+                </div>
+              </Details>
+            </User>
+          );
+        })}
       </div>
     );
   }
@@ -56,18 +57,18 @@ const User = styled.div`
   cursor: pointer;
   border-radius: 5px;
   transition: 0.25s background;
-  background: ${( props: SCompProps ) => props.selected ? theme.primary200.background : '' };
-  color: ${( props: SCompProps ) => props.selected ? theme.primary200.color : '' };
+  background: ${(props: SCompProps) => (props.selected ? theme.primary200.background : '')};
+  color: ${(props: SCompProps) => (props.selected ? theme.primary200.color : '')};
   user-select: none;
 
   &:hover {
-    background: ${( props: SCompProps ) => props.selected ? '' : theme.light100.background };
-    color: ${( props: SCompProps ) => props.selected ? '' : theme.light100.color };
+    background: ${(props: SCompProps) => (props.selected ? '' : theme.light100.background)};
+    color: ${(props: SCompProps) => (props.selected ? '' : theme.light100.color)};
   }
 
   &:active {
-    background: ${( props: SCompProps ) => props.selected ? '' : theme.light100.background };
-    color: ${( props: SCompProps ) => props.selected ? '' : theme.light100.color };
+    background: ${(props: SCompProps) => (props.selected ? '' : theme.light100.background)};
+    color: ${(props: SCompProps) => (props.selected ? '' : theme.light100.color)};
   }
 `;
 
@@ -77,13 +78,14 @@ const Details = styled.div`
   vertical-align: top;
 
   > .mt-user-email {
-    border-bottom: 1px solid ${( props: SCompProps ) => props.selected ? theme.primary200.border : theme.light200.border };
+    border-bottom: 1px solid
+      ${(props: SCompProps) => (props.selected ? theme.primary200.border : theme.light200.border)};
     margin: 0 0 2px 0;
     padding: 0 0 5px 0;
   }
 
   > div > i {
-    color: ${( props: SCompProps ) => props.selected ? theme.primary200.softColor : theme.light200.softColor };
+    color: ${(props: SCompProps) => (props.selected ? theme.primary200.softColor : theme.light200.softColor)};
     font-size: 0.85rem;
   }
 `;

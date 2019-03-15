@@ -11,72 +11,72 @@ type Props = {
   onHeaderClick: () => void;
   className?: string;
   animate?: boolean;
-}
-
-type State = {
 };
+
+type State = {};
 
 /**
  * An html component that represents the entire html page to be rendered
  */
 export default class Drawer extends React.Component<Props, State> {
-
   static defaultProps: Partial<Props> = {
     animate: false
-  }
+  };
 
   private _shouldAnimate: boolean;
 
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this._shouldAnimate = props.animate!;
   }
 
-  componentWillReceiveProps( next: Props ) {
-    if ( next.open !== this.props.open )
-      this._shouldAnimate = next.animate!;
-    else
-      this._shouldAnimate = false;
+  componentWillReceiveProps(next: Props) {
+    if (next.open !== this.props.open) this._shouldAnimate = next.animate!;
+    else this._shouldAnimate = false;
   }
 
   render() {
-    return <div className={this.props.className}>
-      <DrawerHeader className="mt-drawer-header" onClick={() => this.props.onHeaderClick()}>
-        <h3>{this.props.title}</h3>
-        <IconButton>
-          {this.props.open ?
-            <UpIcon
-              style={{
-                color: 'inherit'
-              }}
-            /> :
-            <DownIcon
-              style={{
-                color: 'inherit'
-              }}
-            />}
-        </IconButton>
-      </DrawerHeader>
-      {this.props.open ?
-        <DrawerContent innerRef={
-          ( elm: HTMLDivElement ) => {
-            if ( !elm )
-              return;
+    return (
+      <div className={this.props.className}>
+        <DrawerHeader className="mt-drawer-header" onClick={() => this.props.onHeaderClick()}>
+          <h3>{this.props.title}</h3>
+          <IconButton>
+            {this.props.open ? (
+              <UpIcon
+                style={{
+                  color: 'inherit'
+                }}
+              />
+            ) : (
+              <DownIcon
+                style={{
+                  color: 'inherit'
+                }}
+              />
+            )}
+          </IconButton>
+        </DrawerHeader>
+        {this.props.open ? (
+          <DrawerContent
+            innerRef={(elm: HTMLDivElement) => {
+              if (!elm) return;
 
-            elm.style.maxHeight = '';
-            const height = elm.clientHeight + 'px';
-            elm.style.maxHeight = '0px'
-            elm.style.visibility = 'visible';
+              elm.style.maxHeight = '';
+              const height = elm.clientHeight + 'px';
+              elm.style.maxHeight = '0px';
+              elm.style.visibility = 'visible';
 
-            if ( !this._shouldAnimate )
-              elm.style.maxHeight = height;
-            else
-              setTimeout( () => elm.style.maxHeight = height, 30 );
-          }
-        }>
-          {this.props.children}
-        </DrawerContent> : undefined}
-    </div>;
+              if (!this._shouldAnimate) elm.style.maxHeight = height;
+              else setTimeout(() => (elm.style.maxHeight = height), 30);
+            }}
+          >
+            {this.props.children}
+          </DrawerContent>
+        ) : (
+          undefined
+        )}
+      </div>
+    );
   }
 }
 
@@ -84,9 +84,9 @@ const DrawerHeader = styled.div`
   cursor: pointer;
   user-select: none;
   display: flex;
-  background: ${theme.primary100.background };
-  color: ${theme.primary100.color };
-  border-top: 1px solid ${theme.primary100.border };
+  background: ${theme.primary100.background};
+  color: ${theme.primary100.color};
+  border-top: 1px solid ${theme.primary100.border};
 
   h3 {
     padding: 4px 10px;
@@ -101,7 +101,7 @@ const DrawerHeader = styled.div`
 
 const DrawerContent = styled.div`
   visibility: hidden;
-  box-shadow: inset -2px 2px 5px 0px rgba(0,0,0,0.2);
+  box-shadow: inset -2px 2px 5px 0px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   box-sizing: border-box;
   padding: 0 10px;

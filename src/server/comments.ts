@@ -5,9 +5,9 @@ import { Action } from 'redux';
 import { matchPath } from 'react-router';
 import { controllers } from 'mantle';
 
-export default async function( req: IAuthReq, actions: Action[] ) {
+export default async function(req: IAuthReq, actions: Action[]) {
   const isAdmin = req._user && req._user.privileges !== 'regular' ? true : false;
-  const matchesEdit = matchPath<any>( req.url, { path: '/dashboard/comments/edit/:id' } );
+  const matchesEdit = matchPath<any>(req.url, { path: '/dashboard/comments/edit/:id' });
   const initialFilter: Partial<CommentGetAllOptions> = {
     visibility: isAdmin ? 'all' : 'public',
     index: 0,
@@ -18,17 +18,15 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     root: true
   };
 
-  if ( !isAdmin ) {
-    if ( matchesEdit )
-      throw new RedirectError( '/dashboard/comments' );
+  if (!isAdmin) {
+    if (matchesEdit) throw new RedirectError('/dashboard/comments');
   }
 
-  if ( matchesEdit ) {
-    const comment = await controllers.comments.getOne( matchesEdit.params.id, {} );
-    actions.push( CommentActions.SetComment.create( comment ) );
-  }
-  else {
-    let comments = await controllers.comments.getAll( initialFilter );
-    actions.push( CommentActions.SetComments.create( { page: comments, filters: initialFilter } ) );
+  if (matchesEdit) {
+    const comment = await controllers.comments.getOne(matchesEdit.params.id, {});
+    actions.push(CommentActions.SetComment.create(comment));
+  } else {
+    let comments = await controllers.comments.getAll(initialFilter);
+    actions.push(CommentActions.SetComments.create({ page: comments, filters: initialFilter }));
   }
 }

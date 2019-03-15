@@ -18,11 +18,10 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action | UserAction ): State {
+export default function reducer(state: State = initialState, action: Action | UserAction): State {
   let partialState: Partial<State> | undefined;
 
-  switch ( action.type ) {
-
+  switch (action.type) {
     case ActionCreators.isAuthenticating.type:
       partialState = {
         busy: true,
@@ -43,7 +42,7 @@ export default function reducer( state: State = initialState, action: Action | U
       partialState = {
         busy: false,
         authenticated: false,
-        error: decodeURIComponent( action.payload )
+        error: decodeURIComponent(action.payload)
       };
       break;
 
@@ -61,7 +60,8 @@ export default function reducer( state: State = initialState, action: Action | U
       };
       break;
 
-    default: return state;
+    default:
+      return state;
   }
 
   return { ...state, ...partialState } as State;

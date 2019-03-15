@@ -17,30 +17,29 @@ export type Props = {
   postsSelected: boolean;
   loading: boolean;
   onCancel: () => void;
-  onSearch: ( term: string ) => void;
+  onSearch: (term: string) => void;
   onNew: () => void;
   onDelete: () => void;
-  onFilterToggle: ( val: boolean ) => void;
-}
+  onFilterToggle: (val: boolean) => void;
+};
 
 type State = {
   searchFilter: string;
 };
 
 export default class PostFilterBar extends React.Component<Props, State> {
-
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
 
     this.state = {
       searchFilter: ''
-    }
+    };
   }
 
   render() {
     const buttonIconStyle: React.CSSProperties = { margin: '0 5px 0 0' };
 
-    if ( !this.props.inPostsRoot ) {
+    if (!this.props.inPostsRoot) {
       return (
         <Button
           id="mt-to-post-list"
@@ -51,8 +50,7 @@ export default class PostFilterBar extends React.Component<Props, State> {
           Back
         </Button>
       );
-    }
-    else
+    } else
       return (
         <div>
           <TextField
@@ -60,15 +58,14 @@ export default class PostFilterBar extends React.Component<Props, State> {
             id="mt-posts-filter"
             value={this.state.searchFilter}
             onKeyDown={e => {
-              if ( e.keyCode === 13 )
-                this.props.onSearch( this.state.searchFilter );
+              if (e.keyCode === 13) this.props.onSearch(this.state.searchFilter);
             }}
-            onChange={( e ) => this.setState( { searchFilter: e.currentTarget.value } )}
+            onChange={e => this.setState({ searchFilter: e.currentTarget.value })}
           />
           <IconButton
             className="mt-posts-search"
             color="primary"
-            onClick={e => this.props.onSearch( this.state.searchFilter )}
+            onClick={e => this.props.onSearch(this.state.searchFilter)}
           >
             <SearchIcon />
           </IconButton>
@@ -76,7 +73,7 @@ export default class PostFilterBar extends React.Component<Props, State> {
             <IconButton
               color="primary"
               className="mt-posts-filter"
-              onClick={e => this.props.onFilterToggle( !this.props.filtersOpen )}
+              onClick={e => this.props.onFilterToggle(!this.props.filtersOpen)}
             >
               <FilterIcon />
             </IconButton>
@@ -100,8 +97,8 @@ export default class PostFilterBar extends React.Component<Props, State> {
           >
             <AddIcon style={buttonIconStyle} />
             New Post
-            </Button>
+          </Button>
         </div>
-      )
+      );
   }
 }

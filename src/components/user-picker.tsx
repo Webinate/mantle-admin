@@ -17,7 +17,7 @@ import Paper from '@material-ui/core/Paper';
 type Props = {
   user: IUserEntry<'client' | 'expanded'> | null;
   canEdit?: boolean;
-  onChange: ( user: IUserEntry<'client' | 'expanded'> | null ) => void;
+  onChange: (user: IUserEntry<'client' | 'expanded'> | null) => void;
   labelStyle?: React.CSSProperties;
   labelPosition?: 'right' | 'left';
   imageSize?: number;
@@ -39,25 +39,23 @@ export default class UserPicker extends React.Component<Props, State> {
 
   private elm: HTMLElement | null;
 
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this.state = {
       elm: null,
       open: false,
       users: [],
       username: ''
-    }
+    };
   }
 
-  async onUpdateInput( user: string ) {
-    const page = await users.getAll( { search: user, limit: 10 } );
-    this.setState( { username: user, users: page.data } );
+  async onUpdateInput(user: string) {
+    const page = await users.getAll({ search: user, limit: 10 });
+    this.setState({ username: user, users: page.data });
   }
-
-
 
   private close() {
-    this.setState( { open: false, users: [] } );
+    this.setState({ open: false, users: [] });
   }
 
   private renderPopover() {
@@ -68,7 +66,7 @@ export default class UserPicker extends React.Component<Props, State> {
         open={true}
         onClose={e => {
           e.stopPropagation();
-          this.close()
+          this.close();
         }}
       >
         <div style={{ margin: '10px 5px 10px 10px' }}>
@@ -77,39 +75,38 @@ export default class UserPicker extends React.Component<Props, State> {
             placeholder="Type user name"
             className="mt-user-autocomplete"
             value={this.state.username}
-            onChange={e => this.onUpdateInput( e.currentTarget.value )}
+            onChange={e => this.onUpdateInput(e.currentTarget.value)}
           />
-          <IconButton onClick={e => {
-            e.stopPropagation();
-            this.props.onChange( null );
-            this.setState( { open: false, users: [] } );
-          }}>
+          <IconButton
+            onClick={e => {
+              e.stopPropagation();
+              this.props.onChange(null);
+              this.setState({ open: false, users: [] });
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </div>
         <Paper>
           <MenuList>
-            {this.state.users.map( ( user, index ) => {
+            {this.state.users.map((user, index) => {
               return (
                 <MenuItem
                   className="mt-user-drop-item"
-                  key={`user-${ index }`}
+                  key={`user-${index}`}
                   onClick={e => {
                     e.stopPropagation();
-                    this.props.onChange( user );
-                    this.setState( { open: false, users: [] } );
+                    this.props.onChange(user);
+                    this.setState({ open: false, users: [] });
                   }}
                 >
                   <ListItemIcon>
-                    <Avatar
-                      style={{ background: theme.light400.background }}
-                      src={generateAvatarPic( user )}
-                    />
+                    <Avatar style={{ background: theme.light400.background }} src={generateAvatarPic(user)} />
                   </ListItemIcon>
                   <ListItemText primary={user.username} />
                 </MenuItem>
-              )
-            } )}
+              );
+            })}
           </MenuList>
         </Paper>
       </Popover>
@@ -118,47 +115,49 @@ export default class UserPicker extends React.Component<Props, State> {
 
   private renderLabel() {
     return (
-      <span
-        className="my-user-picker-label"
-        style={{ verticalAlign: 'middle', ...this.props.labelStyle }}
-      >
+      <span className="my-user-picker-label" style={{ verticalAlign: 'middle', ...this.props.labelStyle }}>
         {this.props.user ? this.props.user.username : 'Not set '}
       </span>
     );
   }
 
   render() {
-
-    return <div
-      ref={e => this.elm = e}
-      className="my-user-picker-btn"
-      style={{
-        display: 'inline-block',
-        padding: '0 0 0 5px',
-        cursor: this.props.canEdit ? 'pointer' : ''
-      }}
-      onClick={this.props.canEdit ? e => {
-        this.setState( { open: true, elm: e.currentTarget }, () => {
-          this.onUpdateInput( '' );
-        } );
-      } : undefined}
-    >
-      {this.props.labelPosition === 'left' ? this.renderLabel() : undefined}
-
-      <Avatar
+    return (
+      <div
+        ref={e => (this.elm = e)}
+        className="my-user-picker-btn"
         style={{
-          display: 'inline-flex',
-          verticalAlign: 'middle',
-          margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px',
-          background: theme.light400.background,
-          height: this.props.imageSize,
-          width: this.props.imageSize
+          display: 'inline-block',
+          padding: '0 0 0 5px',
+          cursor: this.props.canEdit ? 'pointer' : ''
         }}
-        src={generateAvatarPic( this.props.user )}
-      />
+        onClick={
+          this.props.canEdit
+            ? e => {
+                this.setState({ open: true, elm: e.currentTarget }, () => {
+                  this.onUpdateInput('');
+                });
+              }
+            : undefined
+        }
+      >
+        {this.props.labelPosition === 'left' ? this.renderLabel() : undefined}
 
-      {this.props.labelPosition === 'right' ? this.renderLabel() : undefined}
-      {this.state.open ? this.renderPopover() : undefined}
-    </div>;
+        <Avatar
+          style={{
+            display: 'inline-flex',
+            verticalAlign: 'middle',
+            margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px',
+            background: theme.light400.background,
+            height: this.props.imageSize,
+            width: this.props.imageSize
+          }}
+          src={generateAvatarPic(this.props.user)}
+        />
+
+        {this.props.labelPosition === 'right' ? this.renderLabel() : undefined}
+        {this.state.open ? this.renderPopover() : undefined}
+      </div>
+    );
   }
 }

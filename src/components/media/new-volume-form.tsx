@@ -14,30 +14,25 @@ import theme from '../../theme/mui-theme';
 
 export type Props = {
   animated: boolean;
-  onComplete: ( volume: Partial<IVolume<'client'>> ) => void;
+  onComplete: (volume: Partial<IVolume<'client'>>) => void;
   isAdmin: boolean;
   error: Error | null;
-}
+};
 
 export type State = {
   activeStep: number;
   activeVolumeType: number;
   nextEnabled: boolean;
   newVolume: Partial<IVolume<'client'>>;
-}
+};
 
 export class NewVolumeForm extends React.Component<Props, State> {
-
   private _steps: string[];
   private static MAX = 1 * 1024 * 1024 * 1024; // 1 Gig
 
-  constructor( props: Props ) {
-    super( props );
-    this._steps = [
-      'Select Volume Type',
-      'Setup Volume Properties',
-      'Set User Permissions'
-    ];
+  constructor(props: Props) {
+    super(props);
+    this._steps = ['Select Volume Type', 'Setup Volume Properties', 'Set User Permissions'];
 
     this.state = {
       activeStep: 0,
@@ -54,34 +49,31 @@ export class NewVolumeForm extends React.Component<Props, State> {
   handleNext = () => {
     const { activeStep } = this.state;
 
-    if ( activeStep < this._steps.length - 1 )
-      this.setState( {
-        activeStep: activeStep + 1,
-      } );
-    else
-      this.props.onComplete( this.state.newVolume );
+    if (activeStep < this._steps.length - 1)
+      this.setState({
+        activeStep: activeStep + 1
+      });
+    else this.props.onComplete(this.state.newVolume);
   };
 
   handleBack = () => {
     const { activeStep } = this.state;
 
-    if ( activeStep > 0 )
-      this.setState( {
-        activeStep: activeStep - 1,
-      } );
-  }
+    if (activeStep > 0)
+      this.setState({
+        activeStep: activeStep - 1
+      });
+  };
 
-  private onChange( newVolue: Partial<IVolume<'client'>> ) {
+  private onChange(newVolue: Partial<IVolume<'client'>>) {
     const updatedVolume = { ...this.state.newVolume, ...newVolue };
-    this.setState( { newVolume: updatedVolume } );
+    this.setState({ newVolume: updatedVolume });
 
     // Validation
-    if ( updatedVolume.name!.trim() === '' )
-      this.setState( { nextEnabled: false } );
-    else if ( updatedVolume.memoryAllocated! <= 0 || updatedVolume.memoryAllocated! >= NewVolumeForm.MAX )
-      this.setState( { nextEnabled: false } );
-    else
-      this.setState( { nextEnabled: true } );
+    if (updatedVolume.name!.trim() === '') this.setState({ nextEnabled: false });
+    else if (updatedVolume.memoryAllocated! <= 0 || updatedVolume.memoryAllocated! >= NewVolumeForm.MAX)
+      this.setState({ nextEnabled: false });
+    else this.setState({ nextEnabled: true });
   }
 
   render() {
@@ -90,47 +82,42 @@ export class NewVolumeForm extends React.Component<Props, State> {
     const isLastStep = activeStep === steps.length - 1;
 
     let activeElm: JSX.Element;
-    if ( activeStep === 0 )
-      activeElm = <VolumeType
-        volume={this.state.newVolume}
-        onChange={v => this.onChange( v )}
-      />
-    else if ( activeStep === 1 )
-      activeElm = <VolumeProperties
-        maxValue={NewVolumeForm.MAX}
-        volume={this.state.newVolume}
-        isAdmin={this.props.isAdmin}
-        onChange={v => this.onChange( v )}
-      />;
-    else
-      activeElm = <div></div>;
+    if (activeStep === 0) activeElm = <VolumeType volume={this.state.newVolume} onChange={v => this.onChange(v)} />;
+    else if (activeStep === 1)
+      activeElm = (
+        <VolumeProperties
+          maxValue={NewVolumeForm.MAX}
+          volume={this.state.newVolume}
+          isAdmin={this.props.isAdmin}
+          onChange={v => this.onChange(v)}
+        />
+      );
+    else activeElm = <div />;
 
     return (
       <div style={{ margin: '30px' }}>
         <Paper style={{ overflow: 'auto' }} id="mt-new-volume-form">
           <Stepper activeStep={activeStep} orientation="vertical">
-            {steps.map( ( label, index ) => {
+            {steps.map((label, index) => {
               return (
                 <Step key={label} completed={index < activeStep}>
                   <StepLabel className="mt-vol-step-label">{label}</StepLabel>
-                  <StepContent
-                    transitionDuration={this.props.animated ? undefined : 0}>{activeElm}</StepContent>
+                  <StepContent transitionDuration={this.props.animated ? undefined : 0}>{activeElm}</StepContent>
                 </Step>
               );
-            } )}
+            })}
           </Stepper>
         </Paper>
-        {this.props.error ?
+        {this.props.error ? (
           <Error>
             <ErrorIcon />
             {this.props.error.message}
-          </Error> : undefined}
+          </Error>
+        ) : (
+          undefined
+        )}
         <Buttons>
-          <Button
-            id="mt-vol-back"
-            disabled={activeStep === 0}
-            onClick={e => this.handleBack()}
-          >
+          <Button id="mt-vol-back" disabled={activeStep === 0} onClick={e => this.handleBack()}>
             Back
           </Button>
           <Button
@@ -156,7 +143,7 @@ const Buttons = styled.div`
 `;
 
 const Error = styled.div`
-  color: ${theme.error.background };
+  color: ${theme.error.background};
   margin: 20px 0;
   svg {
     vertical-align: middle;

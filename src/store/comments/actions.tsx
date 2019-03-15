@@ -7,68 +7,68 @@ import { ActionCreators as AppActions } from '../app/actions';
 
 // Action Creators
 export const ActionCreators = {
-  SetCommentsBusy: new ActionCreator<'comments-busy', boolean>( 'comments-busy' ),
-  SetComments: new ActionCreator<'comments-set-comments', { page: Page<IComment<'client' | 'expanded'>>, filters: Partial<CommentGetAllOptions> }>( 'comments-set-comments' ),
-  SetComment: new ActionCreator<'comments-set-comment', IComment<'client' | 'expanded'>>( 'comments-set-comment' )
+  SetCommentsBusy: new ActionCreator<'comments-busy', boolean>('comments-busy'),
+  SetComments: new ActionCreator<
+    'comments-set-comments',
+    { page: Page<IComment<'client' | 'expanded'>>; filters: Partial<CommentGetAllOptions> }
+  >('comments-set-comments'),
+  SetComment: new ActionCreator<'comments-set-comment', IComment<'client' | 'expanded'>>('comments-set-comment')
 };
 
 // Action Types
-export type Action = typeof ActionCreators[ keyof typeof ActionCreators ];
+export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 
 /**
  * Gets all the comments
  */
-export function getComments( options: Partial<CommentGetAllOptions>, postId?: string ) {
-  return async function( dispatch: Function, getState: () => IRootState ) {
+export function getComments(options: Partial<CommentGetAllOptions>, postId?: string) {
+  return async function(dispatch: Function, getState: () => IRootState) {
     const state = getState();
     const newFilters = { ...state.comments.commentFilters, ...options };
 
     // Resets the array first
-    dispatch( ActionCreators.SetCommentsBusy.create( true ) );
+    dispatch(ActionCreators.SetCommentsBusy.create(true));
 
     let resp: Page<IComment<'client' | 'expanded'>>;
 
-    resp = await comments.getAll( newFilters );
+    resp = await comments.getAll(newFilters);
 
-    dispatch( ActionCreators.SetComments.create( { page: resp, filters: newFilters } ) );
-  }
+    dispatch(ActionCreators.SetComments.create({ page: resp, filters: newFilters }));
+  };
 }
 
-export function createComment( postId: string, comment: Partial<IComment<'client'>>, parent?: string ) {
-  return async function( dispatch: Function, getState: () => IRootState ) {
+export function createComment(postId: string, comment: Partial<IComment<'client'>>, parent?: string) {
+  return async function(dispatch: Function, getState: () => IRootState) {
     try {
-      dispatch( ActionCreators.SetCommentsBusy.create( true ) );
-      await comments.create( postId, comment, parent );
-      dispatch( getComments( {} ) )
+      dispatch(ActionCreators.SetCommentsBusy.create(true));
+      await comments.create(postId, comment, parent);
+      dispatch(getComments({}));
+    } catch (err) {
+      dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
     }
-    catch ( err ) {
-      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
-    }
-  }
+  };
 }
 
-export function editComment( commentId: string, token: Partial<IComment<'client'>> ) {
-  return async function( dispatch: Function, getState: () => IRootState ) {
+export function editComment(commentId: string, token: Partial<IComment<'client'>>) {
+  return async function(dispatch: Function, getState: () => IRootState) {
     try {
-      dispatch( ActionCreators.SetCommentsBusy.create( true ) );
-      await comments.update( commentId, token );
-      dispatch( getComments( {} ) )
+      dispatch(ActionCreators.SetCommentsBusy.create(true));
+      await comments.update(commentId, token);
+      dispatch(getComments({}));
+    } catch (err) {
+      dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
     }
-    catch ( err ) {
-      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
-    }
-  }
+  };
 }
 
-export function deleteComment( commentId: string ) {
-  return async function( dispatch: Function, getState: () => IRootState ) {
+export function deleteComment(commentId: string) {
+  return async function(dispatch: Function, getState: () => IRootState) {
     try {
-      dispatch( ActionCreators.SetCommentsBusy.create( true ) );
-      await comments.remove( commentId );
-      dispatch( getComments( {} ) )
+      dispatch(ActionCreators.SetCommentsBusy.create(true));
+      await comments.remove(commentId);
+      dispatch(getComments({}));
+    } catch (err) {
+      dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
     }
-    catch ( err ) {
-      dispatch( AppActions.serverResponse.create( `Error: ${ err.message }` ) );
-    }
-  }
+  };
 }

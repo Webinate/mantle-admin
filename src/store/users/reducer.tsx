@@ -14,11 +14,11 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action | AdminAction ): State {
+export default function reducer(state: State = initialState, action: Action | AdminAction): State {
   let partialState: Partial<State> | undefined;
   let page = state.userPage;
 
-  switch ( action.type ) {
+  switch (action.type) {
     case ActionCreators.SetUsers.type:
       partialState = {
         userPage: action.payload,
@@ -35,29 +35,34 @@ export default function reducer( state: State = initialState, action: Action | A
         busy: false,
         userPage: {
           ...page!,
-          data: page!.data.map( ( item, index ) => {
-            if ( item._id === action.payload._id )
-              return action.payload;
+          data: page!.data.map((item, index) => {
+            if (item._id === action.payload._id) return action.payload;
             return item;
-          } )
+          })
         }
       };
       break;
 
     case ActionCreators.RemoveUser.type:
       partialState = {
-        userPage: { ...page!, data: page!.data.filter( user => user.username !== action.payload ) },
+        userPage: { ...page!, data: page!.data.filter(user => user.username !== action.payload) },
         busy: false
       };
       break;
 
     case AdminActionCreators.userActivated.type:
       partialState = {
-        userPage: { ...page!, data: page!.data.map( user => { return { ...user, registerKey: '' } } ) }
+        userPage: {
+          ...page!,
+          data: page!.data.map(user => {
+            return { ...user, registerKey: '' };
+          })
+        }
       };
       break;
 
-    default: return state;
+    default:
+      return state;
   }
 
   return { ...state, ...partialState } as State;

@@ -9,15 +9,13 @@ import theme from '../../theme/mui-theme';
 export type Props = {
   volume: IVolume<'client' | 'expanded'>;
   onVolumeSelected: () => void;
-}
+};
 
-export type State = {
-}
+export type State = {};
 
 export class BreadCrumb extends React.Component<Props, State> {
-
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this.state = {
       searchFilter: ''
     };
@@ -26,9 +24,7 @@ export class BreadCrumb extends React.Component<Props, State> {
   render() {
     return (
       <Container>
-        <h2
-          onClick={e => this.props.onVolumeSelected()}
-        >
+        <h2 onClick={e => this.props.onVolumeSelected()}>
           {this.props.volume.type === 'local' ? <FolderIcon /> : <CloudIcon />}
           <KeyboardArrowRight />/{this.props.volume.name}
         </h2>
@@ -47,16 +43,16 @@ const Container = styled.div`
     margin: 0;
 
     &:hover {
-      border-bottom: 1px solid ${theme.primary100.background };
+      border-bottom: 1px solid ${theme.primary100.background};
 
       svg {
-        color: ${theme.primary100.background };
+        color: ${theme.primary100.background};
       }
     }
   }
 
   svg {
     vertical-align: top;
-    color: ${theme.light400.softColor };
+    color: ${theme.light400.softColor};
   }
 `;

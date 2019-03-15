@@ -12,21 +12,21 @@ import { default as appReducer, State as IAppResponseState } from './app/reducer
 import { default as mediaReducer, State as IMediaResponseState } from './media/reducer';
 
 export type IRootState = {
-  users: IUserState,
-  posts: IPostState,
-  home: IHomeState,
-  templates: ITemplateState,
-  comments: ICommentState,
-  categories: ICategoryState,
-  authentication: IAuthState,
-  admin: IAdminState,
-  router: any,
-  app: IAppResponseState,
-  media: IMediaResponseState
+  users: IUserState;
+  posts: IPostState;
+  home: IHomeState;
+  templates: ITemplateState;
+  comments: ICommentState;
+  categories: ICategoryState;
+  authentication: IAuthState;
+  admin: IAdminState;
+  router: any;
+  app: IAppResponseState;
+  media: IMediaResponseState;
 };
 
 // Create the root reducer which creates our root state
-const rootReducer = combineReducers<IRootState>( {
+const rootReducer = combineReducers<IRootState>({
   users: usersReducer,
   posts: postsReducer,
   home: homeReducer,
@@ -38,6 +38,6 @@ const rootReducer = combineReducers<IRootState>( {
   admin: adminReducer,
   app: appReducer,
   media: mediaReducer
-} as ReducersMapObject );
+} as ReducersMapObject);
 
 export default rootReducer;

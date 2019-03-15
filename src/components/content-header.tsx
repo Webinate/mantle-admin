@@ -9,15 +9,15 @@ type Props = {
   style?: React.CSSProperties;
   subPanelStyle?: React.CSSProperties;
   showSub?: boolean;
-}
+};
 
 export default class ContentHeader extends React.Component<Props, any> {
   static defaultProps: Partial<Props> = {
     showSub: false
-  }
+  };
 
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
   }
 
   render() {
@@ -29,24 +29,23 @@ export default class ContentHeader extends React.Component<Props, any> {
           <div>
             <h2>{this.props.title}</h2>
           </div>
-          <div>
-            {this.props.renderFilters && this.props.renderFilters()}
-          </div>
+          <div>{this.props.renderFilters && this.props.renderFilters()}</div>
         </Header>
-        {
-          showSub ?
-            <div style={this.props.subPanelStyle}>
-              {this.props.children}
-            </div> : undefined
-        }
-        {this.props.busy ? <div className="mt-loading" style={{ position: 'absolute', bottom: '0', width: '100%' }}><LinearProgress /></div> : undefined}
+        {showSub ? <div style={this.props.subPanelStyle}>{this.props.children}</div> : undefined}
+        {this.props.busy ? (
+          <div className="mt-loading" style={{ position: 'absolute', bottom: '0', width: '100%' }}>
+            <LinearProgress />
+          </div>
+        ) : (
+          undefined
+        )}
       </Container>
-    )
+    );
   }
 }
 
 const Container = styled.div`
-  box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.3);
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   position: relative;
   background: #fff;

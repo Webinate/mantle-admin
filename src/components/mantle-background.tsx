@@ -1,11 +1,12 @@
 import * as React from 'react';
 
-export default ( props: React.HTMLAttributes<any> ) => {
+export default (props: React.HTMLAttributes<any>) => {
   return (
     <div
-      { ...props }
+      {...props}
       style={{
-        ...props.style, ...{
+        ...props.style,
+        ...{
           height: '100%',
           background: '#efefef',
           backgroundImage: `url('../images/rocks.svg')`,
@@ -16,4 +17,4 @@ export default ( props: React.HTMLAttributes<any> ) => {
       {props.children}
     </div>
   );
-}
+};

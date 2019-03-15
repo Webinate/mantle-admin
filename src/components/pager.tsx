@@ -11,53 +11,45 @@ export type Props = {
   total: number;
   limit: number;
   loading: boolean;
-  onPage: ( offset: number ) => void;
+  onPage: (offset: number) => void;
   contentProps?: React.HTMLProps<HTMLDivElement>;
   heightFromContents?: boolean;
   footerBackground?: boolean;
-}
+};
 
-type State = {
-}
+type State = {};
 
 /**
  * A component for paging through large datasets
  */
 export default class Pager extends React.Component<Props, State> {
-
   static defaultProps: Partial<Props> = {
     footerBackground: true,
     heightFromContents: false
-  }
+  };
 
-  constructor( props: Props ) {
-    super( props );
-    this.state = {
-    };
+  constructor(props: Props) {
+    super(props);
+    this.state = {};
   }
 
   render() {
     const index = this.props.index;
     const total = this.props.total;
     const limit = this.props.limit;
-    const isOverflowing = !( ( index === 0 ) && ( index + limit >= total ) );
+    const isOverflowing = !(index === 0 && index + limit >= total);
     let height: string | undefined = isOverflowing ? 'calc(100% - 50px)' : '100%';
 
-    if ( this.props.heightFromContents )
-      height = undefined;
+    if (this.props.heightFromContents) height = undefined;
 
     return (
       <Container props={this.props}>
-        <div {...this.props.contentProps}
-          style={{ height: height, overflow: 'auto' }}
-        >
+        <div {...this.props.contentProps} style={{ height: height, overflow: 'auto' }}>
           {this.props.children}
         </div>
         {isOverflowing ? (
           <Footer props={this.props}>
-            <Text>
-              {Math.min( ( index + 1 ), total ) + '-' + Math.min( ( index + limit ), total ) + ' of ' + total}
-            </Text>
+            <Text>{Math.min(index + 1, total) + '-' + Math.min(index + limit, total) + ' of ' + total}</Text>
             <Buttons>
               <NavBtn>
                 <Button
@@ -65,9 +57,11 @@ export default class Pager extends React.Component<Props, State> {
                   style={{ minWidth: '54px' }}
                   disabled={this.props.loading || index === 0}
                   onClick={e => {
-                    this.props.onPage( 0 )
+                    this.props.onPage(0);
                   }}
-                >First</Button>
+                >
+                  First
+                </Button>
               </NavBtn>
 
               <NavBtn>
@@ -76,9 +70,11 @@ export default class Pager extends React.Component<Props, State> {
                   style={{ minWidth: '54px' }}
                   disabled={this.props.loading || index + limit >= total}
                   onClick={e => {
-                    this.props.onPage( total - ( total % limit ) )
+                    this.props.onPage(total - (total % limit));
                   }}
-                >Last</Button>
+                >
+                  Last
+                </Button>
               </NavBtn>
 
               <NavBtn>
@@ -86,7 +82,7 @@ export default class Pager extends React.Component<Props, State> {
                   className="mt-pager-prev"
                   disabled={this.props.loading || index === 0}
                   onClick={e => {
-                    this.props.onPage( index - limit )
+                    this.props.onPage(index - limit);
                   }}
                 >
                   <LeftIcon />
@@ -98,7 +94,7 @@ export default class Pager extends React.Component<Props, State> {
                   className="mt-pager-next"
                   disabled={this.props.loading || index + limit >= total}
                   onClick={e => {
-                    this.props.onPage( index + limit )
+                    this.props.onPage(index + limit);
                   }}
                 >
                   <RightIcon />
@@ -106,7 +102,9 @@ export default class Pager extends React.Component<Props, State> {
               </NavBtn>
             </Buttons>
           </Footer>
-        ) : undefined}
+        ) : (
+          undefined
+        )}
       </Container>
     );
   }
@@ -117,14 +115,14 @@ interface PagerProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
 }
 
 const Container = styled.div`
-  height: ${ ( options: PagerProps ) => options.props.heightFromContents ? '' : '100%' };
+  height: ${(options: PagerProps) => (options.props.heightFromContents ? '' : '100%')};
   position: relative;
 `;
 
 const Footer = styled.div`
-  height: ${ ( options: PagerProps ) => options.props.heightFromContents ? '' : '50px' };
-  background: ${ ( options: PagerProps ) => !options.props.footerBackground ? '' : theme.light100.background };
-  border-top: ${( options: PagerProps ) => !options.props.footerBackground ? '' : `1px solid ${ theme.light100.border }` };
+  height: ${(options: PagerProps) => (options.props.heightFromContents ? '' : '50px')};
+  background: ${(options: PagerProps) => (!options.props.footerBackground ? '' : theme.light100.background)};
+  border-top: ${(options: PagerProps) => (!options.props.footerBackground ? '' : `1px solid ${theme.light100.border}`)};
   box-sizing: border-box;
   padding: 0 10px;
   box-sizing: border-box;

@@ -31,49 +31,48 @@ import { RedirectError } from './server/errors';
  * The default entry point for the admin server
  */
 export default class MainController extends Controller {
-
-  constructor( client: IClient ) {
-    super( null );
+  constructor(client: IClient) {
+    super(null);
   }
 
-  async initialize( app: express.Express, db: Db ) {
-    await Promise.all( [
-      super.initialize( app, db ),
-      new routers.auth( {
+  async initialize(app: express.Express, db: Db) {
+    await Promise.all([
+      super.initialize(app, db),
+      new routers.auth({
         rootPath: apiUrl,
         accountRedirectURL: '/message',
         activateAccountUrl: '/auth/activate-account',
         passwordResetURL: '/reset-password'
-      } ).initialize( app, db ),
-      new routers.user( {
+      }).initialize(app, db),
+      new routers.user({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.posts( {
+      }).initialize(app, db),
+      new routers.posts({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.categories( {
+      }).initialize(app, db),
+      new routers.categories({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.volume( {
+      }).initialize(app, db),
+      new routers.volume({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.file( {
+      }).initialize(app, db),
+      new routers.file({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.comments( {
+      }).initialize(app, db),
+      new routers.comments({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.documents( {
+      }).initialize(app, db),
+      new routers.documents({
         rootPath: apiUrl
-      } ).initialize( app, db ),
-      new routers.templates( {
+      }).initialize(app, db),
+      new routers.templates({
         rootPath: apiUrl
-      } ).initialize( app, db )
-    ] );
+      }).initialize(app, db)
+    ]);
 
     const router = express.Router();
-    router.get( '*', [ this.renderPage.bind( this ) ] );
-    app.use( '/', router );
+    router.get('*', [this.renderPage.bind(this)]);
+    app.use('/', router);
     return this;
   }
 
@@ -81,36 +80,31 @@ export default class MainController extends Controller {
    * Draws the html page and its initial react state and component tree
    */
   @decorators.identify()
-  private async renderPage( req: IAuthReq, res: express.Response, next: Function ) {
-    const context: { url?: string } = {}
+  private async renderPage(req: IAuthReq, res: express.Response, next: Function) {
+    const context: { url?: string } = {};
     const history = createHistory();
     let url = req.url;
     let user = req._user;
 
-    if ( !user && ( url !== '/login' && url !== '/register' ) )
-      return res.redirect( '/login' );
-    else if ( user && ( url === '/login' || url === '/register' ) )
-      return res.redirect( '/' );
+    if (!user && (url !== '/login' && url !== '/register')) return res.redirect('/login');
+    else if (user && (url === '/login' || url === '/register')) return res.redirect('/');
 
-    let initialState: Partial<IRootState> = {}
-    const muiAgent = req.headers[ 'user-agent' ];
-    const store = createStore( initialState, history );
-    const theme = createMuiTheme( Theme );
+    let initialState: Partial<IRootState> = {};
+    const muiAgent = req.headers['user-agent'];
+    const store = createStore(initialState, history);
+    const theme = createMuiTheme(Theme);
 
     let actions: Action[];
     try {
-      actions = await hydrate( req );
-    }
-    catch ( err ) {
-      if ( err instanceof RedirectError )
-        return res.redirect( err.redirect );
+      actions = await hydrate(req);
+    } catch (err) {
+      if (err instanceof RedirectError) return res.redirect(err.redirect);
 
-      return this.renderError( res, err );
+      return this.renderError(res, err);
     }
 
     try {
-      for ( const action of actions )
-        store.dispatch( action );
+      for (const action of actions) store.dispatch(action);
 
       // For styled components
       const sheet = new ServerStyleSheet();
@@ -120,62 +114,66 @@ export default class MainController extends Controller {
       const generateClassName = createGenerateClassName();
 
       // We use a require to support hot reloading
-      const App = require( './containers/app' ).App;
+      const App = require('./containers/app').App;
 
-      let html = renderToString( sheet.collectStyles(
-        <Provider store={store}>
-          <JssProvider registry={materialSheets} generateClassName={generateClassName}>
-            <MuiThemeProvider theme={theme} sheetsManager={new Map()}>
-              <StaticRouter location={url} context={context}>
-                <MuiPickersUtilsProvider utils={DateUtils}>
-                  <App {...{} as any} />
-                </MuiPickersUtilsProvider>
-              </StaticRouter>
-            </MuiThemeProvider>
-          </JssProvider>
-        </Provider>
-      ) );
+      let html = renderToString(
+        sheet.collectStyles(
+          <Provider store={store}>
+            <JssProvider registry={materialSheets} generateClassName={generateClassName}>
+              <MuiThemeProvider theme={theme} sheetsManager={new Map()}>
+                <StaticRouter location={url} context={context}>
+                  <MuiPickersUtilsProvider utils={DateUtils}>
+                    <App {...{} as any} />
+                  </MuiPickersUtilsProvider>
+                </StaticRouter>
+              </MuiThemeProvider>
+            </JssProvider>
+          </Provider>
+        )
+      );
 
       const styleTags = sheet.getStyleElement();
 
       // Get the style sheet for material
-      const styleTagsMaterial = materialSheets.toString()
-
+      const styleTagsMaterial = materialSheets.toString();
 
       // Check the context if there needs to be a redirect
-      if ( context.url ) {
-        res.writeHead( 301, {
-          Location: context.url,
-        } );
+      if (context.url) {
+        res.writeHead(301, {
+          Location: context.url
+        });
         res.end();
         return;
       }
 
       initialState = store.getState();
-      html = renderToStaticMarkup( <HTML
-        html={html}
-        styles={styleTags}
-        stylesMaterial={styleTagsMaterial}
-        intialData={initialState}
-        agent={muiAgent!}
-      /> );
+      html = renderToStaticMarkup(
+        <HTML
+          html={html}
+          styles={styleTags}
+          stylesMaterial={styleTagsMaterial}
+          intialData={initialState}
+          agent={muiAgent!}
+        />
+      );
 
-      res.send( html );
-    }
-    catch ( err ) {
-      this.renderError( res, err );
+      res.send(html);
+    } catch (err) {
+      this.renderError(res, err);
     }
   }
 
-  private renderError( res: express.Response, err: Error ) {
-    res.status( 500 );
-    res.send( renderToStaticMarkup(
-      <html>
-        <body>
-          <div>An Error occurred while rendering the application: {err.message}</div>
-          <div>Stack Trace: {err.stack}</div>
-        </body>
-      </html>
-    ) );
+  private renderError(res: express.Response, err: Error) {
+    res.status(500);
+    res.send(
+      renderToStaticMarkup(
+        <html>
+          <body>
+            <div>An Error occurred while rendering the application: {err.message}</div>
+            <div>Stack Trace: {err.stack}</div>
+          </body>
+        </html>
+      )
+    );
   }
 }

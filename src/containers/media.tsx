@@ -5,7 +5,18 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
-import { createVolume, getVolumes, getVolume, deleteVolumes, upload, replaceFile, openDirectory, deleteFiles, editFile, editVolume } from '../store/media/actions';
+import {
+  createVolume,
+  getVolumes,
+  getVolume,
+  deleteVolumes,
+  upload,
+  replaceFile,
+  openDirectory,
+  deleteFiles,
+  editFile,
+  editVolume
+} from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
@@ -14,13 +25,13 @@ import { SortOrder } from '../components/media/volumes';
 import { isAdminUser } from '../utils/component-utils';
 
 // Map state to props
-const mapStateToProps = ( state: IRootState, ownProps: any ) => ( {
+const mapStateToProps = (state: IRootState, ownProps: any) => ({
   user: state.authentication.user,
   app: state.app,
   media: state.media,
   routing: state.router,
   location: ownProps.location as Location
-} );
+});
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
@@ -35,9 +46,9 @@ const dispatchToProps = {
   deleteFiles,
   editFile,
   editVolume
-}
+};
 
-const stateProps = returntypeof( mapStateToProps );
+const stateProps = returntypeof(mapStateToProps);
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
   selectedUids: string[];
@@ -46,107 +57,129 @@ type State = {
 /**
  * The main application entry point
  */
-@connectWrapper( mapStateToProps, dispatchToProps )
+@connectWrapper(mapStateToProps, dispatchToProps)
 export class Media extends React.Component<Props, State> {
-
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
     this.state = {
       selectedUids: []
     };
   }
 
-  private onDelete( volumeId?: string ) {
+  private onDelete(volumeId?: string) {
     const selectedUids = this.state.selectedUids;
-    if ( volumeId ) {
-      this.setState( { selectedUids: [] }, () => {
-        this.props.deleteFiles( volumeId, selectedUids );
-      } )
-    }
-    else {
-      this.setState( { selectedUids: [] }, () => {
-        this.props.deleteVolumes( selectedUids );
-      } );
+    if (volumeId) {
+      this.setState({ selectedUids: [] }, () => {
+        this.props.deleteFiles(volumeId, selectedUids);
+      });
+    } else {
+      this.setState({ selectedUids: [] }, () => {
+        this.props.deleteVolumes(selectedUids);
+      });
     }
   }
 
-  private onSort( sort: SortTypes, direction: SortOrder, volumeId: string | null ) {
-    if ( volumeId )
-      this.props.openDirectory( volumeId, { sort: sort, sortOrder: direction } );
-    else
-      this.props.getVolumes( { sort: sort, sortOrder: direction } );
+  private onSort(sort: SortTypes, direction: SortOrder, volumeId: string | null) {
+    if (volumeId) this.props.openDirectory(volumeId, { sort: sort, sortOrder: direction });
+    else this.props.getVolumes({ sort: sort, sortOrder: direction });
   }
 
   render() {
-    const isInNewMode = matchPath( this.props.location.pathname, { exact: true, path: '/dashboard/media/new' } );
-    const isAdmin = isAdminUser( this.props.user );
-    const isInDirectory = matchPath<any>( this.props.location.pathname, { path: '/dashboard/media/volume/:id' } );
+    const isInNewMode = matchPath(this.props.location.pathname, { exact: true, path: '/dashboard/media/new' });
+    const isAdmin = isAdminUser(this.props.user);
+    const isInDirectory = matchPath<any>(this.props.location.pathname, { path: '/dashboard/media/volume/:id' });
     let mode: 'new-volume' | 'volumes' | 'directory' = 'volumes';
-    if ( isInNewMode )
-      mode = 'new-volume';
-    else if ( isInDirectory )
-      mode = 'directory';
+    if (isInNewMode) mode = 'new-volume';
+    else if (isInDirectory) mode = 'directory';
 
     return (
       <div style={{ height: '100%' }} className="mt-media-container">
         <ContentHeader
           title={this.props.media.selected ? this.props.media.selected.name : 'Media'}
           busy={this.props.media.busy}
-          renderFilters={() => <MediaFilterBar
-            mediaSelected={this.state.selectedUids.length > 0 ? true : false}
-            mode={mode}
-            onNewVolume={() => this.props.push( '/dashboard/media/new' )}
-            onSearch={term => isInDirectory ? this.props.openDirectory( isInDirectory.params.id, { search: term } ) : this.props.getVolumes( { search: term } )}
-            onBack={() => this.props.push( '/dashboard/media' )}
-          />}
-        >
-        </ContentHeader>
+          renderFilters={() => (
+            <MediaFilterBar
+              mediaSelected={this.state.selectedUids.length > 0 ? true : false}
+              mode={mode}
+              onNewVolume={() => this.props.push('/dashboard/media/new')}
+              onSearch={term =>
+                isInDirectory
+                  ? this.props.openDirectory(isInDirectory.params.id, { search: term })
+                  : this.props.getVolumes({ search: term })
+              }
+              onBack={() => this.props.push('/dashboard/media')}
+            />
+          )}
+        />
         <Container>
           <Switch>
-            <Route path="/dashboard/media/new" render={props => <NewVolumeForm
-              isAdmin={isAdmin}
-              animated={!this.props.app.debugMode}
-              error={this.props.media.volumeFormError}
-              onComplete={newVolume => {
-                this.props.createVolume( newVolume, () => this.props.push( '/dashboard/media' ) );
+            <Route
+              path="/dashboard/media/new"
+              render={props => (
+                <NewVolumeForm
+                  isAdmin={isAdmin}
+                  animated={!this.props.app.debugMode}
+                  error={this.props.media.volumeFormError}
+                  onComplete={newVolume => {
+                    this.props.createVolume(newVolume, () => this.props.push('/dashboard/media'));
+                  }}
+                />
+              )}
+            />
+            <Route
+              path="/dashboard/media/edit/:postId"
+              render={props => <div>Editing {props.match.params.postId}</div>}
+            />
+            <Route
+              path="/dashboard/media/volume/:id"
+              render={props => {
+                return (
+                  <MediaNavigator
+                    animated={this.props.app.debugMode ? false : true}
+                    key="nav-directory"
+                    filesFilters={this.props.media.filesFilters}
+                    selectedIds={this.state.selectedUids}
+                    files={this.props.media.filesPage}
+                    onRename={(newName, id) => this.props.editFile(props.match.params.id, id, { name: newName })}
+                    onDelete={() => this.onDelete(props.match.params.id)}
+                    onSort={(sort, dir) => this.onSort(sort, dir, props.match.params.id)}
+                    onUploadFiles={files => {
+                      this.props.upload(props.match.params.id, files);
+                    }}
+                    onReplaceFile={file => {
+                      this.props.replaceFile(props.match.params.id, this.state.selectedUids[0], file);
+                    }}
+                    activeVolume={this.props.media.selected}
+                    activeVolumeId={props.match.params.id}
+                    loading={this.props.media.busy}
+                    onSelectionChanged={selection => this.setState({ selectedUids: selection })}
+                    openDirectory={(id, options) => this.props.openDirectory(id, options)}
+                  />
+                );
               }}
-            />} />
-            <Route path="/dashboard/media/edit/:postId" render={props => <div>Editing {props.match.params.postId}</div>} />
-            <Route path="/dashboard/media/volume/:id" render={props => {
-              return <MediaNavigator
-                animated={this.props.app.debugMode ? false : true}
-                key="nav-directory"
-                filesFilters={this.props.media.filesFilters}
-                selectedIds={this.state.selectedUids}
-                files={this.props.media.filesPage}
-                onRename={( newName, id ) => this.props.editFile( props.match.params.id, id, { name: newName } )}
-                onDelete={() => this.onDelete( props.match.params.id )}
-                onSort={( sort, dir ) => this.onSort( sort, dir, props.match.params.id )}
-                onUploadFiles={files => { this.props.upload( props.match.params.id, files ) }}
-                onReplaceFile={file => { this.props.replaceFile( props.match.params.id, this.state.selectedUids[ 0 ], file ) }}
-                activeVolume={this.props.media.selected}
-                activeVolumeId={props.match.params.id}
-                loading={this.props.media.busy}
-                onSelectionChanged={selection => this.setState( { selectedUids: selection } )}
-                openDirectory={( id, options ) => this.props.openDirectory( id, options )}
-              />
-            }} />
-            <Route path="/dashboard/media" exact={true} render={props => {
-              return <MediaNavigator
-                animated={this.props.app.debugMode ? false : true}
-                key="nav-volumes"
-                volumeFilters={this.props.media.volumeFilters}
-                selectedIds={this.state.selectedUids}
-                onDelete={() => this.onDelete()}
-                onRename={( newName, id ) => this.props.editVolume( id, { name: newName } )}
-                onSort={( sort, dir ) => this.onSort( sort, dir, null )}
-                openVolume={volume => this.props.push( `/dashboard/media/volume/${ volume }` )}
-                onSelectionChanged={volumes => this.setState( { selectedUids: volumes } )}
-                loading={this.props.media.busy}
-                volumes={this.props.media.volumePage}
-                getVolumes={( options ) => this.props.getVolumes( options )}
-              />;
-            }} />
+            />
+            <Route
+              path="/dashboard/media"
+              exact={true}
+              render={props => {
+                return (
+                  <MediaNavigator
+                    animated={this.props.app.debugMode ? false : true}
+                    key="nav-volumes"
+                    volumeFilters={this.props.media.volumeFilters}
+                    selectedIds={this.state.selectedUids}
+                    onDelete={() => this.onDelete()}
+                    onRename={(newName, id) => this.props.editVolume(id, { name: newName })}
+                    onSort={(sort, dir) => this.onSort(sort, dir, null)}
+                    openVolume={volume => this.props.push(`/dashboard/media/volume/${volume}`)}
+                    onSelectionChanged={volumes => this.setState({ selectedUids: volumes })}
+                    loading={this.props.media.busy}
+                    volumes={this.props.media.volumePage}
+                    getVolumes={options => this.props.getVolumes(options)}
+                  />
+                );
+              }}
+            />
           </Switch>
         </Container>
       </div>

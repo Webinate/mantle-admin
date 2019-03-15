@@ -12,14 +12,13 @@ export const initialState: State = {
 };
 
 // Reducer
-export default function reducer( state: State = initialState, action: Action ): State {
+export default function reducer(state: State = initialState, action: Action): State {
   let partialState: Partial<State> | undefined;
 
-  switch ( action.type ) {
-
+  switch (action.type) {
     case ActionCreators.serverResponse.type:
       partialState = {
-        response: action.payload ? decodeURIComponent( action.payload ) : null
+        response: action.payload ? decodeURIComponent(action.payload) : null
       };
       break;
 
@@ -29,8 +28,8 @@ export default function reducer( state: State = initialState, action: Action ): 
       };
       break;
 
-
-    default: return state;
+    default:
+      return state;
   }
 
   return { ...state, ...partialState } as State;

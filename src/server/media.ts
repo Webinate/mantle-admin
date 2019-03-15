@@ -6,8 +6,8 @@ import { matchPath } from 'react-router';
 import { RedirectError } from './errors';
 import { VolumesGetOptions, FilesGetOptions } from 'mantle';
 
-export default async function( req: IAuthReq, actions: Action[] ) {
-  const volumesView = matchPath<any>( req.url, { path: '/dashboard/media/volumes/:id' } );
+export default async function(req: IAuthReq, actions: Action[]) {
+  const volumesView = matchPath<any>(req.url, { path: '/dashboard/media/volumes/:id' });
   const initialVolumeFilter: Partial<VolumesGetOptions> = {
     index: 0,
     search: '',
@@ -15,11 +15,9 @@ export default async function( req: IAuthReq, actions: Action[] ) {
     sortOrder: 'desc'
   };
 
-
-  if ( volumesView ) {
-    let volume = await controllers.volumes.get( { id: volumesView.params.id } );
-    if ( !volume )
-      throw new RedirectError( '/dashboard/media' );
+  if (volumesView) {
+    let volume = await controllers.volumes.get({ id: volumesView.params.id });
+    if (!volume) throw new RedirectError('/dashboard/media');
 
     const initialFileFilter: Partial<FilesGetOptions> = {
       volumeId: volume._id.toString(),
@@ -29,12 +27,11 @@ export default async function( req: IAuthReq, actions: Action[] ) {
       sortOrder: 'desc'
     };
 
-    let files = await controllers.files.getFiles( initialFileFilter );
-    actions.push( MediaActions.SelectedVolume.create( volume ) );
-    actions.push( MediaActions.SetFiles.create( { page: files, filters: initialFileFilter } ) );
-  }
-  else {
-    let volumes = await controllers.volumes.getMany( initialVolumeFilter );
-    actions.push( MediaActions.SetVolumes.create( { page: volumes, filters: initialVolumeFilter } ) );
+    let files = await controllers.files.getFiles(initialFileFilter);
+    actions.push(MediaActions.SelectedVolume.create(volume));
+    actions.push(MediaActions.SetFiles.create({ page: files, filters: initialFileFilter }));
+  } else {
+    let volumes = await controllers.volumes.getMany(initialVolumeFilter);
+    actions.push(MediaActions.SetVolumes.create({ page: volumes, filters: initialVolumeFilter }));
   }
 }

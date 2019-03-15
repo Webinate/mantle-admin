@@ -6,17 +6,15 @@ type Props = {
   stylesMaterial: any;
   intialData: any;
   agent: string;
-}
-type State = {
 };
+type State = {};
 
 /**
  * An html component that represents the entire html page to be rendered
  */
 export default class HTML extends React.Component<Props, State> {
-
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
   }
 
   render() {
@@ -40,7 +38,9 @@ export default class HTML extends React.Component<Props, State> {
           <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui" />
           <meta httpEquiv="cleartype" content="on" />
 
-          {scripts.map( ( s, i ) => <script key={`script-${ i }`} type="text/javascript" src={s} /> )}
+          {scripts.map((s, i) => (
+            <script key={`script-${i}`} type="text/javascript" src={s} />
+          ))}
 
           <link rel="stylesheet" href="/css/main.css" />
           <link rel="icon" type="image/png" href="/images/favicon.png" />
@@ -49,15 +49,17 @@ export default class HTML extends React.Component<Props, State> {
           {this.props.styles}
         </head>
         <body>
-          <div id="application"
-            dangerouslySetInnerHTML={{ __html: this.props.html }}
+          <div id="application" dangerouslySetInnerHTML={{ __html: this.props.html }} />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.PROPS=${JSON.stringify(this.props.intialData).replace(/</g, '\\u003c')}`
+            }}
           />
-          <script dangerouslySetInnerHTML={{
-            __html: `window.PROPS=${ JSON.stringify( this.props.intialData ).replace( /</g, '\\u003c' ) }`
-          }} />
-          <script dangerouslySetInnerHTML={{
-            __html: `window.AGENT=${ JSON.stringify( this.props.agent ) }`
-          }} />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.AGENT=${JSON.stringify(this.props.agent)}`
+            }}
+          />
           <script src="/bundle.js" />
         </body>
       </html>
@@ -65,4 +67,4 @@ export default class HTML extends React.Component<Props, State> {
 
     return content;
   }
-};
+}

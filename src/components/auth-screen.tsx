@@ -9,15 +9,15 @@ type Props = {
   loading: boolean;
   activeComponent: 'login' | 'register';
   error: string | null | undefined;
-  onLogin: ( user: string, password: string ) => void;
-  onPasswordReset: ( user: string ) => void;
-  onActivationReset: ( user: string ) => void;
-  onRegister: ( user: string, email: string, password: string ) => void;
-}
+  onLogin: (user: string, password: string) => void;
+  onPasswordReset: (user: string) => void;
+  onActivationReset: (user: string) => void;
+  onRegister: (user: string, email: string, password: string) => void;
+};
 
 export default class AuthScreen extends React.Component<Props, any> {
-  constructor( props: Props ) {
-    super( props );
+  constructor(props: Props) {
+    super(props);
   }
 
   render() {
@@ -25,28 +25,31 @@ export default class AuthScreen extends React.Component<Props, any> {
       <MantleDiv className="auth-screen">
         <OuterDiv>
           <InnerDiv>
-            {this.props.loading ? <span className="mt-loading"><LinearProgress /></span> : undefined}
+            {this.props.loading ? (
+              <span className="mt-loading">
+                <LinearProgress />
+              </span>
+            ) : (
+              undefined
+            )}
             <ContentDiv>
               <Logo src="./images/mantle-logo.svg" />
-              {
-                this.props.activeComponent === 'login' ?
-                  <LoginForm
-                    loading={this.props.loading}
-                    onLogin={this.props.onLogin}
-                    onPasswordReset={this.props.onPasswordReset}
-                    onActivationReset={this.props.onActivationReset}
-                  /> :
-                  <RegisterForm
-                    onRegister={this.props.onRegister}
-                    loading={this.props.loading}
-                  />
-              }
+              {this.props.activeComponent === 'login' ? (
+                <LoginForm
+                  loading={this.props.loading}
+                  onLogin={this.props.onLogin}
+                  onPasswordReset={this.props.onPasswordReset}
+                  onActivationReset={this.props.onActivationReset}
+                />
+              ) : (
+                <RegisterForm onRegister={this.props.onRegister} loading={this.props.loading} />
+              )}
               {this.props.error ? <Error className="mt-auth-err">{this.props.error}</Error> : undefined}
             </ContentDiv>
           </InnerDiv>
         </OuterDiv>
       </MantleDiv>
-    )
+    );
   }
 }
 
