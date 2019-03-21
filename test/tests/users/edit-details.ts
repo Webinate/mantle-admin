@@ -81,12 +81,12 @@ describe( 'Testing the editing of user details: ', function() {
     await users.load( admin );
     await users.selectUser( joe.email );
 
-    assert.deepEqual( await users.getUserType(), '3' );
+    assert.deepEqual( await users.getUserType(), 'regular' );
     await users.selectUserType( 'admin' );
     await users.clickSaveDetails();
 
     await users.load( admin );
     await users.selectUser( joe.email );
-    assert.deepEqual( await users.getUserType(), '2' );
+    assert.deepEqual( await users.getUserType(), 'admin' );
   } );
 } );

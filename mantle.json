@@ -1,6 +1,6 @@
 {
   "name": "mantle-admin",
-  "enabled": false,
+  "enabled": true,
   "server": {
     "port": 8000,
     "host": "localhost",

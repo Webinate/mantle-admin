@@ -141,7 +141,6 @@ describe( 'Testing the interactions with categories in posts:', function() {
     await postPage.categories.confirmDeletion();
     await postPage.doneLoading();
     await postPage.appModule.closeSnackMessage();
-    await postPage.categories.deleteMode( false );
     categories = await postPage.categories.getCategories();
 
     // Check it does not have root's children
