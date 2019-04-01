@@ -2,11 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es7"
-    ],
+    "lib": ["dom", "dom.iterable", "es7"],
     "sourceMap": true,
     "noImplicitAny": true,
     "outDir": "./dist",
@@ -15,13 +11,9 @@
     "strictNullChecks": true,
     "jsx": "react",
     "experimentalDecorators": true,
-    "noStrictGenericChecks": true
+    "noStrictGenericChecks": true,
+    "skipLibCheck": true
   },
-  "include": [
-    "../../src/types/**/*",
-    "src/**/*"
-  ],
-  "exclude": [
-    "src/server/**/*"
-  ]
+  "include": ["../../src/types/**/*", "src/**/*"],
+  "exclude": ["src/server/**/*"]
 }
