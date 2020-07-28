@@ -2,21 +2,8 @@ import * as React from 'react';
 import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
-import {
-  createVolume,
-  getVolumes,
-  getVolume,
-  deleteVolumes,
-  upload,
-  replaceFile,
-  openDirectory,
-  deleteFiles,
-  editFile,
-  editVolume
-} from '../store/media/actions';
+import mediaActions from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
-import { SortTypes } from '../components/media/directory-view';
-import { SortOrder } from '../components/media/volumes';
 import Dialog from '@material-ui/core/Dialog/Dialog';
 import DialogContent from '@material-ui/core/DialogContent/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions/DialogActions';
@@ -24,6 +11,7 @@ import Button from '@material-ui/core/Button/Button';
 import { BreadCrumb } from '../components/media/bread-crumb';
 import { IFileEntry } from '../../../../src';
 import { LinearProgress } from '@material-ui/core';
+import { VolumeSortType, SortOrder } from '../../../../src/core/enums';
 
 // Map state to props
 const mapStateToProps = (state: IRootState, ownProps: any) => ({
@@ -32,22 +20,22 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   media: state.media,
   open: ownProps.open,
   onCancel: ownProps.onCancel as () => void,
-  onSelect: ownProps.onSelect as (file: IFileEntry<'client' | 'expanded'>) => void
+  onSelect: ownProps.onSelect as (file: IFileEntry<'client' | 'expanded'>) => void,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   push: push,
-  createVolume,
-  getVolumes,
-  getVolume,
-  openDirectory,
-  deleteVolumes,
-  upload,
-  replaceFile,
-  deleteFiles,
-  editFile,
-  editVolume
+  createVolume: mediaActions.createVolume,
+  getVolumes: mediaActions.getVolumes,
+  getVolume: mediaActions.getVolume,
+  openDirectory: mediaActions.openDirectory,
+  deleteVolumes: mediaActions.deleteVolumes,
+  upload: mediaActions.upload,
+  replaceFile: mediaActions.replaceFile,
+  deleteFiles: mediaActions.deleteFiles,
+  editFile: mediaActions.editFile,
+  editVolume: mediaActions.editVolume,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -61,13 +49,13 @@ export class MediaModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      selectedUid: null
+      selectedUid: null,
     };
   }
 
   componentWillMount() {
     this.props.getVolumes!({
-      index: 0
+      index: 0,
     });
   }
 
@@ -85,9 +73,9 @@ export class MediaModal extends React.Component<Props, State> {
     }
   }
 
-  private onSort(sort: SortTypes, direction: SortOrder, volumeId: string | null) {
-    if (volumeId) this.props.openDirectory(volumeId, { sort: sort, sortOrder: direction });
-    else this.props.getVolumes({ sort: sort, sortOrder: direction });
+  private onSort(sort: VolumeSortType, direction: SortOrder, volumeId: string | null) {
+    if (volumeId) this.props.openDirectory(volumeId, { sortType: sort, sortOrder: direction });
+    else this.props.getVolumes({ sortType: sort, sortOrder: direction });
   }
 
   render() {
@@ -96,7 +84,7 @@ export class MediaModal extends React.Component<Props, State> {
     let navigator: JSX.Element | null = null;
     const style: React.CSSProperties = {
       width: '100%',
-      height: '600px'
+      height: '600px',
     };
 
     if (activeDir) {
@@ -106,15 +94,19 @@ export class MediaModal extends React.Component<Props, State> {
           renderOptionalButtons={() => {
             return (
               <DialogActions>
-                <Button id="mt-media-cancel-btn" onClick={e => this.props.onCancel()} disabled={this.props.media.busy}>
+                <Button
+                  id="mt-media-cancel-btn"
+                  onClick={(e) => this.props.onCancel()}
+                  disabled={this.props.media.busy}
+                >
                   Cancel
                 </Button>
                 <Button
                   variant="contained"
                   disabled={!activeDir || !this.state.selectedUid || this.props.media.busy}
                   id="mt-media-confirm-btn"
-                  onClick={e => {
-                    const file = this.props.media.filesPage!.data.find(f => f._id === this.state.selectedUid)!;
+                  onClick={(e) => {
+                    const file = this.props.media.filesPage!.data.find((f) => f._id === this.state.selectedUid)!;
                     this.props.onSelect(file);
                   }}
                   color="primary"
@@ -132,16 +124,16 @@ export class MediaModal extends React.Component<Props, State> {
           onRename={(newName, id) => this.props.editFile(activeDir._id, id, { name: newName })}
           onDelete={() => this.onDelete(activeDir._id)}
           onSort={(sort, dir) => this.onSort(sort, dir, activeDir._id)}
-          onUploadFiles={files => {
+          onUploadFiles={(files) => {
             this.props.upload(activeDir._id, files);
           }}
-          onReplaceFile={file => {
+          onReplaceFile={(file) => {
             this.props.replaceFile(activeDir._id, selectedUids[0], file);
           }}
           activeVolume={this.props.media.selected}
           activeVolumeId={activeDir._id}
           loading={this.props.media.busy}
-          onSelectionChanged={selection => this.setState({ selectedUid: selection[selection.length - 1] })}
+          onSelectionChanged={(selection) => this.setState({ selectedUid: selection[selection.length - 1] })}
           openDirectory={(id, options) => this.props.openDirectory(id, options)}
         />
       );
@@ -156,11 +148,11 @@ export class MediaModal extends React.Component<Props, State> {
           onDelete={() => this.onDelete()}
           onRename={(newName, id) => this.props.editVolume(id, { name: newName })}
           onSort={(sort, dir) => this.onSort(sort, dir, null)}
-          openVolume={volume => this.setState({ selectedUid: null }, () => this.props.openDirectory(volume))}
-          onSelectionChanged={volumes => this.setState({ selectedUid: volumes[volumes.length - 1] })}
+          openVolume={(volume) => this.setState({ selectedUid: null }, () => this.props.openDirectory(volume))}
+          onSelectionChanged={(volumes) => this.setState({ selectedUid: volumes[volumes.length - 1] })}
           loading={this.props.media.busy}
           volumes={this.props.media.volumePage}
-          getVolumes={options => this.props.getVolumes(options)}
+          getVolumes={(options) => this.props.getVolumes(options)}
         />
       );
     }
@@ -177,9 +169,7 @@ export class MediaModal extends React.Component<Props, State> {
         <DialogContent style={{ paddingBottom: '6px' }}>
           {activeDir ? (
             <BreadCrumb volume={activeDir} onVolumeSelected={() => this.props.getVolumes({ index: 0, search: '' })} />
-          ) : (
-            undefined
-          )}
+          ) : undefined}
           {navigator}
         </DialogContent>
       </Dialog>

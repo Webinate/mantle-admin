@@ -37,22 +37,22 @@ export type State = {
 };
 
 export class CommentsList extends React.Component<Props, State> {
-  private _container: HTMLElement | null;
+  private _container: React.RefObject<HTMLDivElement> | null;
 
   static defaultProps: Partial<Props> = {
     heightFromContents: true,
     selectedUids: [],
-    selectable: true
+    selectable: true,
   };
 
   constructor(props: Props) {
     super(props);
-    this._container = null;
+    this._container = React.createRef();
     this.state = {
       activeCommentId: '',
       activeCommentText: '',
       commentToDelete: null,
-      commentToReplyId: ''
+      commentToReplyId: '',
     };
   }
 
@@ -61,7 +61,7 @@ export class CommentsList extends React.Component<Props, State> {
       index: 0,
       depth: -1,
       expanded: true,
-      postId: ''
+      postId: '',
     });
   }
 
@@ -69,30 +69,30 @@ export class CommentsList extends React.Component<Props, State> {
     this.setState({
       activeCommentId: comment._id,
       activeCommentText: comment.content,
-      commentToReplyId: ''
+      commentToReplyId: '',
     });
   }
 
   private renderConfirmDelete() {
     return (
-      <Dialog open={true} onClose={e => this.setState({ commentToDelete: null })}>
+      <Dialog open={true} onClose={(e) => this.setState({ commentToDelete: null })}>
         <DialogContent>
           <DialogContentText id="mt-comment-delete-msg">
             Are you sure you want to delete this comment?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button id="mt-del-comment-cancel-btn" onClick={e => this.setState({ commentToDelete: null })}>
+          <Button id="mt-del-comment-cancel-btn" onClick={(e) => this.setState({ commentToDelete: null })}>
             Cancel
           </Button>
           <Button
             variant="contained"
             id="mt-del-comment-confirm-btn"
             style={{ background: theme.error.background, color: theme.error.color }}
-            onClick={e => {
+            onClick={(e) => {
               this.props.onDelete(this.state.commentToDelete!._id);
               this.setState({
-                commentToDelete: null
+                commentToDelete: null,
               });
             }}
             color="primary"
@@ -129,20 +129,18 @@ export class CommentsList extends React.Component<Props, State> {
         index={comments.index}
         heightFromContents={this.props.heightFromContents}
         footerBackground={false}
-        onPage={index => {
-          if (this._container) this._container.scrollTop = 0;
+        onPage={(index) => {
+          if (this._container && this._container.current) this._container.current.scrollTop = 0;
 
           this.props.getAll({ index: index });
         }}
       >
-        <PostsInnerContent id="mt-comments" style={this.props.style} innerRef={elm => (this._container = elm)}>
+        <PostsInnerContent id="mt-comments" style={this.props.style} ref={this._container}>
           {this.props.loading ? (
             <div className="mt-loading" style={{ textAlign: 'center', padding: '0 0 20px 0' }}>
               <CircularProgress className="mt-loading" size={30} />
             </div>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
 
           {flattened.map((comment, index) => {
             const isEditting = this.state.activeCommentId === comment._id;
@@ -176,13 +174,13 @@ export class CommentsList extends React.Component<Props, State> {
                     <textarea
                       id="mt-comment-edit-txt"
                       autoFocus={true}
-                      ref={elm => {
+                      ref={(elm) => {
                         if (!elm) return;
 
                         elm.style.height = '1px';
                         elm.style.height = 20 + elm.scrollHeight + 'px';
                       }}
-                      onChange={e => {
+                      onChange={(e) => {
                         e.currentTarget.style.height = '1px';
                         e.currentTarget.style.height = 20 + e.currentTarget.scrollHeight + 'px';
                         this.setState({ activeCommentText: e.currentTarget.value });
@@ -194,7 +192,7 @@ export class CommentsList extends React.Component<Props, State> {
                     <div className="mt-edit-conf-panel">
                       <span
                         id="mt-edit-comment-cancel"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           this.setState({ activeCommentId: '' });
                         }}
@@ -203,7 +201,7 @@ export class CommentsList extends React.Component<Props, State> {
                       </span>
                       <span
                         id="mt-edit-comment-save"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
 
                           if (this.state.activeCommentText.trim() === '') return;
@@ -220,36 +218,32 @@ export class CommentsList extends React.Component<Props, State> {
                       {canEditComment ? (
                         <span
                           className="mt-edit-comment-btn"
-                          onClick={e => {
+                          onClick={(e) => {
                             e.stopPropagation();
                             this.onEdit(comment);
                           }}
                         >
                           Edit
                         </span>
-                      ) : (
-                        undefined
-                      )}
+                      ) : undefined}
                       {canEditComment ? (
                         <span
                           className="mt-del-comment-btn"
-                          onClick={e => {
+                          onClick={(e) => {
                             e.stopPropagation();
                             this.setState({ commentToDelete: comment });
                           }}
                         >
                           Delete
                         </span>
-                      ) : (
-                        undefined
-                      )}
+                      ) : undefined}
                       <span
                         className="mt-reply-comment-btn"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           this.setState({
                             commentToReplyId: comment._id,
-                            activeCommentId: ''
+                            activeCommentId: '',
                           });
                         }}
                       >
@@ -265,23 +259,22 @@ export class CommentsList extends React.Component<Props, State> {
                       auth={this.props.auth}
                       enabled={true}
                       commentMode={true}
-                      onNewComment={text => {
+                      onNewComment={(text) => {
                         const postId = typeof comment.post === 'string' ? comment.post : comment.post._id;
                         this.props.onReply(postId, comment._id, {
-                          content: text
+                          content: text,
                         });
                         this.setState({ commentToReplyId: '' });
                       }}
                       onCancel={() => this.setState({ commentToReplyId: '' })}
                     />
-                  ) : (
-                    undefined
-                  )}
+                  ) : undefined}
                 </div>
               </Comment>
             );
           })}
         </PostsInnerContent>
+
         {this.state.commentToDelete ? this.renderConfirmDelete() : undefined}
       </Pager>
     );

@@ -24,13 +24,7 @@ import theme from '../theme/mui-theme';
 import { ICategory } from '../../../../src';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { IRootState } from '../store';
-import {
-  createCategory,
-  editCategory,
-  removeCategory,
-  getCategories,
-  ActionCreators
-} from '../store/categories/actions';
+import categoryActions, { ActionCreators } from '../store/categories/actions';
 
 export type ExternalProps = {
   selected: string[];
@@ -42,16 +36,16 @@ const mapStateToProps = (state: IRootState, ownProps: ExternalProps) => ({
   categories: state.categories,
   selected: ownProps.selected,
   onCategorySelected: ownProps.onCategorySelected,
-  app: state.app
+  app: state.app,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  createCategory,
-  editCategory,
-  removeCategory,
-  getCategories,
-  setError: ActionCreators.SetCategoryErr.create
+  createCategory: categoryActions.createCategory,
+  editCategory: categoryActions.editCategory,
+  removeCategory: categoryActions.removeCategory,
+  getCategories: categoryActions.getCategories,
+  setError: ActionCreators.SetCategoryErr.create,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -77,7 +71,7 @@ export class CategoryEditor extends React.Component<Props, State> {
       newCategory: {},
       autoSlug: '',
       pristineForm: true,
-      selectedCategory: null
+      selectedCategory: null,
     };
   }
 
@@ -105,10 +99,10 @@ export class CategoryEditor extends React.Component<Props, State> {
           label="Category name"
           value={this.state.newCategory.title}
           fullWidth={true}
-          onChange={e => {
+          onChange={(e) => {
             this.setState({
               newCategory: { ...this.state.newCategory, title: e.currentTarget.value },
-              autoSlug: this.getCleanSlugText(e.currentTarget.value)
+              autoSlug: this.getCleanSlugText(e.currentTarget.value),
             });
           }}
         />
@@ -117,7 +111,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           label="Category short code"
           value={this.state.newCategory.slug || this.state.autoSlug}
           fullWidth={true}
-          onChange={e => {
+          onChange={(e) => {
             const slug = this.getCleanSlugText(e.currentTarget.value);
             this.setState({ newCategory: { ...this.state.newCategory, slug: slug } });
           }}
@@ -127,7 +121,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           label="Optional category description"
           value={this.state.newCategory.description}
           fullWidth={true}
-          onChange={e => {
+          onChange={(e) => {
             this.setState({ newCategory: { ...this.state.newCategory, description: e.currentTarget.value } });
           }}
         />
@@ -137,7 +131,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           <Select
             MenuProps={{ transitionDuration: this.props.app.debugMode ? 0 : 'auto' }}
             value={this.state.newCategory.parent || ''}
-            onChange={e => this.setState({ newCategory: { ...this.state.newCategory, parent: e.target.value } })}
+            onChange={(e) => this.setState({ newCategory: { ...this.state.newCategory, parent: e.target.value } })}
             input={<Input id="mt-new-cat-parent-input" />}
           >
             <MenuItem className="mt-cat-parent-item" value={''}>
@@ -161,9 +155,9 @@ export class CategoryEditor extends React.Component<Props, State> {
             style={{
               verticalAlign: 'middle',
               margin: '0 4px 0 0',
-              flex: '1'
+              flex: '1',
             }}
-            onClick={e => {
+            onClick={(e) => {
               this.setState({ addCategoryMode: false });
               this.props.setError(null);
             }}
@@ -177,18 +171,18 @@ export class CategoryEditor extends React.Component<Props, State> {
             color="primary"
             style={{
               verticalAlign: 'middle',
-              flex: '1'
+              flex: '1',
             }}
-            onClick={e => {
+            onClick={(e) => {
               if (this.state.newCategory._id) {
                 this.props.editCategory(
                   {
                     ...this.state.newCategory,
-                    slug: this.state.newCategory.slug || this.state.autoSlug
+                    slug: this.state.newCategory.slug || this.state.autoSlug,
                   },
                   () => {
                     this.setState({
-                      addCategoryMode: false
+                      addCategoryMode: false,
                     });
                   }
                 );
@@ -196,11 +190,11 @@ export class CategoryEditor extends React.Component<Props, State> {
                 this.props.createCategory(
                   {
                     ...this.state.newCategory,
-                    slug: this.state.newCategory.slug || this.state.autoSlug
+                    slug: this.state.newCategory.slug || this.state.autoSlug,
                   },
                   () => {
                     this.setState({
-                      addCategoryMode: false
+                      addCategoryMode: false,
                     });
                   }
                 );
@@ -225,17 +219,17 @@ export class CategoryEditor extends React.Component<Props, State> {
   }
 
   private renderCategory(cat: ICategory<'expanded'>, catIndex: number): JSX.Element {
-    const selected = this.props.selected.find(i => i === cat._id) ? true : false;
+    const selected = this.props.selected.find((i) => i === cat._id) ? true : false;
 
     const checkboxStyle: React.CSSProperties = {
       height: '36px',
-      width: '36px'
+      width: '36px',
     };
 
     const checkboxIconStyle: React.CSSProperties = {
       fill: theme.primary200.background,
       height: '26px',
-      width: '26px'
+      width: '26px',
     };
 
     return (
@@ -249,14 +243,14 @@ export class CategoryEditor extends React.Component<Props, State> {
               checked={selected}
               color="primary"
               id={`mt-cat-${cat._id}`}
-              onClick={e => {
+              onClick={(e) => {
                 if (this.state.deleteMode) this.setState({ selectedCategory: cat });
                 else if (this.state.editMode)
                   this.setState({
                     selectedCategory: cat,
                     editMode: false,
                     addCategoryMode: true,
-                    newCategory: { ...cat }
+                    newCategory: { ...cat },
                   });
                 else this.props.onCategorySelected(cat);
               }}
@@ -307,7 +301,7 @@ export class CategoryEditor extends React.Component<Props, State> {
               variant="contained"
               color="primary"
               className="mt-cancel-category-delete"
-              onClick={e => {
+              onClick={(e) => {
                 this.setState({ deleteMode: false, editMode: false });
               }}
               style={{ display: 'block' }}
@@ -318,35 +312,33 @@ export class CategoryEditor extends React.Component<Props, State> {
         ) : (
           <CategoryButtons>
             {!this.state.addCategoryMode && !this.state.deleteMode && categories.length > 0 && !this.state.editMode ? (
-              <Button className="mt-edit-cat-btn" onClick={e => this.setState({ editMode: true })}>
+              <Button className="mt-edit-cat-btn" onClick={(e) => this.setState({ editMode: true })}>
                 <EditIcon
                   style={{
                     color: theme.primary200.background,
                     margin: '0 5px 0 0',
-                    fontSize: '20px'
+                    fontSize: '20px',
                   }}
                 />
                 Edit Categories
               </Button>
-            ) : (
-              undefined
-            )}
+            ) : undefined}
 
             <Button
               className="mt-new-category-btn"
-              onClick={e =>
+              onClick={(e) =>
                 this.setState({
                   addCategoryMode: true,
                   pristineForm: true,
                   newCategory: {},
-                  autoSlug: ''
+                  autoSlug: '',
                 })
               }
             >
               <AddIcon
                 style={{
                   color: theme.primary200.background,
-                  margin: '0 5px 0 0'
+                  margin: '0 5px 0 0',
                 }}
               />
               Add Category
@@ -355,23 +347,21 @@ export class CategoryEditor extends React.Component<Props, State> {
             {categories.length > 0 ? (
               <Button
                 className="mt-remove-category-btn"
-                onClick={e =>
+                onClick={(e) =>
                   this.setState({
-                    deleteMode: true
+                    deleteMode: true,
                   })
                 }
               >
                 <RemoveIcon
                   style={{
                     color: theme.primary200.background,
-                    margin: '0 5px 0 0'
+                    margin: '0 5px 0 0',
                   }}
                 />
                 Remove Category
               </Button>
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </CategoryButtons>
         )}
       </div>
@@ -399,10 +389,10 @@ export class CategoryEditor extends React.Component<Props, State> {
               <Button
                 style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
                 className="mt-cancel-delcat"
-                onClick={e =>
+                onClick={(e) =>
                   this.setState({
                     selectedCategory: null,
-                    deleteMode: false
+                    deleteMode: false,
                   })
                 }
               >
@@ -414,15 +404,13 @@ export class CategoryEditor extends React.Component<Props, State> {
                 color="primary"
                 style={{ verticalAlign: 'middle' }}
                 className="mt-confirm-delcat"
-                onClick={e => this.onConfirmDelete()}
+                onClick={(e) => this.onConfirmDelete()}
               >
                 Yes
               </Button>
             </DialogActions>
           </Dialog>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </Container>
     );
   }

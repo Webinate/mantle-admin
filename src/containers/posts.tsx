@@ -12,10 +12,10 @@ import {
   changeTemplate,
   updateElement,
   deleteElements,
-  ActionCreators as PostCreators
+  ActionCreators as PostCreators,
 } from '../store/posts/actions';
-import { getCategories, createCategory, removeCategory } from '../store/categories/actions';
-import { getComments, createComment, editComment, deleteComment } from '../store/comments/actions';
+import categoryActions from '../store/categories/actions';
+import commentActions from '../store/comments/actions';
 import { getAllTemplates } from '../store/templates/actions';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -45,31 +45,31 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   routing: state.router,
   templates: state.templates,
   categoriesLoading: state.categories.busy,
-  location: ownProps.location as Location
+  location: ownProps.location as Location,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getPosts,
-  getCategories,
+  getCategories: categoryActions.getCategories,
   getPost,
   createPost,
   removePost: deletePosts,
-  createCategory,
-  removeCategory,
+  createCategory: categoryActions.createCategory,
+  removeCategory: categoryActions.removeCategory,
   editPost,
   push,
-  getComments,
-  createComment,
+  getComments: commentActions.getComments,
+  createComment: commentActions.createComment,
   addElement,
   updateElement,
-  editComment,
-  deleteComment,
+  editComment: commentActions.editComment,
+  deleteComment: commentActions.deleteComment,
   getAllTemplates,
   changeTemplate,
   deleteElements,
   setElmSelection: PostCreators.SetElmSelection.create,
-  setFocussedElm: PostCreators.SetFocussedElm.create
+  setFocussedElm: PostCreators.SetFocussedElm.create,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -95,7 +95,7 @@ export class Posts extends React.Component<Props, State> {
       selectedPosts: [],
       showDeleteModal: false,
       filtersOpen: false,
-      previewMode: false
+      previewMode: false,
     };
   }
 
@@ -109,12 +109,12 @@ export class Posts extends React.Component<Props, State> {
         sortOrder: this.props.posts.postFilters.sortOrder,
         visibility: this.props.posts.postFilters.visibility,
         author: '',
-        sort: this.props.posts.postFilters.sort
+        sort: this.props.posts.postFilters.sort,
       });
     } else {
       const matches = matchPath<{ postId: string }>(this.props.location.pathname, {
         exact: true,
-        path: '/dashboard/posts/edit/:postId'
+        path: '/dashboard/posts/edit/:postId',
       });
       this.props.getPost(matches!.params.postId);
       this.props.getCategories();
@@ -133,12 +133,12 @@ export class Posts extends React.Component<Props, State> {
           sortOrder: this.props.posts.postFilters.sortOrder,
           visibility: this.props.posts.postFilters.visibility,
           author: '',
-          sort: this.props.posts.postFilters.sort
+          sort: this.props.posts.postFilters.sort,
         });
       } else {
         const matches = matchPath<{ postId: string }>(next.location.pathname, {
           exact: true,
-          path: '/dashboard/posts/edit/:postId'
+          path: '/dashboard/posts/edit/:postId',
         });
         this.props.getPost(matches!.params.postId);
         this.props.getCategories();
@@ -149,14 +149,14 @@ export class Posts extends React.Component<Props, State> {
   private onDelete(post: IPost<'client' | 'expanded'>) {
     this._selectedPost = post;
     this.setState({
-      showDeleteModal: true
+      showDeleteModal: true,
     });
   }
 
   private onDeleteMultiple() {
     this._selectedPost = null;
     this.setState({
-      showDeleteModal: true
+      showDeleteModal: true,
     });
   }
 
@@ -173,7 +173,7 @@ export class Posts extends React.Component<Props, State> {
         <NewComment
           auth={user}
           enabled={!this.props.comments.busy}
-          onNewComment={comment => this.props.createComment(postId, { content: comment })}
+          onNewComment={(comment) => this.props.createComment(postId, { content: comment })}
         />
         <CommentsList
           page={commentsPage}
@@ -182,8 +182,8 @@ export class Posts extends React.Component<Props, State> {
           auth={this.props.user!}
           onEdit={(id, token) => this.props.editComment(id, token)}
           loading={this.props.comments.busy}
-          getAll={options => this.props.getComments({ ...options, postId: postId })}
-          onDelete={id => this.props.deleteComment(id)}
+          getAll={(options) => this.props.getComments({ ...options, postId: postId })}
+          onDelete={(id) => this.props.deleteComment(id)}
         />
       </div>
     );
@@ -206,12 +206,12 @@ export class Posts extends React.Component<Props, State> {
           renderFilters={() => (
             <PostFilterBar
               loading={isBusy}
-              onSearch={term => this.onSearch(term)}
+              onSearch={(term) => this.onSearch(term)}
               postsSelected={this.state.selectedPosts.length > 0 ? false : true}
               onNew={() => this.props.createPost({ title: 'New Post', slug: randomId() })}
               onDelete={() => this.onDeleteMultiple()}
               isAdminUser={isAdmin ? false : true}
-              onFilterToggle={val => this.setState({ filtersOpen: val })}
+              onFilterToggle={(val) => this.setState({ filtersOpen: val })}
               inPostsRoot={inPostsRoot ? true : false}
               filtersOpen={this.state.filtersOpen}
               onCancel={() => {
@@ -226,7 +226,7 @@ export class Posts extends React.Component<Props, State> {
             <Route
               path="/dashboard/posts/edit/:postId"
               exact={true}
-              render={props => {
+              render={(props) => {
                 if (!post) return null;
 
                 if (!this.state.previewMode && (isAdmin || (post && user._id === post._id))) {
@@ -239,10 +239,10 @@ export class Posts extends React.Component<Props, State> {
                       activeUser={user}
                       categoriesLoading={this.props.categoriesLoading}
                       templates={templates}
-                      onTemplateChanged={templateId => this.props.changeTemplate(doc._id, templateId)}
+                      onTemplateChanged={(templateId) => this.props.changeTemplate(doc._id, templateId)}
                       post={post}
                       elements={this.props.posts.elements!}
-                      onUpdate={post => this.props.editPost(post)}
+                      onUpdate={(post) => this.props.editPost(post)}
                       isAdmin={isAdmin}
                       onRequestPreview={() => this.setState({ previewMode: true })}
                       renderAfterForm={() => this.renderComment(props.match.params.postId)}
@@ -250,7 +250,7 @@ export class Posts extends React.Component<Props, State> {
                       onUpdateElm={(id, token, createElement, deselect) =>
                         this.props.updateElement(doc._id, id, token, createElement, deselect)
                       }
-                      onDeleteElements={ids => this.props.deleteElements(doc._id, ids)}
+                      onDeleteElements={(ids) => this.props.deleteElements(doc._id, ids)}
                       onSelectionChanged={(selection, focus) => {
                         this.props.setElmSelection(selection);
                         if (focus && selection.length > 0) this.props.setFocussedElm(selection[0]);
@@ -274,7 +274,7 @@ export class Posts extends React.Component<Props, State> {
             <Route
               path="/dashboard/posts"
               exact={true}
-              render={props => {
+              render={(props) => {
                 return (
                   <PostList
                     filtersOpen={this.state.filtersOpen}
@@ -283,12 +283,12 @@ export class Posts extends React.Component<Props, State> {
                     loading={isBusy}
                     animated={this.props.app.debugMode ? false : true}
                     selected={this.state.selectedPosts}
-                    onEdit={post => this.props.push(`/dashboard/posts/edit/${post._id}`)}
-                    onDelete={post => this.onDelete(post)}
-                    onPostSelected={selected => {
+                    onEdit={(post) => this.props.push(`/dashboard/posts/edit/${post._id}`)}
+                    onDelete={(post) => this.onDelete(post)}
+                    onPostSelected={(selected) => {
                       this.setState({ selectedPosts: selected });
                     }}
-                    getPosts={options => this.props.getPosts(options)}
+                    getPosts={(options) => this.props.getPosts(options)}
                   />
                 );
               }}
@@ -310,10 +310,10 @@ export class Posts extends React.Component<Props, State> {
               <Button
                 style={{ margin: '0 5px 0 0', verticalAlign: 'middle' }}
                 className="mt-cancel-delpost"
-                onClick={e => {
+                onClick={(e) => {
                   this._selectedPost = null;
                   this.setState({
-                    showDeleteModal: false
+                    showDeleteModal: false,
                   });
                 }}
               >
@@ -324,7 +324,7 @@ export class Posts extends React.Component<Props, State> {
                 color="primary"
                 style={{ verticalAlign: 'middle' }}
                 className="mt-confirm-delpost"
-                onClick={e => {
+                onClick={(e) => {
                   if (this._selectedPost) this.props.removePost([this._selectedPost]);
                   else this.props.removePost(this.state.selectedPosts);
 
@@ -336,9 +336,7 @@ export class Posts extends React.Component<Props, State> {
               </Button>
             </DialogActions>
           </Dialog>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </div>
     );
   }

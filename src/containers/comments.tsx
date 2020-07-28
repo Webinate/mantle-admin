@@ -3,7 +3,7 @@ import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { default as styled } from '../theme/styled';
 import ContentHeader from '../components/content-header';
-import { getComments, editComment, deleteComment, createComment } from '../store/comments/actions';
+import commentActions from '../store/comments/actions';
 import FilterBar from '../components/comments/filter-bar';
 import { IUserEntry, IPost } from 'mantle';
 import { isAdminUser } from '../utils/component-utils';
@@ -16,21 +16,22 @@ import IconButton from '@material-ui/core/IconButton';
 import theme from '../theme/mui-theme';
 import UserPicker from '../components/user-picker';
 import PostPreview from '../components/posts/post-preview';
+import { CommentSortType, SortOrder } from '../../../../src/core/enums';
 
 // Map state to props
 const mapStateToProps = (state: IRootState, ownProps: any) => ({
   user: state.authentication.user,
   commentState: state.comments,
   app: state.app,
-  location: ownProps.location as Location
+  location: ownProps.location as Location,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
-  getAll: getComments,
-  editComment,
-  deleteComment,
-  createComment
+  getAll: commentActions.getComments,
+  editComment: commentActions.editComment,
+  deleteComment: commentActions.deleteComment,
+  createComment: commentActions.createComment,
 };
 
 type SortType = 'created' | 'updated';
@@ -69,7 +70,7 @@ export class Comments extends React.Component<Props, State> {
       sortBy: filters.sortType ? filters.sortType : 'updated',
       user: null,
       selectedUid: null,
-      selectedPostUid: null
+      selectedPostUid: null,
     };
   }
 
@@ -77,7 +78,7 @@ export class Comments extends React.Component<Props, State> {
     this.props.getAll({ index: 0, keyword: term });
   }
 
-  private onSortByChange(sort: SortType) {
+  private onSortByChange(sort: CommentSortType) {
     this.setState({ sortBy: sort, sortByOpen: false }, () => {
       this.props.getAll({ sortType: sort });
     });
@@ -87,7 +88,7 @@ export class Comments extends React.Component<Props, State> {
     const val = !this.state.sortAscending;
     this.setState({ sortAscending: val, sortByOpen: false }, () => {
       this.props.getAll({
-        sortOrder: val ? 'asc' : 'desc'
+        sortOrder: val ? SortOrder.asc : SortOrder.desc,
       });
     });
   }
@@ -106,7 +107,7 @@ export class Comments extends React.Component<Props, State> {
     let selectedPost: IPost<'expanded'> | null = null;
 
     if (page && this.state.selectedUid) {
-      const comment = page.data.find(c => (c.post as IPost<'expanded'>)._id === this.state.selectedPostUid)!;
+      const comment = page.data.find((c) => (c.post as IPost<'expanded'>)._id === this.state.selectedPostUid)!;
       if (comment) selectedPost = comment.post as IPost<'expanded'>;
     }
 
@@ -117,10 +118,10 @@ export class Comments extends React.Component<Props, State> {
           busy={isBusy}
           renderFilters={() => (
             <FilterBar
-              onSearch={term => this.onSearch(term)}
+              onSearch={(term) => this.onSearch(term)}
               commentsSelected={false}
               isAdminUser={isAdmin ? false : true}
-              onFilterToggle={val => this.setState({ filtersOpen: val })}
+              onFilterToggle={(val) => this.setState({ filtersOpen: val })}
               filtersOpen={this.state.filtersOpen}
             />
           )}
@@ -134,8 +135,8 @@ export class Comments extends React.Component<Props, State> {
             <div>
               <h3>Sort Order:</h3>
               <div
-                ref={e => (this._sortElm = e)}
-                onClick={e => this.setState({ sortByOpen: true })}
+                ref={(e) => (this._sortElm = e)}
+                onClick={(e) => this.setState({ sortByOpen: true })}
                 className="mt-filter-sortby"
               >
                 {this.state.sortBy}
@@ -144,12 +145,18 @@ export class Comments extends React.Component<Props, State> {
                 anchorEl={this._sortElm || undefined}
                 open={this.state.sortByOpen}
                 transitionDuration={animated ? 'auto' : 0}
-                onClose={e => this.setState({ sortByOpen: false })}
+                onClose={(e) => this.setState({ sortByOpen: false })}
               >
-                <MenuItem className="mt-filter-sortby-created" onClick={e => this.onSortByChange('created')}>
+                <MenuItem
+                  className="mt-filter-sortby-created"
+                  onClick={(e) => this.onSortByChange(CommentSortType.created)}
+                >
                   Created
                 </MenuItem>
-                <MenuItem className="mt-filter-sortby-updated" onClick={e => this.onSortByChange('updated')}>
+                <MenuItem
+                  className="mt-filter-sortby-updated"
+                  onClick={(e) => this.onSortByChange(CommentSortType.updated)}
+                >
                   Updated
                 </MenuItem>
               </Menu>
@@ -159,11 +166,11 @@ export class Comments extends React.Component<Props, State> {
                   margin: '0 0 0 5px',
                   verticalAlign: 'middle',
                   height: '20px',
-                  width: '20px'
+                  width: '20px',
                 }}
                 className="mt-sort-order"
-                buttonRef={e => (this._sortElm = e)}
-                onClick={e => this.onAscChange()}
+                buttonRef={(e) => (this._sortElm = e)}
+                onClick={(e) => this.onAscChange()}
               >
                 {this.state.sortAscending ? (
                   <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
@@ -178,7 +185,7 @@ export class Comments extends React.Component<Props, State> {
                 user={this.state.user}
                 imageSize={26}
                 labelPosition="right"
-                onChange={user => this.onUserChange(user)}
+                onChange={(user) => this.onUserChange(user)}
               />
             </div>
           </Filter>
@@ -190,23 +197,23 @@ export class Comments extends React.Component<Props, State> {
                   style={{ padding: '20px' }}
                   heightFromContents={false}
                   selectedUids={this.state.selectedUid ? [this.state.selectedUid] : undefined}
-                  onCommentSelected={comment => {
+                  onCommentSelected={(comment) => {
                     if (comment) {
                       this.setState({
                         selectedUid: comment._id,
-                        selectedPostUid: typeof comment.post === 'string' ? comment.post : comment.post._id
+                        selectedPostUid: typeof comment.post === 'string' ? comment.post : comment.post._id,
                       });
                     } else {
                       this.setState({
                         selectedUid: null,
-                        selectedPostUid: null
+                        selectedPostUid: null,
                       });
                     }
                   }}
-                  getAll={options => this.props.getAll(options)}
+                  getAll={(options) => this.props.getAll(options)}
                   onEdit={(id, token) => this.props.editComment(id, token)}
                   onReply={(post, parent, comment) => this.props.createComment(post, comment, parent)}
-                  onDelete={id => this.props.deleteComment(id)}
+                  onDelete={(id) => this.props.deleteComment(id)}
                   loading={isBusy}
                   page={page}
                 />
@@ -215,9 +222,7 @@ export class Comments extends React.Component<Props, State> {
                 <div>
                   <PostPreview post={selectedPost} loading={false} />
                 </div>
-              ) : (
-                undefined
-              )}
+              ) : undefined}
             </div>
           </div>
         </Container>

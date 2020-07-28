@@ -8,25 +8,24 @@ import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';
 import { controllers } from '../../../../src';
+import { PostSortType, PostVisibility, SortOrder } from '../../../../src/core/enums';
 
-export default async function(req: IAuthReq, actions: Action[]) {
+export default async function (req: IAuthReq, actions: Action[]) {
   const isAdmin = req._user && req._user.privileges !== 'regular' ? true : false;
   const matchesEdit = matchPath<any>(req.url, { path: '/dashboard/posts/edit/:id' });
   const initialCategoryFilter: Partial<CategoriesGetManyOptions> = {
-    expanded: true,
-    depth: -1,
-    root: true
+    root: true,
   };
   const initialPostsFilter: Partial<PostsGetAllOptions> = {
-    visibility: isAdmin ? 'all' : 'public',
-    sort: 'modified',
-    sortOrder: 'desc'
+    visibility: isAdmin ? PostVisibility.all : PostVisibility.public,
+    sort: PostSortType.modified,
+    sortOrder: SortOrder.desc,
   };
   const initialCommentFilter: Partial<CommentGetAllOptions> = {
     expanded: true,
     depth: 5,
     index: 0,
-    postId: matchesEdit ? matchesEdit.params.id : undefined
+    postId: matchesEdit ? matchesEdit.params.id : undefined,
   };
 
   if (matchesEdit) {
@@ -34,7 +33,7 @@ export default async function(req: IAuthReq, actions: Action[]) {
       controllers.posts.getPost({ id: matchesEdit.params.id }),
       controllers.categories.getAll(initialCategoryFilter),
       controllers.comments.getAll(initialCommentFilter),
-      controllers.templates.getMany()
+      controllers.templates.getMany(),
     ]);
 
     const post = postReply[0];

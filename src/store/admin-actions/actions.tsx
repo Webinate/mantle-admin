@@ -1,8 +1,9 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '..';
-import { ClientError } from '../../utils/httpClients';
 import { ActionCreators as AppActionCreators } from '../app/actions';
 import * as auth from '../../../../../src/lib-frontend/auth';
+import { disptachable } from '../../decorators/dispatchable';
+import { dispatchError } from '../../decorators/dispatchError';
 
 // Action Creators
 export const ActionCreators = {
@@ -13,43 +14,33 @@ export const ActionCreators = {
 // Action Types
 export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 
-export function requestPasswordReset(username: string) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.busy.create(true));
+class Actions {
+  @disptachable()
+  @dispatchError(AppActionCreators.serverResponse)
+  async requestPasswordReset(username: string, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.busy.create(true));
+    const resp = await auth.requestPasswordReset(username);
+    dispatch!(AppActionCreators.serverResponse.create(resp.message));
+  }
 
-    try {
-      const resp = await auth.requestPasswordReset(username);
-      dispatch(AppActionCreators.serverResponse.create(resp.message));
-    } catch (e) {
-      dispatch(AppActionCreators.serverResponse.create((e as ClientError).response.statusText));
-    }
-  };
+  @disptachable()
+  @dispatchError(AppActionCreators.serverResponse)
+  async activate(username: string, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.busy.create(true));
+    await auth.approveActivation(username);
+    dispatch!(ActionCreators.userActivated.create(username));
+    dispatch!(AppActionCreators.serverResponse.create('User successfully activated'));
+  }
+
+  @disptachable()
+  @dispatchError(AppActionCreators.serverResponse)
+  async resendActivation(username: string, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.busy.create(true));
+    const resp = await auth.resendActivation(username);
+    dispatch!(ActionCreators.busy.create(false));
+    dispatch!(AppActionCreators.serverResponse.create(resp.message));
+  }
 }
 
-export function activate(username: string) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.busy.create(true));
-
-    try {
-      await auth.approveActivation(username);
-      dispatch(ActionCreators.userActivated.create(username));
-      dispatch(AppActionCreators.serverResponse.create('User successfully activated'));
-    } catch (e) {
-      dispatch(AppActionCreators.serverResponse.create((e as ClientError).response.statusText));
-    }
-  };
-}
-
-export function resendActivation(username: string) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.busy.create(true));
-
-    try {
-      const resp = await auth.resendActivation(username);
-      dispatch(ActionCreators.busy.create(false));
-      dispatch(AppActionCreators.serverResponse.create(resp.message));
-    } catch (e) {
-      dispatch(AppActionCreators.serverResponse.create((e as ClientError).response.statusText));
-    }
-  };
-}
+const actions: Actions = new Actions();
+export default actions;

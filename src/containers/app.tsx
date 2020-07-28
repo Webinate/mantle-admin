@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IRootState } from '../store';
-import { login, logout, register } from '../store/authentication/actions';
+import AuthActions from '../store/authentication/actions';
 import { ActionCreators as AppActions } from '../store/app/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { push } from 'react-router-redux';
@@ -39,9 +39,9 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   push: push,
-  login: login,
-  register: register,
-  logout: logout,
+  login: AuthActions.login,
+  register: AuthActions.register,
+  logout: AuthActions.logout,
   closeSnackbar: AppActions.serverResponse.create
 };
 

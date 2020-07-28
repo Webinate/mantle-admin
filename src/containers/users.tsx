@@ -3,7 +3,7 @@ import { IUserEntry } from '../../../../src';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { getUsers, removeUser, update, create } from '../store/users/actions';
-import { requestPasswordReset, activate, resendActivation } from '../store/admin-actions/actions';
+import AdminActions from '../store/admin-actions/actions';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import UsersList from '../components/users/users-list';
 import ContentHeader from '../components/content-header';
@@ -34,10 +34,10 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   getUsers: getUsers,
-  requestPasswordReset: requestPasswordReset,
-  activate: activate,
+  requestPasswordReset: AdminActions.requestPasswordReset,
+  activate: AdminActions.activate,
   removeUser: removeUser,
-  resendActivation: resendActivation,
+  resendActivation: AdminActions.resendActivation,
   update,
   create
 };

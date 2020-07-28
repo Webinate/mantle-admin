@@ -1,9 +1,10 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '..';
-import { ClientError } from '../../utils/httpClients';
 import { IUserEntry, ILoginToken, IRegisterToken } from '../../../../../src';
 import * as auth from '../../../../../src/lib-frontend/auth';
 import { push } from 'react-router-redux';
+import { disptachable } from '../../decorators/dispatchable';
+import { dispatchError } from '../../decorators/dispatchError';
 
 // Action Creators
 export const ActionCreators = {
@@ -16,41 +17,32 @@ export const ActionCreators = {
 // Action Types
 export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 
-export function login(authToken: ILoginToken) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.isAuthenticating.create(true));
+class Actions {
+  @disptachable()
+  @dispatchError(ActionCreators.authenticationError)
+  async login(authToken: ILoginToken, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.isAuthenticating.create(true));
+    const resp = await auth.login(authToken);
+    dispatch!(ActionCreators.setUser.create(resp.user ? resp.user : null));
+    dispatch!(push('/'));
+  }
 
-    try {
-      const resp = await auth.login(authToken);
-      dispatch(ActionCreators.setUser.create(resp.user ? resp.user : null));
-      dispatch(push('/'));
-    } catch (e) {
-      dispatch(ActionCreators.authenticationError.create((e as ClientError).response.statusText));
-    }
-  };
+  @disptachable()
+  @dispatchError(ActionCreators.authenticationError)
+  async register(authToken: IRegisterToken, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.isAuthenticating.create(true));
+    const resp = await auth.register(authToken);
+    dispatch!(ActionCreators.authenticationError.create(resp.message));
+  }
+
+  @disptachable()
+  @dispatchError(ActionCreators.authenticationError)
+  async logout(dispatch?: Function, getState?: () => IRootState) {
+    await auth.logout();
+    dispatch!(ActionCreators.loggedOut.create(true));
+    dispatch!(push('/login'));
+  }
 }
 
-export function register(authToken: IRegisterToken) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.isAuthenticating.create(true));
-
-    try {
-      const resp = await auth.register(authToken);
-      dispatch(ActionCreators.authenticationError.create(resp.message));
-    } catch (e) {
-      dispatch(ActionCreators.authenticationError.create((e as ClientError).response.statusText));
-    }
-  };
-}
-
-export function logout() {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    try {
-      await auth.logout();
-      dispatch(ActionCreators.loggedOut.create(true));
-      dispatch(push('/login'));
-    } catch (e) {
-      dispatch(ActionCreators.authenticationError.create((e as ClientError).response.statusText));
-    }
-  };
-}
+const actions: Actions = new Actions();
+export default actions;

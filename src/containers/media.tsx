@@ -5,24 +5,12 @@ import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import ContentHeader from '../components/content-header';
-import {
-  createVolume,
-  getVolumes,
-  getVolume,
-  deleteVolumes,
-  upload,
-  replaceFile,
-  openDirectory,
-  deleteFiles,
-  editFile,
-  editVolume
-} from '../store/media/actions';
+import mediaActions from '../store/media/actions';
 import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
-import { SortTypes } from '../components/media/directory-view';
-import { SortOrder } from '../components/media/volumes';
 import { isAdminUser } from '../utils/component-utils';
+import { SortOrder, VolumeSortType } from '../../../../src/core/enums';
 
 // Map state to props
 const mapStateToProps = (state: IRootState, ownProps: any) => ({
@@ -30,22 +18,22 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   app: state.app,
   media: state.media,
   routing: state.router,
-  location: ownProps.location as Location
+  location: ownProps.location as Location,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   push: push,
-  createVolume,
-  getVolumes,
-  getVolume,
-  openDirectory,
-  deleteVolumes,
-  upload,
-  replaceFile,
-  deleteFiles,
-  editFile,
-  editVolume
+  createVolume: mediaActions.createVolume,
+  getVolumes: mediaActions.getVolumes,
+  getVolume: mediaActions.getVolume,
+  openDirectory: mediaActions.openDirectory,
+  deleteVolumes: mediaActions.deleteVolumes,
+  upload: mediaActions.upload,
+  replaceFile: mediaActions.replaceFile,
+  deleteFiles: mediaActions.deleteFiles,
+  editFile: mediaActions.editFile,
+  editVolume: mediaActions.editVolume,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -62,7 +50,7 @@ export class Media extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      selectedUids: []
+      selectedUids: [],
     };
   }
 
@@ -79,9 +67,9 @@ export class Media extends React.Component<Props, State> {
     }
   }
 
-  private onSort(sort: SortTypes, direction: SortOrder, volumeId: string | null) {
-    if (volumeId) this.props.openDirectory(volumeId, { sort: sort, sortOrder: direction });
-    else this.props.getVolumes({ sort: sort, sortOrder: direction });
+  private onSort(sort: VolumeSortType, direction: SortOrder, volumeId: string | null) {
+    if (volumeId) this.props.openDirectory(volumeId, { sortType: sort, sortOrder: direction });
+    else this.props.getVolumes({ sortType: sort, sortOrder: direction });
   }
 
   render() {
@@ -102,7 +90,7 @@ export class Media extends React.Component<Props, State> {
               mediaSelected={this.state.selectedUids.length > 0 ? true : false}
               mode={mode}
               onNewVolume={() => this.props.push('/dashboard/media/new')}
-              onSearch={term =>
+              onSearch={(term) =>
                 isInDirectory
                   ? this.props.openDirectory(isInDirectory.params.id, { search: term })
                   : this.props.getVolumes({ search: term })
@@ -115,12 +103,12 @@ export class Media extends React.Component<Props, State> {
           <Switch>
             <Route
               path="/dashboard/media/new"
-              render={props => (
+              render={(props) => (
                 <NewVolumeForm
                   isAdmin={isAdmin}
                   animated={!this.props.app.debugMode}
                   error={this.props.media.volumeFormError}
-                  onComplete={newVolume => {
+                  onComplete={(newVolume) => {
                     this.props.createVolume(newVolume, () => this.props.push('/dashboard/media'));
                   }}
                 />
@@ -128,11 +116,11 @@ export class Media extends React.Component<Props, State> {
             />
             <Route
               path="/dashboard/media/edit/:postId"
-              render={props => <div>Editing {props.match.params.postId}</div>}
+              render={(props) => <div>Editing {props.match.params.postId}</div>}
             />
             <Route
               path="/dashboard/media/volume/:id"
-              render={props => {
+              render={(props) => {
                 return (
                   <MediaNavigator
                     animated={this.props.app.debugMode ? false : true}
@@ -143,16 +131,16 @@ export class Media extends React.Component<Props, State> {
                     onRename={(newName, id) => this.props.editFile(props.match.params.id, id, { name: newName })}
                     onDelete={() => this.onDelete(props.match.params.id)}
                     onSort={(sort, dir) => this.onSort(sort, dir, props.match.params.id)}
-                    onUploadFiles={files => {
+                    onUploadFiles={(files) => {
                       this.props.upload(props.match.params.id, files);
                     }}
-                    onReplaceFile={file => {
+                    onReplaceFile={(file) => {
                       this.props.replaceFile(props.match.params.id, this.state.selectedUids[0], file);
                     }}
                     activeVolume={this.props.media.selected}
                     activeVolumeId={props.match.params.id}
                     loading={this.props.media.busy}
-                    onSelectionChanged={selection => this.setState({ selectedUids: selection })}
+                    onSelectionChanged={(selection) => this.setState({ selectedUids: selection })}
                     openDirectory={(id, options) => this.props.openDirectory(id, options)}
                   />
                 );
@@ -161,7 +149,7 @@ export class Media extends React.Component<Props, State> {
             <Route
               path="/dashboard/media"
               exact={true}
-              render={props => {
+              render={(props) => {
                 return (
                   <MediaNavigator
                     animated={this.props.app.debugMode ? false : true}
@@ -171,11 +159,11 @@ export class Media extends React.Component<Props, State> {
                     onDelete={() => this.onDelete()}
                     onRename={(newName, id) => this.props.editVolume(id, { name: newName })}
                     onSort={(sort, dir) => this.onSort(sort, dir, null)}
-                    openVolume={volume => this.props.push(`/dashboard/media/volume/${volume}`)}
-                    onSelectionChanged={volumes => this.setState({ selectedUids: volumes })}
+                    openVolume={(volume) => this.props.push(`/dashboard/media/volume/${volume}`)}
+                    onSelectionChanged={(volumes) => this.setState({ selectedUids: volumes })}
                     loading={this.props.media.busy}
                     volumes={this.props.media.volumePage}
-                    getVolumes={options => this.props.getVolumes(options)}
+                    getVolumes={(options) => this.props.getVolumes(options)}
                   />
                 );
               }}

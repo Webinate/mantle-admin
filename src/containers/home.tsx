@@ -3,7 +3,7 @@ import { IRootState } from '../store';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { default as styled } from '../theme/styled';
 import { push } from 'react-router-redux';
-import { getHomeElements } from '../store/home/actions';
+import homeActions from '../store/home/actions';
 import ContentHeader from '../components/content-header';
 import { generateAvatarPic } from '../utils/component-utils';
 import Card from '@material-ui/core/Card';
@@ -36,14 +36,14 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   user: state.authentication.user,
   home: state.home,
   app: state.app,
-  location: ownProps.location as Location
+  location: ownProps.location as Location,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
 const dispatchToProps = {
   push: push,
-  getHomeElements,
-  createPost
+  getHomeElements: homeActions.getHomeElements,
+  createPost,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -62,7 +62,7 @@ export class Home extends React.Component<Props, State> {
     super(props);
     this.state = {
       postExpanded: false,
-      rexExcited: false
+      rexExcited: false,
     };
   }
 
@@ -88,21 +88,19 @@ export class Home extends React.Component<Props, State> {
           <CardMedia
             style={{
               height: 0,
-              paddingTop: '56.25%'
+              paddingTop: '56.25%',
             }}
             title={post.brief}
             image={post.featuredImage.publicURL}
           />
-        ) : (
-          undefined
-        )}
+        ) : undefined}
         <CardActions disableActionSpacing>
-          <IconButton className="mt-edit-latest" onClick={e => this.props.push('/dashboard/posts/edit/' + post._id)}>
+          <IconButton className="mt-edit-latest" onClick={(e) => this.props.push('/dashboard/posts/edit/' + post._id)}>
             <VisibilityIcon />
           </IconButton>
           <IconButton
             className="mt-post-expand-btn"
-            onClick={e => this.setState({ postExpanded: !this.state.postExpanded })}
+            onClick={(e) => this.setState({ postExpanded: !this.state.postExpanded })}
             aria-expanded={this.state.postExpanded}
             aria-label="Show more"
             style={{ marginLeft: 'auto' }}
@@ -112,7 +110,7 @@ export class Home extends React.Component<Props, State> {
         </CardActions>
         <Collapse timeout={this.props.app.debugMode ? 0 : 'auto'} in={this.state.postExpanded} unmountOnExit>
           <CardContent className="mt-latest-post-content">
-            {post.document.template.zones.map(zone => (
+            {post.document.template.zones.map((zone) => (
               <div key={zone} className="mt-zone">
                 <h2 className="mt-zone-header">{zone}</h2>
                 <div
@@ -134,7 +132,7 @@ export class Home extends React.Component<Props, State> {
       <Card>
         <CardHeader title="Recent Posts" />
         <List>
-          {posts.map(p => {
+          {posts.map((p) => {
             return (
               <ListItem key={p._id} className="mt-recent-post">
                 <ListItemAvatar>
@@ -152,7 +150,7 @@ export class Home extends React.Component<Props, State> {
                 <ListItemSecondaryAction>
                   <IconButton
                     className="mt-edit-post-btn"
-                    onClick={e => this.props.push('/dashboard/posts/edit/' + p._id)}
+                    onClick={(e) => this.props.push('/dashboard/posts/edit/' + p._id)}
                     aria-label="Delete"
                   >
                     <ArrowForwardIcon />
@@ -187,8 +185,8 @@ export class Home extends React.Component<Props, State> {
             <div>
               <div
                 className="mt-card"
-                onMouseEnter={e => this.setState({ rexExcited: true })}
-                onMouseLeave={e => this.setState({ rexExcited: false })}
+                onMouseEnter={(e) => this.setState({ rexExcited: true })}
+                onMouseLeave={(e) => this.setState({ rexExcited: false })}
               >
                 <Card>
                   <CardHeader
@@ -196,7 +194,7 @@ export class Home extends React.Component<Props, State> {
                       <Tooltip title="Create a new post">
                         <Button
                           className="mt-create-post"
-                          onClick={e => this.props.createPost({ title: 'New Post', slug: randomId() })}
+                          onClick={(e) => this.props.createPost({ title: 'New Post', slug: randomId() })}
                           variant="fab"
                           mini
                           color="primary"

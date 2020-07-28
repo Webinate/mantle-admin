@@ -32,7 +32,7 @@ export default class LoginForm extends React.Component<Props, State> {
       user: '',
       pass: '',
       formSubmitted: false,
-      retrievePassError: false
+      retrievePassError: false,
     };
   }
 
@@ -81,13 +81,11 @@ export default class LoginForm extends React.Component<Props, State> {
           <Input
             id="login-user"
             value={this.state.user}
-            onChange={e => this.setState({ user: e.currentTarget.value })}
+            onChange={(e) => this.setState({ user: e.currentTarget.value })}
           />
           {this.getUserError() ? (
             <FormHelperText id="mt-username-error">{this.getUserError()}</FormHelperText>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FormControl>
 
         <FormControl className="mt-password" fullWidth={true} error={this.showPasswordError()}>
@@ -96,13 +94,11 @@ export default class LoginForm extends React.Component<Props, State> {
             id="mt-password"
             type="password"
             value={this.state.pass}
-            onChange={e => this.setState({ pass: e.currentTarget.value })}
+            onChange={(e) => this.setState({ pass: e.currentTarget.value })}
           />
           {this.showPasswordError() ? (
             <FormHelperText id="mt-password-error">Please specify a password</FormHelperText>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FormControl>
 
         <ButtonsDiv>
@@ -112,7 +108,7 @@ export default class LoginForm extends React.Component<Props, State> {
             className="mt-login-btn"
             disabled={this.props.loading}
             fullWidth={true}
-            onClick={e => this.onLogin()}
+            onClick={(e) => this.onLogin()}
           >
             <KeyIcon style={{ margin: '0 5px 0 0' }} />
             Login
@@ -125,7 +121,7 @@ export default class LoginForm extends React.Component<Props, State> {
             <AnchorBtns
               className="mt-retrieve-password"
               href=""
-              onClick={e => {
+              onClick={(e) => {
                 if (this.checkUsernameSet(e)) this.props.onLogin(this.state.user, this.state.pass);
               }}
             >
@@ -135,7 +131,7 @@ export default class LoginForm extends React.Component<Props, State> {
             <AnchorBtns
               className="mt-resend-activation"
               href=""
-              onClick={e => {
+              onClick={(e) => {
                 if (this.checkUsernameSet(e)) this.props.onActivationReset(this.state.user);
               }}
             >

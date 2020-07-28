@@ -4,10 +4,10 @@ import { default as theme } from '../../theme/mui-theme';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Icon from '@material-ui/core/Icon';
-import { DraftElements } from '../../../../../src';
+import { ElementType } from '../../../../../src/core/enums';
 
 type Props = {
-  onCreateBlock: (type: DraftElements, html: string) => void;
+  onCreateBlock: (type: ElementType, html: string) => void;
   onInlineToggle: (type: InlineType) => void;
   onAddMedia: () => void;
   onDelete: () => void;
@@ -23,7 +23,7 @@ type State = {
 
 export type Blocks = {
   label: string | JSX.Element;
-  type: DraftElements;
+  type: ElementType;
   html: string;
 };
 
@@ -39,7 +39,7 @@ export type Inline = {
  */
 export default class EditorToolbar extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    animate: false
+    animate: false,
   };
   private _regularBlocks: Blocks[];
   private _listBlocks: Blocks[];
@@ -53,14 +53,14 @@ export default class EditorToolbar extends React.Component<Props, State> {
     this._iconStyles = { fontSize: '18px' };
 
     this._regularBlocks = [
-      { label: 'Header 1', type: 'elm-header-1', html: '<h1></h1>' },
-      { label: 'Header 2', type: 'elm-header-2', html: '<h2></h2>' },
-      { label: 'Header 3', type: 'elm-header-3', html: '<h3></h3>' },
-      { label: 'Header 4', type: 'elm-header-4', html: '<h4></h4>' },
-      { label: 'Header 5', type: 'elm-header-5', html: '<h5></h5>' },
-      { label: 'Header 6', type: 'elm-header-6', html: '<h6></h6>' },
-      { label: 'Code Block', type: 'elm-code', html: '<pre></pre>' },
-      { label: 'Paragraph', type: 'elm-paragraph', html: '<p></p>' }
+      { label: 'Header 1', type: ElementType.header1, html: '<h1></h1>' },
+      { label: 'Header 2', type: ElementType.header2, html: '<h2></h2>' },
+      { label: 'Header 3', type: ElementType.header3, html: '<h3></h3>' },
+      { label: 'Header 4', type: ElementType.header4, html: '<h4></h4>' },
+      { label: 'Header 5', type: ElementType.header5, html: '<h5></h5>' },
+      { label: 'Header 6', type: ElementType.header6, html: '<h6></h6>' },
+      { label: 'Code Block', type: ElementType.code, html: '<pre></pre>' },
+      { label: 'Paragraph', type: ElementType.paragraph, html: '<p></p>' },
     ];
 
     this._listBlocks = [
@@ -70,8 +70,8 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-ul" />
           </Icon>
         ),
-        type: 'elm-list',
-        html: '<ul><li></li></ul>'
+        type: ElementType.list,
+        html: '<ul><li></li></ul>',
       },
       {
         label: (
@@ -79,9 +79,9 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-ol" />
           </Icon>
         ),
-        type: 'elm-list',
-        html: '<ol><li></li></ol>'
-      }
+        type: ElementType.list,
+        html: '<ol><li></li></ol>',
+      },
     ];
 
     this._inlineStyles = [
@@ -91,7 +91,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-bold" />
           </Icon>
         ),
-        type: 'bold'
+        type: 'bold',
       },
       {
         label: (
@@ -99,7 +99,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-italic" />
           </Icon>
         ),
-        type: 'italic'
+        type: 'italic',
       },
       {
         label: (
@@ -107,15 +107,15 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-underline" />
           </Icon>
         ),
-        type: 'underline'
-      }
+        type: 'underline',
+      },
     ];
 
     this._onSelectionChange = this.onSelectionChange.bind(this);
 
     this.state = {
       anchorEl: undefined,
-      activeInlines: []
+      activeInlines: [],
     };
   }
 
@@ -145,8 +145,8 @@ export default class EditorToolbar extends React.Component<Props, State> {
           <i className="icon icon-editor-para" />
         </Icon>
       ),
-      type: 'elm-paragraph',
-      html: '<p></p>'
+      type: ElementType.paragraph,
+      html: '<p></p>',
     };
     const listBlocks = this._listBlocks;
     const blocks = this._regularBlocks;
@@ -155,7 +155,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
     return (
       <div style={this.props.style} className="mt-draft-toolbar">
         <ButtonGroup>
-          <div id="mt-draft-blocks" onClick={e => this.setState({ anchorEl: e.currentTarget })}>
+          <div id="mt-draft-blocks" onClick={(e) => this.setState({ anchorEl: e.currentTarget })}>
             Insert
           </div>
           <Menu
@@ -169,7 +169,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
               <MenuItem
                 key={`bocks-${index}`}
                 id={`mt-create-${block.type}`}
-                onClick={e => {
+                onClick={(e) => {
                   this.props.onCreateBlock(block.type, block.html);
                   this.setState({ anchorEl: undefined });
                 }}
@@ -186,7 +186,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
               className={`mt-inline-btn ${activeInlines.includes(inline.type) ? 'active' : ''}`}
               id={`mt-inline-${inline.type}`}
               key={`elm-inline-${index}`}
-              onMouseDown={e => {
+              onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 this.props.onInlineToggle(inline.type);
@@ -202,7 +202,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <div
               id={`mt-create-${listBlock.type}-${index}`}
               key={`elm-lists-${index}`}
-              onMouseDown={e => {
+              onMouseDown={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 this.props.onCreateBlock(listBlock.type, listBlock.html);
@@ -216,7 +216,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
         <ButtonGroup>
           <div
             id="mt-create-paragraph"
-            onMouseDown={e => {
+            onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.props.onCreateBlock(pBlock.type, pBlock.html);
@@ -229,7 +229,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
         <ButtonGroup>
           <div
             id="mt-create-media"
-            onClick={e => {
+            onClick={(e) => {
               this.props.onAddMedia();
             }}
           >
@@ -242,7 +242,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
         <ButtonGroup>
           <div
             id="mt-create-link"
-            onMouseDown={e => {
+            onMouseDown={(e) => {
               this.props.onLink();
             }}
           >
@@ -255,8 +255,8 @@ export default class EditorToolbar extends React.Component<Props, State> {
         <ButtonGroup>
           <div
             id="mt-create-html"
-            onClick={e => {
-              this.props.onCreateBlock('elm-html', '<div></div>');
+            onClick={(e) => {
+              this.props.onCreateBlock(ElementType.html, '<div></div>');
             }}
           >
             <Icon style={iconStyle}>
@@ -268,7 +268,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
         <ButtonGroup>
           <div
             id="mt-delete-elms"
-            onMouseDown={e => {
+            onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.props.onDelete();

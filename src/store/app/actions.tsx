@@ -1,5 +1,6 @@
 import { ActionCreator } from '../actions-creator';
 import { IRootState } from '..';
+import { disptachable } from '../../decorators/dispatchable';
 
 // Action Creators
 export const ActionCreators = {
@@ -10,14 +11,17 @@ export const ActionCreators = {
 // Action Types
 export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 
-export function messageUser(message: string) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.serverResponse.create(message));
-  };
+class Actions {
+  @disptachable()
+  async messageUser(message: string, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.serverResponse.create(message));
+  }
+
+  @disptachable()
+  async setDebugMode(enabled: boolean, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.setDebugMode.create(enabled));
+  }
 }
 
-export function setDebugMode(enabled: boolean) {
-  return async function(dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.setDebugMode.create(enabled));
-  };
-}
+const actions: Actions = new Actions();
+export default actions;

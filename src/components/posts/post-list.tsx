@@ -15,6 +15,7 @@ import { PostsGetAllOptions } from 'mantle';
 import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';
+import { SortOrder, PostVisibility, PostSortType } from '../../../../../src/core/enums';
 
 export type Props = {
   animated: boolean;
@@ -29,34 +30,34 @@ export type Props = {
   filtersOpen: boolean;
 };
 
-type VisibilityType = 'all' | 'public' | 'private';
 type SortType = 'title' | 'created' | 'modified';
 
 export type State = {
   showDeleteModal: boolean;
   sortAscending: boolean;
   user: IUserEntry<'client' | 'expanded'> | null;
-  visibility: VisibilityType;
+  visibility: PostVisibility;
   sortBy: SortType;
   visibilityOpen: boolean;
   sortByOpen: boolean;
 };
 
 export default class PostList extends React.Component<Props, State> {
-  private _container: HTMLElement | null;
+  private _container: React.RefObject<HTMLDivElement>;
   private _sortElm?: HTMLElement | null;
   private _visibilityElm?: HTMLElement | null;
 
   constructor(props: Props) {
     super(props);
+    this._container = React.createRef();
     this.state = {
       showDeleteModal: false,
       sortAscending: props.postFilters.sortOrder && props.postFilters.sortOrder === 'asc' ? true : false,
-      visibility: 'all',
+      visibility: PostVisibility.all,
       sortBy: props.postFilters.sort ? props.postFilters.sort : 'created',
       user: null,
       visibilityOpen: false,
-      sortByOpen: false
+      sortByOpen: false,
     };
   }
 
@@ -72,7 +73,7 @@ export default class PostList extends React.Component<Props, State> {
       this.props.onPostSelected([post]);
     } else if (e.ctrlKey) {
       if (this.props.selected.indexOf(post) === -1) this.props.onPostSelected(this.props.selected.concat(post));
-      else this.props.onPostSelected(this.props.selected.filter(i => i !== post));
+      else this.props.onPostSelected(this.props.selected.filter((i) => i !== post));
     } else {
       const postPage = this.props.posts!;
       const selected = this.props.selected;
@@ -94,18 +95,18 @@ export default class PostList extends React.Component<Props, State> {
     const val = !this.state.sortAscending;
     this.setState({ sortAscending: val, sortByOpen: false }, () => {
       this.props.getPosts({
-        sortOrder: val ? 'asc' : 'desc'
+        sortOrder: val ? SortOrder.asc : SortOrder.desc,
       });
     });
   }
 
-  private onVisibilityChange(visibility: VisibilityType) {
+  private onVisibilityChange(visibility: PostVisibility) {
     this.setState({ visibility: visibility, visibilityOpen: false }, () => {
       this.props.getPosts({ visibility: visibility });
     });
   }
 
-  private onSortByChange(sort: SortType) {
+  private onSortByChange(sort: PostSortType) {
     this.setState({ sortBy: sort, sortByOpen: false }, () => {
       this.props.getPosts({ sort: sort });
     });
@@ -129,12 +130,12 @@ export default class PostList extends React.Component<Props, State> {
             total={posts!.count}
             limit={posts!.limit}
             index={posts!.index}
-            onPage={index => {
-              if (this._container) this._container.scrollTop = 0;
+            onPage={(index) => {
+              if (this._container.current) this._container.current.scrollTop = 0;
               this.props.getPosts({ index: index });
             }}
             contentProps={{
-              onMouseDown: e => this.props.onPostSelected([])
+              onMouseDown: (e) => this.props.onPostSelected([]),
             }}
           >
             <Filter
@@ -145,8 +146,8 @@ export default class PostList extends React.Component<Props, State> {
               <div>
                 <h3>Sort Order:</h3>
                 <div
-                  ref={e => (this._sortElm = e)}
-                  onClick={e => this.setState({ sortByOpen: true })}
+                  ref={(e) => (this._sortElm = e)}
+                  onClick={(e) => this.setState({ sortByOpen: true })}
                   className="mt-filter-sortby"
                 >
                   {this.state.sortBy}
@@ -155,15 +156,21 @@ export default class PostList extends React.Component<Props, State> {
                   anchorEl={this._sortElm || undefined}
                   open={this.state.sortByOpen}
                   transitionDuration={this.props.animated ? 'auto' : 0}
-                  onClose={e => this.setState({ sortByOpen: false })}
+                  onClose={(e) => this.setState({ sortByOpen: false })}
                 >
-                  <MenuItem className="mt-filter-sortby-title" onClick={e => this.onSortByChange('title')}>
+                  <MenuItem className="mt-filter-sortby-title" onClick={(e) => this.onSortByChange(PostSortType.title)}>
                     Title
                   </MenuItem>
-                  <MenuItem className="mt-filter-sortby-created" onClick={e => this.onSortByChange('created')}>
+                  <MenuItem
+                    className="mt-filter-sortby-created"
+                    onClick={(e) => this.onSortByChange(PostSortType.created)}
+                  >
                     Created
                   </MenuItem>
-                  <MenuItem className="mt-filter-sortby-modified" onClick={e => this.onSortByChange('modified')}>
+                  <MenuItem
+                    className="mt-filter-sortby-modified"
+                    onClick={(e) => this.onSortByChange(PostSortType.modified)}
+                  >
                     Modified
                   </MenuItem>
                 </Menu>
@@ -173,11 +180,11 @@ export default class PostList extends React.Component<Props, State> {
                     margin: '0 0 0 5px',
                     verticalAlign: 'middle',
                     height: '20px',
-                    width: '20px'
+                    width: '20px',
                   }}
                   className="mt-sort-order"
-                  buttonRef={e => (this._sortElm = e)}
-                  onClick={e => this.onAscChange()}
+                  buttonRef={(e) => (this._sortElm = e)}
+                  onClick={(e) => this.onAscChange()}
                 >
                   {this.state.sortAscending ? (
                     <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
@@ -189,8 +196,8 @@ export default class PostList extends React.Component<Props, State> {
               <div>
                 <h3>Filter Visibility:</h3>
                 <div
-                  ref={e => (this._visibilityElm = e)}
-                  onClick={e => this.setState({ visibilityOpen: true })}
+                  ref={(e) => (this._visibilityElm = e)}
+                  onClick={(e) => this.setState({ visibilityOpen: true })}
                   className="mt-filter-visibility"
                 >
                   {this.state.visibility}
@@ -201,13 +208,22 @@ export default class PostList extends React.Component<Props, State> {
                   open={this.state.visibilityOpen}
                   anchorEl={this._visibilityElm!}
                 >
-                  <MenuItem className="mt-filter-visibility-all" onClick={e => this.onVisibilityChange('all')}>
+                  <MenuItem
+                    className="mt-filter-visibility-all"
+                    onClick={(e) => this.onVisibilityChange(PostVisibility.all)}
+                  >
                     All
                   </MenuItem>
-                  <MenuItem className="mt-filter-visibility-private" onClick={e => this.onVisibilityChange('private')}>
+                  <MenuItem
+                    className="mt-filter-visibility-private"
+                    onClick={(e) => this.onVisibilityChange(PostVisibility.private)}
+                  >
                     Private
                   </MenuItem>
-                  <MenuItem className="mt-filter-visibility-public" onClick={e => this.onVisibilityChange('public')}>
+                  <MenuItem
+                    className="mt-filter-visibility-public"
+                    onClick={(e) => this.onVisibilityChange(PostVisibility.public)}
+                  >
                     Public
                   </MenuItem>
                 </Menu>
@@ -218,7 +234,7 @@ export default class PostList extends React.Component<Props, State> {
                   user={this.state.user}
                   imageSize={26}
                   labelPosition="right"
-                  onChange={user => this.onUserChange(user)}
+                  onChange={(user) => this.onUserChange(user)}
                 />
               </div>
             </Filter>
@@ -227,7 +243,7 @@ export default class PostList extends React.Component<Props, State> {
               filtersOpen={this.props.filtersOpen}
               animated={this.props.animated}
               className="mt-posts"
-              innerRef={elm => (this._container = elm)}
+              ref={this._container}
             >
               {posts.data.map((post, postIndex) => {
                 const selected = this.props.selected.indexOf(post) === -1 ? false : true;
@@ -238,7 +254,7 @@ export default class PostList extends React.Component<Props, State> {
                     selected={selected}
                     style={!this.props.animated ? { transition: 'none' } : undefined}
                     className={`mt-post ${selected ? 'selected' : ''}`}
-                    onMouseDown={e => {
+                    onMouseDown={(e) => {
                       this.onPostSelected(post, e);
                     }}
                   >
@@ -246,24 +262,20 @@ export default class PostList extends React.Component<Props, State> {
                       <IconButton
                         style={{ top: -5, right: '60px', position: 'absolute' }}
                         className="mt-post-button mt-post-edit"
-                        onClick={e => this.props.onEdit(post)}
+                        onClick={(e) => this.props.onEdit(post)}
                       >
                         <EditIcon style={{ color: theme.primary200.background }} />
                       </IconButton>
-                    ) : (
-                      undefined
-                    )}
+                    ) : undefined}
                     {!multipleSelected ? (
                       <IconButton
                         style={{ top: -5, right: 6, position: 'absolute' }}
                         className="mt-post-button mt-post-delete"
-                        onClick={e => this.props.onDelete(post)}
+                        onClick={(e) => this.props.onDelete(post)}
                       >
                         <DeleteIcon style={{ color: theme.primary200.background }} />
                       </IconButton>
-                    ) : (
-                      undefined
-                    )}
+                    ) : undefined}
                     <div className="mt-post-featured-thumb">
                       {post.featuredImage ? (
                         <img src={(post.featuredImage as IFileEntry<'client'>).publicURL} />
@@ -301,9 +313,7 @@ export default class PostList extends React.Component<Props, State> {
               })}
             </PostsInnerContent>
           </Pager>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </div>
     );
   }

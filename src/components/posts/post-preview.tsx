@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
-import { IPost, IUserEntry } from 'mantle';
+import { IPost } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -23,7 +23,7 @@ export default class PostPreview extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      activeZone: ''
+      activeZone: '',
     };
   }
 
@@ -38,7 +38,7 @@ export default class PostPreview extends React.Component<Props, State> {
       <Container id="mt-post-preview">
         <div className="mt-preview-headers">
           <div className="mt-preview-author-avatar">
-            <Avatar src={generateAvatarPic(post.author as IUserEntry<'client'>)} />
+            <Avatar src={generateAvatarPic(post.author)} />
           </div>
           <div>
             <h1 id="mt-preview-title">{post.title}</h1>
@@ -46,11 +46,9 @@ export default class PostPreview extends React.Component<Props, State> {
               <span>Posted </span>
               {post.author ? (
                 <span>
-                  by <span id="mt-preview-author">{(post.author as IUserEntry<'client'>).username}</span>
+                  by <span id="mt-preview-author">{post.author.username}</span>
                 </span>
-              ) : (
-                undefined
-              )}
+              ) : undefined}
               <span id="mt-preview-date">{format(new Date(post.lastUpdated), '[at] H:m [on] MMMM Do YYYY')}</span>
             </div>
           </div>
@@ -58,7 +56,7 @@ export default class PostPreview extends React.Component<Props, State> {
 
         <div className="mt-preview-content">
           {zones.length > 1 ? (
-            zones.map(z => (
+            zones.map((z) => (
               <div key={`zone-${z}`}>
                 <div className="mt-zone-header">
                   <h2>{z}</h2>

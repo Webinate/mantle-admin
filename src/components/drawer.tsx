@@ -20,7 +20,7 @@ type State = {};
  */
 export default class Drawer extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    animate: false
+    animate: false,
   };
 
   private _shouldAnimate: boolean;
@@ -44,13 +44,13 @@ export default class Drawer extends React.Component<Props, State> {
             {this.props.open ? (
               <UpIcon
                 style={{
-                  color: 'inherit'
+                  color: 'inherit',
                 }}
               />
             ) : (
               <DownIcon
                 style={{
-                  color: 'inherit'
+                  color: 'inherit',
                 }}
               />
             )}
@@ -58,7 +58,7 @@ export default class Drawer extends React.Component<Props, State> {
         </DrawerHeader>
         {this.props.open ? (
           <DrawerContent
-            innerRef={(elm: HTMLDivElement) => {
+            ref={(elm: HTMLDivElement) => {
               if (!elm) return;
 
               elm.style.maxHeight = '';
@@ -72,9 +72,7 @@ export default class Drawer extends React.Component<Props, State> {
           >
             {this.props.children}
           </DrawerContent>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </div>
     );
   }

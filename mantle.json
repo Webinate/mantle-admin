@@ -1,6 +1,7 @@
 {
   "name": "mantle-admin",
-  "enabled": true,
+  "enabled": false,
+  "enableGraphQl": true,
   "server": {
     "port": 8000,
     "host": "localhost",

@@ -5,7 +5,7 @@ import { VolumesGetOptions } from 'mantle';
 import { FilesGetOptions } from 'mantle';
 import SplitPanel from '../split-panel';
 import VolumeSidePanel from './volume-sidepanel';
-import { DirectoryView, SortTypes, SortOrder } from './directory-view';
+import { DirectoryView } from './directory-view';
 import theme from '../../theme/mui-theme';
 import FileSidePanel from './file-sidepanel';
 import Dialog from '@material-ui/core/Dialog/Dialog';
@@ -14,6 +14,7 @@ import DialogContent from '@material-ui/core/DialogContent/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 import TextField from '@material-ui/core/TextField/TextField';
 import Button from '@material-ui/core/Button/Button';
+import { SortOrder, VolumeSortType } from '../../../../../src/core/enums';
 
 export type Props = {
   animated: boolean;
@@ -35,7 +36,7 @@ export type Props = {
   openVolume?: (volumeId: string) => void;
   openDirectory?: (volumeId: string, options: Partial<FilesGetOptions>) => void;
   onSelectionChanged: (uids: string[]) => void;
-  onSort: (sortBy: SortTypes, sortDir: SortOrder) => void;
+  onSort: (sortBy: VolumeSortType, sortDir: SortOrder) => void;
   renderOptionalButtons?: () => undefined | null | JSX.Element;
 };
 
@@ -47,7 +48,7 @@ export type State = {
 
 export class MediaNavigator extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    multiselect: true
+    multiselect: true,
   };
 
   constructor(props: Props) {
@@ -55,7 +56,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     this.state = {
       deleteMessage: null,
       showRenameForm: false,
-      newName: ''
+      newName: '',
     };
   }
 
@@ -64,7 +65,7 @@ export class MediaNavigator extends React.Component<Props, State> {
       this.props.openDirectory!(this.props.activeVolumeId, { index: 0 });
     } else {
       this.props.getVolumes!({
-        index: 0
+        index: 0,
       });
     }
   }
@@ -84,7 +85,7 @@ export class MediaNavigator extends React.Component<Props, State> {
             label="Enter new name"
             fullWidth
             value={this.state.newName}
-            onChange={e => this.setState({ newName: e.currentTarget.value })}
+            onChange={(e) => this.setState({ newName: e.currentTarget.value })}
           />
         </DialogContent>
         <DialogActions>
@@ -112,7 +113,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     return (
       <Dialog
         open={this.state.deleteMessage ? true : false}
-        onClose={e => this.setState({ deleteMessage: null })}
+        onClose={(e) => this.setState({ deleteMessage: null })}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
@@ -120,17 +121,17 @@ export class MediaNavigator extends React.Component<Props, State> {
           <DialogContentText id="mt-media-delete-msg">{this.state.deleteMessage}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button id="mt-media-cancel-btn" onClick={e => this.setState({ deleteMessage: null })}>
+          <Button id="mt-media-cancel-btn" onClick={(e) => this.setState({ deleteMessage: null })}>
             Cancel
           </Button>
           <Button
             variant="contained"
             id="mt-media-confirm-btn"
             style={{ background: theme.error.background, color: theme.error.color }}
-            onClick={e => {
+            onClick={(e) => {
               this.props.onDelete();
               this.setState({
-                deleteMessage: null
+                deleteMessage: null,
               });
             }}
             color="primary"
@@ -156,7 +157,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     if (volumePage) {
       selectedVolume =
         selectedUids.length > 0
-          ? volumePage.data.find(v => v._id === selectedUids[selectedUids.length - 1]) || null
+          ? volumePage.data.find((v) => v._id === selectedUids[selectedUids.length - 1]) || null
           : null;
 
       if (selectedUids.length === 1 && selectedVolume)
@@ -165,7 +166,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     } else {
       if (filesPage && this.props.selectedIds.length > 0)
         selectedFile =
-          filesPage.data.find(f => f._id === this.props.selectedIds[this.props.selectedIds.length - 1]) || null;
+          filesPage.data.find((f) => f._id === this.props.selectedIds[this.props.selectedIds.length - 1]) || null;
 
       if (selectedUids.length === 1 && selectedFile)
         this.setState({ deleteMessage: `Are you sure you want to delete the file ${selectedFile.name}?` });
@@ -186,7 +187,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     if (volumePage) {
       selectedVolume =
         selectedUids.length > 0
-          ? volumePage.data.find(v => v._id === selectedUids[selectedUids.length - 1]) || null
+          ? volumePage.data.find((v) => v._id === selectedUids[selectedUids.length - 1]) || null
           : null;
 
       activeView = (
@@ -205,7 +206,7 @@ export class MediaNavigator extends React.Component<Props, State> {
     } else if (activeVolume) {
       if (filesPage && this.props.selectedIds.length > 0) {
         selectedFile =
-          filesPage.data.find(f => f._id === this.props.selectedIds[this.props.selectedIds.length - 1]) || null;
+          filesPage.data.find((f) => f._id === this.props.selectedIds[this.props.selectedIds.length - 1]) || null;
       }
 
       activeView = (

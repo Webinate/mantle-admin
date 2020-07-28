@@ -39,7 +39,7 @@ export default class Stage extends React.Component<Prop, State> {
     animated: true,
     delay: 0.5,
     leftSize: 15,
-    rightSize: 25
+    rightSize: 25,
   };
 
   private _shouldAnimateLeft: boolean;
@@ -59,7 +59,7 @@ export default class Stage extends React.Component<Prop, State> {
       animateLeft: false,
       animateRight: false,
       leftOpening: false,
-      rightOpening: false
+      rightOpening: false,
     };
   }
 
@@ -67,7 +67,7 @@ export default class Stage extends React.Component<Prop, State> {
     if (!this.props.animated) {
       this.setState({
         renderLeft: next.leftOpen!,
-        renderRight: next.rightOpen!
+        renderRight: next.rightOpen!,
       });
       return;
     }
@@ -87,7 +87,7 @@ export default class Stage extends React.Component<Prop, State> {
         animateLeft: this._shouldAnimateLeft,
         animateRight: this._shouldAnimateRight,
         leftOpening: next.leftOpen!,
-        rightOpening: next.rightOpen!
+        rightOpening: next.rightOpen!,
       });
 
       if (this._animationTimeout) clearTimeout(this._animationTimeout);
@@ -97,7 +97,7 @@ export default class Stage extends React.Component<Prop, State> {
           animateLeft: false,
           animateRight: false,
           renderLeft: next.leftOpen!,
-          renderRight: next.rightOpen!
+          renderRight: next.rightOpen!,
         });
       }, this.props.delay! * 1000);
     }
@@ -116,7 +116,7 @@ export default class Stage extends React.Component<Prop, State> {
           size={this.props.leftSize!}
           delay={this.props.delay!}
           style={this.props.leftStyle}
-          innerRef={
+          ref={
             this.props.animated
               ? (e: HTMLDivElement) => {
                   if (!e || !this.state.animateLeft) return;
@@ -150,7 +150,7 @@ export default class Stage extends React.Component<Prop, State> {
           size={this.props.rightSize!}
           delay={this.props.delay!}
           style={this.props.rightStyle}
-          innerRef={
+          ref={
             this.props.animated
               ? (e: HTMLDivElement) => {
                   if (!e || !this.state.animateRight) return;

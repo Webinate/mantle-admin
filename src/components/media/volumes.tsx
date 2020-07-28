@@ -14,9 +14,9 @@ import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
 import { VolumesGetOptions } from 'mantle';
+import { SortOrder } from '../../../../../src/core/enums';
 
 export type SortTypes = 'name' | 'created' | 'memory';
-export type SortOrder = 'asc' | 'desc';
 
 export type Props = {
   multiselect?: boolean;
@@ -34,14 +34,15 @@ export type State = {};
 
 export class Volumes extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    multiselect: true
+    multiselect: true,
   };
 
-  private _container: HTMLElement;
+  private _container: React.RefObject<HTMLDivElement>;
 
   constructor(props: Props) {
     super(props);
     this.state = {};
+    this._container = React.createRef();
   }
 
   componentWillReceiveProps(next: Props) {
@@ -49,8 +50,9 @@ export class Volumes extends React.Component<Props, State> {
   }
 
   private changeOrder(sort: SortTypes) {
-    let order: SortOrder = 'desc';
-    if (this.props.activeFilters.sort === sort && this.props.activeFilters.sortOrder === 'desc') order = 'asc';
+    let order: SortOrder = SortOrder.desc;
+    if (this.props.activeFilters.sortType === sort && this.props.activeFilters.sortOrder === SortOrder.desc)
+      order = SortOrder.asc;
 
     this.props.onSort(sort, order);
   }
@@ -71,10 +73,10 @@ export class Volumes extends React.Component<Props, State> {
       this.onSelectionChange([volume._id]);
     } else if (e.ctrlKey) {
       if (selected.indexOf(volume._id) === -1) this.onSelectionChange(selected.concat(volume._id));
-      else this.onSelectionChange(selected.filter(i => i !== volume._id));
+      else this.onSelectionChange(selected.filter((i) => i !== volume._id));
     } else {
       const volumePage = this.props.volumes!;
-      const allIds = volumePage.data.map(v => v._id);
+      const allIds = volumePage.data.map((v) => v._id);
 
       let firstIndex = Math.min(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
       let lastIndex = Math.max(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
@@ -90,7 +92,7 @@ export class Volumes extends React.Component<Props, State> {
     const headers: { label: string; property: SortTypes }[] = [
       { label: 'Name', property: 'name' },
       { label: 'Memory', property: 'memory' },
-      { label: 'Created', property: 'created' }
+      { label: 'Created', property: 'created' },
     ];
     const filters = this.props.activeFilters;
 
@@ -100,28 +102,28 @@ export class Volumes extends React.Component<Props, State> {
         limit={volumes.limit}
         total={volumes.count}
         loading={this.props.loading}
-        onPage={index => {
-          if (this._container) this._container.scrollTop = 0;
+        onPage={(index) => {
+          if (this._container.current) this._container.current.scrollTop = 0;
 
           this.props.getVolumes({ index: index });
         }}
       >
-        <Container innerRef={elm => (this._container = elm)}>
+        <Container ref={this._container}>
           <Table className="mt-volume-table">
             <TableHeader>
               <TableRow>
                 <TableCell
                   numeric={false}
                   padding="checkbox"
-                  sortDirection={filters.sort === 'name' ? filters.sortOrder : false}
+                  sortDirection={filters.sortType === 'name' ? filters.sortOrder : false}
                 >
                   <Checkbox
                     id="mt-select-all"
                     checked={allSelected}
                     style={{ display: this.props.multiselect ? '' : 'none' }}
-                    onClick={e => {
+                    onClick={(e) => {
                       if (allSelected) this.onSelectionChange([]);
-                      else this.onSelectionChange(volumes.data.map(v => v._id));
+                      else this.onSelectionChange(volumes.data.map((v) => v._id));
                     }}
                   />
                 </TableCell>
@@ -130,13 +132,13 @@ export class Volumes extends React.Component<Props, State> {
                   return (
                     <TableCell
                       key={`header-${index}`}
-                      sortDirection={filters.sort === h.property ? filters.sortOrder : false}
+                      sortDirection={filters.sortType === h.property ? filters.sortOrder : false}
                     >
                       <TableSortLabel
-                        active={filters.sort === h.property}
+                        active={filters.sortType === h.property}
                         direction={filters.sortOrder}
                         className={`mt-volume-header-${h.property}`}
-                        onClick={e => this.changeOrder(h.property)}
+                        onClick={(e) => this.changeOrder(h.property)}
                       >
                         {h.label}
                       </TableSortLabel>
@@ -155,18 +157,18 @@ export class Volumes extends React.Component<Props, State> {
                     style={{ cursor: 'pointer' }}
                     role="checkbox"
                     key={`vol-row-${index}`}
-                    onDoubleClick={e => this.props.openVolume(volume._id)}
-                    onClick={e => {
+                    onDoubleClick={(e) => this.props.openVolume(volume._id)}
+                    onClick={(e) => {
                       this.onSelection(e, volume);
                     }}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
 
                           if (selected.indexOf(volume._id) !== -1)
-                            this.onSelectionChange(selected.filter(v => v !== volume._id));
+                            this.onSelectionChange(selected.filter((v) => v !== volume._id));
                           else this.onSelectionChange(selected.concat(volume._id));
                         }}
                         className="mt-vol-checkbox"

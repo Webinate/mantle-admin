@@ -1,6 +1,7 @@
 import { ActionCreators, Action } from './actions';
 import { Page, IVolume, IFileEntry } from '../../../../../src';
 import { VolumesGetOptions, FilesGetOptions } from 'mantle';
+import { SortOrder, VolumeSortType, FileSortType } from '../../../../../src/core/enums';
 
 // State
 export type State = {
@@ -15,12 +16,12 @@ export type State = {
 
 export const initialState: State = {
   volumePage: null,
-  volumeFilters: { index: 0, sort: 'created', sortOrder: 'desc' },
+  volumeFilters: { index: 0, sortType: VolumeSortType.created, sortOrder: SortOrder.desc },
   filesPage: null,
-  filesFilters: { index: 0, sort: 'created', sortOrder: 'desc', search: '' },
+  filesFilters: { index: 0, sortType: FileSortType.created, sortOrder: SortOrder.desc, search: '' },
   selected: null,
   busy: false,
-  volumeFormError: null
+  volumeFormError: null,
 };
 
 // Reducer
@@ -32,7 +33,7 @@ export default function reducer(state: State = initialState, action: Action): St
       partialState = {
         volumePage: action.payload.page,
         volumeFilters: { ...state.volumeFilters, ...action.payload.filters },
-        busy: false
+        busy: false,
       };
       break;
 
@@ -40,7 +41,7 @@ export default function reducer(state: State = initialState, action: Action): St
       partialState = {
         filesPage: action.payload.page,
         filesFilters: { ...state.filesFilters, ...action.payload.filters },
-        busy: false
+        busy: false,
       };
       break;
 
@@ -51,14 +52,14 @@ export default function reducer(state: State = initialState, action: Action): St
     case ActionCreators.VolumeFormError.type:
       partialState = {
         volumeFormError: action.payload,
-        busy: false
+        busy: false,
       };
       break;
 
     case ActionCreators.SelectedVolume.type:
       partialState = {
         selected: action.payload,
-        busy: false
+        busy: false,
       };
       break;
 

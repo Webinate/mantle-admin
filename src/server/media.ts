@@ -5,14 +5,15 @@ import { ActionCreators as MediaActions } from '../store/media/actions';
 import { matchPath } from 'react-router';
 import { RedirectError } from './errors';
 import { VolumesGetOptions, FilesGetOptions } from 'mantle';
+import { SortOrder, VolumeSortType } from '../../../../src/core/enums';
 
-export default async function(req: IAuthReq, actions: Action[]) {
+export default async function (req: IAuthReq, actions: Action[]) {
   const volumesView = matchPath<any>(req.url, { path: '/dashboard/media/volumes/:id' });
   const initialVolumeFilter: Partial<VolumesGetOptions> = {
     index: 0,
     search: '',
-    sort: 'created',
-    sortOrder: 'desc'
+    sortType: VolumeSortType.created,
+    sortOrder: SortOrder.desc,
   };
 
   if (volumesView) {
@@ -23,8 +24,8 @@ export default async function(req: IAuthReq, actions: Action[]) {
       volumeId: volume._id.toString(),
       index: 0,
       search: '',
-      sort: 'created',
-      sortOrder: 'desc'
+      sortType: VolumeSortType.created,
+      sortOrder: SortOrder.desc,
     };
 
     let files = await controllers.files.getFiles(initialFileFilter);

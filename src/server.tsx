@@ -32,7 +32,7 @@ import { RedirectError } from './server/errors';
  */
 export default class MainController extends Controller {
   constructor(client: IClient) {
-    super(null);
+    super();
   }
 
   async initialize(app: express.Express, db: Db) {
@@ -42,32 +42,11 @@ export default class MainController extends Controller {
         rootPath: apiUrl,
         accountRedirectURL: '/message',
         activateAccountUrl: '/auth/activate-account',
-        passwordResetURL: '/reset-password'
-      }).initialize(app, db),
-      new routers.user({
-        rootPath: apiUrl
-      }).initialize(app, db),
-      new routers.posts({
-        rootPath: apiUrl
-      }).initialize(app, db),
-      new routers.categories({
-        rootPath: apiUrl
-      }).initialize(app, db),
-      new routers.volume({
-        rootPath: apiUrl
+        passwordResetURL: '/reset-password',
       }).initialize(app, db),
       new routers.file({
-        rootPath: apiUrl
+        rootPath: apiUrl,
       }).initialize(app, db),
-      new routers.comments({
-        rootPath: apiUrl
-      }).initialize(app, db),
-      new routers.documents({
-        rootPath: apiUrl
-      }).initialize(app, db),
-      new routers.templates({
-        rootPath: apiUrl
-      }).initialize(app, db)
     ]);
 
     const router = express.Router();
@@ -86,7 +65,7 @@ export default class MainController extends Controller {
     let url = req.url;
     let user = req._user;
 
-    if (!user && (url !== '/login' && url !== '/register')) return res.redirect('/login');
+    if (!user && url !== '/login' && url !== '/register') return res.redirect('/login');
     else if (user && (url === '/login' || url === '/register')) return res.redirect('/');
 
     let initialState: Partial<IRootState> = {};
@@ -123,7 +102,7 @@ export default class MainController extends Controller {
               <MuiThemeProvider theme={theme} sheetsManager={new Map()}>
                 <StaticRouter location={url} context={context}>
                   <MuiPickersUtilsProvider utils={DateUtils}>
-                    <App {...{} as any} />
+                    <App {...({} as any)} />
                   </MuiPickersUtilsProvider>
                 </StaticRouter>
               </MuiThemeProvider>
@@ -140,7 +119,7 @@ export default class MainController extends Controller {
       // Check the context if there needs to be a redirect
       if (context.url) {
         res.writeHead(301, {
-          Location: context.url
+          Location: context.url,
         });
         res.end();
         return;

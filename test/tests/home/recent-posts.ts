@@ -1,7 +1,6 @@
-
 import HomePage from '../../pages/home';
 import * as assert from 'assert';
-import { } from 'mocha';
+import {} from 'mocha';
 import { IPost } from 'mantle/src';
 import Agent from '../../utils/agent';
 import utils from '../../utils';
@@ -13,65 +12,62 @@ let page = new HomePage();
 let admin: Agent, joe: Agent;
 let publicPost: IPost<'expanded'>, privatePost: IPost<'expanded'>;
 
-describe( 'Login failures: ', function() {
-
-  before( async () => {
+describe('Recent Posts: ', function() {
+  before(async () => {
     admin = await utils.refreshAdminToken();
-    joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
+    joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
     admin = await utils.refreshAdminToken();
 
-    const posts = ControllerFactory.get( 'posts' );
-    const users = ControllerFactory.get( 'users' );
-    const joeUser = await users.getUser( { username: joe.username } );
-    const adminUser = await users.getUser( { username: admin.username } );
+    const posts = ControllerFactory.get('posts');
+    const users = ControllerFactory.get('users');
+    const joeUser = await users.getUser({ username: joe.username });
+    const adminUser = await users.getUser({ username: admin.username });
 
-    publicPost = await posts.create( {
+    publicPost = (await posts.create({
       title: randomId(),
       slug: randomId(),
       public: true,
       brief: 'This is the first',
       author: adminUser._id.toString()
-    } ) as IPost<'expanded'>;
+    })) as IPost<'expanded'>;
 
-    privatePost = await posts.create( {
+    privatePost = (await posts.create({
       title: randomId(),
       slug: randomId(),
       public: false,
       brief: 'This is brief',
       author: joeUser._id.toString()
-    } ) as IPost<'expanded'>;
+    })) as IPost<'expanded'>;
 
     // Update so we can check its sorting by modified
-    await posts.update( publicPost._id, { public: true } );
-  } )
+    await posts.update(publicPost._id, { public: true });
+  });
 
-  after( async () => {
-    const controller = ControllerFactory.get( 'posts' );
-    await controller.removePost( privatePost._id.toString() );
-    await controller.removePost( publicPost._id.toString() );
-  } )
+  after(async () => {
+    const controller = ControllerFactory.get('posts');
+    await controller.removePost(privatePost._id.toString());
+    await controller.removePost(publicPost._id.toString());
+  });
 
-  it( 'it should have both public & private posts for admin', async () => {
-    await page.load( admin );
+  it('it should have both public & private posts for admin', async () => {
+    await page.load(admin);
     const recent = await page.getRecentPosts();
-    assert.deepEqual( recent[ 0 ].author, publicPost.author.username );
-    assert.deepEqual( recent[ 0 ].created, format( new Date(), 'MMM Do, YYYY' ) ); // Today
-    assert.deepEqual( recent[ 0 ].heading, publicPost.title );
-    assert.deepEqual( recent[ 1 ].heading, privatePost.title );
-  } )
+    assert.deepEqual(recent[0].author, publicPost.author.username);
+    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, YYYY')); // Today
+    assert.deepEqual(recent[0].heading, publicPost.title);
+    assert.deepEqual(recent[1].heading, privatePost.title);
+  });
 
-  it( 'it should have only public posts for joe', async () => {
-
+  it('it should have only public posts for joe', async () => {
     // Update so we can check its sorting by modified
-    const posts = ControllerFactory.get( 'posts' );
-    await posts.update( privatePost._id, { public: false } );
-    await page.load( joe );
+    const posts = ControllerFactory.get('posts');
+    await posts.update(privatePost._id, { public: false });
+    await page.load(joe);
 
     const recent = await page.getRecentPosts();
-    assert.deepEqual( recent[ 0 ].author, publicPost.author.username );
-    assert.deepEqual( recent[ 0 ].created, format( new Date(), 'MMM Do, YYYY' ) ); // Today
-    assert.deepEqual( recent[ 0 ].heading, publicPost.title );
-    if ( recent.length > 1 )
-      assert.notDeepEqual( recent[ 1 ].heading, privatePost.title );
-  } )
-} );
+    assert.deepEqual(recent[0].author, publicPost.author.username);
+    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, YYYY')); // Today
+    assert.deepEqual(recent[0].heading, publicPost.title);
+    if (recent.length > 1) assert.notDeepEqual(recent[1].heading, privatePost.title);
+  });
+});

@@ -13,9 +13,7 @@ import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
 import { FilesGetOptions } from 'mantle';
-
-export type SortTypes = 'name' | 'created' | 'memory';
-export type SortOrder = 'asc' | 'desc';
+import { VolumeSortType, SortOrder } from '../../../../../src/core/enums';
 
 export type Props = {
   multiselect?: boolean;
@@ -26,26 +24,28 @@ export type Props = {
   activeFilters: Partial<FilesGetOptions>;
   openDirectory: (id: string, optons: FilesGetOptions) => void;
   onSelectionChanged: (uids: string[]) => void;
-  onSort: (sortBy: SortTypes, sortDir: SortOrder) => void;
+  onSort: (sortBy: VolumeSortType, sortDir: SortOrder) => void;
 };
 
 export type State = {};
 
 export class DirectoryView extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    multiselect: true
+    multiselect: true,
   };
 
-  private _container: HTMLElement;
+  private _container: React.RefObject<HTMLDivElement>;
 
   constructor(props: Props) {
     super(props);
     this.state = {};
+    this._container = React.createRef();
   }
 
-  private changeOrder(sort: SortTypes) {
-    let order: SortOrder = 'desc';
-    if (this.props.activeFilters.sort === sort && this.props.activeFilters.sortOrder === 'desc') order = 'asc';
+  private changeOrder(sort: VolumeSortType) {
+    let order: SortOrder = SortOrder.desc;
+    if (this.props.activeFilters.sortType === sort && this.props.activeFilters.sortOrder === SortOrder.desc)
+      order = SortOrder.asc;
 
     this.props.onSort(sort, order);
   }
@@ -77,10 +77,10 @@ export class DirectoryView extends React.Component<Props, State> {
       this.onSelectionChange([volume._id]);
     } else if (e.ctrlKey) {
       if (selected.indexOf(volume._id) === -1) this.onSelectionChange(selected.concat(volume._id));
-      else this.onSelectionChange(selected.filter(i => i !== volume._id));
+      else this.onSelectionChange(selected.filter((i) => i !== volume._id));
     } else {
       const filesPage = this.props.files!;
-      const allIds = filesPage.data.map(v => v._id);
+      const allIds = filesPage.data.map((v) => v._id);
 
       let firstIndex = Math.min(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
       let lastIndex = Math.max(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
@@ -92,10 +92,10 @@ export class DirectoryView extends React.Component<Props, State> {
   render() {
     const selected = this.props.selectedUids;
     const files = this.props.files;
-    const headers: { label: string; property: SortTypes }[] = [
-      { label: 'Name', property: 'name' },
-      { label: 'Memory', property: 'memory' },
-      { label: 'Created', property: 'created' }
+    const headers: { label: string; property: VolumeSortType }[] = [
+      { label: 'Name', property: VolumeSortType.name },
+      { label: 'Memory', property: VolumeSortType.memory },
+      { label: 'Created', property: VolumeSortType.created },
     ];
 
     if (!files) return <div>No files</div>;
@@ -109,28 +109,28 @@ export class DirectoryView extends React.Component<Props, State> {
         limit={files.limit}
         total={files.count}
         loading={this.props.loading}
-        onPage={index => {
-          if (this._container) this._container.scrollTop = 0;
+        onPage={(index) => {
+          if (this._container.current) this._container.current.scrollTop = 0;
 
           this.props.openDirectory(this.props.volume._id, { index: index });
         }}
       >
-        <Container innerRef={elm => (this._container = elm)}>
+        <Container ref={this._container}>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableCell
                   numeric={false}
                   padding="checkbox"
-                  sortDirection={filters.sort === 'name' ? filters.sortOrder : false}
+                  sortDirection={filters.sortType === 'name' ? filters.sortOrder : false}
                 >
                   <Checkbox
                     id="mt-select-all"
                     style={{ display: this.props.multiselect ? '' : 'none' }}
                     checked={allSelected}
-                    onClick={e => {
+                    onClick={(e) => {
                       if (allSelected) this.onSelectionChange([]);
-                      else this.onSelectionChange(files.data.map(v => v._id));
+                      else this.onSelectionChange(files.data.map((v) => v._id));
                     }}
                   />
                 </TableCell>
@@ -140,12 +140,12 @@ export class DirectoryView extends React.Component<Props, State> {
                     <TableCell
                       key={`header-${index}`}
                       className={`mt-file-header-${h.label}`}
-                      sortDirection={filters.sort === h.property ? filters.sortOrder : false}
+                      sortDirection={filters.sortType === h.property ? filters.sortOrder : false}
                     >
                       <TableSortLabel
-                        active={filters.sort === h.property}
+                        active={filters.sortType === h.property}
                         direction={filters.sortOrder}
-                        onClick={e => this.changeOrder(h.property)}
+                        onClick={(e) => this.changeOrder(h.property)}
                       >
                         {h.label}
                       </TableSortLabel>
@@ -164,17 +164,17 @@ export class DirectoryView extends React.Component<Props, State> {
                     role="checkbox"
                     key={`vol-row-${index}`}
                     className={`mt-file-row mt-file-row-${index}`}
-                    onClick={e => {
+                    onClick={(e) => {
                       this.onSelection(e, file);
                     }}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
 
                           if (selected.indexOf(file._id) !== -1)
-                            this.onSelectionChange(selected.filter(v => v !== file._id));
+                            this.onSelectionChange(selected.filter((v) => v !== file._id));
                           else this.onSelectionChange(selected.concat(file._id));
                         }}
                         className="mt-file-checkbox"
