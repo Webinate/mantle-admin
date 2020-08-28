@@ -9,7 +9,7 @@ import { dispatchError } from '../../decorators/dispatchError';
 // Action Creators
 export const ActionCreators = {
   SetCategoriesBusy: new ActionCreator<'categories-busy', boolean>('categories-busy'),
-  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory<'client' | 'expanded'>>>(
+  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory<'expanded'>>>(
     'categories-set-categories'
   ),
   SetCategory: new ActionCreator<'categories-set-category', ICategory<'client' | 'expanded'>>(

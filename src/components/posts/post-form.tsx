@@ -81,8 +81,8 @@ export default class PostForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this._editableRef = { ...props.post };
-    const doc = props.post.document as IDocument<'client'>;
-    const template = doc.template as ITemplate<'client'>;
+    const doc = props.post.document!;
+    const template = doc.template;
 
     this.state = {
       editable: this._editableRef,
@@ -96,8 +96,8 @@ export default class PostForm extends React.Component<Props, State> {
   componentWillReceiveProps(next: Props) {
     if (next.post !== this.props.post) {
       this._editableRef = { ...next.post };
-      const doc = next.post.document as IDocument<'client'>;
-      const template = doc.template as ITemplate<'client'>;
+      const doc = next.post.document!;
+      const template = doc.template;
 
       this.setState({
         editable: this._editableRef,

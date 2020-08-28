@@ -7,8 +7,8 @@ import { ActionCreators as CommentActions } from '../store/comments/actions';
 import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';
-import { controllers } from '../../../../src';
 import { PostSortType, PostVisibility, SortOrder } from '../../../../src/core/enums';
+import ControllerFactory from '../../../../src/core/controller-factory';
 
 export default async function (req: IAuthReq, actions: Action[]) {
   const isAdmin = req._user && req._user.privileges !== 'regular' ? true : false;
@@ -30,10 +30,10 @@ export default async function (req: IAuthReq, actions: Action[]) {
 
   if (matchesEdit) {
     const postReply = await Promise.all([
-      controllers.posts.getPost({ id: matchesEdit.params.id }),
-      controllers.categories.getAll(initialCategoryFilter),
-      controllers.comments.getAll(initialCommentFilter),
-      controllers.templates.getMany(),
+      ControllerFactory.get('posts').getPost({ id: matchesEdit.params.id }),
+      ControllerFactory.get('categories').getAll(initialCategoryFilter),
+      ControllerFactory.get('comments').getAll(initialCommentFilter),
+      ControllerFactory.get('templates').getMany(),
     ]);
 
     const post = postReply[0];
@@ -45,7 +45,7 @@ export default async function (req: IAuthReq, actions: Action[]) {
     actions.push(CommentActions.SetComments.create({ page: postReply[2], filters: initialCommentFilter }));
     actions.push(TemplatesActions.GetAll.create(postReply[3]));
   } else {
-    let posts = await controllers.posts.getPosts(initialPostsFilter);
+    let posts = await ControllerFactory.get('posts').getPosts(initialPostsFilter);
     actions.push(PostActions.SetPosts.create({ page: posts, filters: initialPostsFilter }));
   }
 }
