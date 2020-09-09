@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { IComment, Page, IUserEntry, CommentGetAllOptions } from 'mantle';
+import {
+  Comment,
+  User,
+  UpdateCommentInput,
+  AddCommentInput,
+  PaginatedCommentsResponse,
+  QueryCommentsArgs,
+} from 'mantle';
 import Pager from '../../components/pager';
 import { default as styled } from '../../theme/styled';
 import Avatar from '@material-ui/core/Avatar';
@@ -15,24 +22,24 @@ import Button from '@material-ui/core/Button/Button';
 import NewComment from './new-comment';
 
 export type Props = {
-  page: Page<IComment<'client' | 'expanded'>> | null;
+  page: PaginatedCommentsResponse | null;
   loading: boolean;
   selectable?: boolean;
   heightFromContents?: boolean;
-  auth: IUserEntry<'client' | 'expanded'>;
+  auth: User;
   style?: React.CSSProperties;
   selectedUids?: string[];
-  onCommentSelected?: (comment: IComment<'client'>) => void;
-  getAll: (options: Partial<CommentGetAllOptions>) => void;
-  onEdit: (id: string, token: Partial<IComment<'client'>>) => void;
+  onCommentSelected?: (comment: Comment) => void;
+  getAll: (options: Partial<QueryCommentsArgs>) => void;
+  onEdit: (token: Partial<UpdateCommentInput>) => void;
   onDelete: (id: string) => void;
-  onReply: (post: string, parent: string, token: Partial<IComment<'client'>>) => void;
+  onReply: (post: string, parent: string, token: Partial<AddCommentInput>) => void;
 };
 
 export type State = {
   activeCommentId: string;
   activeCommentText: string;
-  commentToDelete: null | IComment<'client'>;
+  commentToDelete: null | Comment;
   commentToReplyId: string;
 };
 
@@ -59,15 +66,13 @@ export class CommentsList extends React.Component<Props, State> {
   componentDidMount() {
     this.props.getAll({
       index: 0,
-      depth: -1,
-      expanded: true,
       postId: '',
     });
   }
 
-  private onEdit(comment: IComment<'client'>) {
+  private onEdit(comment: Comment) {
     this.setState({
-      activeCommentId: comment._id,
+      activeCommentId: comment._id as string,
       activeCommentText: comment.content,
       commentToReplyId: '',
     });
@@ -90,7 +95,7 @@ export class CommentsList extends React.Component<Props, State> {
             id="mt-del-comment-confirm-btn"
             style={{ background: theme.error.background, color: theme.error.color }}
             onClick={(e) => {
-              this.props.onDelete(this.state.commentToDelete!._id);
+              this.props.onDelete(this.state.commentToDelete!._id as string);
               this.setState({
                 commentToDelete: null,
               });
@@ -104,10 +109,10 @@ export class CommentsList extends React.Component<Props, State> {
     );
   }
 
-  private flattenComments(comment: IComment<'client' | 'expanded'>, flat: IComment<'client' | 'expanded'>[]) {
+  private flattenComments(comment: Comment, flat: Comment[]) {
     flat.push(comment);
 
-    for (const child of comment.children) this.flattenComments(child as IComment<'client' | 'expanded'>, flat);
+    for (const child of comment.children) this.flattenComments(child as Comment, flat);
   }
 
   render() {
@@ -115,7 +120,7 @@ export class CommentsList extends React.Component<Props, State> {
 
     if (!comments) return null;
 
-    const flattened: IComment<'client'>[] = [];
+    const flattened: Comment[] = [];
     for (const comment of comments.data) this.flattenComments(comment, flattened);
 
     const auth = this.props.auth;
@@ -143,14 +148,14 @@ export class CommentsList extends React.Component<Props, State> {
           ) : undefined}
 
           {flattened.map((comment, index) => {
-            const isEditting = this.state.activeCommentId === comment._id;
+            const isEditting = this.state.activeCommentId === (comment._id as string);
             const isChild = comment.parent ? true : false;
-            const user = comment.user as IUserEntry<'client'> | null;
+            const user = comment.user;
             let canEditComment = isAdmin || (user && user._id === auth._id ? true : false);
-            const isSelected = this.props.selectedUids!.indexOf(comment._id) !== -1;
+            const isSelected = this.props.selectedUids!.indexOf(comment._id as string) !== -1;
 
             return (
-              <Comment
+              <CommentDiv
                 selectable={this.props.selectable!}
                 className={`mt-comment ${isEditting ? 'mt-editting' : ''} ${isChild ? 'mt-is-child' : ''} ${
                   isSelected ? 'mt-comment-selected' : ''
@@ -164,7 +169,7 @@ export class CommentsList extends React.Component<Props, State> {
                 }}
               >
                 <div className="mt-comment-avatar">
-                  <Avatar src={generateAvatarPic(user)} />
+                  <Avatar src={generateAvatarPic(user || null)} />
                 </div>
                 <div>
                   <div className="mt-comment-author">{comment.author}</div>
@@ -206,7 +211,7 @@ export class CommentsList extends React.Component<Props, State> {
 
                           if (this.state.activeCommentText.trim() === '') return;
 
-                          this.props.onEdit(comment._id, { content: this.state.activeCommentText });
+                          this.props.onEdit({ content: this.state.activeCommentText });
                           this.setState({ activeCommentId: '' });
                         }}
                       >
@@ -242,7 +247,7 @@ export class CommentsList extends React.Component<Props, State> {
                         onClick={(e) => {
                           e.stopPropagation();
                           this.setState({
-                            commentToReplyId: comment._id,
+                            commentToReplyId: comment._id as string,
                             activeCommentId: '',
                           });
                         }}
@@ -254,14 +259,14 @@ export class CommentsList extends React.Component<Props, State> {
                       </span>
                     </div>
                   )}
-                  {comment._id === this.state.commentToReplyId ? (
+                  {(comment._id as string) === this.state.commentToReplyId ? (
                     <NewComment
                       auth={this.props.auth}
                       enabled={true}
                       commentMode={true}
                       onNewComment={(text) => {
                         const postId = typeof comment.post === 'string' ? comment.post : comment.post._id;
-                        this.props.onReply(postId, comment._id, {
+                        this.props.onReply(postId as string, comment._id as string, {
                           content: text,
                         });
                         this.setState({ commentToReplyId: '' });
@@ -270,7 +275,7 @@ export class CommentsList extends React.Component<Props, State> {
                     />
                   ) : undefined}
                 </div>
-              </Comment>
+              </CommentDiv>
             );
           })}
         </PostsInnerContent>
@@ -287,7 +292,7 @@ interface CommentStyleProps extends React.HTMLAttributes<HTMLElement> {
 
 const PostsInnerContent = styled.div``;
 
-const Comment = styled.div`
+const CommentDiv = styled.div`
   display: flex;
   margin: 0 0 16px 0;
   padding: 4px 8px 4px 4px;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IDraftElement } from '../../../../../../src';
+import { Element } from 'mantle';
 import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -7,7 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
 export type Props = {
-  selectedElement: IDraftElement<'expanded'>;
+  selectedElement: Element;
   style: any;
   onChange: (style: any) => void;
 };
@@ -21,7 +21,7 @@ export default class ImageEditor extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      style: { ...props.style }
+      style: { ...props.style },
     };
   }
 
@@ -45,10 +45,10 @@ export default class ImageEditor extends React.Component<Props, State> {
           value={this.state.style['max-width']}
           fullWidth={true}
           helperText="width"
-          onBlur={e => this.onBlur()}
-          onChange={e =>
+          onBlur={(e) => this.onBlur()}
+          onChange={(e) =>
             this.setState({
-              style: { ...this.state.style, 'max-width': e.currentTarget.value ? e.currentTarget.value : undefined }
+              style: { ...this.state.style, 'max-width': e.currentTarget.value ? e.currentTarget.value : undefined },
             })
           }
         />
@@ -57,10 +57,10 @@ export default class ImageEditor extends React.Component<Props, State> {
           value={this.state.style['max-height']}
           fullWidth={true}
           helperText="height"
-          onBlur={e => this.onBlur()}
-          onChange={e =>
+          onBlur={(e) => this.onBlur()}
+          onChange={(e) =>
             this.setState({
-              style: { ...this.state.style, 'max-height': e.currentTarget.value ? e.currentTarget.value : undefined }
+              style: { ...this.state.style, 'max-height': e.currentTarget.value ? e.currentTarget.value : undefined },
             })
           }
         />
@@ -69,7 +69,7 @@ export default class ImageEditor extends React.Component<Props, State> {
             className="mt-image-float"
             value={this.state.style.float || ''}
             fullWidth={true}
-            onChange={e => {
+            onChange={(e) => {
               let floatVal: 'left' | 'right' | undefined = undefined;
               if (e.currentTarget.textContent === 'Left') floatVal = 'left';
               else if (e.currentTarget.textContent === 'Right') floatVal = 'right';

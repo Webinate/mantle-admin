@@ -33,7 +33,7 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   auth: state.authentication,
   routing: state.router,
   location: ownProps,
-  app: state.app
+  app: state.app,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -42,7 +42,7 @@ const dispatchToProps = {
   login: AuthActions.login,
   register: AuthActions.register,
   logout: AuthActions.logout,
-  closeSnackbar: AppActions.serverResponse.create
+  closeSnackbar: AppActions.serverResponse.create,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -82,11 +82,11 @@ export class App extends React.Component<Props, State> {
         loading={this.props.auth.busy}
         error={this.props.auth.error}
         activeComponent={formType}
-        onLogin={(user, pass) => this.props.login({ username: user, password: pass, rememberMe: true })}
-        onActivationReset={user => {}}
-        onPasswordReset={user => {}}
+        onLogin={(user, pass) => this.props.login({ username: user, password: pass, remember: true })}
+        onActivationReset={(user) => {}}
+        onPasswordReset={(user) => {}}
         onRegister={(user, email, password) =>
-          this.props.register({ username: user, password: password, email: email })
+          this.props.register({ username: user, password: password, email: email, activationUrl: '/activate' })
         }
       />
     );
@@ -100,45 +100,45 @@ export class App extends React.Component<Props, State> {
         icon: <HomeIcon style={iconStyle} />,
         exact: true,
         path: '/dashboard',
-        onClick: () => this.goTo('/dashboard')
+        onClick: () => this.goTo('/dashboard'),
       },
       {
         label: 'Posts',
         icon: <PostsIcon style={iconStyle} />,
         exact: false,
         path: '/dashboard/posts',
-        onClick: () => this.goTo('/dashboard/posts')
+        onClick: () => this.goTo('/dashboard/posts'),
       },
       {
         label: 'Users',
         icon: <GroupIcon style={iconStyle} />,
         exact: false,
         path: '/dashboard/users',
-        onClick: () => this.goTo('/dashboard/users')
+        onClick: () => this.goTo('/dashboard/users'),
       },
       {
         label: 'Comments',
         icon: <CommentIcon style={iconStyle} />,
         exact: false,
         path: '/dashboard/comments',
-        onClick: () => this.goTo('/dashboard/comments')
+        onClick: () => this.goTo('/dashboard/comments'),
       },
       {
         label: 'Media',
         icon: <MediaLibIcon style={iconStyle} />,
         exact: false,
         path: '/dashboard/media',
-        onClick: () => this.goTo('/dashboard/media')
-      }
+        onClick: () => this.goTo('/dashboard/media'),
+      },
     ];
 
     return (
       <div>
         <CssBaseline />
-        <Route path="/" exact={true} render={props => <Redirect to="/dashboard" />} />
+        <Route path="/" exact={true} render={(props) => <Redirect to="/dashboard" />} />
         <Route
           path="/dashboard"
-          render={props => {
+          render={(props) => {
             return (
               <Dashboard
                 animated={this.props.app.debugMode ? false : true}
@@ -156,7 +156,7 @@ export class App extends React.Component<Props, State> {
                             button
                             className={selected ? 'selected' : ''}
                             key={`menu-item-${index}`}
-                            onClick={e => i.onClick()}
+                            onClick={(e) => i.onClick()}
                           >
                             <ListItemIcon>
                               <Icon>{i.icon}</Icon>
@@ -175,42 +175,42 @@ export class App extends React.Component<Props, State> {
                   <Route
                     path="/dashboard"
                     exact={true}
-                    render={props => {
-                      return <Home {...{ location: props.location } as any} />;
+                    render={(props) => {
+                      return <Home {...({ location: props.location } as any)} />;
                     }}
                   />
                   <Route
                     path="/dashboard/posts"
-                    render={props => {
-                      return <Posts {...{ location: props.location } as any} />;
+                    render={(props) => {
+                      return <Posts {...({ location: props.location } as any)} />;
                     }}
                   />
                   <Route
                     path="/dashboard/users"
-                    render={props => {
-                      return <Users {...{} as any} />;
+                    render={(props) => {
+                      return <Users {...({} as any)} />;
                     }}
                   />
                   <Route
                     path="/dashboard/comments"
-                    render={props => {
-                      return <Comments {...{ location: props.location } as any} />;
+                    render={(props) => {
+                      return <Comments {...({ location: props.location } as any)} />;
                     }}
                   />
                   <Route
                     path="/dashboard/media"
-                    render={props => {
-                      return <Media {...{ location: props.location } as any} />;
+                    render={(props) => {
+                      return <Media {...({ location: props.location } as any)} />;
                     }}
                   />
-                  <Route render={props => <h1>Not Found</h1>} />
+                  <Route render={(props) => <h1>Not Found</h1>} />
                 </Switch>
               </Dashboard>
             );
           }}
         />
-        <Route path="/login" render={props => this.getAuthScreen('login')} />
-        <Route path="/register" render={props => this.getAuthScreen('register')} />
+        <Route path="/login" render={(props) => this.getAuthScreen('login')} />
+        <Route path="/register" render={(props) => this.getAuthScreen('register')} />
 
         <Snackbar
           className={`mt-response-message ${this.props.app.response ? 'mt-snack-open' : 'mt-snack-closed'}`}
@@ -224,10 +224,10 @@ export class App extends React.Component<Props, State> {
               key="close-1"
               variant="contained"
               id="mt-close-snackbar-btn"
-              onClick={e => this.props.closeSnackbar(null)}
+              onClick={(e) => this.props.closeSnackbar(null)}
             >
               close
-            </Button>
+            </Button>,
           ]}
           message={<span id="mt-close-snackbar-msg">{this.props.app.response || ''}</span>}
         />

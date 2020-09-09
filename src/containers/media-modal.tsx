@@ -9,9 +9,8 @@ import DialogContent from '@material-ui/core/DialogContent/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 import Button from '@material-ui/core/Button/Button';
 import { BreadCrumb } from '../components/media/bread-crumb';
-import { IFileEntry } from '../../../../src';
+import { SortOrder, File, VolumeSortType, FileSortType } from 'mantle';
 import { LinearProgress } from '@material-ui/core';
-import { VolumeSortType, SortOrder } from '../../../../src/core/enums';
 
 // Map state to props
 const mapStateToProps = (state: IRootState, ownProps: any) => ({
@@ -20,7 +19,7 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   media: state.media,
   open: ownProps.open,
   onCancel: ownProps.onCancel as () => void,
-  onSelect: ownProps.onSelect as (file: IFileEntry<'client' | 'expanded'>) => void,
+  onSelect: ownProps.onSelect as (file: File) => void,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -73,9 +72,9 @@ export class MediaModal extends React.Component<Props, State> {
     }
   }
 
-  private onSort(sort: VolumeSortType, direction: SortOrder, volumeId: string | null) {
-    if (volumeId) this.props.openDirectory(volumeId, { sortType: sort, sortOrder: direction });
-    else this.props.getVolumes({ sortType: sort, sortOrder: direction });
+  private onSort(sort: VolumeSortType | FileSortType, direction: SortOrder, volumeId: string | null) {
+    if (volumeId) this.props.openDirectory(volumeId, { sortType: sort as FileSortType, sortOrder: direction });
+    else this.props.getVolumes({ sortType: sort as VolumeSortType, sortOrder: direction });
   }
 
   render() {
@@ -106,7 +105,9 @@ export class MediaModal extends React.Component<Props, State> {
                   disabled={!activeDir || !this.state.selectedUid || this.props.media.busy}
                   id="mt-media-confirm-btn"
                   onClick={(e) => {
-                    const file = this.props.media.filesPage!.data.find((f) => f._id === this.state.selectedUid)!;
+                    const file = this.props.media.filesPage!.data.find(
+                      (f) => (f._id as string) === this.state.selectedUid
+                    )!;
                     this.props.onSelect(file);
                   }}
                   color="primary"
@@ -121,17 +122,17 @@ export class MediaModal extends React.Component<Props, State> {
           selectedIds={selectedUids}
           files={this.props.media.filesPage}
           style={style}
-          onRename={(newName, id) => this.props.editFile(activeDir._id, id, { name: newName })}
-          onDelete={() => this.onDelete(activeDir._id)}
-          onSort={(sort, dir) => this.onSort(sort, dir, activeDir._id)}
+          onRename={(newName, id) => this.props.editFile(activeDir._id as string, id, { name: newName })}
+          onDelete={() => this.onDelete(activeDir._id as string)}
+          onSort={(sort, dir) => this.onSort(sort, dir, activeDir._id as string)}
           onUploadFiles={(files) => {
-            this.props.upload(activeDir._id, files);
+            this.props.upload(activeDir._id as string, files);
           }}
           onReplaceFile={(file) => {
-            this.props.replaceFile(activeDir._id, selectedUids[0], file);
+            this.props.replaceFile(activeDir._id as string, selectedUids[0], file);
           }}
           activeVolume={this.props.media.selected}
-          activeVolumeId={activeDir._id}
+          activeVolumeId={activeDir._id as string}
           loading={this.props.media.busy}
           onSelectionChanged={(selection) => this.setState({ selectedUid: selection[selection.length - 1] })}
           openDirectory={(id, options) => this.props.openDirectory(id, options)}

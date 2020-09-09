@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from '../../../../src';
+import { User, PaginatedUserResponse } from 'mantle';
 import Popover from '@material-ui/core/Popover';
 import Input from '@material-ui/core/Input';
 import IconButton from '@material-ui/core/IconButton';
@@ -10,14 +10,15 @@ import Avatar from '@material-ui/core/Avatar';
 import CloseIcon from '@material-ui/icons/Close';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
-import * as users from '../../../../src/lib-frontend/users';
+import { graphql } from '../utils/httpClients';
 import MenuList from '@material-ui/core/MenuList';
 import Paper from '@material-ui/core/Paper';
+import { GET_USERS } from '../graphql/requests/user-requests';
 
 type Props = {
-  user: IUserEntry<'client' | 'expanded'> | null;
+  user: User | null;
   canEdit?: boolean;
-  onChange: (user: IUserEntry<'client' | 'expanded'> | null) => void;
+  onChange: (user: User | null) => void;
   labelStyle?: React.CSSProperties;
   labelPosition?: 'right' | 'left';
   imageSize?: number;
@@ -26,7 +27,7 @@ type Props = {
 type State = {
   elm: Element | null;
   open: boolean;
-  users: IUserEntry<'client' | 'expanded'>[];
+  users: User[];
   username: string;
 };
 
@@ -34,7 +35,7 @@ export default class UserPicker extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
     canEdit: true,
     labelPosition: 'left',
-    imageSize: 40
+    imageSize: 40,
   };
 
   private elm: HTMLElement | null;
@@ -45,12 +46,12 @@ export default class UserPicker extends React.Component<Props, State> {
       elm: null,
       open: false,
       users: [],
-      username: ''
+      username: '',
     };
   }
 
   async onUpdateInput(user: string) {
-    const page = await users.getAll({ search: user, limit: 10 });
+    const page = await graphql<PaginatedUserResponse>(GET_USERS, { search: user, limit: 10 });
     this.setState({ username: user, users: page.data });
   }
 
@@ -64,7 +65,7 @@ export default class UserPicker extends React.Component<Props, State> {
         style={{ padding: 5 }}
         anchorEl={this.elm!}
         open={true}
-        onClose={e => {
+        onClose={(e) => {
           e.stopPropagation();
           this.close();
         }}
@@ -75,10 +76,10 @@ export default class UserPicker extends React.Component<Props, State> {
             placeholder="Type user name"
             className="mt-user-autocomplete"
             value={this.state.username}
-            onChange={e => this.onUpdateInput(e.currentTarget.value)}
+            onChange={(e) => this.onUpdateInput(e.currentTarget.value)}
           />
           <IconButton
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               this.props.onChange(null);
               this.setState({ open: false, users: [] });
@@ -94,7 +95,7 @@ export default class UserPicker extends React.Component<Props, State> {
                 <MenuItem
                   className="mt-user-drop-item"
                   key={`user-${index}`}
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     this.props.onChange(user);
                     this.setState({ open: false, users: [] });
@@ -124,16 +125,16 @@ export default class UserPicker extends React.Component<Props, State> {
   render() {
     return (
       <div
-        ref={e => (this.elm = e)}
+        ref={(e) => (this.elm = e)}
         className="my-user-picker-btn"
         style={{
           display: 'inline-block',
           padding: '0 0 0 5px',
-          cursor: this.props.canEdit ? 'pointer' : ''
+          cursor: this.props.canEdit ? 'pointer' : '',
         }}
         onClick={
           this.props.canEdit
-            ? e => {
+            ? (e) => {
                 this.setState({ open: true, elm: e.currentTarget }, () => {
                   this.onUpdateInput('');
                 });
@@ -150,7 +151,7 @@ export default class UserPicker extends React.Component<Props, State> {
             margin: this.props.labelPosition === 'right' ? '0 5px 0 0' : '0 0 0 5px',
             background: theme.light400.background,
             height: this.props.imageSize,
-            width: this.props.imageSize
+            width: this.props.imageSize,
           }}
           src={generateAvatarPic(this.props.user)}
         />

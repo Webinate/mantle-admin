@@ -16,7 +16,7 @@ import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import Icon from '@material-ui/core/Icon';
 import RemoveIcon from '@material-ui/icons/Delete';
-import { IPost, IUserEntry, IFileEntry, IDraftElement, ITemplate, IDocument, IImageElement } from 'mantle';
+import { Post, User, File, Element, UpdatePostInput, AddPostInput, AddElementInput, UpdateElementInput } from 'mantle';
 import { State as TemplateState } from '../../store/templates/reducer';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
@@ -28,7 +28,6 @@ import { MediaModal } from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
 import { ElmEditor } from './elm-editor';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -37,29 +36,28 @@ import EditIcon from '@material-ui/icons/Edit';
 import { DatePickerWrapperProps } from 'material-ui-pickers/DatePicker/DatePickerWrapper';
 import DatePicker from 'material-ui-pickers/DatePicker';
 import ImageEditor from './element-editors/image-editor';
-import { ElementType } from '../../../../../src/core/enums';
 
 export type Props = {
-  activeUser: IUserEntry<'client' | 'expanded'>;
+  activeUser: User;
   isAdmin: boolean;
   id?: string;
-  post: Partial<IPost<'expanded'>>;
-  elements: IDraftElement<'client' | 'expanded'>[];
+  post: Partial<Post>;
+  elements: Element[];
   templates: TemplateState;
   categoriesLoading: boolean;
   animated: boolean;
   selectedElements: string[];
   focussedId: string;
   onRequestPreview: () => void;
-  onUpdate?: (post: Partial<IPost<'client' | 'expanded'>>) => void;
-  onCreate?: (post: Partial<IPost<'client' | 'expanded'>>) => void;
+  onUpdate?: (post: Partial<UpdatePostInput>) => void;
+  onCreate?: (post: Partial<AddPostInput>) => void;
   renderAfterForm?: () => undefined | null | JSX.Element;
   onTemplateChanged: (templateId: string) => void;
-  onCreateElm: (elms: Partial<IDraftElement<'client' | 'expanded'>>[], index?: number) => void;
+  onCreateElm: (elms: Partial<AddElementInput>[], index?: number) => void;
   onUpdateElm: (
     id: string,
-    token: Partial<IDraftElement<'client'>>,
-    createElement: Partial<IDraftElement<'client' | 'expanded'>> | null,
+    token: Partial<UpdateElementInput>,
+    createElement: Partial<AddElementInput> | null,
     deselect: 'select' | 'deselect' | 'none'
   ) => void;
   onDeleteElements: (ids: string[]) => void;
@@ -67,20 +65,22 @@ export type Props = {
 };
 
 export type State = {
-  editable: Partial<IPost<'client' | 'expanded'>>;
+  editable: Partial<UpdatePostInput>;
+  selectedUser: User | null;
   currentTagText: string;
   slugWasEdited: boolean;
   showMediaPopup: boolean;
+  featuredImage: File | null;
   activeTemplate: string;
 };
 
 export default class PostForm extends React.Component<Props, State> {
-  private _editableRef: Partial<IPost<'client' | 'expanded'>>;
+  private _editableRef: Partial<UpdatePostInput>;
   private _datePicker: React.Component<DatePickerWrapperProps, any, any> | null;
 
   constructor(props: Props) {
     super(props);
-    this._editableRef = { ...props.post };
+    this._editableRef = this.postToEditable(props.post);
     const doc = props.post.document!;
     const template = doc.template;
 
@@ -89,20 +89,36 @@ export default class PostForm extends React.Component<Props, State> {
       currentTagText: '',
       slugWasEdited: false,
       showMediaPopup: false,
-      activeTemplate: template._id,
+      featuredImage: props.post.featuredImage || null,
+      selectedUser: props.post.author || null,
+      activeTemplate: template._id.toString(),
     };
+  }
+
+  postToEditable(post: Partial<Post>) {
+    return {
+      _id: post._id,
+      author: post.author?._id,
+      title: post.title,
+      slug: post.slug,
+      brief: post.brief,
+      categories: post.categories ? post.categories.map((c) => c._id as string) : [],
+      public: post.public,
+      tags: post.tags,
+      featuredImage: post.featuredImage?._id,
+    } as UpdatePostInput;
   }
 
   componentWillReceiveProps(next: Props) {
     if (next.post !== this.props.post) {
-      this._editableRef = { ...next.post };
+      this._editableRef = this.postToEditable(next.post);
       const doc = next.post.document!;
       const template = doc.template;
 
       this.setState({
         editable: this._editableRef,
         currentTagText: '',
-        activeTemplate: template._id,
+        activeTemplate: template._id.toString(),
       });
     }
   }
@@ -159,7 +175,7 @@ export default class PostForm extends React.Component<Props, State> {
                   className="mt-post-confirm"
                   onClick={(e) => {
                     if (this.props.post && this.props.onUpdate) this.props.onUpdate(this.state.editable);
-                    else if (this.props.onCreate) this.props.onCreate(this.state.editable);
+                    else if (this.props.onCreate) this.props.onCreate(this.state.editable as AddPostInput);
                   }}
                   color="primary"
                   fullWidth={true}
@@ -294,7 +310,7 @@ export default class PostForm extends React.Component<Props, State> {
           <div className="mt-panel-inner">
             <TextField
               id="mt-post-desc"
-              value={this.state.editable.brief}
+              value={this.state.editable.brief || ''}
               fullWidth={true}
               multiline={true}
               helperText="Post Brief Description"
@@ -333,8 +349,8 @@ export default class PostForm extends React.Component<Props, State> {
           <div style={{ position: 'relative', flex: '1' }}>
             <FeaturedImg id="mt-featured-img" onClick={(e) => this.setState({ showMediaPopup: true })}>
               <Tooltip title="Click to upload image">
-                {this.state.editable.featuredImage ? (
-                  <img src={(this.state.editable.featuredImage as IFileEntry<'client'>).publicURL} />
+                {this.state.featuredImage ? (
+                  <img src={this.state.featuredImage.publicURL} />
                 ) : (
                   <img src={'/images/post-feature.svg'} />
                 )}
@@ -362,10 +378,10 @@ export default class PostForm extends React.Component<Props, State> {
             <CategoryEditor
               onCategorySelected={(category) => {
                 let newIds: string[] = [];
-                const index = this.state.editable.categories!.indexOf(category._id);
+                const index = this.state.editable.categories!.indexOf(category._id as string);
 
-                if (index === -1) newIds = this.state.editable.categories!.concat(category._id);
-                else newIds = this.state.editable.categories!.filter((f) => f !== category._id);
+                if (index === -1) newIds = this.state.editable.categories!.concat(category._id as string) as string[];
+                else newIds = this.state.editable.categories!.filter((f) => f !== category._id) as string[];
 
                 this.setState({ editable: { ...this.state.editable, categories: newIds } });
               }}
@@ -387,8 +403,8 @@ export default class PostForm extends React.Component<Props, State> {
   private renderTemplates() {
     const templates = this.props.templates;
     const templateId = this.state.activeTemplate;
-    const doc = this.state.editable.document as IDocument<'client'>;
-    const curTemplate = doc.template as ITemplate<'client'>;
+    const doc = this.props.post.document!;
+    const curTemplate = doc.template;
 
     return (
       <ExpansionPanel className="mt-templates-panel">
@@ -402,14 +418,14 @@ export default class PostForm extends React.Component<Props, State> {
             ) : (
               <List>
                 {templates.templatesPage.data.map((t) => (
-                  <ListItem key={t._id} className="mt-template-item">
+                  <ListItem key={t._id as string} className="mt-template-item">
                     <ListItemText className="mt-template-item-name" primary={t.name} />
                     <ListItemSecondaryAction>
                       <Switch
                         color="primary"
                         className="mt-template-item-switch"
-                        onChange={(e) => this.setState({ activeTemplate: t._id })}
-                        checked={templateId === t._id}
+                        onChange={(e) => this.setState({ activeTemplate: t._id as string })}
+                        checked={templateId === (t._id as string)}
                       />
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -449,15 +465,13 @@ export default class PostForm extends React.Component<Props, State> {
   private renderElementProperties() {
     if (this.props.selectedElements.length === 0) return null;
 
-    const element = this.props.elements.find((e) => e._id === this.props.selectedElements[0]) as IDraftElement<
-      'expanded'
-    >;
+    const element = this.props.elements.find((e) => e._id === this.props.selectedElements[0]);
     let editor: { title: string; editor: JSX.Element } | null = null;
 
     if (!element) return null;
 
-    if (element.type === ElementType.image) {
-      const image = element as IImageElement<'expanded'>;
+    if (element.type === 'image') {
+      const image = element;
       editor = {
         title: 'Image Properties',
         editor: (
@@ -465,7 +479,7 @@ export default class PostForm extends React.Component<Props, State> {
             style={image.style}
             selectedElement={element}
             onChange={(style) => {
-              this.props.onUpdateElm(image._id, { style } as IImageElement<'client'>, null, 'none');
+              this.props.onUpdateElm(image._id, { style }, null, 'none');
             }}
           />
         ),
@@ -487,7 +501,7 @@ export default class PostForm extends React.Component<Props, State> {
   }
 
   render() {
-    const doc = this.state.editable.document as IDocument<'client'>;
+    const doc = this.props.post.document;
 
     return (
       <Form animated={this.props.animated}>
@@ -495,7 +509,7 @@ export default class PostForm extends React.Component<Props, State> {
           <div>
             <input
               id="mt-post-title"
-              value={this.state.editable.title}
+              value={this.state.editable.title || ''}
               placeholder="Enter Post Title"
               onChange={(e) => {
                 this.setState({
@@ -510,7 +524,7 @@ export default class PostForm extends React.Component<Props, State> {
             <SlugContainer>
               <div>
                 <SlugEditor
-                  value={this.state.editable.slug}
+                  value={this.state.editable.slug || ''}
                   onChange={(value) => {
                     this.setState({
                       slugWasEdited: true,
@@ -525,17 +539,18 @@ export default class PostForm extends React.Component<Props, State> {
                   canEdit={this.props.isAdmin}
                   onChange={(user) => {
                     this.setState({
-                      editable: { ...this.state.editable, author: user ? user : '' } as IPost<'client'>,
+                      selectedUser: user,
+                      editable: { ...this.state.editable, author: user ? (user._id as string) : '' },
                     });
                   }}
-                  user={this.state.editable.author ? (this.state.editable.author as IUserEntry<'client'>) : null}
+                  user={this.state.selectedUser ? this.state.selectedUser : null}
                 />
               </div>
             </SlugContainer>
           </div>
           <ElmEditor
             elements={this.props.elements}
-            document={doc}
+            document={doc!}
             onCreateElm={(elms, index) => this.props.onCreateElm(elms, index)}
             onUpdateElm={(id, html, createParagraph, deselect) =>
               this.props.onUpdateElm(id, { html }, createParagraph, deselect)
@@ -567,7 +582,8 @@ export default class PostForm extends React.Component<Props, State> {
             onSelect={(file) =>
               this.setState({
                 showMediaPopup: false,
-                editable: { ...this.state.editable, featuredImage: file } as IPost<'expanded'>,
+                featuredImage: file,
+                editable: { ...this.state.editable, featuredImage: file._id },
               })
             }
           />

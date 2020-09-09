@@ -1,16 +1,16 @@
 import { ActionCreators, Action } from './actions';
 import { ActionCreators as AdminActionCreators, Action as AdminAction } from '../admin-actions/actions';
-import { IUserEntry, Page } from '../../../../../src';
+import { PaginatedUserResponse } from 'mantle';
 
 // State
 export type State = {
-  readonly userPage: Page<IUserEntry<'client' | 'expanded'>> | null;
+  readonly userPage: PaginatedUserResponse | null;
   readonly busy: boolean;
 };
 
 export const initialState: State = {
   userPage: null,
-  busy: false
+  busy: false,
 };
 
 // Reducer
@@ -22,7 +22,7 @@ export default function reducer(state: State = initialState, action: Action | Ad
     case ActionCreators.SetUsers.type:
       partialState = {
         userPage: action.payload,
-        busy: false
+        busy: false,
       };
       break;
 
@@ -38,15 +38,15 @@ export default function reducer(state: State = initialState, action: Action | Ad
           data: page!.data.map((item, index) => {
             if (item._id === action.payload._id) return action.payload;
             return item;
-          })
-        }
+          }),
+        },
       };
       break;
 
     case ActionCreators.RemoveUser.type:
       partialState = {
-        userPage: { ...page!, data: page!.data.filter(user => user.username !== action.payload) },
-        busy: false
+        userPage: { ...page!, data: page!.data.filter((user) => user.username !== action.payload) },
+        busy: false,
       };
       break;
 
@@ -54,10 +54,10 @@ export default function reducer(state: State = initialState, action: Action | Ad
       partialState = {
         userPage: {
           ...page!,
-          data: page!.data.map(user => {
+          data: page!.data.map((user) => {
             return { ...user, registerKey: '' };
-          })
-        }
+          }),
+        },
       };
       break;
 

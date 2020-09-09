@@ -12,9 +12,9 @@ import HTML from './components/html';
 import { apiUrl } from './utils/httpClients';
 import createHistory from 'history/createMemoryHistory';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import { Controller } from '../../../src';
-import { IAuthReq, IClient } from '../../../src';
-import { routers, decorators } from '../../../src';
+import { Router } from '../../../src/routers/router';
+import { FileRouter } from '../../../src/routers/file';
+import { AuthRouter } from '../../../src/routers/auth';
 import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
@@ -22,15 +22,19 @@ import { SheetsRegistry } from 'react-jss/lib/jss';
 import JssProvider from 'react-jss/lib/JssProvider';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import DateUtils from 'material-ui-pickers/utils/date-fns-utils';
+import { User as UserModel } from '../../../src/graphql/models/user-type';
+import type { User } from 'mantle';
 
 // Needed for onTouchTap
 import { Action } from 'redux';
 import { RedirectError } from './server/errors';
+import controllerFactory from '../../../src/core/controller-factory';
+import { IClient } from '../../../src/types/config/properties/i-client';
 
 /**
  * The default entry point for the admin server
  */
-export default class MainController extends Controller {
+export default class MainController extends Router {
   constructor(client: IClient) {
     super();
   }
@@ -38,13 +42,13 @@ export default class MainController extends Controller {
   async initialize(app: express.Express, db: Db) {
     await Promise.all([
       super.initialize(app, db),
-      new routers.auth({
+      new AuthRouter({
         rootPath: apiUrl,
         accountRedirectURL: '/message',
         activateAccountUrl: '/auth/activate-account',
         passwordResetURL: '/reset-password',
       }).initialize(app, db),
-      new routers.file({
+      new FileRouter({
         rootPath: apiUrl,
       }).initialize(app, db),
     ]);
@@ -58,12 +62,15 @@ export default class MainController extends Controller {
   /**
    * Draws the html page and its initial react state and component tree
    */
-  @decorators.identify()
-  private async renderPage(req: IAuthReq, res: express.Response, next: Function) {
+  private async renderPage(req: express.Request, res: express.Response, next: Function) {
+    // Get current session
+    const session = await controllerFactory.get('sessions').getSession(req);
+    if (session) await controllerFactory.get('sessions').setSessionHeader(session, req, res);
+
     const context: { url?: string } = {};
     const history = createHistory();
     let url = req.url;
-    let user = req._user;
+    let user = session?.user || null;
 
     if (!user && url !== '/login' && url !== '/register') return res.redirect('/login');
     else if (user && (url === '/login' || url === '/register')) return res.redirect('/');
@@ -75,7 +82,7 @@ export default class MainController extends Controller {
 
     let actions: Action[];
     try {
-      actions = await hydrate(req);
+      actions = await hydrate(req.url, user ? (UserModel.fromEntity(user) as User) : null);
     } catch (err) {
       if (err instanceof RedirectError) return res.redirect(err.redirect);
 

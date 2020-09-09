@@ -1,20 +1,22 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, ICategory } from '../../../../../src';
-import * as categories from '../../../../../src/lib-frontend/categories';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { disptachable } from '../../decorators/dispatchable';
 import { dispatchError } from '../../decorators/dispatchError';
+import { PaginatedCategoryResponse, AddCategoryInput, UpdateCategoryInput, Category } from 'mantle';
+import { graphql } from '../../utils/httpClients';
+import {
+  GET_CATEGORIES,
+  PATCH_CATEGORY,
+  ADD_CATEGORY,
+  REMOVE_CATEGORY,
+} from '../../graphql/requests/category-requests';
 
 // Action Creators
 export const ActionCreators = {
   SetCategoriesBusy: new ActionCreator<'categories-busy', boolean>('categories-busy'),
-  SetCategories: new ActionCreator<'categories-set-categories', Page<ICategory<'expanded'>>>(
-    'categories-set-categories'
-  ),
-  SetCategory: new ActionCreator<'categories-set-category', ICategory<'client' | 'expanded'>>(
-    'categories-set-category'
-  ),
+  SetCategories: new ActionCreator<'categories-set-categories', PaginatedCategoryResponse>('categories-set-categories'),
+  SetCategory: new ActionCreator<'categories-set-category', Category>('categories-set-category'),
   SetCategoryErr: new ActionCreator<'categories-set-err', string | null>('categories-set-err'),
 };
 
@@ -25,24 +27,21 @@ class Actions {
   @disptachable()
   async getCategories(index: number = 0, limit?: number, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-    const resp = await categories.getAll({
-      index: index,
-      limit: limit,
-      root: true,
-    });
+    const resp = await graphql<PaginatedCategoryResponse>(GET_CATEGORIES, { index: index, limit: limit, root: true });
     dispatch!(ActionCreators.SetCategories.create(resp));
   }
 
   @disptachable()
   @dispatchError(ActionCreators.SetCategoryErr, { prefix: 'Error: ' })
   async editCategory(
-    category: Partial<ICategory<'client'>>,
+    category: Partial<UpdateCategoryInput>,
     callback?: () => void,
     dispatch?: Function,
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-    const resp = await categories.edit(category._id as string, category);
+    const resp = await graphql<Category>(PATCH_CATEGORY, { token: category });
+    // const resp = await categories.edit(category._id as string, category);
     dispatch!(AppActions.serverResponse.create(`Category '${resp.title}' updated`));
     dispatch!(this.getCategories());
 
@@ -52,13 +51,14 @@ class Actions {
   @disptachable()
   @dispatchError(ActionCreators.SetCategoryErr, { prefix: 'Error: ' })
   async createCategory(
-    category: Partial<ICategory<'client'>>,
+    category: Partial<AddCategoryInput>,
     callback?: () => void,
     dispatch?: Function,
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-    const resp = await categories.create(category);
+    const resp = await graphql<Category>(ADD_CATEGORY, { token: category });
+    // const resp = await categories.create(category);
     dispatch!(AppActions.serverResponse.create(`New Category '${resp.title}' created`));
     dispatch!(this.getCategories());
 
@@ -66,10 +66,11 @@ class Actions {
   }
 
   @disptachable()
-  async removeCategory(category: ICategory<'client'>, dispatch?: Function, getState?: () => IRootState) {
+  async removeCategory(category: Category, dispatch?: Function, getState?: () => IRootState) {
     try {
       dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-      await categories.remove(category._id);
+      await graphql<Category>(REMOVE_CATEGORY, { id: category._id });
+      // await categories.remove(category._id);
       dispatch!(AppActions.serverResponse.create(`Category '${category.title}' removed`));
       dispatch!(this.getCategories());
     } catch (err) {

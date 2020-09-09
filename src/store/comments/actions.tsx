@@ -1,20 +1,21 @@
 import { ActionCreator } from '../actions-creator';
-import { Page, IComment } from '../../../../../src';
-import { CommentGetAllOptions } from 'mantle';
-import * as comments from '../../../../../src/lib-frontend/comments';
+import { Comment, PaginatedCommentsResponse, AddCommentInput, QueryCommentsArgs } from 'mantle';
+import { UpdateCommentInput } from 'mantle';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { disptachable } from '../../decorators/dispatchable';
 import { dispatchError } from '../../decorators/dispatchError';
+import { graphql } from '../../utils/httpClients';
+import { ADD_COMMENT, PATCH_COMMENT, GET_COMMENTS, REMOVE_COMMENT } from '../../graphql/requests/comment-requests';
 
 // Action Creators
 export const ActionCreators = {
   SetCommentsBusy: new ActionCreator<'comments-busy', boolean>('comments-busy'),
   SetComments: new ActionCreator<
     'comments-set-comments',
-    { page: Page<IComment<'client' | 'expanded'>>; filters: Partial<CommentGetAllOptions> }
+    { page: PaginatedCommentsResponse; filters: Partial<QueryCommentsArgs> }
   >('comments-set-comments'),
-  SetComment: new ActionCreator<'comments-set-comment', IComment<'client' | 'expanded'>>('comments-set-comment')
+  SetComment: new ActionCreator<'comments-set-comment', Comment>('comments-set-comment'),
 };
 
 // Action Types
@@ -25,7 +26,7 @@ class Actions {
    */
   @disptachable()
   async getComments(
-    options: Partial<CommentGetAllOptions>,
+    options: Partial<QueryCommentsArgs>,
     postId?: string,
     dispatch?: Function,
     getState?: () => IRootState
@@ -36,9 +37,10 @@ class Actions {
     // Resets the array first
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
 
-    let resp: Page<IComment<'client' | 'expanded'>>;
+    // let resp: Page<IComment<'client' | 'expanded'>>;
 
-    resp = await comments.getAll(newFilters);
+    const resp = await graphql<PaginatedCommentsResponse>(GET_COMMENTS, newFilters);
+    // resp = await comments.getAll(newFilters);
 
     dispatch!(ActionCreators.SetComments.create({ page: resp, filters: newFilters }));
   }
@@ -47,26 +49,23 @@ class Actions {
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async createComment(
     postId: string,
-    comment: Partial<IComment<'client'>>,
+    comment: Partial<AddCommentInput>,
     parent?: string,
     dispatch?: Function,
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
-    await comments.create(postId, comment, parent);
+    await graphql<Comment>(ADD_COMMENT, { token: comment });
+    // await comments.create(postId, comment, parent);
     dispatch!(this.getComments({}));
   }
 
   @disptachable()
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
-  async editComment(
-    commentId: string,
-    token: Partial<IComment<'client'>>,
-    dispatch?: Function,
-    getState?: () => IRootState
-  ) {
+  async editComment(token: Partial<UpdateCommentInput>, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
-    await comments.update(commentId, token);
+    await graphql<Comment>(PATCH_COMMENT, { token: token });
+    // await comments.update(commentId, token);
     dispatch!(this.getComments({}));
   }
 
@@ -74,7 +73,8 @@ class Actions {
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async deleteComment(commentId: string, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
-    await comments.remove(commentId);
+    await graphql<Comment>(REMOVE_COMMENT, { id: commentId });
+    // await comments.remove(commentId);
     dispatch!(this.getComments({}));
   }
 }

@@ -20,8 +20,8 @@ export async function get(url: string) {
   const resp = await fetch(url, {
     credentials: 'include',
     headers: new Headers({
-      'content-type': 'application/json'
-    })
+      'content-type': 'application/json',
+    }),
   });
 
   if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
@@ -40,8 +40,8 @@ export async function post(url: string, data: any) {
     body: JSON.stringify(data),
     credentials: 'include',
     headers: new Headers({
-      'content-type': 'application/json'
-    })
+      'content-type': 'application/json',
+    }),
   });
 
   if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
@@ -60,8 +60,8 @@ export async function del(url: string, data?: any) {
     body: data ? JSON.stringify(data) : undefined,
     credentials: 'include',
     headers: new Headers({
-      'content-type': 'application/json'
-    })
+      'content-type': 'application/json',
+    }),
   });
 
   if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
@@ -80,11 +80,29 @@ export async function put(url: string, data?: any) {
     body: data ? JSON.stringify(data) : undefined,
     credentials: 'include',
     headers: new Headers({
-      'content-type': 'application/json'
-    })
+      'content-type': 'application/json',
+    }),
   });
 
   if (resp.status >= 400 && resp.status <= 500) throw new ClientError(resp.statusText, resp.status, resp);
 
   return resp;
+}
+
+export async function graphql<T>(query: string, variables: any, headers?: any) {
+  const resp = await fetch('/graphql', {
+    method: 'post',
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+    credentials: 'include',
+    headers: new Headers({
+      'content-type': 'application/json',
+      accept: 'application/json',
+      ...headers,
+    }),
+  });
+
+  return (await resp.json()).data as T;
 }

@@ -23,7 +23,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
-import { IPost, IDocument } from '../../../../src';
+import { Post } from 'mantle';
 import { default as styled } from '../theme/styled';
 import { Route, Switch, matchPath } from 'react-router-dom';
 import { push } from 'react-router-redux';
@@ -75,7 +75,7 @@ const dispatchToProps = {
 const stateProps = returntypeof(mapStateToProps);
 type Props = typeof stateProps & typeof dispatchToProps;
 type State = {
-  selectedPosts: IPost<'client' | 'expanded'>[];
+  selectedPosts: Post[];
   showDeleteModal: boolean;
   filtersOpen: boolean;
   previewMode: boolean;
@@ -86,7 +86,7 @@ type State = {
  */
 @connectWrapper(mapStateToProps, dispatchToProps)
 export class Posts extends React.Component<Props, State> {
-  private _selectedPost: IPost<'client' | 'expanded'> | null;
+  private _selectedPost: Post | null;
 
   constructor(props: Props) {
     super(props);
@@ -109,7 +109,7 @@ export class Posts extends React.Component<Props, State> {
         sortOrder: this.props.posts.postFilters.sortOrder,
         visibility: this.props.posts.postFilters.visibility,
         author: '',
-        sort: this.props.posts.postFilters.sort,
+        sortType: this.props.posts.postFilters.sortType,
       });
     } else {
       const matches = matchPath<{ postId: string }>(this.props.location.pathname, {
@@ -133,7 +133,7 @@ export class Posts extends React.Component<Props, State> {
           sortOrder: this.props.posts.postFilters.sortOrder,
           visibility: this.props.posts.postFilters.visibility,
           author: '',
-          sort: this.props.posts.postFilters.sort,
+          sortType: this.props.posts.postFilters.sortType,
         });
       } else {
         const matches = matchPath<{ postId: string }>(next.location.pathname, {
@@ -146,7 +146,7 @@ export class Posts extends React.Component<Props, State> {
     }
   }
 
-  private onDelete(post: IPost<'client' | 'expanded'>) {
+  private onDelete(post: Post) {
     this._selectedPost = post;
     this.setState({
       showDeleteModal: true,
@@ -180,7 +180,7 @@ export class Posts extends React.Component<Props, State> {
           selectable={false}
           onReply={(post, parent, comment) => this.props.createComment(post, comment, parent)}
           auth={this.props.user!}
-          onEdit={(id, token) => this.props.editComment(id, token)}
+          onEdit={(token) => this.props.editComment(token)}
           loading={this.props.comments.busy}
           getAll={(options) => this.props.getComments({ ...options, postId: postId })}
           onDelete={(id) => this.props.deleteComment(id)}
@@ -230,7 +230,7 @@ export class Posts extends React.Component<Props, State> {
                 if (!post) return null;
 
                 if (!this.state.previewMode && (isAdmin || (post && user._id === post._id))) {
-                  const doc = post.document as IDocument<'client' | 'expanded'>;
+                  const doc = post.document;
 
                   return (
                     <PostForm
@@ -239,18 +239,18 @@ export class Posts extends React.Component<Props, State> {
                       activeUser={user}
                       categoriesLoading={this.props.categoriesLoading}
                       templates={templates}
-                      onTemplateChanged={(templateId) => this.props.changeTemplate(doc._id, templateId)}
+                      onTemplateChanged={(templateId) => this.props.changeTemplate(doc._id as string, templateId)}
                       post={post}
                       elements={this.props.posts.elements!}
                       onUpdate={(post) => this.props.editPost(post)}
                       isAdmin={isAdmin}
                       onRequestPreview={() => this.setState({ previewMode: true })}
                       renderAfterForm={() => this.renderComment(props.match.params.postId)}
-                      onCreateElm={(elms, index) => this.props.addElement(doc._id, elms, index)}
+                      onCreateElm={(elms, index) => this.props.addElement(doc._id as string, elms, index)}
                       onUpdateElm={(id, token, createElement, deselect) =>
-                        this.props.updateElement(doc._id, id, token, createElement, deselect)
+                        this.props.updateElement(doc._id as string, token, createElement, deselect)
                       }
-                      onDeleteElements={(ids) => this.props.deleteElements(doc._id, ids)}
+                      onDeleteElements={(ids) => this.props.deleteElements(doc._id as string, ids)}
                       onSelectionChanged={(selection, focus) => {
                         this.props.setElmSelection(selection);
                         if (focus && selection.length > 0) this.props.setFocussedElm(selection[0]);

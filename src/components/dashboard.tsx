@@ -9,10 +9,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { default as styled } from '../theme/styled';
 import { default as theme } from '../theme/mui-theme';
 import { generateAvatarPic } from '../utils/component-utils';
-import { IUserEntry } from '../../../../src';
+import { User } from 'mantle';
 
 type Props = {
-  activeUser: IUserEntry<'client' | 'expanded'>;
+  activeUser: User;
   title: string;
   onHome: () => void;
   onLogOut: () => void;
@@ -30,7 +30,7 @@ export default class Dashboard extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      open: false
+      open: false,
     };
   }
 
@@ -45,7 +45,7 @@ export default class Dashboard extends React.Component<Props, State> {
             <div
               style={{ color: 'inherit', display: 'inline-block', cursor: 'pointer' }}
               className="mt-user-menu"
-              onClick={event => {
+              onClick={(event) => {
                 this.setState({ open: true, anchorEl: event.currentTarget });
               }}
             >
@@ -71,7 +71,7 @@ export default class Dashboard extends React.Component<Props, State> {
                   <ListItemText primary="Settings" />
                 </MenuItem>
 
-                <MenuItem className="mt-logout" onClick={e => this.props.onLogOut()}>
+                <MenuItem className="mt-logout" onClick={(e) => this.props.onLogOut()}>
                   <ListItemIcon>
                     <Icon className="icon icon-exit" />
                   </ListItemIcon>
@@ -81,7 +81,7 @@ export default class Dashboard extends React.Component<Props, State> {
             </Popover>
           </div>
 
-          <IconButton style={{ color: 'inherit' }} onClick={e => this.props.onHome()}>
+          <IconButton style={{ color: 'inherit' }} onClick={(e) => this.props.onHome()}>
             <Icon style={{ color: 'inherit', fontSize: '30px', lineHeight: '30px' }} className="icon icon-mantle" />
           </IconButton>
           <h1>{this.props.title}</h1>

@@ -1,9 +1,9 @@
 import { ActionCreator } from '../actions-creator';
-import { IPost } from '../../../../../src';
-import * as posts from '../../../../../src/lib-frontend/posts';
+import { Post, PaginatedPostsResponse } from 'mantle';
 import { IRootState } from '..';
 import { disptachable } from '../../decorators/dispatchable';
-import { SortOrder, PostSortType } from '../../../../../src/core/enums';
+import { graphql } from '../../utils/httpClients';
+import { GET_POST, GET_POSTS } from '../../graphql/requests/post-requests';
 
 // Action Creators
 export const ActionCreators = {
@@ -11,8 +11,8 @@ export const ActionCreators = {
   SetPost: new ActionCreator<
     'home-set-home-data',
     {
-      post: IPost<'expanded'>;
-      posts: IPost<'expanded'>[];
+      post: Post;
+      posts: Post[];
     } | null
   >('home-set-home-data'),
 };
@@ -24,18 +24,24 @@ class Actions {
   @disptachable()
   async getHomeElements(dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetPostsBusy.create(true));
+    // const [postsByCreationDate, postsByModifiedDate] = await Promise.all([
+    //   posts.getAll({ sort: PostSortType.created, sortOrder: SortOrder.desc, limit: 5 }),
+    //   posts.getAll({ sort: PostSortType.modified, sortOrder: SortOrder.desc, limit: 5 }),
+    // ]);
+
     const [postsByCreationDate, postsByModifiedDate] = await Promise.all([
-      posts.getAll({ sort: PostSortType.created, sortOrder: SortOrder.desc, limit: 5 }),
-      posts.getAll({ sort: PostSortType.modified, sortOrder: SortOrder.desc, limit: 5 }),
+      graphql<PaginatedPostsResponse>(GET_POSTS, { sort: 'created', sortOrder: 'desc', limit: 5 }),
+      graphql<PaginatedPostsResponse>(GET_POSTS, { sort: 'modified', sortOrder: 'desc', limit: 5 }),
     ]);
 
     if (postsByCreationDate.data.length > 0) {
-      const latestPost = await posts.getOne({ id: postsByCreationDate.data[0]._id });
+      const latestPost = await graphql<Post>(GET_POST, { id: postsByCreationDate.data[0]._id });
+      // const latestPost = await posts.getOne({ id: postsByCreationDate.data[0]._id });
 
       dispatch!(
         ActionCreators.SetPost.create({
-          post: latestPost as IPost<'expanded'>,
-          posts: postsByModifiedDate.data as IPost<'expanded'>[],
+          post: latestPost,
+          posts: postsByModifiedDate.data,
         })
       );
     } else dispatch!(ActionCreators.SetPost.create(null));

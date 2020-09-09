@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { IUserEntry } from '../../../../../src';
+import { User } from 'mantle';
 import { ActionCreators as UserActions, Action as UserAction } from '../users/actions';
 
 // State
@@ -7,14 +7,14 @@ export type State = {
   readonly busy: boolean;
   readonly authenticated: boolean;
   readonly error?: string | null;
-  readonly user: IUserEntry<'client' | 'expanded'> | null;
+  readonly user: User | null;
 };
 
 export const initialState: State = {
   authenticated: false,
   busy: false,
   error: null,
-  user: null
+  user: null,
 };
 
 // Reducer
@@ -25,7 +25,7 @@ export default function reducer(state: State = initialState, action: Action | Us
     case ActionCreators.isAuthenticating.type:
       partialState = {
         busy: true,
-        error: null
+        error: null,
       };
       break;
 
@@ -34,7 +34,7 @@ export default function reducer(state: State = initialState, action: Action | Us
         user: action.payload,
         authenticated: action.payload ? true : false,
         busy: false,
-        error: null
+        error: null,
       };
       break;
 
@@ -42,7 +42,7 @@ export default function reducer(state: State = initialState, action: Action | Us
       partialState = {
         busy: false,
         authenticated: false,
-        error: action.payload
+        error: action.payload,
       };
       break;
 
@@ -50,13 +50,13 @@ export default function reducer(state: State = initialState, action: Action | Us
       partialState = {
         busy: false,
         authenticated: false,
-        error: null
+        error: null,
       };
       break;
 
     case UserActions.UpdateUser.type:
       partialState = {
-        user: !state.user || action.payload._id === state.user._id ? action.payload : state.user
+        user: !state.user || action.payload._id === state.user._id ? action.payload : state.user,
       };
       break;
 

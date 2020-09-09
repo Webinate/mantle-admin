@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Volumes } from './volumes';
-import { IVolume, Page, IFileEntry } from '../../../../../src';
-import { VolumesGetOptions } from 'mantle';
-import { FilesGetOptions } from 'mantle';
+import { Volume, File as MantleFile, PaginatedVolumeResponse, PaginatedFilesResponse } from 'mantle';
 import SplitPanel from '../split-panel';
 import VolumeSidePanel from './volume-sidepanel';
 import { DirectoryView } from './directory-view';
@@ -14,29 +12,29 @@ import DialogContent from '@material-ui/core/DialogContent/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 import TextField from '@material-ui/core/TextField/TextField';
 import Button from '@material-ui/core/Button/Button';
-import { SortOrder, VolumeSortType } from '../../../../../src/core/enums';
+import { SortOrder, VolumeSortType, QueryVolumesArgs, FileSortType, QueryFilesArgs } from 'mantle';
 
 export type Props = {
   animated: boolean;
   multiselect?: boolean;
-  activeVolume?: IVolume<'client' | 'expanded'> | null;
-  volumes?: Page<IVolume<'client' | 'expanded'>> | null;
-  files?: Page<IFileEntry<'client' | 'expanded'>> | null;
+  activeVolume?: Volume | null;
+  volumes?: PaginatedVolumeResponse | null;
+  files?: PaginatedFilesResponse | null;
   loading: boolean;
   selectedIds: string[];
   activeVolumeId?: string;
-  filesFilters?: Partial<FilesGetOptions>;
-  volumeFilters?: Partial<VolumesGetOptions>;
+  filesFilters?: Partial<QueryFilesArgs>;
+  volumeFilters?: Partial<QueryVolumesArgs>;
   style?: React.CSSProperties;
   onRename: (name: string, id: string) => void;
   onUploadFiles?: (files: File[]) => void;
   onReplaceFile?: (file: File) => void;
   onDelete: () => void;
-  getVolumes?: (options: Partial<VolumesGetOptions>) => void;
+  getVolumes?: (options: Partial<QueryVolumesArgs>) => void;
   openVolume?: (volumeId: string) => void;
-  openDirectory?: (volumeId: string, options: Partial<FilesGetOptions>) => void;
+  openDirectory?: (volumeId: string, options: Partial<QueryFilesArgs>) => void;
   onSelectionChanged: (uids: string[]) => void;
-  onSort: (sortBy: VolumeSortType, sortDir: SortOrder) => void;
+  onSort: (sortBy: VolumeSortType | FileSortType, sortDir: SortOrder) => void;
   renderOptionalButtons?: () => undefined | null | JSX.Element;
 };
 
@@ -150,8 +148,8 @@ export class MediaNavigator extends React.Component<Props, State> {
 
     const numToDelete = this.props.selectedIds.length;
     const volumePage = this.props.volumes;
-    let selectedFile: IFileEntry<'client' | 'expanded'> | null = null;
-    let selectedVolume: IVolume<'client' | 'expanded'> | null = null;
+    let selectedFile: MantleFile | null = null;
+    let selectedVolume: Volume | null = null;
     const filesPage = this.props.files;
 
     if (volumePage) {
@@ -166,7 +164,8 @@ export class MediaNavigator extends React.Component<Props, State> {
     } else {
       if (filesPage && this.props.selectedIds.length > 0)
         selectedFile =
-          filesPage.data.find((f) => f._id === this.props.selectedIds[this.props.selectedIds.length - 1]) || null;
+          filesPage.data.find((f) => (f._id as string) === this.props.selectedIds[this.props.selectedIds.length - 1]) ||
+          null;
 
       if (selectedUids.length === 1 && selectedFile)
         this.setState({ deleteMessage: `Are you sure you want to delete the file ${selectedFile.name}?` });
@@ -181,8 +180,8 @@ export class MediaNavigator extends React.Component<Props, State> {
     const mediaSelected = this.props.selectedIds.length > 0;
     const selectedUids = this.props.selectedIds;
     let activeView: JSX.Element | null = null;
-    let selectedFile: IFileEntry<'client' | 'expanded'> | null = null;
-    let selectedVolume: IVolume<'client' | 'expanded'> | null = null;
+    let selectedFile: MantleFile | null = null;
+    let selectedVolume: Volume | null = null;
 
     if (volumePage) {
       selectedVolume =
@@ -206,7 +205,8 @@ export class MediaNavigator extends React.Component<Props, State> {
     } else if (activeVolume) {
       if (filesPage && this.props.selectedIds.length > 0) {
         selectedFile =
-          filesPage.data.find((f) => f._id === this.props.selectedIds[this.props.selectedIds.length - 1]) || null;
+          filesPage.data.find((f) => (f._id as string) === this.props.selectedIds[this.props.selectedIds.length - 1]) ||
+          null;
       }
 
       activeView = (

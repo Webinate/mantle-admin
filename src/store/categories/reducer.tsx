@@ -1,10 +1,10 @@
 import { ActionCreators, Action } from './actions';
-import { Page, ICategory } from '../../../../../src';
+import { PaginatedCategoryResponse, Category } from 'mantle';
 
 // State
 export type State = {
-  readonly categoryPage: Page<ICategory<'expanded'>> | null;
-  readonly category: ICategory<'client' | 'expanded'> | null;
+  readonly categoryPage: PaginatedCategoryResponse | null;
+  readonly category: Category | null;
   readonly busy: boolean;
   readonly error: string | null;
 };
@@ -13,7 +13,7 @@ export const initialState: State = {
   categoryPage: null,
   category: null,
   error: null,
-  busy: false,
+  busy: false
 };
 
 // Reducer
@@ -24,14 +24,14 @@ export default function reducer(state: State = initialState, action: Action): St
     case ActionCreators.SetCategories.type:
       partialState = {
         categoryPage: action.payload,
-        busy: false,
+        busy: false
       };
       break;
 
     case ActionCreators.SetCategoryErr.type:
       partialState = {
         error: action.payload,
-        busy: false,
+        busy: false
       };
       break;
 
@@ -42,7 +42,7 @@ export default function reducer(state: State = initialState, action: Action): St
     case ActionCreators.SetCategory.type:
       partialState = {
         category: action.payload,
-        busy: false,
+        busy: false
       };
       break;
 

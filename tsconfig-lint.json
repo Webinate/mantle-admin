@@ -2,21 +2,16 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es7"
-    ],
+    "lib": ["dom", "dom.iterable", "es7"],
     "sourceMap": false,
     "outDir": "./dist/server",
     "allowUnusedLabels": false,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
     "strictNullChecks": true,
     "jsx": "react",
     "experimentalDecorators": true,
     "noImplicitAny": true
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

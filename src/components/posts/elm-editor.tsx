@@ -2,7 +2,7 @@ import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import EditorToolbar from './editor-toolbar';
-import { IDraftElement, IImageElement, IDocument, ITemplate } from 'mantle';
+import { Document, Element, AddElementInput } from 'mantle';
 import { InlineType } from './editor-toolbar';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -11,20 +11,19 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import TextField from '@material-ui/core/TextField';
 import { MediaModal } from '../../containers/media-modal';
-import { ElementType } from '../../../../../src/core/enums';
 
 export type Props = {
-  elements: IDraftElement<'client' | 'expanded'>[];
+  elements: Element[];
   selected: string[];
   focussedId: string;
-  document: IDocument<'client'>;
+  document: Document;
   onSelectionChanged: (ids: string[], focus: boolean) => void;
-  onCreateElm: (type: Partial<IDraftElement<'client' | 'expanded'>>[], index?: number) => void;
+  onCreateElm: (type: Partial<AddElementInput>[], index?: number) => void;
   onDeleteElm: (ids: string[]) => void;
   onUpdateElm: (
     id: string,
     html: string,
-    createElement: Partial<IDraftElement<'client' | 'expanded'>> | null,
+    createElement: Partial<AddElementInput> | null,
     deselect: 'select' | 'deselect' | 'none'
   ) => void;
 };
@@ -67,12 +66,12 @@ export class ElmEditor extends React.Component<Props, State> {
       showMediaPopup: false,
       html: '',
       linkUrl: '',
-      selectedZone: (props.document.template as ITemplate<'client'>).zones[0],
+      selectedZone: props.document.template.zones[0],
     };
   }
 
   componentWillReceiveProps(next: Props) {
-    const nextTemplate = next.document.template as ITemplate<'client'>;
+    const nextTemplate = next.document.template;
 
     if (next.document !== this.props.document) this.setState({ selectedZone: nextTemplate.zones[0] });
 
@@ -89,7 +88,7 @@ export class ElmEditor extends React.Component<Props, State> {
 
     if (next.focussedId !== this.props.focussedId && next.focussedId !== '') {
       const elm = next.elements.find((e) => e._id === next.focussedId)!;
-      if (elm.type === ElementType.html) {
+      if (elm.type === 'html') {
         this._createEditor = false;
         this.setState({ html: elm.html });
       }
@@ -224,7 +223,7 @@ export class ElmEditor extends React.Component<Props, State> {
   }
 
   private copyElementsToLocalStorage(copy: boolean) {
-    let selectedElms = this.props.elements.filter((e) => this.props.selected.includes(e._id));
+    let selectedElms = this.props.elements.filter((e) => this.props.selected.includes(e._id as string));
     localStorage.setItem('elm-editor-clip', JSON.stringify(selectedElms));
   }
 
@@ -235,15 +234,19 @@ export class ElmEditor extends React.Component<Props, State> {
 
   private pasteElementsFromLocalStorage() {
     try {
-      const selectedElementsJson: Partial<IDraftElement<'client'>>[] = JSON.parse(
-        localStorage.getItem('elm-editor-clip')!
-      );
+      const selectedElementsJson: Partial<Element>[] = JSON.parse(localStorage.getItem('elm-editor-clip')!);
 
       const refinedElms = selectedElementsJson.map((e) => {
         delete e._id;
         delete e.parent;
-        e.zone = this.state.selectedZone;
-        return e;
+
+        return {
+          html: e.html,
+          image: e.image,
+          style: e.style,
+          type: e.type,
+          zone: this.state.selectedZone,
+        } as AddElementInput;
       });
 
       this.props.onCreateElm(refinedElms);
@@ -257,12 +260,12 @@ export class ElmEditor extends React.Component<Props, State> {
    * @param deselect If true, then nothing should be selected after update
    */
   private updateElmHtml(
-    elm: IDraftElement<'client' | 'expanded'>,
-    createElement: Partial<IDraftElement<'client' | 'expanded'>> | null,
+    elm: Element,
+    createElement: Partial<AddElementInput> | null,
     deselect: 'select' | 'deselect' | 'none'
   ) {
-    if (elm.type === ElementType.html) {
-      this.props.onUpdateElm(elm._id, this.state.html, createElement, deselect);
+    if (elm.type === 'html') {
+      this.props.onUpdateElm(elm._id as string, this.state.html, createElement, deselect);
       return;
     }
 
@@ -283,8 +286,8 @@ export class ElmEditor extends React.Component<Props, State> {
 
     // Get the html string
     let html = first.outerHTML;
-    if (elm.html !== html) this.props.onUpdateElm(elm._id, html, createElement, deselect);
-    else if (createElement) this.props.onCreateElm([{ type: ElementType.paragraph, zone: this.state.selectedZone }]);
+    if (elm.html !== html) this.props.onUpdateElm(elm._id as string, html, createElement, deselect);
+    else if (createElement) this.props.onCreateElm([{ type: 'paragraph', zone: this.state.selectedZone }]);
     else if (deselect) this.props.onSelectionChanged([], false);
   }
 
@@ -350,7 +353,7 @@ export class ElmEditor extends React.Component<Props, State> {
   /**
    * Select the active elements
    */
-  private onElmDown(e: React.MouseEvent<HTMLElement>, elm: IDraftElement<'client' | 'expanded'>) {
+  private onElmDown(e: React.MouseEvent<HTMLElement>, elm: Element) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -363,21 +366,27 @@ export class ElmEditor extends React.Component<Props, State> {
     }
 
     if (!e.ctrlKey && !e.shiftKey) {
-      this.props.onSelectionChanged([elm._id], false);
+      this.props.onSelectionChanged([elm._id as string], false);
     } else if (e.ctrlKey) {
-      if (this.props.selected.indexOf(elm._id) === -1)
-        this.props.onSelectionChanged(this.props.selected.concat(elm._id), false);
+      if (this.props.selected.indexOf(elm._id as string) === -1)
+        this.props.onSelectionChanged(this.props.selected.concat(elm._id as string), false);
       else
         this.props.onSelectionChanged(
           this.props.selected.filter((i) => i !== elm._id),
           false
         );
     } else {
-      const elements = this.props.elements.map((elm) => elm._id);
+      const elements = this.props.elements.map((elm) => elm._id as string);
       const selected = this.props.selected;
 
-      let firstIndex = Math.min(elements.indexOf(elm._id), selected.length > 0 ? elements.indexOf(selected[0]) : 0);
-      let lastIndex = Math.max(elements.indexOf(elm._id), selected.length > 0 ? selected.indexOf(selected[0]) : 0);
+      let firstIndex = Math.min(
+        elements.indexOf(elm._id as string),
+        selected.length > 0 ? elements.indexOf(selected[0]) : 0
+      );
+      let lastIndex = Math.max(
+        elements.indexOf(elm._id as string),
+        selected.length > 0 ? selected.indexOf(selected[0]) : 0
+      );
 
       this.props.onSelectionChanged(elements.slice(firstIndex, lastIndex + 1), false);
     }
@@ -436,10 +445,10 @@ export class ElmEditor extends React.Component<Props, State> {
   private onEnter(e: React.KeyboardEvent<HTMLElement>) {
     const selectedElm = this.getSelectedElement();
 
-    if (selectedElm && selectedElm.type !== ElementType.list) {
+    if (selectedElm && selectedElm.type !== 'list') {
       e.preventDefault();
       e.stopPropagation();
-      this.updateElmHtml(selectedElm, { type: ElementType.paragraph, zone: this.state.selectedZone }, 'select');
+      this.updateElmHtml(selectedElm, { type: 'paragraph', zone: this.state.selectedZone }, 'select');
     }
   }
 
@@ -537,10 +546,10 @@ export class ElmEditor extends React.Component<Props, State> {
     let elements = this.props.elements;
     const selection = this.props.selected;
     const doc = this.props.document;
-    const template = doc.template as ITemplate<'client'>;
+    const template = doc.template;
     const selectedZone = this.state.selectedZone;
     const zones = template.zones.concat('unassigned');
-    const unassigned: IDraftElement<'client' | 'expanded'>[] = [];
+    const unassigned: Element[] = [];
     const focussedId = this.props.focussedId;
 
     for (const elm of elements) if (!zones.includes(elm.zone) || elm.zone === 'unassigned') unassigned.push(elm);
@@ -583,9 +592,9 @@ export class ElmEditor extends React.Component<Props, State> {
 
           <div className={`mt-editor-container`} onClick={(e) => (this._canPaste = true)}>
             {elements.map((elm, index) => {
-              const isEditable = elm.type !== ElementType.image;
+              const isEditable = elm.type !== 'image';
 
-              if (focussedId === elm._id && elm.type === ElementType.html) {
+              if (focussedId === elm._id && elm.type === 'html') {
                 return (
                   <div key={`elm-${index}`} className={`mt-element active focussed`}>
                     <textarea
@@ -621,9 +630,9 @@ export class ElmEditor extends React.Component<Props, State> {
               return (
                 <div
                   key={`elm-${index}`}
-                  className={`mt-element${selection.includes(elm._id) ? ' active' : ''}`}
+                  className={`mt-element${selection.includes(elm._id as string) ? ' active' : ''}`}
                   onMouseDown={(e) => this.onElmDown(e, elm)}
-                  onDoubleClick={(e) => this.props.onSelectionChanged([elm._id], true)}
+                  onDoubleClick={(e) => this.props.onSelectionChanged([elm._id as string], true)}
                   dangerouslySetInnerHTML={{ __html: elm.html }}
                 />
               );
@@ -648,10 +657,10 @@ export class ElmEditor extends React.Component<Props, State> {
                   this.props.onCreateElm(
                     [
                       {
-                        type: ElementType.image,
-                        image: file._id,
+                        type: 'image',
+                        image: file._id as string,
                         zone: this.state.selectedZone,
-                      } as IImageElement<'client'>,
+                      },
                     ],
                     this._lastActiveIndex + 1
                   )

@@ -3,14 +3,14 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import { IVolume } from '../../../../../../src';
+import { UpdateVolumeInput } from 'mantle';
 import { default as styled } from '../../../theme/styled';
 import { formatBytes } from '../../../utils/component-utils';
 
 export type Props = {
   isAdmin: boolean;
-  volume: Partial<IVolume<'client'>>;
-  onChange: (props: Partial<IVolume<'client'>>) => void;
+  volume: Partial<UpdateVolumeInput>;
+  onChange: (props: Partial<UpdateVolumeInput>) => void;
   maxValue: number;
 };
 
@@ -60,14 +60,12 @@ export default class NewVolumeForm extends React.Component<Props, State> {
             <Input
               id="mt-volume-name"
               autoFocus={true}
-              value={this.props.volume.name}
-              onChange={e => this.props.onChange({ name: e.currentTarget.value })}
+              value={this.props.volume.name || ''}
+              onChange={(e) => this.props.onChange({ name: e.currentTarget.value })}
             />
             {!this.props.volume.name ? (
               <FormHelperText id="mt-volume-name-error">Name cannot be empty</FormHelperText>
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </FormControl>
         </div>
         <div>
@@ -76,7 +74,7 @@ export default class NewVolumeForm extends React.Component<Props, State> {
             <Input
               id="mt-volume-memory"
               value={this.props.volume.memoryAllocated}
-              onChange={e => this.props.onChange({ memoryAllocated: this.formatMemory(e.currentTarget.value) })}
+              onChange={(e) => this.props.onChange({ memoryAllocated: this.formatMemory(e.currentTarget.value) })}
             />
             {memElm}
           </FormControl>

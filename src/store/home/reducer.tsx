@@ -1,17 +1,17 @@
 import { ActionCreators, Action } from './actions';
-import { IPost } from '../../../../../src';
+import { Post } from 'mantle';
 
 // State
 export type State = {
-  readonly latestPost: IPost<'expanded'> | null;
-  readonly posts: IPost<'expanded'>[];
+  readonly latestPost: Post | null;
+  readonly posts: Post[];
   readonly busy: boolean;
 };
 
 export const initialState: State = {
   latestPost: null,
   posts: [],
-  busy: false
+  busy: false,
 };
 
 // Reducer
@@ -27,7 +27,7 @@ export default function reducer(state: State = initialState, action: Action): St
       partialState = {
         latestPost: action.payload ? action.payload.post : null,
         posts: action.payload ? action.payload.posts : [],
-        busy: false
+        busy: false,
       };
       break;
 

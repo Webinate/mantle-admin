@@ -26,7 +26,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import ArrowForwardIcon from '@material-ui/icons/ChevronRight';
-import { IPost } from '../../../../src';
+import { Post } from 'mantle';
 import * as format from 'date-fns/format';
 import { createPost } from '../store/posts/actions';
 import { randomId } from '../utils/misc';
@@ -70,7 +70,7 @@ export class Home extends React.Component<Props, State> {
     this.props.getHomeElements();
   }
 
-  private renderLatestPost(post: IPost<'expanded'>) {
+  private renderLatestPost(post: Post) {
     return (
       <Card className="mt-latest-post">
         <CardHeader
@@ -134,7 +134,7 @@ export class Home extends React.Component<Props, State> {
         <List>
           {posts.map((p) => {
             return (
-              <ListItem key={p._id} className="mt-recent-post">
+              <ListItem key={p._id as string} className="mt-recent-post">
                 <ListItemAvatar>
                   <Avatar alt={p.author ? p.author.username : 'Author'} src={generateAvatarPic(p.author)} />
                 </ListItemAvatar>

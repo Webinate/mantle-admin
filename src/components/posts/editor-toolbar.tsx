@@ -4,7 +4,7 @@ import { default as theme } from '../../theme/mui-theme';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Icon from '@material-ui/core/Icon';
-import { ElementType } from '../../../../../src/core/enums';
+import { ElementType } from 'mantle';
 
 type Props = {
   onCreateBlock: (type: ElementType, html: string) => void;
@@ -53,14 +53,14 @@ export default class EditorToolbar extends React.Component<Props, State> {
     this._iconStyles = { fontSize: '18px' };
 
     this._regularBlocks = [
-      { label: 'Header 1', type: ElementType.header1, html: '<h1></h1>' },
-      { label: 'Header 2', type: ElementType.header2, html: '<h2></h2>' },
-      { label: 'Header 3', type: ElementType.header3, html: '<h3></h3>' },
-      { label: 'Header 4', type: ElementType.header4, html: '<h4></h4>' },
-      { label: 'Header 5', type: ElementType.header5, html: '<h5></h5>' },
-      { label: 'Header 6', type: ElementType.header6, html: '<h6></h6>' },
-      { label: 'Code Block', type: ElementType.code, html: '<pre></pre>' },
-      { label: 'Paragraph', type: ElementType.paragraph, html: '<p></p>' },
+      { label: 'Header 1', type: 'header1', html: '<h1></h1>' },
+      { label: 'Header 2', type: 'header2', html: '<h2></h2>' },
+      { label: 'Header 3', type: 'header3', html: '<h3></h3>' },
+      { label: 'Header 4', type: 'header4', html: '<h4></h4>' },
+      { label: 'Header 5', type: 'header5', html: '<h5></h5>' },
+      { label: 'Header 6', type: 'header6', html: '<h6></h6>' },
+      { label: 'Code Block', type: 'code', html: '<pre></pre>' },
+      { label: 'Paragraph', type: 'paragraph', html: '<p></p>' },
     ];
 
     this._listBlocks = [
@@ -70,7 +70,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-ul" />
           </Icon>
         ),
-        type: ElementType.list,
+        type: 'list',
         html: '<ul><li></li></ul>',
       },
       {
@@ -79,7 +79,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
             <i className="icon icon-editor-ol" />
           </Icon>
         ),
-        type: ElementType.list,
+        type: 'list',
         html: '<ol><li></li></ol>',
       },
     ];
@@ -145,7 +145,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
           <i className="icon icon-editor-para" />
         </Icon>
       ),
-      type: ElementType.paragraph,
+      type: 'paragraph',
       html: '<p></p>',
     };
     const listBlocks = this._listBlocks;
@@ -256,7 +256,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
           <div
             id="mt-create-html"
             onClick={(e) => {
-              this.props.onCreateBlock(ElementType.html, '<div></div>');
+              this.props.onCreateBlock('html', '<div></div>');
             }}
           >
             <Icon style={iconStyle}>

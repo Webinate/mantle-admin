@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from '../../../../../src';
+import { User } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
@@ -7,9 +7,9 @@ import * as format from 'date-fns/format';
 import { generateAvatarPic } from '../../utils/component-utils';
 
 type Props = {
-  users: IUserEntry<'client' | 'expanded'>[];
+  users: User[];
   selected: string[];
-  onUserSelected: (user: IUserEntry<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement>) => void;
+  onUserSelected: (user: User, e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 interface SCompProps extends React.HTMLProps<HTMLDivElement> {
@@ -24,10 +24,10 @@ export default class UsersList extends React.Component<Props, any> {
     return (
       <div className="mt-user-list">
         {users.map((user, index) => {
-          selected = selectedUsers.indexOf(user._id) === -1 ? false : true;
+          selected = selectedUsers.indexOf(user._id as string) === -1 ? false : true;
 
           return (
-            <User key={`user-${index}`} selected={selected} onMouseDown={e => this.props.onUserSelected(user, e)}>
+            <UserDiv key={`user-${index}`} selected={selected} onMouseDown={(e) => this.props.onUserSelected(user, e)}>
               <Avatar src={generateAvatarPic(user)} style={{ height: 80, width: 80, float: 'left' }} />
               <Details selected={selected}>
                 <div>
@@ -41,7 +41,7 @@ export default class UsersList extends React.Component<Props, any> {
                   <i>Last Active: {format(new Date(user.lastLoggedIn), 'MMMM Do, YYYY')}</i>
                 </div>
               </Details>
-            </User>
+            </UserDiv>
           );
         })}
       </div>
@@ -49,7 +49,7 @@ export default class UsersList extends React.Component<Props, any> {
   }
 }
 
-const User = styled.div`
+const UserDiv = styled.div`
   margin: 20px;
   float: left;
   padding: 10px;

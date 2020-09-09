@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from '../../../../../src';
+import { AddUserInput } from 'mantle';
 import { default as styled } from '../../theme/styled';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -7,12 +7,12 @@ import { default as theme } from '../../theme/mui-theme';
 
 type Props = {
   serverError: string;
-  onUserCreated: (user: Partial<IUserEntry<'client'>>) => void;
+  onUserCreated: (user: Partial<AddUserInput>) => void;
   onCancel: () => void;
 };
 
 type State = {
-  user: Partial<IUserEntry<'client'>>;
+  user: Partial<AddUserInput>;
   isValid: boolean;
 };
 
@@ -21,11 +21,11 @@ export default class NewUserForm extends React.Component<Props, State> {
     super(props);
     this.state = {
       user: {},
-      isValid: false
+      isValid: false,
     };
   }
 
-  private updateUser(user: Partial<IUserEntry<'client'>>) {
+  private updateUser(user: Partial<AddUserInput>) {
     this.setState({ user: user });
 
     if (!user.username || !user.password || !user.email) this.setState({ isValid: false });
@@ -42,7 +42,7 @@ export default class NewUserForm extends React.Component<Props, State> {
           <div>
             <TextField
               id="mt-new-username"
-              onChange={e => this.updateUser({ ...user, username: e.currentTarget.value })}
+              onChange={(e) => this.updateUser({ ...user, username: e.currentTarget.value })}
               value={user.username}
               label="Username"
               fullWidth={true}
@@ -51,7 +51,7 @@ export default class NewUserForm extends React.Component<Props, State> {
           <div>
             <TextField
               id="mt-new-email"
-              onChange={e => this.updateUser({ ...user, email: e.currentTarget.value })}
+              onChange={(e) => this.updateUser({ ...user, email: e.currentTarget.value })}
               value={user.email}
               label="Email"
               fullWidth={true}
@@ -60,7 +60,7 @@ export default class NewUserForm extends React.Component<Props, State> {
           <div>
             <TextField
               id="mt-new-password"
-              onChange={e => this.updateUser({ ...user, password: e.currentTarget.value })}
+              onChange={(e) => this.updateUser({ ...user, password: e.currentTarget.value })}
               value={user.password}
               label="Password"
               fullWidth={true}
@@ -69,14 +69,14 @@ export default class NewUserForm extends React.Component<Props, State> {
         </Details>
 
         <div className="mt-buttons">
-          <Button onClick={e => this.props.onCancel()} id="mt-cancel-add-user">
+          <Button onClick={(e) => this.props.onCancel()} id="mt-cancel-add-user">
             Cancel
           </Button>
           <Button
             variant="raised"
             color="primary"
             disabled={!this.state.isValid}
-            onClick={e => this.props.onUserCreated(this.state.user)}
+            onClick={(e) => this.props.onUserCreated(this.state.user)}
             id="mt-confirm-add-user"
           >
             Add New User

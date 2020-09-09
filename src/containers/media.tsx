@@ -10,7 +10,7 @@ import { MediaNavigator } from '../components/media/media-navigator';
 import { MediaFilterBar } from '../components/media/media-filter-bar';
 import { NewVolumeForm } from '../components/media/new-volume-form';
 import { isAdminUser } from '../utils/component-utils';
-import { SortOrder, VolumeSortType } from '../../../../src/core/enums';
+import { VolumeSortType, FileSortType, SortOrder } from 'mantle';
 
 // Map state to props
 const mapStateToProps = (state: IRootState, ownProps: any) => ({
@@ -67,9 +67,9 @@ export class Media extends React.Component<Props, State> {
     }
   }
 
-  private onSort(sort: VolumeSortType, direction: SortOrder, volumeId: string | null) {
-    if (volumeId) this.props.openDirectory(volumeId, { sortType: sort, sortOrder: direction });
-    else this.props.getVolumes({ sortType: sort, sortOrder: direction });
+  private onSort(sort: VolumeSortType | FileSortType, direction: SortOrder, volumeId: string | null) {
+    if (volumeId) this.props.openDirectory(volumeId, { sortType: sort as FileSortType, sortOrder: direction });
+    else this.props.getVolumes({ sortType: sort as VolumeSortType, sortOrder: direction });
   }
 
   render() {

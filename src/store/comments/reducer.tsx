@@ -1,13 +1,12 @@
 import { ActionCreators, Action } from './actions';
-import { CommentGetAllOptions } from 'mantle';
-import { Page, IComment } from '../../../../../src';
+import { Comment, PaginatedCommentsResponse, QueryCommentsArgs } from 'mantle';
 import { ActionCreators as AppActions, Action as AppAction } from '../app/actions';
 
 // State
 export type State = {
-  readonly commentFilters: Partial<CommentGetAllOptions>;
-  readonly commentPage: Page<IComment<'client' | 'expanded'>> | null;
-  readonly comment: IComment<'client' | 'expanded'> | null;
+  readonly commentFilters: Partial<QueryCommentsArgs>;
+  readonly commentPage: PaginatedCommentsResponse | null;
+  readonly comment: Comment | null;
   readonly busy: boolean;
 };
 
@@ -15,7 +14,7 @@ export const initialState: State = {
   commentFilters: { index: 0, root: true },
   commentPage: null,
   comment: null,
-  busy: false
+  busy: false,
 };
 
 // Reducer
@@ -31,20 +30,20 @@ export default function reducer(state: State = initialState, action: Action | Ap
       partialState = {
         busy: false,
         commentPage: action.payload.page,
-        commentFilters: { ...state.commentFilters, ...action.payload.filters }
+        commentFilters: { ...state.commentFilters, ...action.payload.filters },
       };
       break;
 
     case ActionCreators.SetComment.type:
       partialState = {
         comment: action.payload,
-        busy: false
+        busy: false,
       };
       break;
 
     case AppActions.serverResponse.type:
       partialState = {
-        busy: false
+        busy: false,
       };
       break;
 

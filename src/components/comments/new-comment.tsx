@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
-import { IUserEntry } from 'mantle';
+import { User } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import CommentIcon from '@material-ui/icons/Comment';
@@ -10,7 +10,7 @@ import theme from '../../theme/mui-theme';
 export type Props = {
   enabled: boolean;
   commentMode?: boolean;
-  auth: IUserEntry<'client' | 'expanded'>;
+  auth: User;
   onNewComment: (comment: string) => void;
   onCancel?: () => void;
 };
@@ -21,13 +21,13 @@ type State = {
 
 export default class NewComment extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
-    commentMode: false
+    commentMode: false,
   };
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      comment: ''
+      comment: '',
     };
   }
 
@@ -43,8 +43,8 @@ export default class NewComment extends React.Component<Props, State> {
             id={this.props.commentMode ? 'mt-reply-comment-content' : 'mt-new-comment-content'}
             value={this.state.comment}
             autoFocus={this.props.commentMode ? true : undefined}
-            onClick={e => e.stopPropagation()}
-            onChange={e => {
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
               e.currentTarget.style.height = '1px';
               e.currentTarget.style.height = 20 + e.currentTarget.scrollHeight + 'px';
               this.setState({ comment: e.currentTarget.value });
@@ -54,7 +54,7 @@ export default class NewComment extends React.Component<Props, State> {
             <div className="mt-comment-form-actions">
               <span
                 id="mt-reply-comment-cancel-btn"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   if (this.props.onCancel) this.props.onCancel();
                 }}
@@ -63,7 +63,7 @@ export default class NewComment extends React.Component<Props, State> {
               </span>
               <span
                 id="mt-reply-comment-add-btn"
-                onClick={e => {
+                onClick={(e) => {
                   if (this.state.comment.trim() === '') return;
 
                   e.stopPropagation();
@@ -79,7 +79,7 @@ export default class NewComment extends React.Component<Props, State> {
               <IconButton
                 id="mt-new-comment-add-btn"
                 disabled={!this.props.enabled}
-                onClick={e => {
+                onClick={(e) => {
                   if (this.state.comment.trim() === '') return;
 
                   this.props.onNewComment(this.state.comment);

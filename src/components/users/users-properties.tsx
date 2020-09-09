@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry, IFileEntry, UserPrivilege } from 'mantle';
+import { File, UserPrivilege, UpdateUserInput, User } from 'mantle';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -24,15 +24,15 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 type Props = {
-  activeUser: IUserEntry<'client' | 'expanded'>;
-  selected: IUserEntry<'client' | 'expanded'> | null;
+  activeUser: User;
+  selected: User | null;
   animated: boolean;
-  updateUserDetails: (user: Partial<IUserEntry<'client' | 'expanded'>>) => void;
+  updateUserDetails: (user: Partial<UpdateUserInput>) => void;
   resetPasswordRequest(username: string): void;
   activateAccount(username: string): void;
-  onDeleteRequested(username: IUserEntry<'client' | 'expanded'>): void;
+  onDeleteRequested(username: User): void;
   resendActivation(username: string): void;
-  updateUserAvatar(userId: string, file: IFileEntry<'client' | 'expanded'>): void;
+  updateUserAvatar(userId: string, file: File): void;
 };
 
 type State = {
@@ -40,7 +40,7 @@ type State = {
   accountsOpen: boolean;
   removeOpen: boolean;
   showMediaPopup: boolean;
-  user: IUserEntry<'client' | 'expanded'> | null;
+  user: User | null;
 };
 
 export default class UserProperties extends React.Component<Props, State> {
@@ -51,7 +51,7 @@ export default class UserProperties extends React.Component<Props, State> {
       accountsOpen: false,
       removeOpen: false,
       showMediaPopup: false,
-      user: props.selected ? { ...props.selected } : null
+      user: props.selected ? { ...props.selected } : null,
     };
   }
 
@@ -59,7 +59,7 @@ export default class UserProperties extends React.Component<Props, State> {
     if (next.selected !== this.props.selected) this.setState({ user: next.selected ? { ...next.selected } : null });
   }
 
-  userCanInteract(user: IUserEntry<'client' | 'expanded'>) {
+  userCanInteract(user: User) {
     const activeUser = this.props.activeUser;
 
     // If admin
@@ -84,14 +84,12 @@ export default class UserProperties extends React.Component<Props, State> {
               variant="fab"
               id="mt-upload-profile"
               color="primary"
-              onClick={e => this.setState({ showMediaPopup: true })}
+              onClick={(e) => this.setState({ showMediaPopup: true })}
               style={{ background: theme.primary200.background, bottom: '10px', right: '10px', position: 'absolute' }}
             >
               <Icon className="icon icon-camera" />
             </Button>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
           <Avatar
             className="mt-avatar-image"
             src={generateAvatarPic(selected)}
@@ -129,16 +127,14 @@ export default class UserProperties extends React.Component<Props, State> {
                       disabled={isAdmin ? false : true}
                       onChange={
                         isAdmin
-                          ? e => this.setState({ user: { ...this.state.user!, email: e.currentTarget.value } })
+                          ? (e) => this.setState({ user: { ...this.state.user!, email: e.currentTarget.value } })
                           : undefined
                       }
-                      value={isAdmin ? this.state.user!.email : this.props.activeUser.email}
+                      value={isAdmin ? this.state.user!.email! : this.props.activeUser.email!}
                       fullWidth={true}
                     />
                   </Field>
-                ) : (
-                  undefined
-                )}
+                ) : undefined}
                 <Field>
                   <DatePicker
                     helperText="Joined On"
@@ -162,9 +158,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       format={'MMMM Do, YYYY'}
                     />
                   </Field>
-                ) : (
-                  undefined
-                )}
+                ) : undefined}
                 {isAdmin ? (
                   <Field>
                     <FormControl fullWidth={true}>
@@ -172,11 +166,11 @@ export default class UserProperties extends React.Component<Props, State> {
                         className="mt-user-type"
                         fullWidth={true}
                         value={this.state.user!.privileges}
-                        onChange={e =>
+                        onChange={(e) =>
                           this.setState({ user: { ...this.state.user!, privileges: e.target.value as UserPrivilege } })
                         }
                         inputProps={{
-                          fullWidth: true
+                          fullWidth: true,
                         }}
                       >
                         <MenuItem id="mt-type-super" value={'super'} disabled={true}>
@@ -192,9 +186,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       <FormHelperText>User Type</FormHelperText>
                     </FormControl>
                   </Field>
-                ) : (
-                  undefined
-                )}
+                ) : undefined}
                 {isAdmin ? (
                   <Field>
                     <Button
@@ -202,22 +194,19 @@ export default class UserProperties extends React.Component<Props, State> {
                       id="mt-save-user-details"
                       color="primary"
                       fullWidth={true}
-                      onClick={e => {
+                      onClick={(e) => {
                         const changes = this.state.user!;
                         this.props.updateUserDetails({
-                          createdOn: changes.createdOn,
-                          email: changes.email,
+                          email: changes.email!,
                           privileges: changes.privileges,
-                          _id: changes._id
+                          _id: changes._id,
                         });
                       }}
                     >
                       Update Details
                     </Button>
                   </Field>
-                ) : (
-                  undefined
-                )}
+                ) : undefined}
               </div>
             </ExpansionPanelDetails>
           </ExpansionPanel>
@@ -253,7 +242,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       <div className="mt-inline-label">Resend activation email</div>
                       <div className="mt-inline-input">
                         <Tooltip placement="top-start" title="Resent activation code">
-                          <IconButton onClick={e => this.props.resendActivation(this.props.selected!.username)}>
+                          <IconButton onClick={(e) => this.props.resendActivation(this.props.selected!.username)}>
                             <Icon
                               style={{ color: theme.primary200.background }}
                               className="icon icon-mark-unread mt-resend-activation"
@@ -262,16 +251,14 @@ export default class UserProperties extends React.Component<Props, State> {
                         </Tooltip>
                       </div>
                     </InlineField>
-                  ) : (
-                    undefined
-                  )}
+                  ) : undefined}
 
                   {selected.registerKey !== '' && isAdmin ? (
                     <InlineField>
                       <div className="mt-inline-label">Activate Account</div>
                       <div className="mt-inline-input">
                         <Tooltip placement="top-start" title="Activates the user">
-                          <IconButton onClick={e => this.props.activateAccount(this.props.selected!.username)}>
+                          <IconButton onClick={(e) => this.props.activateAccount(this.props.selected!.username)}>
                             <Icon
                               style={{ color: theme.primary200.background }}
                               className="icon icon-done mt-activate-account"
@@ -280,15 +267,11 @@ export default class UserProperties extends React.Component<Props, State> {
                         </Tooltip>
                       </div>
                     </InlineField>
-                  ) : (
-                    undefined
-                  )}
+                  ) : undefined}
                 </div>
               </ExpansionPanelDetails>
             </ExpansionPanel>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
 
           {this.userCanInteract(selected) ? (
             <ExpansionPanel>
@@ -308,34 +291,30 @@ export default class UserProperties extends React.Component<Props, State> {
                     variant="contained"
                     style={{ background: theme.error.background, color: theme.error.color }}
                     className="mt-remove-acc-btn"
-                    onClick={e => this.props.onDeleteRequested(selected)}
+                    onClick={(e) => this.props.onDeleteRequested(selected)}
                   >
                     Delete Account
                   </Button>
                 </div>
               </ExpansionPanelDetails>
             </ExpansionPanel>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </DetailsContainer>
 
         {this.state.showMediaPopup ? (
           <MediaModal
-            {...{} as any}
+            {...({} as any)}
             open={true}
             onCancel={() => {
               this.setState({ showMediaPopup: false });
             }}
-            onSelect={file =>
+            onSelect={(file) =>
               this.setState({ showMediaPopup: false }, () =>
-                this.props.updateUserAvatar(this.props.selected!._id, file)
+                this.props.updateUserAvatar(this.props.selected!._id as string, file)
               )
             }
           />
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </Properties>
     );
   }

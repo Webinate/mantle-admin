@@ -1,27 +1,38 @@
-import { PostsGetAllOptions, CommentGetAllOptions, CategoriesGetManyOptions, IPost } from 'mantle';
+import { User } from 'mantle';
 import { RedirectError } from './errors';
 import { ActionCreators as PostActions } from '../store/posts/actions';
 import { ActionCreators as CategoryActions } from '../store/categories/actions';
 import { ActionCreators as TemplatesActions } from '../store/templates/actions';
 import { ActionCreators as CommentActions } from '../store/comments/actions';
-import { IAuthReq } from '../../../../src';
 import { Action } from 'redux';
 import { matchPath } from 'react-router';
-import { PostSortType, PostVisibility, SortOrder } from '../../../../src/core/enums';
+import {
+  PostSortType,
+  PostVisibility,
+  SortOrder,
+  CategoriesGetOptions,
+  PostsGetOptions,
+  CommentsGetOptions,
+} from '../../../../src/core/enums';
 import ControllerFactory from '../../../../src/core/controller-factory';
+import { PaginatedCategoryResponse } from '../../../../src/graphql/models/category-type';
+import { PaginatedCommentsResponse } from '../../../../src/graphql/models/comment-type';
+import { PaginatedTemplateResponse } from '../../../../src/graphql/models/template-type';
+import { PaginatedPostsResponse } from '../../../../src/graphql/models/post-type';
+import { Post } from '../../../../src/graphql/models/post-type';
 
-export default async function (req: IAuthReq, actions: Action[]) {
-  const isAdmin = req._user && req._user.privileges !== 'regular' ? true : false;
-  const matchesEdit = matchPath<any>(req.url, { path: '/dashboard/posts/edit/:id' });
-  const initialCategoryFilter: Partial<CategoriesGetManyOptions> = {
+export default async function (url: string, user: User | null, actions: Action[]) {
+  const isAdmin = user && user.privileges !== 'regular' ? true : false;
+  const matchesEdit = matchPath<any>(url, { path: '/dashboard/posts/edit/:id' });
+  const initialCategoryFilter: Partial<CategoriesGetOptions> = {
     root: true,
   };
-  const initialPostsFilter: Partial<PostsGetAllOptions> = {
+  const initialPostsFilter: Partial<PostsGetOptions> = {
     visibility: isAdmin ? PostVisibility.all : PostVisibility.public,
     sort: PostSortType.modified,
     sortOrder: SortOrder.desc,
   };
-  const initialCommentFilter: Partial<CommentGetAllOptions> = {
+  const initialCommentFilter: Partial<CommentsGetOptions> = {
     expanded: true,
     depth: 5,
     index: 0,
@@ -40,12 +51,19 @@ export default async function (req: IAuthReq, actions: Action[]) {
 
     if (!isAdmin && !post.public) throw new RedirectError('/dashboard/posts');
 
-    actions.push(PostActions.SetPost.create(post as IPost<'expanded'>));
-    actions.push(CategoryActions.SetCategories.create(postReply[1]));
-    actions.push(CommentActions.SetComments.create({ page: postReply[2], filters: initialCommentFilter }));
-    actions.push(TemplatesActions.GetAll.create(postReply[3]));
+    actions.push(PostActions.SetPost.create(Post.fromEntity(post)));
+    actions.push(CategoryActions.SetCategories.create(PaginatedCategoryResponse.fromEntity(postReply[1])));
+    actions.push(
+      CommentActions.SetComments.create({
+        page: PaginatedCommentsResponse.fromEntity(postReply[2]),
+        filters: initialCommentFilter,
+      })
+    );
+    actions.push(TemplatesActions.GetAll.create(PaginatedTemplateResponse.fromEntity(postReply[3])));
   } else {
     let posts = await ControllerFactory.get('posts').getPosts(initialPostsFilter);
-    actions.push(PostActions.SetPosts.create({ page: posts, filters: initialPostsFilter }));
+    actions.push(
+      PostActions.SetPosts.create({ page: PaginatedPostsResponse.fromEntity(posts), filters: initialPostsFilter })
+    );
   }
 }

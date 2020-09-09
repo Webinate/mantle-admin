@@ -4,40 +4,36 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
 import Pager from '../pager';
-import { Page, IPost, IUserEntry, IFileEntry } from '../../../../../src';
+import { Post, User, PaginatedPostsResponse, PostVisibility, PostSortType, QueryPostsArgs } from 'mantle';
 import * as format from 'date-fns/format';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Create';
-import { PostsGetAllOptions } from 'mantle';
 import UserPicker from '../user-picker';
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowUpIcon from '@material-ui/icons/ArrowDropUp';
-import { SortOrder, PostVisibility, PostSortType } from '../../../../../src/core/enums';
 
 export type Props = {
   animated: boolean;
   loading: boolean;
-  posts: Page<IPost<'client' | 'expanded'>> | null;
-  getPosts: (options: Partial<PostsGetAllOptions>) => void;
-  postFilters: Partial<PostsGetAllOptions>;
-  onPostSelected: (post: IPost<'client' | 'expanded'>[]) => void;
-  onEdit: (post: IPost<'client' | 'expanded'>) => void;
-  onDelete: (post: IPost<'client' | 'expanded'>) => void;
-  selected: IPost<'client' | 'expanded'>[];
+  posts: PaginatedPostsResponse | null;
+  getPosts: (options: Partial<QueryPostsArgs>) => void;
+  postFilters: Partial<QueryPostsArgs>;
+  onPostSelected: (post: Post[]) => void;
+  onEdit: (post: Post) => void;
+  onDelete: (post: Post) => void;
+  selected: Post[];
   filtersOpen: boolean;
 };
-
-type SortType = 'title' | 'created' | 'modified';
 
 export type State = {
   showDeleteModal: boolean;
   sortAscending: boolean;
-  user: IUserEntry<'client' | 'expanded'> | null;
+  user: User | null;
   visibility: PostVisibility;
-  sortBy: SortType;
+  sortBy: PostSortType;
   visibilityOpen: boolean;
   sortByOpen: boolean;
 };
@@ -53,8 +49,8 @@ export default class PostList extends React.Component<Props, State> {
     this.state = {
       showDeleteModal: false,
       sortAscending: props.postFilters.sortOrder && props.postFilters.sortOrder === 'asc' ? true : false,
-      visibility: PostVisibility.all,
-      sortBy: props.postFilters.sort ? props.postFilters.sort : 'created',
+      visibility: 'all',
+      sortBy: props.postFilters.sortType ? props.postFilters.sortType : 'created',
       user: null,
       visibilityOpen: false,
       sortByOpen: false,
@@ -65,7 +61,7 @@ export default class PostList extends React.Component<Props, State> {
     if (next.posts !== this.props.posts) this.props.onPostSelected([]);
   }
 
-  private onPostSelected(post: IPost<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement>) {
+  private onPostSelected(post: Post, e: React.MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -95,7 +91,7 @@ export default class PostList extends React.Component<Props, State> {
     const val = !this.state.sortAscending;
     this.setState({ sortAscending: val, sortByOpen: false }, () => {
       this.props.getPosts({
-        sortOrder: val ? SortOrder.asc : SortOrder.desc,
+        sortOrder: val ? 'asc' : 'desc',
       });
     });
   }
@@ -108,11 +104,11 @@ export default class PostList extends React.Component<Props, State> {
 
   private onSortByChange(sort: PostSortType) {
     this.setState({ sortBy: sort, sortByOpen: false }, () => {
-      this.props.getPosts({ sort: sort });
+      this.props.getPosts({ sortType: sort });
     });
   }
 
-  private onUserChange(user: IUserEntry<'client' | 'expanded'> | null) {
+  private onUserChange(user: User | null) {
     this.setState({ user: user }, () => {
       this.props.getPosts({ author: user ? user.username : '' });
     });
@@ -158,19 +154,13 @@ export default class PostList extends React.Component<Props, State> {
                   transitionDuration={this.props.animated ? 'auto' : 0}
                   onClose={(e) => this.setState({ sortByOpen: false })}
                 >
-                  <MenuItem className="mt-filter-sortby-title" onClick={(e) => this.onSortByChange(PostSortType.title)}>
+                  <MenuItem className="mt-filter-sortby-title" onClick={(e) => this.onSortByChange('title')}>
                     Title
                   </MenuItem>
-                  <MenuItem
-                    className="mt-filter-sortby-created"
-                    onClick={(e) => this.onSortByChange(PostSortType.created)}
-                  >
+                  <MenuItem className="mt-filter-sortby-created" onClick={(e) => this.onSortByChange('created')}>
                     Created
                   </MenuItem>
-                  <MenuItem
-                    className="mt-filter-sortby-modified"
-                    onClick={(e) => this.onSortByChange(PostSortType.modified)}
-                  >
+                  <MenuItem className="mt-filter-sortby-modified" onClick={(e) => this.onSortByChange('modified')}>
                     Modified
                   </MenuItem>
                 </Menu>
@@ -208,22 +198,16 @@ export default class PostList extends React.Component<Props, State> {
                   open={this.state.visibilityOpen}
                   anchorEl={this._visibilityElm!}
                 >
-                  <MenuItem
-                    className="mt-filter-visibility-all"
-                    onClick={(e) => this.onVisibilityChange(PostVisibility.all)}
-                  >
+                  <MenuItem className="mt-filter-visibility-all" onClick={(e) => this.onVisibilityChange('all')}>
                     All
                   </MenuItem>
                   <MenuItem
                     className="mt-filter-visibility-private"
-                    onClick={(e) => this.onVisibilityChange(PostVisibility.private)}
+                    onClick={(e) => this.onVisibilityChange('private')}
                   >
                     Private
                   </MenuItem>
-                  <MenuItem
-                    className="mt-filter-visibility-public"
-                    onClick={(e) => this.onVisibilityChange(PostVisibility.public)}
-                  >
+                  <MenuItem className="mt-filter-visibility-public" onClick={(e) => this.onVisibilityChange('public')}>
                     Public
                   </MenuItem>
                 </Menu>
@@ -249,7 +233,7 @@ export default class PostList extends React.Component<Props, State> {
                 const selected = this.props.selected.indexOf(post) === -1 ? false : true;
 
                 return (
-                  <Post
+                  <PostDiv
                     key={'post-' + postIndex}
                     selected={selected}
                     style={!this.props.animated ? { transition: 'none' } : undefined}
@@ -278,7 +262,7 @@ export default class PostList extends React.Component<Props, State> {
                     ) : undefined}
                     <div className="mt-post-featured-thumb">
                       {post.featuredImage ? (
-                        <img src={(post.featuredImage as IFileEntry<'client'>).publicURL} />
+                        <img src={post.featuredImage.publicURL} />
                       ) : (
                         <img src={'/images/post-feature.svg'} />
                       )}
@@ -303,12 +287,12 @@ export default class PostList extends React.Component<Props, State> {
                     </div>
                     <div className="mt-post-info">
                       <Avatar
-                        src={generateAvatarPic(post.author as IUserEntry<'client'>)}
+                        src={generateAvatarPic(post.author || null)}
                         style={{ width: 36, height: 36, float: 'right', margin: '10px 0 0 0' }}
                       />
                       <h3 className="mt-post-name">{post.title || 'UNTITLED'}</h3>
                     </div>
-                  </Post>
+                  </PostDiv>
                 );
               })}
             </PostsInnerContent>
@@ -365,7 +349,7 @@ const Filter = styled.div`
   }
 `;
 
-const Post = styled.div`
+const PostDiv = styled.div`
   margin: 10px;
   float: left;
   padding: 5px;

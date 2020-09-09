@@ -5,7 +5,7 @@ import { default as styled } from '../theme/styled';
 import ContentHeader from '../components/content-header';
 import commentActions from '../store/comments/actions';
 import FilterBar from '../components/comments/filter-bar';
-import { IUserEntry, IPost } from 'mantle';
+import { User, Post, CommentSortType } from 'mantle';
 import { isAdminUser } from '../utils/component-utils';
 import { CommentsList } from '../components/comments/comments-list';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -16,7 +16,6 @@ import IconButton from '@material-ui/core/IconButton';
 import theme from '../theme/mui-theme';
 import UserPicker from '../components/user-picker';
 import PostPreview from '../components/posts/post-preview';
-import { CommentSortType, SortOrder } from '../../../../src/core/enums';
 
 // Map state to props
 const mapStateToProps = (state: IRootState, ownProps: any) => ({
@@ -46,7 +45,7 @@ type State = {
   sortAscending: boolean;
   selectedUid: string | null;
   selectedPostUid: string | null;
-  user: IUserEntry<'client' | 'expanded'> | null;
+  user: User | null;
 };
 
 /**
@@ -88,12 +87,12 @@ export class Comments extends React.Component<Props, State> {
     const val = !this.state.sortAscending;
     this.setState({ sortAscending: val, sortByOpen: false }, () => {
       this.props.getAll({
-        sortOrder: val ? SortOrder.asc : SortOrder.desc,
+        sortOrder: val ? 'asc' : 'desc',
       });
     });
   }
 
-  private onUserChange(user: IUserEntry<'client' | 'expanded'> | null) {
+  private onUserChange(user: User | null) {
     this.setState({ user: user }, () => {
       this.props.getAll({ user: user ? user.username : '' });
     });
@@ -104,11 +103,11 @@ export class Comments extends React.Component<Props, State> {
     const isBusy = this.props.commentState.busy;
     const isAdmin = isAdminUser(this.props.user);
     const animated = this.props.app.debugMode ? false : true;
-    let selectedPost: IPost<'expanded'> | null = null;
+    let selectedPost: Post | null = null;
 
     if (page && this.state.selectedUid) {
-      const comment = page.data.find((c) => (c.post as IPost<'expanded'>)._id === this.state.selectedPostUid)!;
-      if (comment) selectedPost = comment.post as IPost<'expanded'>;
+      const comment = page.data.find((c) => (c.post._id as string) === this.state.selectedPostUid)!;
+      if (comment) selectedPost = comment.post;
     }
 
     return (
@@ -147,16 +146,10 @@ export class Comments extends React.Component<Props, State> {
                 transitionDuration={animated ? 'auto' : 0}
                 onClose={(e) => this.setState({ sortByOpen: false })}
               >
-                <MenuItem
-                  className="mt-filter-sortby-created"
-                  onClick={(e) => this.onSortByChange(CommentSortType.created)}
-                >
+                <MenuItem className="mt-filter-sortby-created" onClick={(e) => this.onSortByChange('created')}>
                   Created
                 </MenuItem>
-                <MenuItem
-                  className="mt-filter-sortby-updated"
-                  onClick={(e) => this.onSortByChange(CommentSortType.updated)}
-                >
+                <MenuItem className="mt-filter-sortby-updated" onClick={(e) => this.onSortByChange('updated')}>
                   Updated
                 </MenuItem>
               </Menu>
@@ -200,8 +193,8 @@ export class Comments extends React.Component<Props, State> {
                   onCommentSelected={(comment) => {
                     if (comment) {
                       this.setState({
-                        selectedUid: comment._id,
-                        selectedPostUid: typeof comment.post === 'string' ? comment.post : comment.post._id,
+                        selectedUid: comment._id as string,
+                        selectedPostUid: typeof comment.post === 'string' ? comment.post : (comment.post._id as string),
                       });
                     } else {
                       this.setState({
@@ -211,7 +204,7 @@ export class Comments extends React.Component<Props, State> {
                     }
                   }}
                   getAll={(options) => this.props.getAll(options)}
-                  onEdit={(id, token) => this.props.editComment(id, token)}
+                  onEdit={(token) => this.props.editComment(token)}
                   onReply={(post, parent, comment) => this.props.createComment(post, comment, parent)}
                   onDelete={(id) => this.props.deleteComment(id)}
                   loading={isBusy}

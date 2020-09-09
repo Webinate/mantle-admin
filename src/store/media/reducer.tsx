@@ -1,24 +1,22 @@
 import { ActionCreators, Action } from './actions';
-import { Page, IVolume, IFileEntry } from '../../../../../src';
-import { VolumesGetOptions, FilesGetOptions } from 'mantle';
-import { SortOrder, VolumeSortType, FileSortType } from '../../../../../src/core/enums';
+import { Volume, PaginatedVolumeResponse, PaginatedFilesResponse, QueryVolumesArgs, QueryFilesArgs } from 'mantle';
 
 // State
 export type State = {
-  readonly volumePage: Page<IVolume<'client' | 'expanded'>> | null;
-  readonly volumeFilters: Partial<VolumesGetOptions>;
-  readonly filesPage: Page<IFileEntry<'client' | 'expanded'>> | null;
-  readonly filesFilters: Partial<FilesGetOptions>;
-  readonly selected: IVolume<'client' | 'expanded'> | null;
+  readonly volumePage: PaginatedVolumeResponse | null;
+  readonly volumeFilters: Partial<QueryVolumesArgs>;
+  readonly filesPage: PaginatedFilesResponse | null;
+  readonly filesFilters: Partial<QueryFilesArgs>;
+  readonly selected: Volume | null;
   readonly busy: boolean;
   readonly volumeFormError: Error | null;
 };
 
 export const initialState: State = {
   volumePage: null,
-  volumeFilters: { index: 0, sortType: VolumeSortType.created, sortOrder: SortOrder.desc },
+  volumeFilters: { index: 0, sortType: 'created', sortOrder: 'desc' },
   filesPage: null,
-  filesFilters: { index: 0, sortType: FileSortType.created, sortOrder: SortOrder.desc, search: '' },
+  filesFilters: { index: 0, sortType: 'created', sortOrder: 'desc', search: '' },
   selected: null,
   busy: false,
   volumeFormError: null,

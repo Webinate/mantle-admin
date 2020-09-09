@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
-import { IVolume, IUserEntry } from '../../../../../src';
+import { Volume } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -15,7 +15,7 @@ import FolderOpen from '@material-ui/icons/FolderOpen';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 
 export type Props = {
-  selectedVolume: IVolume<'client' | 'expanded'> | null;
+  selectedVolume: Volume | null;
   onDelete: () => void;
   onOpen: (volumeId: string) => void;
   onRename: () => void;
@@ -35,32 +35,30 @@ export default class VolumeSidePanel extends React.Component<Props, State> {
       <Container id="mt-volume-info">
         {volume ? (
           <div>
-            <Tooltip title={(volume.user as IUserEntry<'client'>).username}>
-              <Avatar src={generateAvatarPic(volume.user as IUserEntry<'client'>)} style={{ height: 40, width: 40 }} />
+            <Tooltip title={volume.user.username}>
+              <Avatar src={generateAvatarPic(volume.user)} style={{ height: 40, width: 40 }} />
             </Tooltip>
           </div>
         ) : null}
         <Divider style={{ margin: '5px auto 0 auto' }} />
         <List component="nav">
           {volume ? (
-            <ListItem button id="mt-open-volume" onClick={e => this.props.onOpen(volume._id)}>
+            <ListItem button id="mt-open-volume" onClick={(e) => this.props.onOpen(volume._id as string)}>
               <ListItemIcon>
                 <FolderOpen />
               </ListItemIcon>
               <ListItemText inset primary={`Open ${volume.name}`} />
             </ListItem>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
 
-          <ListItem button id="mt-rename-volume" disabled={!volume} onClick={e => this.props.onRename()}>
+          <ListItem button id="mt-rename-volume" disabled={!volume} onClick={(e) => this.props.onRename()}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
             <ListItemText inset primary="Rename" />
           </ListItem>
 
-          <ListItem button id="mt-delete-volume" onClick={e => this.props.onDelete()}>
+          <ListItem button id="mt-delete-volume" onClick={(e) => this.props.onDelete()}>
             <ListItemIcon>
               <DeleteIcon />
             </ListItemIcon>

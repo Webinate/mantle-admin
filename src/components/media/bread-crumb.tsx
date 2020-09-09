@@ -2,12 +2,12 @@ import * as React from 'react';
 import FolderIcon from '@material-ui/icons/Folder';
 import CloudIcon from '@material-ui/icons/Cloud';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import { IVolume } from '../../../../../src';
+import { Volume } from 'mantle';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 
 export type Props = {
-  volume: IVolume<'client' | 'expanded'>;
+  volume: Volume;
   onVolumeSelected: () => void;
 };
 
@@ -17,14 +17,14 @@ export class BreadCrumb extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      searchFilter: ''
+      searchFilter: '',
     };
   }
 
   render() {
     return (
       <Container>
-        <h2 onClick={e => this.props.onVolumeSelected()}>
+        <h2 onClick={(e) => this.props.onVolumeSelected()}>
           {this.props.volume.type === 'local' ? <FolderIcon /> : <CloudIcon />}
           <KeyboardArrowRight />/{this.props.volume.name}
         </h2>

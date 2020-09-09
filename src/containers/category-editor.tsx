@@ -21,14 +21,14 @@ import EditIcon from '@material-ui/icons/Edit';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import theme from '../theme/mui-theme';
-import { ICategory } from '../../../../src';
+import { Category, UpdateCategoryInput } from 'mantle';
 import { connectWrapper, returntypeof } from '../utils/decorators';
 import { IRootState } from '../store';
 import categoryActions, { ActionCreators } from '../store/categories/actions';
 
 export type ExternalProps = {
   selected: string[];
-  onCategorySelected: (category: ICategory<'client'>) => void;
+  onCategorySelected: (category: Category) => void;
 };
 
 // Map state to props
@@ -54,10 +54,10 @@ type State = {
   addCategoryMode: boolean;
   deleteMode: boolean;
   editMode: boolean;
-  newCategory: Partial<ICategory<'client' | 'expanded'>>;
+  newCategory: Partial<UpdateCategoryInput>;
   autoSlug: string;
   pristineForm: boolean;
-  selectedCategory: ICategory<'client' | 'expanded'> | null;
+  selectedCategory: Category | null;
 };
 
 @connectWrapper(mapStateToProps, dispatchToProps)
@@ -81,14 +81,14 @@ export class CategoryEditor extends React.Component<Props, State> {
     return cleanValue;
   }
 
-  private expandCategory(c: ICategory<'client' | 'expanded'>, flatCategories: ICategory<'client' | 'expanded'>[]) {
+  private expandCategory(c: Category, flatCategories: Category[]) {
     flatCategories.push(c);
-    for (const child of c.children) this.expandCategory(child as ICategory<'client'>, flatCategories);
+    if (c.children) for (const child of c.children) this.expandCategory(child, flatCategories);
   }
 
-  private renderNewCategoryForm(categories: ICategory<'client' | 'expanded'>[]) {
+  private renderNewCategoryForm(categories: Category[]) {
     const isLoading = this.props.categories.busy;
-    const flatCategories: ICategory<'client' | 'expanded'>[] = [];
+    const flatCategories: Category[] = [];
     for (const c of categories) this.expandCategory(c, flatCategories);
 
     return (
@@ -119,7 +119,7 @@ export class CategoryEditor extends React.Component<Props, State> {
         <TextField
           id="mt-new-cat-desc"
           label="Optional category description"
-          value={this.state.newCategory.description}
+          value={this.state.newCategory.description || ''}
           fullWidth={true}
           onChange={(e) => {
             this.setState({ newCategory: { ...this.state.newCategory, description: e.currentTarget.value } });
@@ -130,7 +130,7 @@ export class CategoryEditor extends React.Component<Props, State> {
           <InputLabel htmlFor="mt-new-cat-parent-input">Parent Category</InputLabel>
           <Select
             MenuProps={{ transitionDuration: this.props.app.debugMode ? 0 : 'auto' }}
-            value={this.state.newCategory.parent || ''}
+            value={(this.state.newCategory.parent as string) || ''}
             onChange={(e) => this.setState({ newCategory: { ...this.state.newCategory, parent: e.target.value } })}
             input={<Input id="mt-new-cat-parent-input" />}
           >
@@ -139,7 +139,7 @@ export class CategoryEditor extends React.Component<Props, State> {
             </MenuItem>
             {flatCategories.map((parent, parentIndex) => {
               return (
-                <MenuItem className="mt-cat-parent-item" key={`parent-${parentIndex}`} value={parent._id}>
+                <MenuItem className="mt-cat-parent-item" key={`parent-${parentIndex}`} value={parent._id as string}>
                   {parent.title}
                 </MenuItem>
               );
@@ -218,7 +218,7 @@ export class CategoryEditor extends React.Component<Props, State> {
     if (categories.length === 1 && this.state.deleteMode) this.setState({ deleteMode: false });
   }
 
-  private renderCategory(cat: ICategory<'expanded'>, catIndex: number): JSX.Element {
+  private renderCategory(cat: Category, catIndex: number): JSX.Element {
     const selected = this.props.selected.find((i) => i === cat._id) ? true : false;
 
     const checkboxStyle: React.CSSProperties = {
@@ -250,7 +250,13 @@ export class CategoryEditor extends React.Component<Props, State> {
                     selectedCategory: cat,
                     editMode: false,
                     addCategoryMode: true,
-                    newCategory: { ...cat },
+                    newCategory: {
+                      _id: cat._id,
+                      description: cat.description,
+                      parent: cat.parent ? cat.parent._id : '',
+                      slug: cat.slug,
+                      title: cat.title,
+                    },
                   });
                 else this.props.onCategorySelected(cat);
               }}
@@ -280,18 +286,18 @@ export class CategoryEditor extends React.Component<Props, State> {
         />
 
         <CategoryChildren>
-          {cat.children.map((child, subIndex) => this.renderCategory(child, subIndex))}
+          {cat.children && cat.children.map((child, subIndex) => this.renderCategory(child, subIndex))}
         </CategoryChildren>
       </div>
     );
   }
 
-  private renderAllCategories(categories: ICategory<'client' | 'expanded'>[]) {
+  private renderAllCategories(categories: Category[]) {
     return (
       <div>
         <ActiveCategories className="mt-category-root">
           {categories.map((c, catIndex) => {
-            return this.renderCategory(c as ICategory<'expanded'>, catIndex);
+            return this.renderCategory(c, catIndex);
           })}
         </ActiveCategories>
 
@@ -369,9 +375,7 @@ export class CategoryEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const categories: ICategory<'client' | 'expanded'>[] = this.props.categories.categoryPage
-      ? this.props.categories.categoryPage.data
-      : [];
+    const categories = this.props.categories.categoryPage ? this.props.categories.categoryPage.data : [];
     return (
       <Container className="mt-category-container">
         <div>

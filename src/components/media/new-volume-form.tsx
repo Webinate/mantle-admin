@@ -6,7 +6,7 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import ErrorIcon from '@material-ui/icons/Error';
 import { default as styled } from '../../theme/styled';
-import { IVolume } from '../../../../../src';
+import { AddVolumeInput } from 'mantle';
 import VolumeProperties from './new-volume-stages/volume-properties';
 import StepContent from '@material-ui/core/StepContent';
 import VolumeType from './new-volume-stages/volume-type';
@@ -14,7 +14,7 @@ import theme from '../../theme/mui-theme';
 
 export type Props = {
   animated: boolean;
-  onComplete: (volume: Partial<IVolume<'client'>>) => void;
+  onComplete: (volume: Partial<AddVolumeInput>) => void;
   isAdmin: boolean;
   error: Error | null;
 };
@@ -23,7 +23,7 @@ export type State = {
   activeStep: number;
   activeVolumeType: number;
   nextEnabled: boolean;
-  newVolume: Partial<IVolume<'client'>>;
+  newVolume: Partial<AddVolumeInput>;
 };
 
 export class NewVolumeForm extends React.Component<Props, State> {
@@ -41,8 +41,8 @@ export class NewVolumeForm extends React.Component<Props, State> {
       newVolume: {
         name: 'New Volume',
         type: 'local',
-        memoryAllocated: 500 * 1024 * 1024
-      }
+        memoryAllocated: 500 * 1024 * 1024,
+      },
     };
   }
 
@@ -51,7 +51,7 @@ export class NewVolumeForm extends React.Component<Props, State> {
 
     if (activeStep < this._steps.length - 1)
       this.setState({
-        activeStep: activeStep + 1
+        activeStep: activeStep + 1,
       });
     else this.props.onComplete(this.state.newVolume);
   };
@@ -61,11 +61,11 @@ export class NewVolumeForm extends React.Component<Props, State> {
 
     if (activeStep > 0)
       this.setState({
-        activeStep: activeStep - 1
+        activeStep: activeStep - 1,
       });
   };
 
-  private onChange(newVolue: Partial<IVolume<'client'>>) {
+  private onChange(newVolue: Partial<AddVolumeInput>) {
     const updatedVolume = { ...this.state.newVolume, ...newVolue };
     this.setState({ newVolume: updatedVolume });
 
@@ -82,14 +82,15 @@ export class NewVolumeForm extends React.Component<Props, State> {
     const isLastStep = activeStep === steps.length - 1;
 
     let activeElm: JSX.Element;
-    if (activeStep === 0) activeElm = <VolumeType volume={this.state.newVolume} onChange={v => this.onChange(v)} />;
+    if (activeStep === 0)
+      activeElm = <VolumeType volumeType={this.state.newVolume.type!} onChange={(v) => this.onChange(v)} />;
     else if (activeStep === 1)
       activeElm = (
         <VolumeProperties
           maxValue={NewVolumeForm.MAX}
           volume={this.state.newVolume}
           isAdmin={this.props.isAdmin}
-          onChange={v => this.onChange(v)}
+          onChange={(v) => this.onChange(v as AddVolumeInput)}
         />
       );
     else activeElm = <div />;
@@ -113,11 +114,9 @@ export class NewVolumeForm extends React.Component<Props, State> {
             <ErrorIcon />
             {this.props.error.message}
           </Error>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
         <Buttons>
-          <Button id="mt-vol-back" disabled={activeStep === 0} onClick={e => this.handleBack()}>
+          <Button id="mt-vol-back" disabled={activeStep === 0} onClick={(e) => this.handleBack()}>
             Back
           </Button>
           <Button
@@ -125,7 +124,7 @@ export class NewVolumeForm extends React.Component<Props, State> {
             disabled={!this.state.nextEnabled}
             variant="contained"
             color="primary"
-            onClick={e => this.handleNext()}
+            onClick={(e) => this.handleNext()}
           >
             {isLastStep ? 'Add Volume' : 'Next'}
           </Button>

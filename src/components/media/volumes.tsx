@@ -9,24 +9,20 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Checkbox from '@material-ui/core/Checkbox';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
-import { IVolume, Page } from '../../../../../src';
+import { Volume, PaginatedVolumeResponse, VolumeSortType, SortOrder, QueryVolumesArgs } from 'mantle';
 import * as format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
-import { VolumesGetOptions } from 'mantle';
-import { SortOrder } from '../../../../../src/core/enums';
-
-export type SortTypes = 'name' | 'created' | 'memory';
 
 export type Props = {
   multiselect?: boolean;
-  volumes: Page<IVolume<'client' | 'expanded'>>;
+  volumes: PaginatedVolumeResponse;
   loading: boolean;
   selectedUids: string[];
-  activeFilters: Partial<VolumesGetOptions>;
+  activeFilters: Partial<QueryVolumesArgs>;
   onSelectionChanged: (uids: string[]) => void;
-  getVolumes: (options: Partial<VolumesGetOptions>) => void;
-  onSort: (sortBy: SortTypes, sortDir: SortOrder) => void;
+  getVolumes: (options: Partial<QueryVolumesArgs>) => void;
+  onSort: (sortBy: VolumeSortType, sortDir: SortOrder) => void;
   openVolume: (volumeId: string) => void;
 };
 
@@ -49,10 +45,9 @@ export class Volumes extends React.Component<Props, State> {
     if (next.volumes !== this.props.volumes) this.props.onSelectionChanged([]);
   }
 
-  private changeOrder(sort: SortTypes) {
-    let order: SortOrder = SortOrder.desc;
-    if (this.props.activeFilters.sortType === sort && this.props.activeFilters.sortOrder === SortOrder.desc)
-      order = SortOrder.asc;
+  private changeOrder(sort: VolumeSortType) {
+    let order: SortOrder = 'desc';
+    if (this.props.activeFilters.sortType === sort && this.props.activeFilters.sortOrder === 'desc') order = 'asc';
 
     this.props.onSort(sort, order);
   }
@@ -61,25 +56,31 @@ export class Volumes extends React.Component<Props, State> {
     this.props.onSelectionChanged(volumes);
   }
 
-  private onSelection(e: React.MouseEvent<HTMLElement>, volume: IVolume<'client' | 'expanded'>) {
+  private onSelection(e: React.MouseEvent<HTMLElement>, volume: Volume) {
     const selected = this.props.selectedUids;
 
     if (!this.props.multiselect) {
-      this.onSelectionChange([volume._id]);
+      this.onSelectionChange([volume._id as string]);
       return;
     }
 
     if (!e.ctrlKey && !e.shiftKey) {
-      this.onSelectionChange([volume._id]);
+      this.onSelectionChange([volume._id as string]);
     } else if (e.ctrlKey) {
-      if (selected.indexOf(volume._id) === -1) this.onSelectionChange(selected.concat(volume._id));
+      if (selected.indexOf(volume._id as string) === -1) this.onSelectionChange(selected.concat(volume._id as string));
       else this.onSelectionChange(selected.filter((i) => i !== volume._id));
     } else {
       const volumePage = this.props.volumes!;
-      const allIds = volumePage.data.map((v) => v._id);
+      const allIds = volumePage.data.map((v) => v._id as string);
 
-      let firstIndex = Math.min(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
-      let lastIndex = Math.max(allIds.indexOf(volume._id), selected.length > 0 ? allIds.indexOf(selected[0]) : 0);
+      let firstIndex = Math.min(
+        allIds.indexOf(volume._id as string),
+        selected.length > 0 ? allIds.indexOf(selected[0]) : 0
+      );
+      let lastIndex = Math.max(
+        allIds.indexOf(volume._id as string),
+        selected.length > 0 ? allIds.indexOf(selected[0]) : 0
+      );
 
       this.onSelectionChange(allIds.slice(firstIndex, lastIndex + 1));
     }
@@ -89,7 +90,7 @@ export class Volumes extends React.Component<Props, State> {
     const selected = this.props.selectedUids;
     const volumes = this.props.volumes;
     const allSelected = this.props.selectedUids.length === volumes.data.length;
-    const headers: { label: string; property: SortTypes }[] = [
+    const headers: { label: string; property: VolumeSortType }[] = [
       { label: 'Name', property: 'name' },
       { label: 'Memory', property: 'memory' },
       { label: 'Created', property: 'created' },
@@ -115,7 +116,7 @@ export class Volumes extends React.Component<Props, State> {
                 <TableCell
                   numeric={false}
                   padding="checkbox"
-                  sortDirection={filters.sortType === 'name' ? filters.sortOrder : false}
+                  sortDirection={filters.sortType === 'name' ? filters.sortOrder! : false}
                 >
                   <Checkbox
                     id="mt-select-all"
@@ -123,7 +124,7 @@ export class Volumes extends React.Component<Props, State> {
                     style={{ display: this.props.multiselect ? '' : 'none' }}
                     onClick={(e) => {
                       if (allSelected) this.onSelectionChange([]);
-                      else this.onSelectionChange(volumes.data.map((v) => v._id));
+                      else this.onSelectionChange(volumes.data.map((v) => v._id as string));
                     }}
                   />
                 </TableCell>
@@ -132,11 +133,11 @@ export class Volumes extends React.Component<Props, State> {
                   return (
                     <TableCell
                       key={`header-${index}`}
-                      sortDirection={filters.sortType === h.property ? filters.sortOrder : false}
+                      sortDirection={filters.sortType === h.property ? filters.sortOrder! : false}
                     >
                       <TableSortLabel
                         active={filters.sortType === h.property}
-                        direction={filters.sortOrder}
+                        direction={filters.sortOrder!}
                         className={`mt-volume-header-${h.property}`}
                         onClick={(e) => this.changeOrder(h.property)}
                       >
@@ -157,7 +158,7 @@ export class Volumes extends React.Component<Props, State> {
                     style={{ cursor: 'pointer' }}
                     role="checkbox"
                     key={`vol-row-${index}`}
-                    onDoubleClick={(e) => this.props.openVolume(volume._id)}
+                    onDoubleClick={(e) => this.props.openVolume(volume._id as string)}
                     onClick={(e) => {
                       this.onSelection(e, volume);
                     }}
@@ -167,12 +168,12 @@ export class Volumes extends React.Component<Props, State> {
                         onClick={(e) => {
                           e.stopPropagation();
 
-                          if (selected.indexOf(volume._id) !== -1)
+                          if (selected.indexOf(volume._id as string) !== -1)
                             this.onSelectionChange(selected.filter((v) => v !== volume._id));
-                          else this.onSelectionChange(selected.concat(volume._id));
+                          else this.onSelectionChange(selected.concat(volume._id as string));
                         }}
                         className="mt-vol-checkbox"
-                        checked={selected.indexOf(volume._id) !== -1}
+                        checked={selected.indexOf(volume._id as string) !== -1}
                       />
                     </TableCell>
                     <TableCell padding="checkbox" className={`mt-vol-type mt-volume-type-${volume.type}`}>

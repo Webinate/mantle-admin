@@ -1,14 +1,14 @@
-import { IUserEntry, IFileEntry } from '../../../../src';
+import { User } from 'mantle';
 
 /**
  * Picks a random user avatar based on the given index
  */
-export function generateAvatarPic(avatar: IUserEntry<'client' | 'expanded'> | null) {
-  if (avatar === null) return '/images/avatar-blank.svg';
+export function generateAvatarPic(avatar: User | null | undefined) {
+  if (avatar === null || avatar === undefined) return '/images/avatar-blank.svg';
 
   if (!avatar.avatar) return `/images/avatar-1.svg`;
 
-  if (avatar.avatarFile) return (avatar.avatarFile as IFileEntry<'client'>).publicURL!;
+  if (avatar.avatarFile) return avatar.avatarFile.publicURL!;
 
   const userNum = parseInt(avatar.avatar);
   if (isNaN(userNum)) return avatar.avatar as string;
@@ -32,6 +32,6 @@ export function formatBytes(bytes: number, decimals = 2) {
 /**
  * Gets if the current user is an admin
  */
-export function isAdminUser(user: IUserEntry<'client' | 'expanded'> | null) {
+export function isAdminUser(user: User | null) {
   return user && user.privileges !== 'regular' ? true : false;
 }

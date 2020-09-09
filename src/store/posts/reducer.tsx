@@ -1,26 +1,25 @@
 import { ActionCreators, Action } from './actions';
-import { PostsGetAllOptions, IDocument, IDraftElement } from 'mantle';
-import { Page, IPost } from '../../../../../src';
+import { Post, Element, PaginatedPostsResponse, QueryPostsArgs } from 'mantle';
 
 // State
 export type State = {
-  readonly postFilters: Partial<PostsGetAllOptions>;
-  readonly postPage: Page<IPost<'client' | 'expanded'>> | null;
-  readonly post: IPost<'expanded'> | null;
+  readonly postFilters: Partial<QueryPostsArgs>;
+  readonly postPage: PaginatedPostsResponse | null;
+  readonly post: Post | null;
   readonly busy: boolean;
   readonly selection: string[];
   readonly focussedId: string;
-  readonly elements: IDraftElement<'client' | 'expanded'>[] | null;
+  readonly elements: Element[] | null;
 };
 
 export const initialState: State = {
-  postFilters: { index: 0, sort: 'created' },
+  postFilters: { index: 0, sortType: 'created' },
   postPage: null,
   post: null,
   busy: false,
   focussedId: '',
   selection: [],
-  elements: null
+  elements: null,
 };
 
 // Reducer
@@ -32,7 +31,7 @@ export default function reducer(state: State = initialState, action: Action): St
       partialState = {
         postPage: action.payload.page,
         postFilters: { ...state.postFilters, ...action.payload.filters },
-        busy: false
+        busy: false,
       };
       break;
 
@@ -41,21 +40,21 @@ export default function reducer(state: State = initialState, action: Action): St
       break;
 
     case ActionCreators.SetTemplate.type:
-      partialState = { post: { ...state.post!, document: action.payload } as IPost<'expanded'> };
+      partialState = { post: { ...state.post!, document: action.payload } };
       break;
 
     case ActionCreators.SetPost.type:
-      let doc = action.payload.document as IDocument<'expanded'>;
+      let doc = action.payload.document;
 
       partialState = {
         post: action.payload,
-        elements: [...doc.elements],
-        busy: false
+        elements: [...(doc.elements || [])],
+        busy: false,
       };
       break;
 
     case ActionCreators.AddElement.type:
-      let elements: IDraftElement<'client' | 'expanded'>[];
+      let elements: Element[];
       if (action.payload.index !== undefined) {
         state.elements!.splice(action.payload.index, 0, ...action.payload.elms);
         elements = [...state.elements!];
@@ -63,41 +62,41 @@ export default function reducer(state: State = initialState, action: Action): St
 
       partialState = {
         elements: elements,
-        selection: [action.payload.elms[action.payload.elms.length - 1]._id],
-        focussedId: action.payload.elms.length === 1 ? action.payload.elms[0]._id : '',
+        selection: [action.payload.elms[action.payload.elms.length - 1]._id as string],
+        focussedId: action.payload.elms.length === 1 ? (action.payload.elms[0]._id as string) : '',
         busy: false,
-        post: state.post!
+        post: state.post!,
       };
       break;
 
     case ActionCreators.SetFocussedElm.type:
       partialState = {
-        focussedId: action.payload
+        focussedId: action.payload,
       };
       break;
 
     case ActionCreators.UpdateElement.type:
       partialState = {
-        elements: state.elements!.map(elm => (elm._id === action.payload._id ? action.payload : elm)),
+        elements: state.elements!.map((elm) => (elm._id === action.payload._id ? action.payload : elm)),
         focussedId: '',
-        post: state.post!
+        post: state.post!,
       };
       break;
 
     case ActionCreators.SetElmSelection.type:
       partialState = {
         selection: action.payload,
-        focussedId: action.payload.length === 0 ? '' : state.focussedId
+        focussedId: action.payload.length === 0 ? '' : state.focussedId,
       };
       break;
 
     case ActionCreators.RemoveElements.type:
       partialState = {
-        elements: state.elements!.filter(elm => !action.payload.includes(elm._id)),
+        elements: state.elements!.filter((elm) => !action.payload.includes(elm._id as string)),
         selection: [],
         focussedId: '',
         busy: false,
-        post: state.post!
+        post: state.post!,
       };
       break;
 

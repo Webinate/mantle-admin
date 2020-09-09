@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IUserEntry } from '../../../../src';
+import { User } from 'mantle';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
 import { getUsers, removeUser, update, create } from '../store/users/actions';
@@ -28,7 +28,7 @@ const mapStateToProps = (state: IRootState, ownProps: any) => ({
   userState: state.users,
   auth: state.authentication,
   admin: state.admin,
-  app: state.app
+  app: state.app,
 });
 
 // Map actions to props (This binds the actions to the dispatch fucntion)
@@ -39,7 +39,7 @@ const dispatchToProps = {
   removeUser: removeUser,
   resendActivation: AdminActions.resendActivation,
   update,
-  create
+  create,
 };
 
 const stateProps = returntypeof(mapStateToProps);
@@ -66,7 +66,7 @@ export class Users extends React.Component<Props, State> {
       newUserForm: false,
       dialogueHeader: '',
       dialogue: null,
-      dialogueConfirmBtn: 'Ok'
+      dialogueConfirmBtn: 'Ok',
     };
   }
 
@@ -76,30 +76,30 @@ export class Users extends React.Component<Props, State> {
 
   componentWillReceiveProps(next: Props) {}
 
-  private onUserSelected(user: IUserEntry<'client' | 'expanded'>, e: React.MouseEvent<HTMLDivElement>) {
+  private onUserSelected(user: User, e: React.MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
 
     if (!e.ctrlKey && !e.shiftKey) {
-      this.setState({ selectedUids: [user._id] });
+      this.setState({ selectedUids: [user._id as string] });
     } else if (e.ctrlKey) {
-      if (this.state.selectedUids.indexOf(user._id) === -1)
-        this.setState({ selectedUids: this.state.selectedUids.concat(user._id) });
-      else this.setState({ selectedUids: this.state.selectedUids.filter(i => i !== user._id) });
+      if (this.state.selectedUids.indexOf(user._id as string) === -1)
+        this.setState({ selectedUids: this.state.selectedUids.concat(user._id as string) });
+      else this.setState({ selectedUids: this.state.selectedUids.filter((i) => i !== user._id) });
     } else {
       const userPage = this.props.userState.userPage!;
       const selected = this.state.selectedUids;
 
       let firstIndex = Math.min(
         userPage.data.indexOf(user),
-        selected.length > 0 ? userPage.data.findIndex(u => u._id === selected[0]) : 0
+        selected.length > 0 ? userPage.data.findIndex((u) => u._id === selected[0]) : 0
       );
       let lastIndex = Math.max(
         userPage.data.indexOf(user),
-        selected.length > 0 ? userPage.data.findIndex(u => u._id === selected[0]) : 0
+        selected.length > 0 ? userPage.data.findIndex((u) => u._id === selected[0]) : 0
       );
 
-      this.setState({ selectedUids: userPage.data.slice(firstIndex, lastIndex + 1).map(u => u._id) });
+      this.setState({ selectedUids: userPage.data.slice(firstIndex, lastIndex + 1).map((u) => u._id as string) });
     }
   }
 
@@ -111,14 +111,14 @@ export class Users extends React.Component<Props, State> {
           <DialogContentText className="mt-modal-message">{this.state.dialogue}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button className="mt-cancel" variant="contained" onClick={e => this.setState({ dialogue: null })}>
+          <Button className="mt-cancel" variant="contained" onClick={(e) => this.setState({ dialogue: null })}>
             Cancel
           </Button>
           <Button
             variant="contained"
             className="mt-confirm"
             style={{ background: theme.error.background, color: theme.error.color }}
-            onClick={e => {
+            onClick={(e) => {
               this.setState({ dialogue: null });
               onConfirm();
             }}
@@ -130,7 +130,7 @@ export class Users extends React.Component<Props, State> {
     );
   }
 
-  private renderUserList(selected: IUserEntry<'expanded' | 'client'> | null) {
+  private renderUserList(selected: User | null) {
     const animated = this.props.app.debugMode ? false : true;
     const page = typeof this.props.userState.userPage! === 'string' ? null : this.props.userState.userPage!;
     const isBusy = this.props.userState.busy;
@@ -142,10 +142,10 @@ export class Users extends React.Component<Props, State> {
             <Pager
               limit={page.limit}
               loading={isBusy}
-              onPage={index => this.props.getUsers(index)}
+              onPage={(index) => this.props.getUsers(index)}
               index={page.index}
               total={page.count}
-              contentProps={{ onMouseDown: e => this.setState({ selectedUids: [] }) }}
+              contentProps={{ onMouseDown: (e) => this.setState({ selectedUids: [] }) }}
             >
               <UsersList
                 users={page.data}
@@ -153,16 +153,14 @@ export class Users extends React.Component<Props, State> {
                 onUserSelected={(user, e) => this.onUserSelected(user, e)}
               />
             </Pager>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </div>
         {selected ? (
           <div
             className="mt-selected"
             ref={
               animated
-                ? e => {
+                ? (e) => {
                     if (e) setTimeout(() => (e.style.maxWidth = '400px'), 30);
                   }
                 : undefined
@@ -170,31 +168,29 @@ export class Users extends React.Component<Props, State> {
           >
             <UserProperties
               animated={animated}
-              resetPasswordRequest={username => {
+              resetPasswordRequest={(username) => {
                 this.props.requestPasswordReset(username);
               }}
-              activateAccount={username => {
+              activateAccount={(username) => {
                 this.props.activate(username);
               }}
-              resendActivation={username => {
+              resendActivation={(username) => {
                 this.props.resendActivation(username);
               }}
               updateUserAvatar={(userId, file) => this.props.update(userId, { avatarFile: file._id })}
               activeUser={this.props.auth.user!}
-              updateUserDetails={user => this.props.update(user._id!, user as IUserEntry<'client'>)}
-              onDeleteRequested={user => {
+              updateUserDetails={(user) => this.props.update(user._id! as string, user)}
+              onDeleteRequested={(user) => {
                 this.setState({
                   dialogueHeader: 'Remove User',
                   dialogue: `Are you sure you want to remove the user '${user.username}', this action is irreversible?`,
-                  dialogueConfirmBtn: `I Understand, Remove User`
+                  dialogueConfirmBtn: `I Understand, Remove User`,
                 });
               }}
               selected={selected}
             />
           </div>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </SplitPanel>
     );
   }
@@ -211,18 +207,18 @@ export class Users extends React.Component<Props, State> {
           placeholder="Filter username or email"
           id="mt-users-filter"
           value={this.state.userFilter}
-          onKeyDown={e => {
+          onKeyDown={(e) => {
             if (e.keyCode === 13) {
               this.setState({ selectedUids: [] }, () => {
                 this.props.getUsers(0, this.state.userFilter);
               });
             }
           }}
-          onChange={e => this.setState({ userFilter: e.currentTarget.value })}
+          onChange={(e) => this.setState({ userFilter: e.currentTarget.value })}
         />
         <IconButton
           id="mt-users-search-button"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ selectedUids: [] }, () => {
               this.props.getUsers(0, this.state.userFilter);
             });
@@ -234,7 +230,7 @@ export class Users extends React.Component<Props, State> {
         {isAdmin ? (
           <Button
             variant="contained"
-            onClick={e => this.setState({ newUserForm: true })}
+            onClick={(e) => this.setState({ newUserForm: true })}
             id="mt-add-user"
             disabled={isBusy}
             color="primary"
@@ -242,9 +238,7 @@ export class Users extends React.Component<Props, State> {
             <AddIcon />
             Add User
           </Button>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </div>
     );
   }
@@ -254,7 +248,7 @@ export class Users extends React.Component<Props, State> {
       <div>
         <Button
           style={{ margin: '5px 0 0 0' }}
-          onClick={e => this.setState({ newUserForm: false })}
+          onClick={(e) => this.setState({ newUserForm: false })}
           id="mt-cancel-new-user"
         >
           <FontCancel />
@@ -269,7 +263,7 @@ export class Users extends React.Component<Props, State> {
     const selectedUids = this.state.selectedUids;
     const selected =
       selectedUids.length > 0
-        ? this.props.userState.userPage!.data.find(u => u._id === selectedUids[selectedUids.length - 1]) || null
+        ? this.props.userState.userPage!.data.find((u) => u._id === selectedUids[selectedUids.length - 1]) || null
         : null;
 
     return (
@@ -283,7 +277,7 @@ export class Users extends React.Component<Props, State> {
         {this.state.newUserForm ? (
           <NewUserForm
             serverError={'There was an error babe'}
-            onUserCreated={newUser => this.props.create(newUser, () => this.setState({ newUserForm: false }))}
+            onUserCreated={(newUser) => this.props.create(newUser, () => this.setState({ newUserForm: false }))}
             onCancel={() => this.setState({ newUserForm: false })}
           />
         ) : (

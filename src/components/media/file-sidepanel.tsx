@@ -9,11 +9,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import UploadIcon from '@material-ui/icons/FileUpload';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import CompareIcon from '@material-ui/icons/CompareArrows';
-import { IFileEntry } from '../../../../../src';
+import { File as MantleFile } from 'mantle';
 import { formatBytes } from '../../utils/component-utils';
 
 export type Props = {
-  selectedFile: IFileEntry<'client' | 'expanded'> | null;
+  selectedFile: MantleFile | null;
   selectedIds: string[];
   onDelete: () => void;
   onRename: () => void;
@@ -51,7 +51,7 @@ export default class FileSidePanel extends React.Component<Props, State> {
     e.currentTarget.value = '';
   }
 
-  private getPreview(file: IFileEntry<'client' | 'expanded'>) {
+  private getPreview(file: MantleFile) {
     if (
       file.mimeType === 'image/png' ||
       file.mimeType === 'image/jpeg' ||
@@ -71,20 +71,20 @@ export default class FileSidePanel extends React.Component<Props, State> {
         <div>
           {selectedFile ? <h2>{selectedFile.name}</h2> : undefined}
           <input
-            ref={e => (this._fileInput = e)}
+            ref={(e) => (this._fileInput = e)}
             multiple={true}
             style={{ visibility: 'hidden', height: '0px', width: '4px' }}
             id="mt-file-upload-input"
             type="file"
-            onChange={e => this.onFilesChanged(e)}
+            onChange={(e) => this.onFilesChanged(e)}
           />
           <input
-            ref={e => (this._fileReplaceInput = e)}
+            ref={(e) => (this._fileReplaceInput = e)}
             multiple={false}
             style={{ visibility: 'hidden', height: '0px', width: '4px' }}
             id="mt-file-replace-input"
             type="file"
-            onChange={e => this.onFileReplaceChanged(e)}
+            onChange={(e) => this.onFileReplaceChanged(e)}
           />
           {selectedFile ? (
             <Preview>
@@ -103,8 +103,8 @@ export default class FileSidePanel extends React.Component<Props, State> {
                 <div id="mt-file-url">
                   <input
                     value={selectedFile.publicURL}
-                    onChange={e => {}}
-                    onClick={e => e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)}
+                    onChange={(e) => {}}
+                    onClick={(e) => e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)}
                   />
                 </div>
               </div>
@@ -116,28 +116,28 @@ export default class FileSidePanel extends React.Component<Props, State> {
             </Info>
           ) : null}
           <List component="nav">
-            <ListItem button onClick={e => this.onUpload()} id="mt-upload-file">
+            <ListItem button onClick={(e) => this.onUpload()} id="mt-upload-file">
               <ListItemIcon>
                 <UploadIcon />
               </ListItemIcon>
               <ListItemText inset primary="Upload files" />
             </ListItem>
 
-            <ListItem button disabled={!filesSelected} onClick={e => this.props.onDelete()} id="mt-delete-file">
+            <ListItem button disabled={!filesSelected} onClick={(e) => this.props.onDelete()} id="mt-delete-file">
               <ListItemIcon>
                 <DeleteIcon />
               </ListItemIcon>
               <ListItemText inset primary="Delete files" />
             </ListItem>
 
-            <ListItem button disabled={!filesSelected} onClick={e => this.props.onRename()} id="mt-rename-file">
+            <ListItem button disabled={!filesSelected} onClick={(e) => this.props.onRename()} id="mt-rename-file">
               <ListItemIcon>
                 <AssignmentIcon />
               </ListItemIcon>
               <ListItemText inset primary="Rename" />
             </ListItem>
 
-            <ListItem button disabled={!filesSelected} onClick={e => this.onReplace()} id="mt-replace-file">
+            <ListItem button disabled={!filesSelected} onClick={(e) => this.onReplace()} id="mt-replace-file">
               <ListItemIcon>
                 <CompareIcon />
               </ListItemIcon>
