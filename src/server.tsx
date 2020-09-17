@@ -23,7 +23,7 @@ import JssProvider from 'react-jss/lib/JssProvider';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import DateUtils from 'material-ui-pickers/utils/date-fns-utils';
 import { User as UserModel } from '../../../src/graphql/models/user-type';
-import type { User } from 'mantle';
+import { User } from 'mantle';
 
 // Needed for onTouchTap
 import { Action } from 'redux';
