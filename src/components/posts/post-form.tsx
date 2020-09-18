@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as format from 'date-fns/format';
+import format from 'date-fns/format';
 import IconButton from '@material-ui/core/IconButton';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
@@ -33,8 +33,8 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import EditIcon from '@material-ui/icons/Edit';
-import { DatePickerWrapperProps } from 'material-ui-pickers/DatePicker/DatePickerWrapper';
-import DatePicker from 'material-ui-pickers/DatePicker';
+
+import { DatePicker } from '@material-ui/pickers';
 import ImageEditor from './element-editors/image-editor';
 
 export type Props = {

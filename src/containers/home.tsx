@@ -10,7 +10,7 @@ import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
@@ -27,7 +27,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import ArrowForwardIcon from '@material-ui/icons/ChevronRight';
 import { Post } from 'mantle';
-import * as format from 'date-fns/format';
+import format from 'date-fns/format';
 import { createPost } from '../store/posts/actions';
 import { randomId } from '../utils/misc';
 
@@ -94,7 +94,7 @@ export class Home extends React.Component<Props, State> {
             image={post.featuredImage.publicURL}
           />
         ) : undefined}
-        <CardActions disableActionSpacing>
+        <CardActions disableSpacing>
           <IconButton className="mt-edit-latest" onClick={(e) => this.props.push('/dashboard/posts/edit/' + post._id)}>
             <VisibilityIcon />
           </IconButton>
@@ -192,15 +192,14 @@ export class Home extends React.Component<Props, State> {
                   <CardHeader
                     action={
                       <Tooltip title="Create a new post">
-                        <Button
+                        <Fab
                           className="mt-create-post"
                           onClick={(e) => this.props.createPost({ title: 'New Post', slug: randomId() })}
-                          variant="fab"
-                          mini
+                          size="small"
                           color="primary"
                         >
                           <AddIcon />
-                        </Button>
+                        </Fab>
                       </Tooltip>
                     }
                     title="Add new post"

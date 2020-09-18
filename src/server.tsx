@@ -15,13 +15,13 @@ import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { Router } from '../../../src/routers/router';
 import { FileRouter } from '../../../src/routers/file';
 import { AuthRouter } from '../../../src/routers/auth';
-import { MuiThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
+import { ThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 import { ServerStyleSheet } from 'styled-components';
 import { SheetsRegistry } from 'react-jss/lib/jss';
 import JssProvider from 'react-jss/lib/JssProvider';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-import DateUtils from 'material-ui-pickers/utils/date-fns-utils';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 import { User as UserModel } from '../../../src/graphql/models/user-type';
 import { User } from 'mantle';
 
@@ -106,13 +106,13 @@ export default class MainController extends Router {
         sheet.collectStyles(
           <Provider store={store}>
             <JssProvider registry={materialSheets} generateClassName={generateClassName}>
-              <MuiThemeProvider theme={theme} sheetsManager={new Map()}>
+              <ThemeProvider theme={theme}>
                 <StaticRouter location={url} context={context}>
-                  <MuiPickersUtilsProvider utils={DateUtils}>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <App {...({} as any)} />
                   </MuiPickersUtilsProvider>
                 </StaticRouter>
-              </MuiThemeProvider>
+              </ThemeProvider>
             </JssProvider>
           </Provider>
         )

@@ -73,7 +73,7 @@ export default class NewUserForm extends React.Component<Props, State> {
             Cancel
           </Button>
           <Button
-            variant="raised"
+            variant="contained"
             color="primary"
             disabled={!this.state.isValid}
             onClick={(e) => this.props.onUserCreated(this.state.user)}

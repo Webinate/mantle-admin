@@ -65,8 +65,7 @@ export default class UserPicker extends React.Component<Props, State> {
         style={{ padding: 5 }}
         anchorEl={this.elm!}
         open={true}
-        onClose={(e) => {
-          e.stopPropagation();
+        onClose={() => {
           this.close();
         }}
       >

@@ -71,8 +71,8 @@ export default class ImageEditor extends React.Component<Props, State> {
             fullWidth={true}
             onChange={(e) => {
               let floatVal: 'left' | 'right' | undefined = undefined;
-              if (e.currentTarget.textContent === 'Left') floatVal = 'left';
-              else if (e.currentTarget.textContent === 'Right') floatVal = 'right';
+              if (e.currentTarget.value === 'Left') floatVal = 'left';
+              else if (e.currentTarget.value === 'Right') floatVal = 'right';
 
               this.setState({ style: { ...this.state.style, float: floatVal } }, () => {
                 this.onBlur();

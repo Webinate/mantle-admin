@@ -2,7 +2,7 @@ import * as React from 'react';
 import { default as styled } from '../../../theme/styled';
 import StorageIcon from '@material-ui/icons/Storage';
 import CloudIcon from '@material-ui/icons/CloudCircle';
-import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
 import { AddVolumeInput, VolumeType as VolumeTypeEnum } from 'mantle';
 
 export type Props = {
@@ -43,13 +43,12 @@ export default class VolumeType extends React.Component<Props> {
           return (
             <div className="mt-volume-types" key={`type=${index}`}>
               <div>
-                <Button
-                  variant="fab"
+                <Fab
                   color={this.props.volumeType === options.type ? 'primary' : undefined}
                   onClick={(e) => this.props.onChange({ type: options.type })}
                 >
                   {options.icon}
-                </Button>
+                </Fab>
               </div>
               <div>
                 <h2>{options.heading}</h2>

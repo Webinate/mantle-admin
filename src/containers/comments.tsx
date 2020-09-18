@@ -162,7 +162,7 @@ export class Comments extends React.Component<Props, State> {
                   width: '20px',
                 }}
                 className="mt-sort-order"
-                buttonRef={(e) => (this._sortElm = e)}
+                ref={(e) => (this._sortElm = e)}
                 onClick={(e) => this.onAscChange()}
               >
                 {this.state.sortAscending ? (

@@ -9,7 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 import { Volume, File, PaginatedFilesResponse, SortOrder, FileSortType, QueryFilesArgs } from 'mantle';
-import * as format from 'date-fns/format';
+import format from 'date-fns/format';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
 
@@ -122,11 +122,7 @@ export class DirectoryView extends React.Component<Props, State> {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableCell
-                  numeric={false}
-                  padding="checkbox"
-                  sortDirection={filters.sortType === 'name' ? filters.sortOrder! : false}
-                >
+                <TableCell padding="checkbox" sortDirection={filters.sortType === 'name' ? filters.sortOrder! : false}>
                   <Checkbox
                     id="mt-select-all"
                     style={{ display: this.props.multiselect ? '' : 'none' }}

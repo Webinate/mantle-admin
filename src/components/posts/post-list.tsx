@@ -5,7 +5,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
 import Pager from '../pager';
 import { Post, User, PaginatedPostsResponse, PostVisibility, PostSortType, QueryPostsArgs } from 'mantle';
-import * as format from 'date-fns/format';
+import format from 'date-fns/format';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
@@ -173,7 +173,7 @@ export default class PostList extends React.Component<Props, State> {
                     width: '20px',
                   }}
                   className="mt-sort-order"
-                  buttonRef={(e) => (this._sortElm = e)}
+                  ref={(e) => (this._sortElm = e)}
                   onClick={(e) => this.onAscChange()}
                 >
                   {this.state.sortAscending ? (

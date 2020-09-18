@@ -3,6 +3,7 @@ import { File, UserPrivilege, UpdateUserInput, User } from 'mantle';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
 import TextField from '@material-ui/core/TextField';
 import Icon from '@material-ui/core/Icon';
 import Select from '@material-ui/core/Select';
@@ -13,7 +14,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Avatar from '@material-ui/core/Avatar';
-import DatePicker from 'material-ui-pickers/DatePicker';
+import { DatePicker } from '@material-ui/pickers';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import { generateAvatarPic, isAdminUser } from '../../utils/component-utils';
@@ -80,15 +81,14 @@ export default class UserProperties extends React.Component<Props, State> {
       <Properties className="mt-user-properties" animated={this.props.animated}>
         <ImgContainer>
           {isAdmin || selected._id === this.props.activeUser._id ? (
-            <Button
-              variant="fab"
+            <Fab
               id="mt-upload-profile"
               color="primary"
               onClick={(e) => this.setState({ showMediaPopup: true })}
               style={{ background: theme.primary200.background, bottom: '10px', right: '10px', position: 'absolute' }}
             >
               <Icon className="icon icon-camera" />
-            </Button>
+            </Fab>
           ) : undefined}
           <Avatar
             className="mt-avatar-image"

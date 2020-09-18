@@ -65,7 +65,7 @@ class Actions {
   }
 
   @disptachable()
-  async upload(volumeId: string, filesArr: File[], dispatch?: Function, getState?: () => IRootState) {
+  async upload(volumeId: string, filesArr: any[], dispatch?: Function, getState?: () => IRootState) {
     const state = getState!();
     const filesFilter: Partial<QueryFilesArgs> = state.media.filesFilters
       ? { ...state.media.filesFilters, ...{ index: 0 } }
@@ -89,7 +89,7 @@ class Actions {
   }
 
   @disptachable()
-  async replaceFile(volumeId: string, fileId: string, file: File, dispatch?: Function, getState?: () => IRootState) {
+  async replaceFile(volumeId: string, fileId: string, file: any, dispatch?: Function, getState?: () => IRootState) {
     const state = getState!();
     const filesFilter: Partial<QueryFilesArgs> = state.media.filesFilters
       ? { ...state.media.filesFilters, ...{ index: 0 } }

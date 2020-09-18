@@ -6,7 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import DeleteIcon from '@material-ui/icons/Delete';
-import UploadIcon from '@material-ui/icons/FileUpload';
+import UploadIcon from '@material-ui/icons/CloudUpload';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import CompareIcon from '@material-ui/icons/CompareArrows';
 import { File as MantleFile } from 'mantle';
