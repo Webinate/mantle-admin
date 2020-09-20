@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.tsdk": "c:\\projects\\mantle\\clients\\mantle-admin\\node_modules\\typescript\\lib",
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,

@@ -23,9 +23,9 @@ export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 export function getUsers(index: number = 0, search?: string) {
   return async function (dispatch: Function, getState: () => IRootState) {
     dispatch(ActionCreators.SetUsersBusy.create(true));
-    const resp = await graphql<PaginatedUserResponse>(GET_USERS, { index: index, search: search });
+    const resp = await graphql<{ users: PaginatedUserResponse }>(GET_USERS, { index: index, search: search });
     // const resp = await getAll({ index: index, search: search });
-    dispatch(ActionCreators.SetUsers.create(resp));
+    dispatch(ActionCreators.SetUsers.create(resp.users));
   };
 }
 
@@ -33,9 +33,9 @@ export function update(id: string, token: Partial<UpdateUserInput>) {
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetUsersBusy.create(true));
-      const resp = await graphql<User>(PATCH_USER, { token });
+      const resp = await graphql<{ updateUser: User }>(PATCH_USER, { token });
       // const resp = await updateUser(id, token);
-      dispatch(ActionCreators.UpdateUser.create(resp));
+      dispatch(ActionCreators.UpdateUser.create(resp.updateUser));
     } catch (err) {
       dispatch(ActionCreators.SetUsersBusy.create(false));
       dispatch(AppActions.serverResponse.create(err.message));
@@ -47,11 +47,11 @@ export function create(token: Partial<AddUserInput>, onComplete: () => void) {
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetUsersBusy.create(true));
-      await graphql<User>(CREATE_USER, { token });
+      await graphql<{ addUser: User }>(CREATE_USER, { token });
       // await createUser(token);
       // const resp = await getAll({ index: 0, search: '' });
-      const resp = await graphql<PaginatedUserResponse>(GET_USERS, { index: 0, search: '' });
-      dispatch(ActionCreators.SetUsers.create(resp));
+      const resp = await graphql<{ users: PaginatedUserResponse }>(GET_USERS, { index: 0, search: '' });
+      dispatch(ActionCreators.SetUsers.create(resp.users));
       onComplete();
     } catch (err) {
       dispatch(ActionCreators.SetUsersBusy.create(false));
@@ -68,7 +68,7 @@ export function removeUser(username: string) {
     try {
       dispatch(ActionCreators.SetUsersBusy.create(true));
       // await remove(username);
-      await graphql<User>(REMOVE_USER, { username });
+      await graphql<{ removeUser: User }>(REMOVE_USER, { username });
       dispatch(ActionCreators.RemoveUser.create(username));
       dispatch(AppActionCreators.serverResponse.create(`User '${username}' successfully removed`));
     } catch {

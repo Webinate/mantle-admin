@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { hydrate } from 'react-dom';
 import { ConnectedRouter } from './utils/connectedRouter';
-import { App } from './containers/app';
+import App from './containers/app';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { Provider } from 'react-redux';
 import createStore from './utils/createStore';
 import { IRootState } from './store';
 import createHistory from 'history/createBrowserHistory';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
 
 const props = (window as any).PROPS;
@@ -23,13 +23,13 @@ console.log(`Debug Mode: ${state.app.debugMode}`);
 
 export const app = hydrate(
   <Provider store={store}>
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <ConnectedRouter store={store} history={history}>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <App {...({} as any)} />
+          <App />
         </MuiPickersUtilsProvider>
       </ConnectedRouter>
-    </MuiThemeProvider>
+    </ThemeProvider>
   </Provider>,
   mountNode
 );

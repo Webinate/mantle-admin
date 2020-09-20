@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import format from 'date-fns/format';
 import IconButton from '@material-ui/core/IconButton';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -22,9 +23,9 @@ import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 import SlugEditor from '../slug-editor';
 import UserPicker from '../user-picker';
-import { CategoryEditor } from '../../containers/category-editor';
+import CategoryEditor from '../../containers/category-editor';
 import FormControl from '@material-ui/core/FormControl';
-import { MediaModal } from '../../containers/media-modal';
+import MediaModal from '../../containers/media-modal';
 import Tooltip from '@material-ui/core/Tooltip';
 import { ElmEditor } from './elm-editor';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -74,88 +75,73 @@ export type State = {
   activeTemplate: string;
 };
 
-export default class PostForm extends React.Component<Props, State> {
-  private _editableRef: Partial<UpdatePostInput>;
-  private _datePicker: React.Component<DatePickerWrapperProps, any, any> | null;
+const postToEditable = (post: Partial<Post>) => {
+  return {
+    _id: post._id,
+    author: post.author?._id,
+    title: post.title,
+    slug: post.slug,
+    brief: post.brief,
+    categories: post.categories ? post.categories.map((c) => c._id as string) : [],
+    public: post.public,
+    tags: post.tags,
+    featuredImage: post.featuredImage?._id,
+  } as UpdatePostInput;
+};
 
-  constructor(props: Props) {
-    super(props);
-    this._editableRef = this.postToEditable(props.post);
+const PostForm: React.FC<Props> = (props) => {
+  let _editableRef = postToEditable(props.post);
+  const doc = props.post.document!;
+  const template = doc.template;
+
+  const [editable, setEditable] = useState<Partial<UpdatePostInput>>(_editableRef);
+  const [featuredImage, setFeaturedImage] = useState<File | null>(props.post.featuredImage || null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(props.post.author || null);
+  const [currentTagText, setCurrentTagText] = useState('');
+  const [activeTemplate, setActiveTemplate] = useState(template._id.toString());
+  const [slugWasEdited, setSlugWasEdited] = useState(false);
+  const [showMediaPopup, setShowMediaPopup] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
+
+  useEffect(() => {
+    _editableRef = postToEditable(props.post);
     const doc = props.post.document!;
     const template = doc.template;
 
-    this.state = {
-      editable: this._editableRef,
-      currentTagText: '',
-      slugWasEdited: false,
-      showMediaPopup: false,
-      featuredImage: props.post.featuredImage || null,
-      selectedUser: props.post.author || null,
-      activeTemplate: template._id.toString(),
-    };
-  }
+    setEditable(_editableRef);
+    setCurrentTagText('');
+    setActiveTemplate(template._id.toString());
+  }, [props.post]);
 
-  postToEditable(post: Partial<Post>) {
-    return {
-      _id: post._id,
-      author: post.author?._id,
-      title: post.title,
-      slug: post.slug,
-      brief: post.brief,
-      categories: post.categories ? post.categories.map((c) => c._id as string) : [],
-      public: post.public,
-      tags: post.tags,
-      featuredImage: post.featuredImage?._id,
-    } as UpdatePostInput;
-  }
-
-  componentWillReceiveProps(next: Props) {
-    if (next.post !== this.props.post) {
-      this._editableRef = this.postToEditable(next.post);
-      const doc = next.post.document!;
-      const template = doc.template;
-
-      this.setState({
-        editable: this._editableRef,
-        currentTagText: '',
-        activeTemplate: template._id.toString(),
-      });
-    }
-  }
-
-  private addTag() {
-    const text = this.state.currentTagText.trim();
-
-    if (this.state.editable.tags!.indexOf(text) !== -1) return;
-
+  const addTag = () => {
+    const text = currentTagText.trim();
+    if (editable.tags!.indexOf(text) !== -1) return;
     if (text === '') return;
 
-    this.setState({
-      currentTagText: '',
-      editable: {
-        ...this.state.editable,
-        tags: this.state.editable.tags!.concat(this.state.currentTagText.trim()),
-      },
+    setCurrentTagText('');
+    setEditable({
+      ...editable,
+      tags: editable.tags!.concat(currentTagText.trim()),
     });
-  }
+  };
 
-  private getSlug(title: string) {
-    if (this.state.slugWasEdited) return this.state.editable.slug;
+  const getSlug = (title: string) => {
+    if (slugWasEdited) return editable.slug;
 
     let toRet = title.toLowerCase().replace(/\s+/g, '-');
     toRet = toRet.replace(/[^a-zA-Z0-9 -]/g, '');
     return toRet;
-  }
+  };
 
-  private isPostValid() {
-    if (!this.state.editable.title || this.state.editable.title.trim() === '') return false;
-    if (!this.state.editable.slug || this.state.editable.slug.trim() === '') return false;
+  const isPostValid = () => {
+    if (!editable.title || editable.title.trim() === '') return false;
+    if (!editable.slug || editable.slug.trim() === '') return false;
 
     return true;
-  }
+  };
 
-  private renderUpdateBox() {
-    const isAdmin = this.props.isAdmin;
+  const renderUpdateBox = () => {
+    const isAdmin = props.isAdmin;
 
     return (
       <ExpansionPanel expanded={true} className="mt-update-panel">
@@ -164,7 +150,7 @@ export default class PostForm extends React.Component<Props, State> {
             <div className="mt-panel-publish">
               <div>
                 <Tooltip title="Preview Post" placement="left">
-                  <IconButton id="mt-post-preview-btn" onClick={(e) => this.props.onRequestPreview()}>
+                  <IconButton id="mt-post-preview-btn" onClick={(e) => props.onRequestPreview()}>
                     <VisibilityIcon />
                   </IconButton>
                 </Tooltip>
@@ -174,12 +160,12 @@ export default class PostForm extends React.Component<Props, State> {
                   variant="contained"
                   className="mt-post-confirm"
                   onClick={(e) => {
-                    if (this.props.post && this.props.onUpdate) this.props.onUpdate(this.state.editable);
-                    else if (this.props.onCreate) this.props.onCreate(this.state.editable as AddPostInput);
+                    if (props.post && props.onUpdate) props.onUpdate(editable);
+                    else if (props.onCreate) props.onCreate(editable as AddPostInput);
                   }}
                   color="primary"
                   fullWidth={true}
-                  disabled={!this.isPostValid()}
+                  disabled={!isPostValid()}
                 >
                   Update
                 </Button>
@@ -191,30 +177,28 @@ export default class PostForm extends React.Component<Props, State> {
                 control={
                   <Switch
                     color="primary"
-                    checked={this.state.editable.public ? true : false}
+                    checked={editable.public ? true : false}
                     onChange={(e) => {
-                      this.setState({
-                        editable: {
-                          ...this.state.editable,
-                          public: this.state.editable.public ? false : true,
-                        },
+                      setEditable({
+                        ...editable,
+                        public: editable.public ? false : true,
                       });
                     }}
                   />
                 }
                 label={
                   <span className="mt-visibility-toggle-label">
-                    {this.state.editable.public ? 'Post is public' : 'Post is private'}
+                    {editable.public ? 'Post is public' : 'Post is private'}
                   </span>
                 }
               />
             </FormControl>
-            {this.props.post ? (
+            {props.post ? (
               <Dates>
                 <div>Created: </div>
                 <div>
                   {isAdmin ? (
-                    <span onClick={(e) => (this._datePicker! as any).open(e)}>
+                    <span onClick={(e) => setIsDateOpen(true)}>
                       <EditIcon id="mt-edit-created-date" />
                     </span>
                   ) : undefined}
@@ -223,31 +207,34 @@ export default class PostForm extends React.Component<Props, State> {
                     <DatePicker
                       leftArrowIcon={<ChevronLeft id="mt-date-prev-month" />}
                       rightArrowIcon={<ChevronRight id="mt-date-next-month" />}
-                      dialogContentClassName="mt-picker-content"
-                      ref={(e) => (this._datePicker = e)}
+                      open={isDateOpen}
+                      onOpen={() => setIsDateOpen(true)}
+                      onClose={() => setIsDateOpen(false)}
+                      DialogProps={{ className: 'mt-picker-content' }}
                       className="mt-created-on-picker"
                       style={{ display: 'none' }}
-                      value={new Date(this.state.editable.createdOn!)}
+                      value={new Date(editable.createdOn!)}
                       onChange={(e: Date) =>
-                        this.setState({ editable: { ...this.state.editable, createdOn: e.getTime() } })
+                        setEditable({
+                          ...editable,
+                          createdOn: e.getTime(),
+                        })
                       }
                     />
                   ) : undefined}
-                  <span id="mt-post-created-date">
-                    {format(new Date(this.state.editable.createdOn!), 'MMM Do, YYYY')}
-                  </span>
+                  <span id="mt-post-created-date">{format(new Date(editable.createdOn!), 'MMM Do, yyyy')}</span>
                 </div>
                 <div>Updated: </div>
-                <div id="mt-post-updated-date">{format(new Date(this.props.post.lastUpdated!), 'MMM Do, YYYY')}</div>
+                <div id="mt-post-updated-date">{format(new Date(props.post.lastUpdated!), 'MMM Do, yyyy')}</div>
               </Dates>
             ) : undefined}
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  private renderTags() {
+  const renderTags = () => {
     return (
       <ExpansionPanel className="mt-tags-panel">
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
@@ -260,22 +247,22 @@ export default class PostForm extends React.Component<Props, State> {
                 <TextField
                   id="mt-add-new-tag"
                   helperText="Type a tag and hit enter"
-                  value={this.state.currentTagText}
+                  value={currentTagText}
                   fullWidth={true}
                   onKeyUp={(e) => {
-                    if (e.keyCode === 13 && this.state.currentTagText.trim() !== '') this.addTag();
+                    if (e.keyCode === 13 && currentTagText.trim() !== '') addTag();
                   }}
-                  onChange={(e) => this.setState({ currentTagText: e.currentTarget.value })}
+                  onChange={(e) => setCurrentTagText(e.currentTarget.value)}
                 />
               </div>
               <div>
-                <IconButton id="mt-add-tag" onClick={(e) => this.addTag()} style={{ margin: '0 4px' }}>
+                <IconButton id="mt-add-tag" onClick={(e) => addTag()} style={{ margin: '0 4px' }}>
                   <AddIcon />
                 </IconButton>
               </div>
             </TagsInput>
             <TagWrapper>
-              {this.state.editable.tags!.map((tag, tagIndex) => {
+              {editable.tags!.map((tag, tagIndex) => {
                 return (
                   <Chip
                     key={`tag-${tagIndex}`}
@@ -283,11 +270,9 @@ export default class PostForm extends React.Component<Props, State> {
                     className="mt-tag-chip"
                     style={{ margin: '4px 4px 0 0' }}
                     onDelete={(e) => {
-                      this.setState({
-                        editable: {
-                          ...this.state.editable,
-                          tags: this.state.editable.tags!.filter((t) => t !== tag),
-                        },
+                      setEditable({
+                        ...editable,
+                        tags: editable.tags!.filter((t) => t !== tag),
                       });
                     }}
                   />
@@ -298,9 +283,9 @@ export default class PostForm extends React.Component<Props, State> {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  private renderMeta() {
+  const renderMeta = () => {
     return (
       <ExpansionPanel className="mt-meta-panel">
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
@@ -310,30 +295,38 @@ export default class PostForm extends React.Component<Props, State> {
           <div className="mt-panel-inner">
             <TextField
               id="mt-post-desc"
-              value={this.state.editable.brief || ''}
+              value={editable.brief || ''}
               fullWidth={true}
               multiline={true}
               helperText="Post Brief Description"
-              onChange={(e) => this.setState({ editable: { ...this.state.editable, brief: e.currentTarget.value } })}
+              onChange={(e) => {
+                setEditable({
+                  ...editable,
+                  brief: e.currentTarget.value,
+                });
+              }}
             />
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  private renderFeaturedImg() {
+  const renderFeaturedImg = () => {
     return (
       <ExpansionPanel className="mt-featured-panel">
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
           <h3>Featured Image</h3>
-          {this.state.editable.featuredImage ? (
+          {editable.featuredImage ? (
             <Icon
               id="mt-remove-featured"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                this.setState({ editable: { ...this.state.editable, featuredImage: '' } });
+                setEditable({
+                  ...editable,
+                  featuredImage: '',
+                });
               }}
               style={{
                 margin: '5px 0px 0px 18px',
@@ -347,27 +340,23 @@ export default class PostForm extends React.Component<Props, State> {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div style={{ position: 'relative', flex: '1' }}>
-            <FeaturedImg id="mt-featured-img" onClick={(e) => this.setState({ showMediaPopup: true })}>
+            <FeaturedImg id="mt-featured-img" onClick={(e) => setShowMediaPopup(true)}>
               <Tooltip title="Click to upload image">
-                {this.state.featuredImage ? (
-                  <img src={this.state.featuredImage.publicURL} />
-                ) : (
-                  <img src={'/images/post-feature.svg'} />
-                )}
+                {featuredImage ? <img src={featuredImage.publicURL} /> : <img src={'/images/post-feature.svg'} />}
               </Tooltip>
             </FeaturedImg>
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  private renderCategories() {
+  const renderCategories = () => {
     return (
       <ExpansionPanel className="mt-categories-panel">
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon className="mt-panel-expand" />}>
           <h3>Categories</h3>
-          {this.props.categoriesLoading ? (
+          {props.categoriesLoading ? (
             <span style={{ margin: '4px 0 0 15px' }} className="mt-cat-loading">
               <CircularProgress size={20} />
             </span>
@@ -378,32 +367,35 @@ export default class PostForm extends React.Component<Props, State> {
             <CategoryEditor
               onCategorySelected={(category) => {
                 let newIds: string[] = [];
-                const index = this.state.editable.categories!.indexOf(category._id as string);
+                const index = editable.categories!.indexOf(category._id as string);
 
-                if (index === -1) newIds = this.state.editable.categories!.concat(category._id as string) as string[];
-                else newIds = this.state.editable.categories!.filter((f) => f !== category._id) as string[];
+                if (index === -1) newIds = editable.categories!.concat(category._id as string) as string[];
+                else newIds = editable.categories!.filter((f) => f !== category._id) as string[];
 
-                this.setState({ editable: { ...this.state.editable, categories: newIds } });
+                setEditable({
+                  ...editable,
+                  categories: newIds,
+                });
               }}
               {...({
-                selected: this.state.editable.categories || [],
+                selected: editable.categories || [],
               } as any)}
             />
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  private hasModified() {
-    if (this.state.editable !== this._editableRef) return true;
+  const hasModified = () => {
+    if (editable !== _editableRef) return true;
     else return false;
-  }
+  };
 
-  private renderTemplates() {
-    const templates = this.props.templates;
-    const templateId = this.state.activeTemplate;
-    const doc = this.props.post.document!;
+  const renderTemplates = () => {
+    const templates = props.templates;
+    const templateId = activeTemplate;
+    const doc = props.post.document!;
     const curTemplate = doc.template;
 
     return (
@@ -424,7 +416,7 @@ export default class PostForm extends React.Component<Props, State> {
                       <Switch
                         color="primary"
                         className="mt-template-item-switch"
-                        onChange={(e) => this.setState({ activeTemplate: t._id as string })}
+                        onChange={(e) => setActiveTemplate(t._id)}
                         checked={templateId === (t._id as string)}
                       />
                     </ListItemSecondaryAction>
@@ -438,13 +430,13 @@ export default class PostForm extends React.Component<Props, State> {
               variant="contained"
               id="mt-apply-template"
               fullWidth={true}
-              disabled={this.state.activeTemplate === curTemplate._id}
-              onClick={(e) => this.props.onTemplateChanged(this.state.activeTemplate)}
+              disabled={activeTemplate === curTemplate._id}
+              onClick={(e) => props.onTemplateChanged(activeTemplate)}
             >
               Apply Template
             </Button>
 
-            {this.hasModified() ? (
+            {hasModified() ? (
               <div
                 style={{
                   textAlign: 'center',
@@ -460,12 +452,12 @@ export default class PostForm extends React.Component<Props, State> {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  private renderElementProperties() {
-    if (this.props.selectedElements.length === 0) return null;
+  const renderElementProperties = () => {
+    if (props.selectedElements.length === 0) return null;
 
-    const element = this.props.elements.find((e) => e._id === this.props.selectedElements[0]);
+    const element = props.elements.find((e) => e._id === props.selectedElements[0]);
     let editor: { title: string; editor: JSX.Element } | null = null;
 
     if (!element) return null;
@@ -479,7 +471,7 @@ export default class PostForm extends React.Component<Props, State> {
             style={image.style}
             selectedElement={element}
             onChange={(style) => {
-              this.props.onUpdateElm(image._id, { style }, null, 'none');
+              props.onUpdateElm(image._id, { style }, null, 'none');
             }}
           />
         ),
@@ -498,100 +490,96 @@ export default class PostForm extends React.Component<Props, State> {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  }
+  };
 
-  render() {
-    const doc = this.props.post.document;
-
-    return (
-      <Form animated={this.props.animated}>
+  return (
+    <Form animated={props.animated}>
+      <div>
         <div>
-          <div>
-            <input
-              id="mt-post-title"
-              value={this.state.editable.title || ''}
-              placeholder="Enter Post Title"
-              onChange={(e) => {
-                this.setState({
-                  editable: {
-                    ...this.state.editable,
-                    title: e.currentTarget.value,
-                    slug: this.getSlug(e.currentTarget.value),
-                  },
-                });
-              }}
-            />
-            <SlugContainer>
-              <div>
-                <SlugEditor
-                  value={this.state.editable.slug || ''}
-                  onChange={(value) => {
-                    this.setState({
-                      slugWasEdited: true,
-                      editable: { ...this.state.editable, slug: value },
-                    });
-                  }}
-                />
-              </div>
-              <div>
-                <i>Author: </i>
-                <UserPicker
-                  canEdit={this.props.isAdmin}
-                  onChange={(user) => {
-                    this.setState({
-                      selectedUser: user,
-                      editable: { ...this.state.editable, author: user ? (user._id as string) : '' },
-                    });
-                  }}
-                  user={this.state.selectedUser ? this.state.selectedUser : null}
-                />
-              </div>
-            </SlugContainer>
-          </div>
-          <ElmEditor
-            elements={this.props.elements}
-            document={doc!}
-            onCreateElm={(elms, index) => this.props.onCreateElm(elms, index)}
-            onUpdateElm={(id, html, createParagraph, deselect) =>
-              this.props.onUpdateElm(id, { html }, createParagraph, deselect)
-            }
-            onDeleteElm={(ids) => this.props.onDeleteElements(ids)}
-            onSelectionChanged={(uids, focus) => this.props.onSelectionChanged(uids, focus)}
-            selected={this.props.selectedElements}
-            focussedId={this.props.focussedId}
-          />
-          {this.props.renderAfterForm ? this.props.renderAfterForm() : undefined}
-        </div>
-        <div>
-          {this.renderUpdateBox()}
-          {this.renderElementProperties()}
-          {this.renderTags()}
-          {this.renderMeta()}
-          {this.renderFeaturedImg()}
-          {this.renderCategories()}
-          {this.renderTemplates()}
-        </div>
-
-        {this.state.showMediaPopup ? (
-          <MediaModal
-            {...({} as any)}
-            open={true}
-            onCancel={() => {
-              this.setState({ showMediaPopup: false });
+          <input
+            id="mt-post-title"
+            value={editable.title || ''}
+            placeholder="Enter Post Title"
+            onChange={(e) => {
+              setEditable({
+                ...editable,
+                title: e.currentTarget.value,
+                slug: getSlug(e.currentTarget.value),
+              });
             }}
-            onSelect={(file) =>
-              this.setState({
-                showMediaPopup: false,
-                featuredImage: file,
-                editable: { ...this.state.editable, featuredImage: file._id },
-              })
-            }
           />
-        ) : undefined}
-      </Form>
-    );
-  }
-}
+          <SlugContainer>
+            <div>
+              <SlugEditor
+                value={editable.slug || ''}
+                onChange={(value) => {
+                  setSlugWasEdited(true);
+                  setEditable({
+                    ...editable,
+                    slug: value,
+                  });
+                }}
+              />
+            </div>
+            <div>
+              <i>Author: </i>
+              <UserPicker
+                canEdit={props.isAdmin}
+                onChange={(user) => {
+                  setSelectedUser(user);
+                  setEditable({
+                    ...editable,
+                    author: user ? user._id : '',
+                  });
+                }}
+                user={selectedUser ? selectedUser : null}
+              />
+            </div>
+          </SlugContainer>
+        </div>
+        <ElmEditor
+          elements={props.elements}
+          document={doc!}
+          onCreateElm={(elms, index) => props.onCreateElm(elms, index)}
+          onUpdateElm={(id, html, createParagraph, deselect) =>
+            props.onUpdateElm(id, { html }, createParagraph, deselect)
+          }
+          onDeleteElm={(ids) => props.onDeleteElements(ids)}
+          onSelectionChanged={(uids, focus) => props.onSelectionChanged(uids, focus)}
+          selected={props.selectedElements}
+          focussedId={props.focussedId}
+        />
+        {props.renderAfterForm ? props.renderAfterForm() : undefined}
+      </div>
+      <div>
+        {renderUpdateBox()}
+        {renderElementProperties()}
+        {renderTags()}
+        {renderMeta()}
+        {renderFeaturedImg()}
+        {renderCategories()}
+        {renderTemplates()}
+      </div>
+
+      {showMediaPopup ? (
+        <MediaModal
+          open={true}
+          onCancel={() => setShowMediaPopup(false)}
+          onSelect={(file) => {
+            setShowMediaPopup(false);
+            setFeaturedImage(file);
+            setEditable({
+              ...editable,
+              featuredImage: file._id,
+            });
+          }}
+        />
+      ) : undefined}
+    </Form>
+  );
+};
+
+export default PostForm;
 
 interface FormStyleProps extends React.HTMLAttributes<HTMLElement> {
   animated: boolean;

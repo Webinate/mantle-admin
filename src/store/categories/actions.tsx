@@ -27,8 +27,12 @@ class Actions {
   @disptachable()
   async getCategories(index: number = 0, limit?: number, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-    const resp = await graphql<PaginatedCategoryResponse>(GET_CATEGORIES, { index: index, limit: limit, root: true });
-    dispatch!(ActionCreators.SetCategories.create(resp));
+    const resp = await graphql<{ categories: PaginatedCategoryResponse }>(GET_CATEGORIES, {
+      index: index,
+      limit: limit,
+      root: true,
+    });
+    dispatch!(ActionCreators.SetCategories.create(resp.categories));
   }
 
   @disptachable()
@@ -40,9 +44,9 @@ class Actions {
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-    const resp = await graphql<Category>(PATCH_CATEGORY, { token: category });
+    const resp = await graphql<{ updateCategory: Category }>(PATCH_CATEGORY, { token: category });
     // const resp = await categories.edit(category._id as string, category);
-    dispatch!(AppActions.serverResponse.create(`Category '${resp.title}' updated`));
+    dispatch!(AppActions.serverResponse.create(`Category '${resp.updateCategory.title}' updated`));
     dispatch!(this.getCategories());
 
     if (callback) callback();
@@ -57,9 +61,9 @@ class Actions {
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-    const resp = await graphql<Category>(ADD_CATEGORY, { token: category });
+    const resp = await graphql<{ createCategory: Category }>(ADD_CATEGORY, { token: category });
     // const resp = await categories.create(category);
-    dispatch!(AppActions.serverResponse.create(`New Category '${resp.title}' created`));
+    dispatch!(AppActions.serverResponse.create(`New Category '${resp.createCategory.title}' created`));
     dispatch!(this.getCategories());
 
     if (callback) callback();
@@ -69,7 +73,7 @@ class Actions {
   async removeCategory(category: Category, dispatch?: Function, getState?: () => IRootState) {
     try {
       dispatch!(ActionCreators.SetCategoriesBusy.create(true));
-      await graphql<Category>(REMOVE_CATEGORY, { id: category._id });
+      await graphql<{ removeCategory: Category }>(REMOVE_CATEGORY, { id: category._id });
       // await categories.remove(category._id);
       dispatch!(AppActions.serverResponse.create(`Category '${category.title}' removed`));
       dispatch!(this.getCategories());

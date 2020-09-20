@@ -12,7 +12,7 @@ let page = new HomePage();
 let admin: Agent, joe: Agent;
 let publicPost: IPost<'expanded'>, privatePost: IPost<'expanded'>;
 
-describe('Latest Post tests: ', function() {
+describe('Latest Post tests: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
@@ -31,7 +31,7 @@ describe('Latest Post tests: ', function() {
       slug: randomId(),
       public: true,
       brief: 'This is the first',
-      author: adminUser._id.toString()
+      author: adminUser._id.toString(),
     })) as IPost<'expanded'>;
 
     privatePost = (await posts.create({
@@ -39,7 +39,7 @@ describe('Latest Post tests: ', function() {
       slug: randomId(),
       public: true,
       brief: 'This is brief',
-      author: joeUser._id.toString()
+      author: joeUser._id.toString(),
     })) as IPost<'expanded'>;
 
     await docs.addElement(
@@ -82,7 +82,7 @@ describe('Latest Post tests: ', function() {
 
     assert.deepEqual(latest.heading, privatePost.title);
     assert.deepEqual(latest.author, privatePost.author ? privatePost.author.username : '');
-    assert.deepEqual(latest.created, format(new Date(), 'MMM Do, YYYY')); // Make sure its today
+    assert.deepEqual(latest.created, format(new Date(), 'MMM Do, yyyy')); // Make sure its today
     assert.deepEqual(latest.zones.length, 2);
     assert.deepEqual(latest.zones[0].name, 'left');
     assert.deepEqual(latest.zones[0].content, 'Left');

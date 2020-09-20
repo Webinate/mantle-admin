@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { IRootState } from '../store';
-import { connectWrapper, returntypeof } from '../utils/decorators';
 import { default as styled } from '../theme/styled';
 import { push } from 'react-router-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import homeActions from '../store/home/actions';
+import { State as AppState } from '../store/app/reducer';
+import { State as HomeState } from '../store/home/reducer';
 import ContentHeader from '../components/content-header';
 import { generateAvatarPic } from '../utils/component-utils';
 import Card from '@material-ui/core/Card';
@@ -31,46 +34,21 @@ import format from 'date-fns/format';
 import { createPost } from '../store/posts/actions';
 import { randomId } from '../utils/misc';
 
-// Map state to props
-const mapStateToProps = (state: IRootState, ownProps: any) => ({
-  user: state.authentication.user,
-  home: state.home,
-  app: state.app,
-  location: ownProps.location as Location,
-});
-
-// Map actions to props (This binds the actions to the dispatch fucntion)
-const dispatchToProps = {
-  push: push,
-  getHomeElements: homeActions.getHomeElements,
-  createPost,
-};
-
-const stateProps = returntypeof(mapStateToProps);
-type Props = typeof stateProps & typeof dispatchToProps;
-type State = {
-  postExpanded: boolean;
-  rexExcited: boolean;
-};
-
 /**
  * The main application entry point
  */
-@connectWrapper(mapStateToProps, dispatchToProps)
-export class Home extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      postExpanded: false,
-      rexExcited: false,
-    };
-  }
+const Home: React.FC<void> = () => {
+  const [postExpanded, setPostExpanded] = useState(false);
+  const [rexExcited, setRexExcited] = useState(false);
+  const dispatch = useDispatch();
+  const home = useSelector<IRootState, HomeState>((state) => state.home);
+  const app = useSelector<IRootState, AppState>((state) => state.app);
 
-  componentDidMount() {
-    this.props.getHomeElements();
-  }
+  useEffect(() => {
+    dispatch(homeActions.getHomeElements());
+  }, []);
 
-  private renderLatestPost(post: Post) {
+  const renderLatestPost = (post: Post) => {
     return (
       <Card className="mt-latest-post">
         <CardHeader
@@ -80,7 +58,7 @@ export class Home extends React.Component<Props, State> {
           subheader={
             <span>
               By <span className="mt-post-header-author">{post.author ? post.author.username : ''}</span> on{' '}
-              <span className="mt-post-header-date">{format(new Date(post.createdOn), 'MMM Do, YYYY')}</span>
+              <span className="mt-post-header-date">{format(new Date(post.createdOn), 'MMM Do, yyyy')}</span>
             </span>
           }
         />
@@ -95,20 +73,20 @@ export class Home extends React.Component<Props, State> {
           />
         ) : undefined}
         <CardActions disableSpacing>
-          <IconButton className="mt-edit-latest" onClick={(e) => this.props.push('/dashboard/posts/edit/' + post._id)}>
+          <IconButton className="mt-edit-latest" onClick={(e) => dispatch(push('/dashboard/posts/edit/' + post._id))}>
             <VisibilityIcon />
           </IconButton>
           <IconButton
             className="mt-post-expand-btn"
-            onClick={(e) => this.setState({ postExpanded: !this.state.postExpanded })}
-            aria-expanded={this.state.postExpanded}
+            onClick={(e) => setPostExpanded(!postExpanded)}
+            aria-expanded={postExpanded}
             aria-label="Show more"
             style={{ marginLeft: 'auto' }}
           >
-            {this.state.postExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            {postExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </CardActions>
-        <Collapse timeout={this.props.app.debugMode ? 0 : 'auto'} in={this.state.postExpanded} unmountOnExit>
+        <Collapse timeout={app.debugMode ? 0 : 'auto'} in={postExpanded} unmountOnExit>
           <CardContent className="mt-latest-post-content">
             {post.document.template.zones.map((zone) => (
               <div key={zone} className="mt-zone">
@@ -123,10 +101,10 @@ export class Home extends React.Component<Props, State> {
         </Collapse>
       </Card>
     );
-  }
+  };
 
-  private renderPostList() {
-    const posts = this.props.home.posts;
+  const renderPostList = () => {
+    const posts = home.posts;
 
     return (
       <Card>
@@ -143,14 +121,14 @@ export class Home extends React.Component<Props, State> {
                   secondary={
                     <span>
                       By <span className="mt-recent-post-author">{p.author ? p.author.username : ''}</span> on{' '}
-                      <span className="mt-recent-post-date">{format(new Date(p.createdOn), 'MMM Do, YYYY')}</span>
+                      <span className="mt-recent-post-date">{format(new Date(p.createdOn), 'MMM Do, yyyy')}</span>
                     </span>
                   }
                 />
                 <ListItemSecondaryAction>
                   <IconButton
                     className="mt-edit-post-btn"
-                    onClick={(e) => this.props.push('/dashboard/posts/edit/' + p._id)}
+                    onClick={(e) => dispatch(push('/dashboard/posts/edit/' + p._id))}
                     aria-label="Delete"
                   >
                     <ArrowForwardIcon />
@@ -162,59 +140,52 @@ export class Home extends React.Component<Props, State> {
         </List>
       </Card>
     );
-  }
+  };
 
-  render() {
-    const home = this.props.home;
-    const isBusy = home.busy;
+  const isBusy = home.busy;
 
-    return (
-      <Container className="mt-home-container">
-        <ContentHeader title="Home" busy={isBusy} />
-        <Content>
-          <img
-            style={{ visibility: this.state.rexExcited ? 'hidden' : 'visible', opacity: 1 }}
-            src="../images/rex-bored.svg"
-          />
-          <img
-            style={{ visibility: this.state.rexExcited ? 'visible' : 'hidden', opacity: 1 }}
-            src="../images/rex-excited.svg"
-          />
-          <DashRow>
-            {home.posts.length > 0 ? <div>{this.renderPostList()}</div> : <div />}
-            <div>
-              <div
-                className="mt-card"
-                onMouseEnter={(e) => this.setState({ rexExcited: true })}
-                onMouseLeave={(e) => this.setState({ rexExcited: false })}
-              >
-                <Card>
-                  <CardHeader
-                    action={
-                      <Tooltip title="Create a new post">
-                        <Fab
-                          className="mt-create-post"
-                          onClick={(e) => this.props.createPost({ title: 'New Post', slug: randomId() })}
-                          size="small"
-                          color="primary"
-                        >
-                          <AddIcon />
-                        </Fab>
-                      </Tooltip>
-                    }
-                    title="Add new post"
-                  />
-                </Card>
-              </div>
-
-              {home.latestPost ? <div className="mt-card">{this.renderLatestPost(home.latestPost)}</div> : undefined}
+  return (
+    <Container className="mt-home-container">
+      <ContentHeader title="Home" busy={isBusy} />
+      <Content>
+        <img style={{ visibility: rexExcited ? 'hidden' : 'visible', opacity: 1 }} src="../images/rex-bored.svg" />
+        <img style={{ visibility: rexExcited ? 'visible' : 'hidden', opacity: 1 }} src="../images/rex-excited.svg" />
+        <DashRow>
+          {home.posts.length > 0 ? <div>{renderPostList()}</div> : <div />}
+          <div>
+            <div
+              className="mt-card"
+              onMouseEnter={(e) => setRexExcited(true)}
+              onMouseLeave={(e) => setRexExcited(false)}
+            >
+              <Card>
+                <CardHeader
+                  action={
+                    <Tooltip title="Create a new post">
+                      <Fab
+                        className="mt-create-post"
+                        onClick={(e) => dispatch(createPost({ title: 'New Post', slug: randomId() }))}
+                        size="small"
+                        color="primary"
+                      >
+                        <AddIcon />
+                      </Fab>
+                    </Tooltip>
+                  }
+                  title="Add new post"
+                />
+              </Card>
             </div>
-          </DashRow>
-        </Content>
-      </Container>
-    );
-  }
-}
+
+            {home.latestPost ? <div className="mt-card">{renderLatestPost(home.latestPost)}</div> : undefined}
+          </div>
+        </DashRow>
+      </Content>
+    </Container>
+  );
+};
+
+export default Home;
 
 const Container = styled.div`
   height: 100%;

@@ -23,9 +23,9 @@ class Actions {
   @dispatchError(ActionCreators.authenticationError)
   async login(authToken: LoginInput, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.isAuthenticating.create(true));
-    const resp = await graphql<AuthResponse>(LOGIN, { token: authToken });
+    const resp = await graphql<{ login: AuthResponse }>(LOGIN, { token: authToken });
     // const resp = await auth.login(authToken);
-    dispatch!(ActionCreators.setUser.create(resp.user ? resp.user : null));
+    dispatch!(ActionCreators.setUser.create(resp.login.user ? resp.login.user : null));
     dispatch!(push('/'));
   }
 
@@ -33,15 +33,15 @@ class Actions {
   @dispatchError(ActionCreators.authenticationError)
   async register(authToken: RegisterInput, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.isAuthenticating.create(true));
-    const resp = await graphql<AuthResponse>(REGISTER, { token: authToken });
+    const resp = await graphql<{ register: AuthResponse }>(REGISTER, { token: authToken });
     // const resp = await auth.register(authToken);
-    dispatch!(ActionCreators.authenticationError.create(resp.message));
+    dispatch!(ActionCreators.authenticationError.create(resp.register.message));
   }
 
   @disptachable()
   @dispatchError(ActionCreators.authenticationError)
   async logout(dispatch?: Function, getState?: () => IRootState) {
-    await graphql<AuthResponse>(LOGOUT, {});
+    await graphql<{ logout: AuthResponse }>(LOGOUT, {});
     // await auth.logout();
     dispatch!(ActionCreators.loggedOut.create(true));
     dispatch!(push('/login'));

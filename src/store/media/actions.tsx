@@ -54,10 +54,10 @@ class Actions {
 
       dispatch!(ActionCreators.SelectedVolume.create(null));
       dispatch!(ActionCreators.SetVolumesBusy.create(true));
-      const resp = await graphql<PaginatedVolumeResponse>(GET_VOLUMES, newFilters);
+      const resp = await graphql<{ volumes: PaginatedVolumeResponse }>(GET_VOLUMES, newFilters);
       // const resp = await volumes.getAll(newFilters);
       dispatch!(ActionCreators.SelectedVolume.create(null));
-      dispatch!(ActionCreators.SetVolumes.create({ page: resp, filters: newFilters }));
+      dispatch!(ActionCreators.SetVolumes.create({ page: resp.volumes, filters: newFilters }));
     } catch (err) {
       dispatch!(ActionCreators.SetVolumesBusy.create(false));
       dispatch!(AppActions.serverResponse.create(err.message));
@@ -141,10 +141,10 @@ class Actions {
     dispatch!(ActionCreators.SetVolumesBusy.create(true));
 
     try {
-      const promises: Promise<boolean>[] = [];
+      const promises: Promise<{ removeVolume: boolean }>[] = [];
       for (const id of ids) {
         promises.push(
-          graphql<boolean>(REMOVE_VOLUME, { id })
+          graphql<{ removeVolume: boolean }>(REMOVE_VOLUME, { id })
         );
         // promises.push(volumes.remove(id));
       }
@@ -153,9 +153,9 @@ class Actions {
 
       const state = getState!();
 
-      const resp = await graphql<PaginatedVolumeResponse>(GET_VOLUMES, state.media.volumeFilters);
+      const resp = await graphql<{ volumes: PaginatedVolumeResponse }>(GET_VOLUMES, state.media.volumeFilters);
       // const resp = await volumes.getAll(state.media.volumeFilters);
-      dispatch!(ActionCreators.SetVolumes.create({ page: resp, filters: state.media.volumeFilters }));
+      dispatch!(ActionCreators.SetVolumes.create({ page: resp.volumes, filters: state.media.volumeFilters }));
     } catch (err) {
       dispatch!(ActionCreators.SetVolumesBusy.create(false));
       dispatch!(AppActions.serverResponse.create(err.message));
@@ -166,8 +166,8 @@ class Actions {
   async getVolume(id: string, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetVolumesBusy.create(true));
     // const resp = await volumes.getOne(id);
-    const resp = await graphql<Volume>(GET_VOLUME, { id });
-    dispatch!(ActionCreators.SelectedVolume.create(resp));
+    const resp = await graphql<{ volume: Volume }>(GET_VOLUME, { id });
+    dispatch!(ActionCreators.SelectedVolume.create(resp.volume));
   }
 
   @disptachable()
@@ -185,11 +185,11 @@ class Actions {
     try {
       // const responses = await Promise.all([volumes.getOne(id), files.getAll(id, filesFilter)]);
       const responses = await Promise.all([
-        graphql<Volume>(GET_VOLUME, { id }),
+        graphql<{ volume: Volume }>(GET_VOLUME, { id }),
         graphql<PaginatedFilesResponse>(GET_FILES, { volumeId: id, ...filesFilter }),
       ]);
 
-      dispatch!(ActionCreators.SelectedVolume.create(responses[0]));
+      dispatch!(ActionCreators.SelectedVolume.create(responses[0].volume));
       dispatch!(ActionCreators.SetFiles.create({ page: responses[1], filters: filesFilter }));
     } catch (err) {
       dispatch!(AppActions.serverResponse.create(err.message));
@@ -211,13 +211,13 @@ class Actions {
   @dispatchError(AppActions.serverResponse)
   async editVolume(id: string, token: Partial<UpdateVolumeInput>, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetVolumesBusy.create(true));
-    await graphql<Volume>(PATCH_VOLUME, { token: token });
+    await graphql<{ updateVolume: Volume }>(PATCH_VOLUME, { token: token });
     // await volumes.update(id, token);
 
     const state = getState!();
     // const responses = await volumes.getAll(state.media.volumeFilters);
-    const resp = await graphql<PaginatedVolumeResponse>(GET_VOLUMES, state.media.volumeFilters);
-    dispatch!(ActionCreators.SetVolumes.create({ page: resp, filters: state.media.volumeFilters }));
+    const resp = await graphql<{ volumes: PaginatedVolumeResponse }>(GET_VOLUMES, state.media.volumeFilters);
+    dispatch!(ActionCreators.SetVolumes.create({ page: resp.volumes, filters: state.media.volumeFilters }));
   }
 
   @disptachable()
@@ -260,12 +260,12 @@ class Actions {
         delete toSend.memoryAllocated;
       }
 
-      await graphql<Volume>(ADD_VOLUME, { token: toSend });
-      const resp = await graphql<PaginatedVolumeResponse>(GET_VOLUMES, state.media.volumeFilters);
+      await graphql<{ addVolume: Volume }>(ADD_VOLUME, { token: toSend });
+      const resp = await graphql<{ volumes: PaginatedVolumeResponse }>(GET_VOLUMES, state.media.volumeFilters);
 
       // await volumes.create(toSend);
       // let resp = await volumes.getAll(volumeFilters);
-      dispatch!(ActionCreators.SetVolumes.create({ page: resp, filters: volumeFilters }));
+      dispatch!(ActionCreators.SetVolumes.create({ page: resp.volumes, filters: volumeFilters }));
       callback();
     } catch (err) {
       dispatch!(ActionCreators.VolumeFormError.create(err));

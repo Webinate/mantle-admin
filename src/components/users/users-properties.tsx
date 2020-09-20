@@ -18,7 +18,7 @@ import { DatePicker } from '@material-ui/pickers';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
 import { generateAvatarPic, isAdminUser } from '../../utils/component-utils';
-import { MediaModal } from '../../containers/media-modal';
+import MediaModal from '../../containers/media-modal';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -143,7 +143,7 @@ export default class UserProperties extends React.Component<Props, State> {
                     onChange={(e: Date) => this.setState({ user: { ...this.state.user!, createdOn: e.getTime() } })}
                     fullWidth={true}
                     disabled={isAdmin ? false : true}
-                    format={'MMMM Do, YYYY'}
+                    format={'MMMM Do, yyyy'}
                   />
                 </Field>
                 {this.userCanInteract(selected) ? (
@@ -155,7 +155,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       fullWidth={true}
                       value={new Date(selected.lastLoggedIn)}
                       onChange={(e: Date) => {}}
-                      format={'MMMM Do, YYYY'}
+                      format={'MMMM Do, yyyy'}
                     />
                   </Field>
                 ) : undefined}
@@ -303,7 +303,6 @@ export default class UserProperties extends React.Component<Props, State> {
 
         {this.state.showMediaPopup ? (
           <MediaModal
-            {...({} as any)}
             open={true}
             onCancel={() => {
               this.setState({ showMediaPopup: false });

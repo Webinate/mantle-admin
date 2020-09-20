@@ -51,9 +51,9 @@ export function getPosts(options: Partial<QueryPostsArgs>) {
       const newFilters = { ...state.posts.postFilters, ...options };
 
       dispatch(ActionCreators.SetPostsBusy.create(true));
-      const resp = await graphql<PaginatedPostsResponse>(GET_POSTS, newFilters);
+      const resp = await graphql<{ posts: PaginatedPostsResponse }>(GET_POSTS, newFilters);
       // const resp = await posts.getAll(newFilters);
-      dispatch(ActionCreators.SetPosts.create({ page: resp, filters: newFilters }));
+      dispatch(ActionCreators.SetPosts.create({ page: resp.posts, filters: newFilters }));
     } catch (err) {
       dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
@@ -64,9 +64,9 @@ export function getPosts(options: Partial<QueryPostsArgs>) {
 export function getPost(id: string) {
   return async function (dispatch: Function, getState: () => IRootState) {
     dispatch(ActionCreators.SetPostsBusy.create(true));
-    const resp = await graphql<Post>(GET_POST, { id });
+    const resp = await graphql<{ post: Post }>(GET_POST, { id });
     // const resp = await posts.getOne({ id });
-    dispatch(ActionCreators.SetPost.create(resp));
+    dispatch(ActionCreators.SetPost.create(resp.post));
   };
 }
 
@@ -74,11 +74,11 @@ export function createPost(post: Partial<AddPostInput>) {
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetPostsBusy.create(true));
-      const resp = await graphql<Post>(ADD_POST, { token: post });
+      const resp = await graphql<{ createPost: Post }>(ADD_POST, { token: post });
       // const resp = await posts.create(post);
-      dispatch(AppActions.serverResponse.create(`New Post '${resp.title}' created`));
+      dispatch(AppActions.serverResponse.create(`New Post '${resp.createPost.title}' created`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
-      dispatch(push(`/dashboard/posts/edit/${resp._id}`));
+      dispatch(push(`/dashboard/posts/edit/${resp.createPost._id}`));
     } catch (err) {
       dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
@@ -91,7 +91,7 @@ export function deletePosts(toDelete: Partial<Post>[]) {
     try {
       dispatch(ActionCreators.SetPostsBusy.create(true));
       const promises = toDelete.map((p) => {
-        return graphql<Post>(REMOVE_POST, { id: p._id });
+        return graphql<{ removePost: Post }>(REMOVE_POST, { id: p._id });
         // return posts.remove(p._id!)
       });
       await Promise.all(promises);
@@ -104,8 +104,8 @@ export function deletePosts(toDelete: Partial<Post>[]) {
       const state = getState();
       const filters = { ...state.posts.postFilters, ...{ index: 0, keyword: '' } };
       // const resp = await posts.getAll(filters);
-      const resp = await graphql<PaginatedPostsResponse>(GET_POSTS, filters);
-      dispatch(ActionCreators.SetPosts.create({ page: resp, filters: filters }));
+      const resp = await graphql<{ posts: PaginatedPostsResponse }>(GET_POSTS, filters);
+      dispatch(ActionCreators.SetPosts.create({ page: resp.posts, filters: filters }));
     } catch (err) {
       dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
@@ -117,10 +117,10 @@ export function editPost(post: Partial<UpdatePostInput>) {
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetPostsBusy.create(true));
-      const resp = await graphql<Post>(UPDATE_POST, { token: post });
+      const resp = await graphql<{ patchPost: Post }>(UPDATE_POST, { token: post });
       // const resp = await posts.update(post._id as string, post);
-      dispatch(ActionCreators.SetPost.create(resp));
-      dispatch(AppActions.serverResponse.create(`Post '${resp.title}' updated`));
+      dispatch(ActionCreators.SetPost.create(resp.patchPost));
+      dispatch(AppActions.serverResponse.create(`Post '${resp.patchPost.title}' updated`));
     } catch (err) {
       dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
@@ -132,10 +132,10 @@ export function changeTemplate(docId: string, templateId: string) {
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetPostsBusy.create(true));
-      await graphql<Post>(SET_TEMPLATE, { template: templateId, id: docId });
-      const resp = await graphql<Document>(GET_DOCUMENT, { id: docId });
+      await graphql<{ changeDocTemplate: Post }>(SET_TEMPLATE, { template: templateId, id: docId });
+      const resp = await graphql<{ document: Document }>(GET_DOCUMENT, { id: docId });
       // const resp = await documents.setTemplate(docId, templateId);
-      dispatch(ActionCreators.SetTemplate.create(resp));
+      dispatch(ActionCreators.SetTemplate.create(resp.document));
       dispatch(AppActions.serverResponse.create(`Post template updated`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
     } catch (err) {
@@ -161,11 +161,11 @@ export function addElement(docId: string, elements: Partial<AddElementInput>[], 
 
       const resp = await Promise.all(
         elements.map((e) => {
-          return graphql<Element>(ADD_ELEMENT, { token: e, docId });
+          return graphql<{ addDocElement: Element }>(ADD_ELEMENT, { token: e, docId });
           // return documents.addElement(docId, e, index);
         })
       );
-      dispatch(ActionCreators.AddElement.create({ elms: resp, index: index }));
+      dispatch(ActionCreators.AddElement.create({ elms: resp.map((r) => r.addDocElement), index: index }));
     } catch (err) {
       dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
       dispatch(ActionCreators.SetPostsBusy.create(false));
@@ -182,19 +182,20 @@ export function updateElement(
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetPostsBusy.create(true));
-      const resp = await graphql<Element>(PATCH_ELEMENT, { token, docId });
+      const resp = await graphql<{ updateDocElement: Element }>(PATCH_ELEMENT, { token, docId });
       // const resp = await documents.editElement(docId, elementId, token);
-      dispatch(ActionCreators.UpdateElement.create(resp));
+      dispatch(ActionCreators.UpdateElement.create(resp.updateDocElement));
       if (createElement) {
         const index = getSelectedIndex(getState());
-        const newElm = await graphql<Element>(ADD_ELEMENT, { token: createElement, docId });
+        const newElm = await graphql<{ addDocElement: Element }>(ADD_ELEMENT, { token: createElement, docId });
         // const newElm = await documents.addElement(docId, createElement, index);
-        dispatch(ActionCreators.AddElement.create({ elms: [newElm], index: index }));
+        dispatch(ActionCreators.AddElement.create({ elms: [newElm.addDocElement], index: index }));
         if (deselect === 'deselect') dispatch(ActionCreators.SetElmSelection.create([]));
       } else {
         dispatch(ActionCreators.SetPostsBusy.create(false));
         if (deselect === 'deselect') dispatch(ActionCreators.SetElmSelection.create([]));
-        else if (deselect === 'select') dispatch(ActionCreators.SetFocussedElm.create(resp._id as string));
+        else if (deselect === 'select')
+          dispatch(ActionCreators.SetFocussedElm.create(resp.updateDocElement._id as string));
       }
     } catch (err) {
       dispatch(AppActions.serverResponse.create(`Error: ${err.message}`));
@@ -209,7 +210,7 @@ export function deleteElements(docId: string, ids: string[]) {
       dispatch(ActionCreators.SetPostsBusy.create(true));
       await Promise.all(
         ids.map((id) => {
-          return graphql<boolean>(REMOVE_ELEMENT, { elementId: id, docId });
+          return graphql<{ removeDocElement: boolean }>(REMOVE_ELEMENT, { elementId: id, docId });
           // return documents.removeElement(docId, id)
         })
       );

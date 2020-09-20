@@ -15,13 +15,10 @@ import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { Router } from '../../../src/routers/router';
 import { FileRouter } from '../../../src/routers/file';
 import { AuthRouter } from '../../../src/routers/auth';
-import { ThemeProvider, createMuiTheme, createGenerateClassName } from '@material-ui/core/styles';
+import { ThemeProvider, ServerStyleSheets, createMuiTheme } from '@material-ui/core/styles';
 import Theme from './theme/mui-theme';
-import { ServerStyleSheet } from 'styled-components';
-import { SheetsRegistry } from 'react-jss/lib/jss';
-import JssProvider from 'react-jss/lib/JssProvider';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import * as DateFnsUtils from '@date-io/date-fns';
 import { User as UserModel } from '../../../src/graphql/models/user-type';
 import { User } from 'mantle';
 
@@ -92,36 +89,30 @@ export default class MainController extends Router {
     try {
       for (const action of actions) store.dispatch(action);
 
-      // For styled components
-      const sheet = new ServerStyleSheet();
-
       // For material ui
-      const materialSheets = new SheetsRegistry();
-      const generateClassName = createGenerateClassName();
+      const sheets = new ServerStyleSheets();
 
       // We use a require to support hot reloading
-      const App = require('./containers/app').App;
+      const App = await import('./containers/app');
 
       let html = renderToString(
-        sheet.collectStyles(
+        sheets.collect(
           <Provider store={store}>
-            <JssProvider registry={materialSheets} generateClassName={generateClassName}>
-              <ThemeProvider theme={theme}>
-                <StaticRouter location={url} context={context}>
-                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <App {...({} as any)} />
-                  </MuiPickersUtilsProvider>
-                </StaticRouter>
-              </ThemeProvider>
-            </JssProvider>
+            <ThemeProvider theme={theme}>
+              <StaticRouter location={url} context={context}>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <App.default />
+                </MuiPickersUtilsProvider>
+              </StaticRouter>
+            </ThemeProvider>
           </Provider>
         )
       );
 
-      const styleTags = sheet.getStyleElement();
+      const styleTags = sheets.getStyleElement();
 
-      // Get the style sheet for material
-      const styleTagsMaterial = materialSheets.toString();
+      // Grab the CSS from the sheets.
+      const styleTagsMaterial = sheets.toString();
 
       // Check the context if there needs to be a redirect
       if (context.url) {

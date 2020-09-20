@@ -187,7 +187,7 @@ export class DirectoryView extends React.Component<Props, State> {
                     </TableCell>
                     <TableCell className="mt-file-name">{file.name}</TableCell>
                     <TableCell className="mt-file-memory">{formatBytes(file.size!)}</TableCell>
-                    <TableCell className="mt-file-created">{format(new Date(file.created!), 'MMM Do, YYYY')}</TableCell>
+                    <TableCell className="mt-file-created">{format(new Date(file.created!), 'MMM Do, yyyy')}</TableCell>
                   </TableRow>
                 );
               })}

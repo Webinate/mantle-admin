@@ -12,7 +12,7 @@ let page = new HomePage();
 let admin: Agent, joe: Agent;
 let publicPost: IPost<'expanded'>, privatePost: IPost<'expanded'>;
 
-describe('Recent Posts: ', function() {
+describe('Recent Posts: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
@@ -28,7 +28,7 @@ describe('Recent Posts: ', function() {
       slug: randomId(),
       public: true,
       brief: 'This is the first',
-      author: adminUser._id.toString()
+      author: adminUser._id.toString(),
     })) as IPost<'expanded'>;
 
     privatePost = (await posts.create({
@@ -36,7 +36,7 @@ describe('Recent Posts: ', function() {
       slug: randomId(),
       public: false,
       brief: 'This is brief',
-      author: joeUser._id.toString()
+      author: joeUser._id.toString(),
     })) as IPost<'expanded'>;
 
     // Update so we can check its sorting by modified
@@ -53,7 +53,7 @@ describe('Recent Posts: ', function() {
     await page.load(admin);
     const recent = await page.getRecentPosts();
     assert.deepEqual(recent[0].author, publicPost.author.username);
-    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, YYYY')); // Today
+    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, yyyy')); // Today
     assert.deepEqual(recent[0].heading, publicPost.title);
     assert.deepEqual(recent[1].heading, privatePost.title);
   });
@@ -66,7 +66,7 @@ describe('Recent Posts: ', function() {
 
     const recent = await page.getRecentPosts();
     assert.deepEqual(recent[0].author, publicPost.author.username);
-    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, YYYY')); // Today
+    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, yyyy')); // Today
     assert.deepEqual(recent[0].heading, publicPost.title);
     if (recent.length > 1) assert.notDeepEqual(recent[1].heading, privatePost.title);
   });

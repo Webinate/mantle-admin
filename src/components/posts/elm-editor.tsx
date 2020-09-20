@@ -10,7 +10,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import TextField from '@material-ui/core/TextField';
-import { MediaModal } from '../../containers/media-modal';
+import MediaModal from '../../containers/media-modal';
 
 export type Props = {
   elements: Element[];
@@ -643,7 +643,6 @@ export class ElmEditor extends React.Component<Props, State> {
 
         {this.state.showMediaPopup ? (
           <MediaModal
-            {...({} as any)}
             open={true}
             onCancel={() => {
               this.setState({ showMediaPopup: false });

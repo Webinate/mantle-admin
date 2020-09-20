@@ -17,17 +17,17 @@ export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 export function getAllTemplates() {
   return async function (dispatch: Function, getState: () => IRootState) {
     dispatch(ActionCreators.SetBusy.create(true));
-    const page = await graphql<PaginatedTemplateResponse>(GET_TEMPLATES, {});
+    const page = await graphql<{ templates: PaginatedTemplateResponse }>(GET_TEMPLATES, {});
     // const page = await templates.getAll();
-    dispatch(ActionCreators.GetAll.create(page));
+    dispatch(ActionCreators.GetAll.create(page.templates));
   };
 }
 
 export function getTemplate(id: string) {
   return async function (dispatch: Function, getState: () => IRootState) {
     dispatch(ActionCreators.SetBusy.create(true));
-    const template = await graphql<Template>(GET_TEMPLATE, { id });
+    const template = await graphql<{ template: Template }>(GET_TEMPLATE, { id });
     // const template = await templates.getOne(id);
-    dispatch(ActionCreators.GetOne.create(template));
+    dispatch(ActionCreators.GetOne.create(template.template));
   };
 }

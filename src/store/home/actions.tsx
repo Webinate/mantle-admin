@@ -30,18 +30,18 @@ class Actions {
     // ]);
 
     const [postsByCreationDate, postsByModifiedDate] = await Promise.all([
-      graphql<PaginatedPostsResponse>(GET_POSTS, { sort: 'created', sortOrder: 'desc', limit: 5 }),
-      graphql<PaginatedPostsResponse>(GET_POSTS, { sort: 'modified', sortOrder: 'desc', limit: 5 }),
+      graphql<{ posts: PaginatedPostsResponse }>(GET_POSTS, { sort: 'created', sortOrder: 'desc', limit: 5 }),
+      graphql<{ posts: PaginatedPostsResponse }>(GET_POSTS, { sort: 'modified', sortOrder: 'desc', limit: 5 }),
     ]);
 
-    if (postsByCreationDate.data.length > 0) {
-      const latestPost = await graphql<Post>(GET_POST, { id: postsByCreationDate.data[0]._id });
+    if (postsByCreationDate.posts.data.length > 0) {
+      const latestPost = await graphql<{ post: Post }>(GET_POST, { id: postsByCreationDate.posts.data[0]._id });
       // const latestPost = await posts.getOne({ id: postsByCreationDate.data[0]._id });
 
       dispatch!(
         ActionCreators.SetPost.create({
-          post: latestPost,
-          posts: postsByModifiedDate.data,
+          post: latestPost.post,
+          posts: postsByModifiedDate.posts.data,
         })
       );
     } else dispatch!(ActionCreators.SetPost.create(null));

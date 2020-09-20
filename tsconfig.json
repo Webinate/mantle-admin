@@ -12,7 +12,9 @@
     "strictNullChecks": true,
     "jsx": "react",
     "experimentalDecorators": true,
-    "noStrictGenericChecks": true
+    "emitDecoratorMetadata": true,
+    "noStrictGenericChecks": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["../../src/types/**/*", "src/**/*"],
   "exclude": ["src/server/**/*"]

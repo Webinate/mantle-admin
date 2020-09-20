@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { IRootState } from '../store';
-import { connectWrapper, returntypeof } from '../utils/decorators';
 import { default as styled } from '../theme/styled';
 import ContentHeader from '../components/content-header';
 import commentActions from '../store/comments/actions';
@@ -16,213 +16,166 @@ import IconButton from '@material-ui/core/IconButton';
 import theme from '../theme/mui-theme';
 import UserPicker from '../components/user-picker';
 import PostPreview from '../components/posts/post-preview';
-
-// Map state to props
-const mapStateToProps = (state: IRootState, ownProps: any) => ({
-  user: state.authentication.user,
-  commentState: state.comments,
-  app: state.app,
-  location: ownProps.location as Location,
-});
-
-// Map actions to props (This binds the actions to the dispatch fucntion)
-const dispatchToProps = {
-  getAll: commentActions.getComments,
-  editComment: commentActions.editComment,
-  deleteComment: commentActions.deleteComment,
-  createComment: commentActions.createComment,
-};
-
-type SortType = 'created' | 'updated';
-
-const stateProps = returntypeof(mapStateToProps);
-type Props = typeof stateProps & typeof dispatchToProps;
-type State = {
-  sortBy: SortType;
-  showDeleteModal: boolean;
-  filtersOpen: boolean;
-  sortByOpen: boolean;
-  sortAscending: boolean;
-  selectedUid: string | null;
-  selectedPostUid: string | null;
-  user: User | null;
-};
+import { State as CommentsState } from '../store/comments/reducer';
+import { State as AppState } from '../store/app/reducer';
+import { useSelector, useDispatch } from 'react-redux';
 
 /**
  * The comments container
  */
-@connectWrapper(mapStateToProps, dispatchToProps)
-export class Comments extends React.Component<Props, State> {
-  private _sortElm: HTMLElement | null;
+const Comments: React.FC = () => {
+  let _sortElm: HTMLElement | null = null;
+  const dispatch = useDispatch();
+  const authUser = useSelector<IRootState, User | null>((state) => state.authentication.user);
+  const commentState = useSelector<IRootState, CommentsState>((state) => state.comments);
+  const app = useSelector<IRootState, AppState>((state) => state.app);
+  const filters = commentState.commentFilters;
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortByOpen, setSortByOpen] = useState(false);
+  const [sortAscending, setSortAscending] = useState(filters.sortOrder! === 'asc' ? true : false);
+  const [sortBy, setSortBy] = useState<CommentSortType>(filters.sortType ? filters.sortType : 'updated');
+  const [user, setUser] = useState<User | null>(null);
+  const [selectedUid, setSelectedUid] = useState<string | null>(null);
+  const [selectedPostUid, setSelectedPostUid] = useState<string | null>(null);
 
-  constructor(props: Props) {
-    super(props);
-    this._sortElm = null;
+  const onSearch = (term: string) => {
+    dispatch(commentActions.getComments({ index: 0, keyword: term }));
+  };
 
-    const filters = props.commentState.commentFilters;
+  const onSortByChange = (sort: CommentSortType) => {
+    setSortBy(sort);
+    setSortByOpen(false);
+    dispatch(commentActions.getComments({ sortType: sort }));
+  };
 
-    this.state = {
-      showDeleteModal: false,
-      filtersOpen: false,
-      sortByOpen: false,
-      sortAscending: filters.sortOrder! === 'asc' ? true : false,
-      sortBy: filters.sortType ? filters.sortType : 'updated',
-      user: null,
-      selectedUid: null,
-      selectedPostUid: null,
-    };
-  }
-
-  private onSearch(term: string) {
-    this.props.getAll({ index: 0, keyword: term });
-  }
-
-  private onSortByChange(sort: CommentSortType) {
-    this.setState({ sortBy: sort, sortByOpen: false }, () => {
-      this.props.getAll({ sortType: sort });
-    });
-  }
-
-  private onAscChange() {
-    const val = !this.state.sortAscending;
-    this.setState({ sortAscending: val, sortByOpen: false }, () => {
-      this.props.getAll({
+  const onAscChange = () => {
+    const val = !sortAscending;
+    setSortAscending(val);
+    setSortByOpen(false);
+    dispatch(
+      commentActions.getComments({
         sortOrder: val ? 'asc' : 'desc',
-      });
-    });
+      })
+    );
+  };
+
+  const onUserChange = (user: User | null) => {
+    setUser(user);
+    dispatch(commentActions.getComments({ user: user ? user.username : '' }));
+  };
+
+  const page = commentState.commentPage;
+  const isBusy = commentState.busy;
+  const isAdmin = isAdminUser(authUser);
+  const animated = app.debugMode ? false : true;
+  let selectedPost: Post | null = null;
+
+  if (page && selectedUid) {
+    const comment = page.data.find((c) => (c.post._id as string) === selectedPostUid)!;
+    if (comment) selectedPost = comment.post;
   }
 
-  private onUserChange(user: User | null) {
-    this.setState({ user: user }, () => {
-      this.props.getAll({ user: user ? user.username : '' });
-    });
-  }
-
-  render() {
-    const page = this.props.commentState.commentPage;
-    const isBusy = this.props.commentState.busy;
-    const isAdmin = isAdminUser(this.props.user);
-    const animated = this.props.app.debugMode ? false : true;
-    let selectedPost: Post | null = null;
-
-    if (page && this.state.selectedUid) {
-      const comment = page.data.find((c) => (c.post._id as string) === this.state.selectedPostUid)!;
-      if (comment) selectedPost = comment.post;
-    }
-
-    return (
-      <div className="mt-comments-container">
-        <ContentHeader
-          title="Comments"
-          busy={isBusy}
-          renderFilters={() => (
-            <FilterBar
-              onSearch={(term) => this.onSearch(term)}
-              commentsSelected={false}
-              isAdminUser={isAdmin ? false : true}
-              onFilterToggle={(val) => this.setState({ filtersOpen: val })}
-              filtersOpen={this.state.filtersOpen}
-            />
-          )}
-        />
-        <Container>
-          <Filter
-            animated={animated}
-            className={`mt-filters-panel ${this.state.filtersOpen ? 'open' : 'closed'}`}
-            filtersOpen={this.state.filtersOpen}
-          >
-            <div>
-              <h3>Sort Order:</h3>
-              <div
-                ref={(e) => (this._sortElm = e)}
-                onClick={(e) => this.setState({ sortByOpen: true })}
-                className="mt-filter-sortby"
-              >
-                {this.state.sortBy}
-              </div>
-              <Menu
-                anchorEl={this._sortElm || undefined}
-                open={this.state.sortByOpen}
-                transitionDuration={animated ? 'auto' : 0}
-                onClose={(e) => this.setState({ sortByOpen: false })}
-              >
-                <MenuItem className="mt-filter-sortby-created" onClick={(e) => this.onSortByChange('created')}>
-                  Created
-                </MenuItem>
-                <MenuItem className="mt-filter-sortby-updated" onClick={(e) => this.onSortByChange('updated')}>
-                  Updated
-                </MenuItem>
-              </Menu>
-              <IconButton
-                style={{
-                  cursor: 'pointer',
-                  margin: '0 0 0 5px',
-                  verticalAlign: 'middle',
-                  height: '20px',
-                  width: '20px',
-                }}
-                className="mt-sort-order"
-                ref={(e) => (this._sortElm = e)}
-                onClick={(e) => this.onAscChange()}
-              >
-                {this.state.sortAscending ? (
-                  <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
-                ) : (
-                  <ArrowUpIcon style={{ padding: 0, height: '20px', width: '20px' }} />
-                )}
-              </IconButton>
+  return (
+    <div className="mt-comments-container">
+      <ContentHeader
+        title="Comments"
+        busy={isBusy}
+        renderFilters={() => (
+          <FilterBar
+            onSearch={(term) => onSearch(term)}
+            commentsSelected={false}
+            isAdminUser={isAdmin ? false : true}
+            onFilterToggle={(val) => setFiltersOpen(val)}
+            filtersOpen={filtersOpen}
+          />
+        )}
+      />
+      <Container>
+        <Filter
+          animated={animated}
+          className={`mt-filters-panel ${filtersOpen ? 'open' : 'closed'}`}
+          filtersOpen={filtersOpen}
+        >
+          <div>
+            <h3>Sort Order:</h3>
+            <div ref={(e) => (_sortElm = e)} onClick={(e) => setSortByOpen(true)} className="mt-filter-sortby">
+              {sortBy}
             </div>
+            <Menu
+              anchorEl={_sortElm || undefined}
+              open={sortByOpen}
+              transitionDuration={animated ? 'auto' : 0}
+              onClose={(e) => setSortByOpen(false)}
+            >
+              <MenuItem className="mt-filter-sortby-created" onClick={(e) => onSortByChange('created')}>
+                Created
+              </MenuItem>
+              <MenuItem className="mt-filter-sortby-updated" onClick={(e) => onSortByChange('updated')}>
+                Updated
+              </MenuItem>
+            </Menu>
+            <IconButton
+              style={{
+                cursor: 'pointer',
+                margin: '0 0 0 5px',
+                verticalAlign: 'middle',
+                height: '20px',
+                width: '20px',
+              }}
+              className="mt-sort-order"
+              ref={(e) => (_sortElm = e)}
+              onClick={(e) => onAscChange()}
+            >
+              {sortAscending ? (
+                <ArrowDownIcon style={{ padding: 0, height: '20px', width: '20px' }} />
+              ) : (
+                <ArrowUpIcon style={{ padding: 0, height: '20px', width: '20px' }} />
+              )}
+            </IconButton>
+          </div>
+          <div>
+            <h3>Filter User:</h3>
+            <UserPicker user={user} imageSize={26} labelPosition="right" onChange={(user) => onUserChange(user)} />
+          </div>
+        </Filter>
+        <div style={{ height: filtersOpen ? `calc(100% - ${filterSize}px)` : '100%' }}>
+          <div className="mt-comment-list-container">
             <div>
-              <h3>Filter User:</h3>
-              <UserPicker
-                user={this.state.user}
-                imageSize={26}
-                labelPosition="right"
-                onChange={(user) => this.onUserChange(user)}
+              <CommentsList
+                auth={authUser!}
+                style={{ padding: '20px' }}
+                heightFromContents={false}
+                selectedUids={selectedUid ? [selectedUid] : undefined}
+                onCommentSelected={(comment) => {
+                  if (comment) {
+                    setSelectedUid(comment._id as string);
+                    setSelectedPostUid(typeof comment.post === 'string' ? comment.post : (comment.post._id as string));
+                  } else {
+                    setSelectedUid(null);
+                    setSelectedPostUid(null);
+                  }
+                }}
+                getAll={(options) => dispatch(commentActions.getComments(options))}
+                onEdit={(token) => dispatch(commentActions.editComment(token))}
+                onReply={(post, parent, comment) => dispatch(commentActions.createComment(post, comment, parent))}
+                onDelete={(id) => dispatch(commentActions.deleteComment(id))}
+                loading={isBusy}
+                page={page}
               />
             </div>
-          </Filter>
-          <div style={{ height: this.state.filtersOpen ? `calc(100% - ${filterSize}px)` : '100%' }}>
-            <div className="mt-comment-list-container">
+            {selectedPost ? (
               <div>
-                <CommentsList
-                  auth={this.props.user!}
-                  style={{ padding: '20px' }}
-                  heightFromContents={false}
-                  selectedUids={this.state.selectedUid ? [this.state.selectedUid] : undefined}
-                  onCommentSelected={(comment) => {
-                    if (comment) {
-                      this.setState({
-                        selectedUid: comment._id as string,
-                        selectedPostUid: typeof comment.post === 'string' ? comment.post : (comment.post._id as string),
-                      });
-                    } else {
-                      this.setState({
-                        selectedUid: null,
-                        selectedPostUid: null,
-                      });
-                    }
-                  }}
-                  getAll={(options) => this.props.getAll(options)}
-                  onEdit={(token) => this.props.editComment(token)}
-                  onReply={(post, parent, comment) => this.props.createComment(post, comment, parent)}
-                  onDelete={(id) => this.props.deleteComment(id)}
-                  loading={isBusy}
-                  page={page}
-                />
+                <PostPreview post={selectedPost} loading={false} />
               </div>
-              {selectedPost ? (
-                <div>
-                  <PostPreview post={selectedPost} loading={false} />
-                </div>
-              ) : undefined}
-            </div>
+            ) : undefined}
           </div>
-        </Container>
-      </div>
-    );
-  }
-}
+        </div>
+      </Container>
+    </div>
+  );
+};
+
+export default Comments;
 
 interface FilterProps extends React.HTMLProps<HTMLDivElement> {
   filtersOpen: boolean;

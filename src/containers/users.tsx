@@ -1,10 +1,13 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { User } from 'mantle';
 import { IRootState } from '../store';
 import theme from '../theme/mui-theme';
-import { getUsers, removeUser, update, create } from '../store/users/actions';
-import AdminActions from '../store/admin-actions/actions';
-import { connectWrapper, returntypeof } from '../utils/decorators';
+import { create, getUsers, removeUser, update } from '../store/users/actions';
+import { State as UsersState } from '../store/users/reducer';
+import { State as AuthState } from '../store/authentication/reducer';
+import { State as AppState } from '../store/app/reducer';
+import adminActions from '../store/admin-actions/actions';
 import UsersList from '../components/users/users-list';
 import ContentHeader from '../components/content-header';
 import Pager from '../components/pager';
@@ -22,73 +25,39 @@ import AddIcon from '@material-ui/icons/Add';
 import { default as styled } from '../theme/styled';
 import NewUserForm from '../components/users/new-user-form';
 import FontCancel from '@material-ui/icons/ArrowBack';
-
-// Map state to props
-const mapStateToProps = (state: IRootState, ownProps: any) => ({
-  userState: state.users,
-  auth: state.authentication,
-  admin: state.admin,
-  app: state.app,
-});
-
-// Map actions to props (This binds the actions to the dispatch fucntion)
-const dispatchToProps = {
-  getUsers: getUsers,
-  requestPasswordReset: AdminActions.requestPasswordReset,
-  activate: AdminActions.activate,
-  removeUser: removeUser,
-  resendActivation: AdminActions.resendActivation,
-  update,
-  create,
-};
-
-const stateProps = returntypeof(mapStateToProps);
-type Props = typeof stateProps & typeof dispatchToProps;
-type State = {
-  selectedUids: string[];
-  userFilter: string;
-  dialogue: null | string;
-  dialogueHeader: string;
-  dialogueConfirmBtn: string;
-  newUserForm: boolean;
-};
+import { useSelector, useDispatch } from 'react-redux';
 
 /**
  * The main application entry point
  */
-@connectWrapper(mapStateToProps, dispatchToProps)
-export class Users extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      selectedUids: [],
-      userFilter: '',
-      newUserForm: false,
-      dialogueHeader: '',
-      dialogue: null,
-      dialogueConfirmBtn: 'Ok',
-    };
-  }
+const Users: React.FC<void> = (props) => {
+  const [selectedUids, setSelectedUids] = useState<string[]>([]);
+  const [userFilter, setUserFilter] = useState('');
+  const [dialogue, setDialogue] = useState<null | string>(null);
+  const [dialogueHeader, setDialogueHeader] = useState('');
+  const [dialogueConfirmBtn, setDialogueConfirmBtn] = useState('Ok');
+  const [newUserForm, setNewUserForm] = useState(false);
+  const dispatch = useDispatch();
+  const userState = useSelector<IRootState, UsersState>((state) => state.users);
+  const auth = useSelector<IRootState, AuthState>((state) => state.authentication);
+  const app = useSelector<IRootState, AppState>((state) => state.app);
 
-  componentDidMount() {
-    this.props.getUsers();
-  }
+  useEffect(() => {
+    dispatch(getUsers());
+  }, [dispatch]);
 
-  componentWillReceiveProps(next: Props) {}
-
-  private onUserSelected(user: User, e: React.MouseEvent<HTMLDivElement>) {
+  const onUserSelected = (user: User, e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!e.ctrlKey && !e.shiftKey) {
-      this.setState({ selectedUids: [user._id as string] });
+      setSelectedUids([user._id as string]);
     } else if (e.ctrlKey) {
-      if (this.state.selectedUids.indexOf(user._id as string) === -1)
-        this.setState({ selectedUids: this.state.selectedUids.concat(user._id as string) });
-      else this.setState({ selectedUids: this.state.selectedUids.filter((i) => i !== user._id) });
+      if (selectedUids.indexOf(user._id as string) === -1) setSelectedUids(selectedUids.concat(user._id as string));
+      else setSelectedUids(selectedUids.filter((i) => i !== user._id));
     } else {
-      const userPage = this.props.userState.userPage!;
-      const selected = this.state.selectedUids;
+      const userPage = userState.userPage!;
+      const selected = selectedUids;
 
       let firstIndex = Math.min(
         userPage.data.indexOf(user),
@@ -99,19 +68,19 @@ export class Users extends React.Component<Props, State> {
         selected.length > 0 ? userPage.data.findIndex((u) => u._id === selected[0]) : 0
       );
 
-      this.setState({ selectedUids: userPage.data.slice(firstIndex, lastIndex + 1).map((u) => u._id as string) });
+      setSelectedUids(userPage.data.slice(firstIndex, lastIndex + 1).map((u) => u._id as string));
     }
-  }
+  };
 
-  renderModal(onConfirm: () => void) {
+  const renderModal = (onConfirm: () => void) => {
     return (
       <Dialog className="mt-users-modal" open={true}>
-        <DialogTitle>{this.state.dialogueHeader}</DialogTitle>
+        <DialogTitle>{dialogueHeader}</DialogTitle>
         <DialogContent>
-          <DialogContentText className="mt-modal-message">{this.state.dialogue}</DialogContentText>
+          <DialogContentText className="mt-modal-message">{dialogue}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button className="mt-cancel" variant="contained" onClick={(e) => this.setState({ dialogue: null })}>
+          <Button className="mt-cancel" variant="contained" onClick={(e) => setDialogue(null)}>
             Cancel
           </Button>
           <Button
@@ -119,21 +88,21 @@ export class Users extends React.Component<Props, State> {
             className="mt-confirm"
             style={{ background: theme.error.background, color: theme.error.color }}
             onClick={(e) => {
-              this.setState({ dialogue: null });
+              setDialogue(null);
               onConfirm();
             }}
           >
-            {this.state.dialogueConfirmBtn}
+            {dialogueConfirmBtn}
           </Button>
         </DialogActions>
       </Dialog>
     );
-  }
+  };
 
-  private renderUserList(selected: User | null) {
-    const animated = this.props.app.debugMode ? false : true;
-    const page = typeof this.props.userState.userPage! === 'string' ? null : this.props.userState.userPage!;
-    const isBusy = this.props.userState.busy;
+  const renderUserList = (selected: User | null) => {
+    const animated = app.debugMode ? false : true;
+    const page = typeof userState.userPage! === 'string' ? null : userState.userPage!;
+    const isBusy = userState.busy;
 
     return (
       <SplitPanel animated={animated}>
@@ -142,15 +111,15 @@ export class Users extends React.Component<Props, State> {
             <Pager
               limit={page.limit}
               loading={isBusy}
-              onPage={(index) => this.props.getUsers(index)}
+              onPage={(index) => dispatch(getUsers(index))}
               index={page.index}
               total={page.count}
-              contentProps={{ onMouseDown: (e) => this.setState({ selectedUids: [] }) }}
+              contentProps={{ onMouseDown: (e) => setSelectedUids([]) }}
             >
               <UsersList
                 users={page.data}
-                selected={this.state.selectedUids}
-                onUserSelected={(user, e) => this.onUserSelected(user, e)}
+                selected={selectedUids}
+                onUserSelected={(user, e) => onUserSelected(user, e)}
               />
             </Pager>
           ) : undefined}
@@ -169,23 +138,23 @@ export class Users extends React.Component<Props, State> {
             <UserProperties
               animated={animated}
               resetPasswordRequest={(username) => {
-                this.props.requestPasswordReset(username);
+                dispatch(adminActions.requestPasswordReset(username));
               }}
               activateAccount={(username) => {
-                this.props.activate(username);
+                dispatch(adminActions.activate(username));
               }}
               resendActivation={(username) => {
-                this.props.resendActivation(username);
+                dispatch(adminActions.resendActivation(username));
               }}
-              updateUserAvatar={(userId, file) => this.props.update(userId, { avatarFile: file._id })}
-              activeUser={this.props.auth.user!}
-              updateUserDetails={(user) => this.props.update(user._id! as string, user)}
+              updateUserAvatar={(userId, file) => dispatch(update(userId, { avatarFile: file._id }))}
+              activeUser={auth.user!}
+              updateUserDetails={(user) => dispatch(update(user._id! as string, user))}
               onDeleteRequested={(user) => {
-                this.setState({
-                  dialogueHeader: 'Remove User',
-                  dialogue: `Are you sure you want to remove the user '${user.username}', this action is irreversible?`,
-                  dialogueConfirmBtn: `I Understand, Remove User`,
-                });
+                setDialogue(
+                  `Are you sure you want to remove the user '${user.username}', this action is irreversible?`
+                );
+                setDialogueHeader('Remove User');
+                setDialogueConfirmBtn(`I Understand, Remove User`);
               }}
               selected={selected}
             />
@@ -193,11 +162,11 @@ export class Users extends React.Component<Props, State> {
         ) : undefined}
       </SplitPanel>
     );
-  }
+  };
 
-  private renderListHeader() {
-    const isAdmin = this.props.auth.user && this.props.auth.user.privileges !== 'regular' ? true : false;
-    const isBusy = this.props.userState.busy;
+  const renderListHeader = () => {
+    const isAdmin = auth.user && auth.user.privileges !== 'regular' ? true : false;
+    const isBusy = userState.busy;
 
     return (
       <div>
@@ -206,22 +175,20 @@ export class Users extends React.Component<Props, State> {
           style={{ verticalAlign: 'middle' }}
           placeholder="Filter username or email"
           id="mt-users-filter"
-          value={this.state.userFilter}
+          value={userFilter}
           onKeyDown={(e) => {
             if (e.keyCode === 13) {
-              this.setState({ selectedUids: [] }, () => {
-                this.props.getUsers(0, this.state.userFilter);
-              });
+              setSelectedUids([]);
+              getUsers(0, userFilter);
             }
           }}
-          onChange={(e) => this.setState({ userFilter: e.currentTarget.value })}
+          onChange={(e) => setUserFilter(e.currentTarget.value)}
         />
         <IconButton
           id="mt-users-search-button"
           onClick={(e) => {
-            this.setState({ selectedUids: [] }, () => {
-              this.props.getUsers(0, this.state.userFilter);
-            });
+            setSelectedUids([]);
+            dispatch(getUsers(0, userFilter));
           }}
           style={{ verticalAlign: 'middle' }}
         >
@@ -230,7 +197,7 @@ export class Users extends React.Component<Props, State> {
         {isAdmin ? (
           <Button
             variant="contained"
-            onClick={(e) => this.setState({ newUserForm: true })}
+            onClick={(e) => setNewUserForm(true)}
             id="mt-add-user"
             disabled={isBusy}
             color="primary"
@@ -241,58 +208,53 @@ export class Users extends React.Component<Props, State> {
         ) : undefined}
       </div>
     );
-  }
+  };
 
-  private renderFormHeader() {
+  const renderFormHeader = () => {
     return (
       <div>
-        <Button
-          style={{ margin: '5px 0 0 0' }}
-          onClick={(e) => this.setState({ newUserForm: false })}
-          id="mt-cancel-new-user"
-        >
+        <Button style={{ margin: '5px 0 0 0' }} onClick={(e) => setNewUserForm(false)} id="mt-cancel-new-user">
           <FontCancel />
           Back
         </Button>
       </div>
     );
-  }
+  };
 
-  render() {
-    const isBusy = this.props.userState.busy;
-    const selectedUids = this.state.selectedUids;
-    const selected =
-      selectedUids.length > 0
-        ? this.props.userState.userPage!.data.find((u) => u._id === selectedUids[selectedUids.length - 1]) || null
-        : null;
+  const isBusy = userState.busy;
+  const selected =
+    selectedUids.length > 0
+      ? userState.userPage!.data.find((u) => u._id === selectedUids[selectedUids.length - 1]) || null
+      : null;
 
-    return (
-      <div style={{ height: '100%' }}>
-        <ContentHeader
-          title="Users"
-          busy={isBusy}
-          renderFilters={() => (this.state.newUserForm ? this.renderFormHeader() : this.renderListHeader())}
+  return (
+    <div style={{ height: '100%' }}>
+      <ContentHeader
+        title="Users"
+        busy={isBusy}
+        renderFilters={() => (newUserForm ? renderFormHeader() : renderListHeader())}
+      />
+
+      {newUserForm ? (
+        <NewUserForm
+          serverError={'There was an error babe'}
+          onUserCreated={(newUser) => dispatch(create(newUser, () => setNewUserForm(false)))}
+          onCancel={() => setNewUserForm(false)}
         />
+      ) : (
+        renderUserList(selected)
+      )}
 
-        {this.state.newUserForm ? (
-          <NewUserForm
-            serverError={'There was an error babe'}
-            onUserCreated={(newUser) => this.props.create(newUser, () => this.setState({ newUserForm: false }))}
-            onCancel={() => this.setState({ newUserForm: false })}
-          />
-        ) : (
-          this.renderUserList(selected)
-        )}
+      {dialogue
+        ? renderModal(() => {
+            dispatch(removeUser(selected!.username));
+          })
+        : undefined}
+    </div>
+  );
+};
 
-        {this.state.dialogue
-          ? this.renderModal(() => {
-              this.props.removeUser(selected!.username);
-            })
-          : undefined}
-      </div>
-    );
-  }
-}
+export default Users;
 
 interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
   animated: boolean;

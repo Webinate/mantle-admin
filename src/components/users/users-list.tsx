@@ -3,7 +3,7 @@ import { User } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
-import * as format from 'date-fns/format';
+import format from 'date-fns/format';
 import { generateAvatarPic } from '../../utils/component-utils';
 
 type Props = {
@@ -35,10 +35,10 @@ export default class UsersList extends React.Component<Props, any> {
                 </div>
                 <div className="mt-user-email">{user.email}</div>
                 <div>
-                  <i>Joined: {format(new Date(user.createdOn), 'MMMM Do, YYYY')}</i>
+                  <i>Joined: {format(new Date(user.createdOn), 'MMMM Do, yyyy')}</i>
                 </div>
                 <div>
-                  <i>Last Active: {format(new Date(user.lastLoggedIn), 'MMMM Do, YYYY')}</i>
+                  <i>Last Active: {format(new Date(user.lastLoggedIn), 'MMMM Do, yyyy')}</i>
                 </div>
               </Details>
             </UserDiv>

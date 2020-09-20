@@ -20,7 +20,7 @@ class Actions {
   @dispatchError(AppActionCreators.serverResponse)
   async requestPasswordReset(username: string, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.busy.create(true));
-    const resp = await graphql<boolean>(REQUEST_PASSWORD_RESET, { username });
+    const resp = await graphql<{ requestPasswordReset: boolean }>(REQUEST_PASSWORD_RESET, { username });
     // const resp = await auth.requestPasswordReset(username);
     dispatch!(
       AppActionCreators.serverResponse.create(
@@ -34,7 +34,7 @@ class Actions {
   async activate(username: string, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.busy.create(true));
     // await auth.approveActivation(username);
-    await graphql<boolean>(APPROVE_ACTIVATION, { username });
+    await graphql<{ approveActivation: boolean }>(APPROVE_ACTIVATION, { username });
     dispatch!(ActionCreators.userActivated.create(username));
     dispatch!(AppActionCreators.serverResponse.create('User successfully activated'));
   }
@@ -43,7 +43,7 @@ class Actions {
   @dispatchError(AppActionCreators.serverResponse)
   async resendActivation(username: string, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.busy.create(true));
-    const resp = await graphql<boolean>(RESEND_ACTIVATION, { username });
+    const resp = await graphql<{ resendActivation: boolean }>(RESEND_ACTIVATION, { username });
     // const resp = await auth.resendActivation(username);
     dispatch!(ActionCreators.busy.create(false));
     dispatch!(

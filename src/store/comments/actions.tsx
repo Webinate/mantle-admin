@@ -39,10 +39,10 @@ class Actions {
 
     // let resp: Page<IComment<'client' | 'expanded'>>;
 
-    const resp = await graphql<PaginatedCommentsResponse>(GET_COMMENTS, newFilters);
+    const resp = await graphql<{ comments: PaginatedCommentsResponse }>(GET_COMMENTS, newFilters);
     // resp = await comments.getAll(newFilters);
 
-    dispatch!(ActionCreators.SetComments.create({ page: resp, filters: newFilters }));
+    dispatch!(ActionCreators.SetComments.create({ page: resp.comments, filters: newFilters }));
   }
 
   @disptachable()
@@ -55,7 +55,7 @@ class Actions {
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
-    await graphql<Comment>(ADD_COMMENT, { token: comment });
+    await graphql<{ addComment: Comment }>(ADD_COMMENT, { token: comment });
     // await comments.create(postId, comment, parent);
     dispatch!(this.getComments({}));
   }
@@ -64,7 +64,7 @@ class Actions {
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async editComment(token: Partial<UpdateCommentInput>, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
-    await graphql<Comment>(PATCH_COMMENT, { token: token });
+    await graphql<{ patchComment: Comment }>(PATCH_COMMENT, { token: token });
     // await comments.update(commentId, token);
     dispatch!(this.getComments({}));
   }
@@ -73,7 +73,7 @@ class Actions {
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async deleteComment(commentId: string, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCommentsBusy.create(true));
-    await graphql<Comment>(REMOVE_COMMENT, { id: commentId });
+    await graphql<{ removeComment: Comment }>(REMOVE_COMMENT, { id: commentId });
     // await comments.remove(commentId);
     dispatch!(this.getComments({}));
   }
