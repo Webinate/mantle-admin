@@ -3,7 +3,7 @@ import { User } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { default as styled } from '../../theme/styled';
 import { default as theme } from '../../theme/mui-theme';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { generateAvatarPic } from '../../utils/component-utils';
 
 type Props = {

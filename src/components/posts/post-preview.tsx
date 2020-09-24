@@ -4,7 +4,7 @@ import { Post } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic } from '../../utils/component-utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import theme from '../../theme/mui-theme';
 
 export type Props = {

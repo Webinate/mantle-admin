@@ -9,7 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { default as styled } from '../../theme/styled';
 import theme from '../../theme/mui-theme';
 import { Volume, File, PaginatedFilesResponse, SortOrder, FileSortType, QueryFilesArgs } from 'mantle';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import Pager from '../pager';
 import { formatBytes } from '../../utils/component-utils';
 

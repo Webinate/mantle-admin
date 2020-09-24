@@ -12,7 +12,7 @@ import { default as styled } from '../../theme/styled';
 import Avatar from '@material-ui/core/Avatar';
 import { generateAvatarPic, isAdminUser } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog/Dialog';
 import DialogContentText from '@material-ui/core/DialogContentText/DialogContentText';

@@ -1,15 +1,5 @@
+import { ClientError } from './client-error';
 export const apiUrl = '/api';
-
-export class ClientError extends Error {
-  public response: Response;
-  public code: number;
-
-  constructor(message: string, code: number, response: Response) {
-    super(message);
-    this.response = response;
-    this.code = code;
-  }
-}
 
 export async function getJson<T>(url: string) {
   const resp = await get(url);

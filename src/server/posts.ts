@@ -20,8 +20,11 @@ import { PaginatedCommentsResponse } from '../../../../src/graphql/models/commen
 import { PaginatedTemplateResponse } from '../../../../src/graphql/models/template-type';
 import { PaginatedPostsResponse } from '../../../../src/graphql/models/post-type';
 import { Post } from '../../../../src/graphql/models/post-type';
+import { graphql } from '../utils/nodeClients';
+import { GET_POST } from '../graphql/requests/post-requests';
+import { Request } from 'express';
 
-export default async function (url: string, user: User | null, actions: Action[]) {
+export default async function (url: string, user: User | null, actions: Action[], request: Request, host: string) {
   const isAdmin = user && user.privileges !== 'regular' ? true : false;
   const matchesEdit = matchPath<any>(url, { path: '/dashboard/posts/edit/:id' });
   const initialCategoryFilter: Partial<CategoriesGetOptions> = {
@@ -41,17 +44,18 @@ export default async function (url: string, user: User | null, actions: Action[]
 
   if (matchesEdit) {
     const postReply = await Promise.all([
-      ControllerFactory.get('posts').getPost({ id: matchesEdit.params.id }),
+      graphql<{ post: Post }>(host, GET_POST, { id: matchesEdit.params.id }, request.headers),
+      // ControllerFactory.get('posts').getPost({ id: matchesEdit.params.id }),
       ControllerFactory.get('categories').getAll(initialCategoryFilter),
       ControllerFactory.get('comments').getAll(initialCommentFilter),
       ControllerFactory.get('templates').getMany(),
     ]);
 
-    const post = postReply[0];
+    const post = postReply[0].post;
 
     if (!isAdmin && !post.public) throw new RedirectError('/dashboard/posts');
 
-    actions.push(PostActions.SetPost.create(Post.fromEntity(post)));
+    actions.push(PostActions.SetPost.create(post));
     actions.push(CategoryActions.SetCategories.create(PaginatedCategoryResponse.fromEntity(postReply[1])));
     actions.push(
       CommentActions.SetComments.create({

@@ -30,7 +30,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import ArrowForwardIcon from '@material-ui/icons/ChevronRight';
 import { Post } from 'mantle';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { createPost } from '../store/posts/actions';
 import { randomId } from '../utils/misc';
 

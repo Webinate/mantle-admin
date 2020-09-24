@@ -20,6 +20,7 @@ import Theme from './theme/mui-theme';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import * as DateFnsUtils from '@date-io/date-fns';
 import { User as UserModel } from '../../../src/graphql/models/user-type';
+import { IServer } from '../../../src/types/config/properties/i-client';
 import { User } from 'mantle';
 
 // Needed for onTouchTap
@@ -32,8 +33,11 @@ import { IClient } from '../../../src/types/config/properties/i-client';
  * The default entry point for the admin server
  */
 export default class MainController extends Router {
+  client: IClient;
+
   constructor(client: IClient) {
     super();
+    this.client = client;
   }
 
   async initialize(app: express.Express, db: Db) {
@@ -76,10 +80,16 @@ export default class MainController extends Router {
     const muiAgent = req.headers['user-agent'];
     const store = createStore(initialState, history);
     const theme = createMuiTheme(Theme);
+    const server = this.client.server as IServer;
 
     let actions: Action[];
     try {
-      actions = await hydrate(req.url, user ? (UserModel.fromEntity(user) as User) : null);
+      actions = await hydrate(
+        req.url,
+        user ? (UserModel.fromEntity(user) as User) : null,
+        req,
+        `${server.ssl ? 'https://' : 'http://'}${server.host}:${server.port}`
+      );
     } catch (err) {
       if (err instanceof RedirectError) return res.redirect(err.redirect);
 

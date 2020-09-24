@@ -70,7 +70,7 @@
     "history": "~4.6.3",
     "immutable": "^3.8.2",
     "mantle": "file:..\\..",
-    "node-fetch": "^1.7.3",
+    "node-fetch": "2.6.1",
     "prettier": "2.0.5",
     "react": "16.13.1",
     "react-dom": "16.13.1",

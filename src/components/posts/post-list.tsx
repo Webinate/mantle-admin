@@ -5,7 +5,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
 import Pager from '../pager';
 import { Post, User, PaginatedPostsResponse, PostVisibility, PostSortType, QueryPostsArgs } from 'mantle';
-import format from 'date-fns/format';
+import { format } from 'date-fns';
 import { default as styled } from '../../theme/styled';
 import { generateAvatarPic } from '../../utils/component-utils';
 import theme from '../../theme/mui-theme';

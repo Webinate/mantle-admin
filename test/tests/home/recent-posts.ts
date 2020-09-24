@@ -6,7 +6,7 @@ import Agent from '../../utils/agent';
 import utils from '../../utils';
 import ControllerFactory from 'mantle/src/core/controller-factory';
 import { randomId } from '../../utils/misc';
-import * as format from 'date-fns/format';
+import { format } from 'date-fns';
 
 let page = new HomePage();
 let admin: Agent, joe: Agent;

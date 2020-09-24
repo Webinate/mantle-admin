@@ -1,4 +1,4 @@
-import { ClientError } from '../utils/httpClients';
+import { ClientError } from '../utils/client-error';
 import { ActionCreator } from '../store/actions-creator';
 
 /**
