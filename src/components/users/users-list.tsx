@@ -35,10 +35,10 @@ export default class UsersList extends React.Component<Props, any> {
                 </div>
                 <div className="mt-user-email">{user.email}</div>
                 <div>
-                  <i>Joined: {format(new Date(user.createdOn), 'MMMM Do, yyyy')}</i>
+                  <i>Joined: {format(new Date(user.createdOn), 'MMMM do, yyyy')}</i>
                 </div>
                 <div>
-                  <i>Last Active: {format(new Date(user.lastLoggedIn), 'MMMM Do, yyyy')}</i>
+                  <i>Last Active: {format(new Date(user.lastLoggedIn), 'MMMM do, yyyy')}</i>
                 </div>
               </Details>
             </UserDiv>

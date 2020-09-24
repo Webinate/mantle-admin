@@ -190,7 +190,7 @@ export class Volumes extends React.Component<Props, State> {
                       {formatBytes(volume.memoryUsed!)} / {formatBytes(volume.memoryAllocated!)}
                     </TableCell>
                     <TableCell className="mt-volume-created">
-                      {format(new Date(volume.created!), 'MMM Do, yyyy')}
+                      {format(new Date(volume.created!), 'MMM do, yyyy')}
                     </TableCell>
                   </TableRow>
                 );

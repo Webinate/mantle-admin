@@ -66,7 +66,7 @@ export class CommentsList extends React.Component<Props, State> {
   componentDidMount() {
     this.props.getAll({
       index: 0,
-      postId: '',
+      postId: undefined,
     });
   }
 
@@ -112,7 +112,9 @@ export class CommentsList extends React.Component<Props, State> {
   private flattenComments(comment: Comment, flat: Comment[]) {
     flat.push(comment);
 
-    for (const child of comment.children) this.flattenComments(child as Comment, flat);
+    if (comment.children) {
+      for (const child of comment.children) this.flattenComments(child as Comment, flat);
+    }
   }
 
   render() {
@@ -211,7 +213,7 @@ export class CommentsList extends React.Component<Props, State> {
 
                           if (this.state.activeCommentText.trim() === '') return;
 
-                          this.props.onEdit({ content: this.state.activeCommentText });
+                          this.props.onEdit({ content: this.state.activeCommentText, _id: this.state.activeCommentId });
                           this.setState({ activeCommentId: '' });
                         }}
                       >
@@ -255,7 +257,7 @@ export class CommentsList extends React.Component<Props, State> {
                         Reply
                       </span>
                       <span className="mt-comment-date">
-                        {format(new Date(comment.lastUpdated), 'MMMM Do YYYY [at] H:m')}
+                        {format(new Date(comment.lastUpdated), `MMMM do yyyy 'at' H:m`)}
                       </span>
                     </div>
                   )}
@@ -268,6 +270,7 @@ export class CommentsList extends React.Component<Props, State> {
                         const postId = typeof comment.post === 'string' ? comment.post : comment.post._id;
                         this.props.onReply(postId as string, comment._id as string, {
                           content: text,
+                          post: postId,
                         });
                         this.setState({ commentToReplyId: '' });
                       }}

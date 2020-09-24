@@ -14,7 +14,7 @@ require('ts-node').register({
 
 const browserSync = require('browser-sync').create();
 const fs = require('fs');
-const startup = require('../../src/core/initialization/startup');
+// const startup = require('../../src/core/initialization/startup');
 const webpack = require('webpack');
 
 // Get the server details
@@ -22,7 +22,7 @@ const mantleJson = JSON.parse(fs.readFileSync('./clients/mantle-admin/mantle.jso
 
 async function start() {
   // Initialize the server
-  await startup.initialize();
+  // await startup.initialize();
 
   browserSync.init({
     proxy: 'localhost:' + mantleJson.server.port,

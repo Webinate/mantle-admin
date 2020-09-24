@@ -86,6 +86,7 @@ const postToEditable = (post: Partial<Post>) => {
     public: post.public,
     tags: post.tags,
     featuredImage: post.featuredImage?._id,
+    createdOn: post.createdOn,
   } as UpdatePostInput;
 };
 
@@ -222,10 +223,10 @@ const PostForm: React.FC<Props> = (props) => {
                       }
                     />
                   ) : undefined}
-                  <span id="mt-post-created-date">{format(new Date(editable.createdOn!), 'MMM Do, yyyy')}</span>
+                  <span id="mt-post-created-date">{format(new Date(editable.createdOn!), 'MMM do, yyyy')}</span>
                 </div>
                 <div>Updated: </div>
-                <div id="mt-post-updated-date">{format(new Date(props.post.lastUpdated!), 'MMM Do, yyyy')}</div>
+                <div id="mt-post-updated-date">{format(new Date(props.post.lastUpdated!), 'MMM do, yyyy')}</div>
               </Dates>
             ) : undefined}
           </div>

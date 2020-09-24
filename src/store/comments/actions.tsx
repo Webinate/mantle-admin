@@ -25,12 +25,7 @@ class Actions {
    * Gets all the comments
    */
   @disptachable()
-  async getComments(
-    options: Partial<QueryCommentsArgs>,
-    postId?: string,
-    dispatch?: Function,
-    getState?: () => IRootState
-  ) {
+  async getComments(options: Partial<QueryCommentsArgs>, dispatch?: Function, getState?: () => IRootState) {
     const state = getState!();
     const newFilters = { ...state.comments.commentFilters, ...options };
 
@@ -48,7 +43,6 @@ class Actions {
   @disptachable()
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async createComment(
-    postId: string,
     comment: Partial<AddCommentInput>,
     parent?: string,
     dispatch?: Function,

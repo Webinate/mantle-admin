@@ -82,7 +82,7 @@ describe('Latest Post tests: ', function () {
 
     assert.deepEqual(latest.heading, privatePost.title);
     assert.deepEqual(latest.author, privatePost.author ? privatePost.author.username : '');
-    assert.deepEqual(latest.created, format(new Date(), 'MMM Do, yyyy')); // Make sure its today
+    assert.deepEqual(latest.created, format(new Date(), 'MMM do, yyyy')); // Make sure its today
     assert.deepEqual(latest.zones.length, 2);
     assert.deepEqual(latest.zones[0].name, 'left');
     assert.deepEqual(latest.zones[0].content, 'Left');

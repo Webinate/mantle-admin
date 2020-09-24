@@ -4,6 +4,8 @@ import { IRootState } from '..';
 import { disptachable } from '../../decorators/dispatchable';
 import { graphql } from '../../utils/httpClients';
 import { GET_POST, GET_POSTS } from '../../graphql/requests/post-requests';
+import { dispatchError } from '../../decorators/dispatchError';
+import { ActionCreators as AppActions } from '../app/actions';
 
 // Action Creators
 export const ActionCreators = {
@@ -22,6 +24,7 @@ export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 
 class Actions {
   @disptachable()
+  @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async getHomeElements(dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetPostsBusy.create(true));
     // const [postsByCreationDate, postsByModifiedDate] = await Promise.all([

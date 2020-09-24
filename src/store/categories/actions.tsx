@@ -3,7 +3,13 @@ import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { disptachable } from '../../decorators/dispatchable';
 import { dispatchError } from '../../decorators/dispatchError';
-import { PaginatedCategoryResponse, AddCategoryInput, UpdateCategoryInput, Category } from 'mantle';
+import {
+  PaginatedCategoryResponse,
+  QueryCategoriesArgs,
+  AddCategoryInput,
+  UpdateCategoryInput,
+  Category,
+} from 'mantle';
 import { graphql } from '../../utils/httpClients';
 import {
   GET_CATEGORIES,
@@ -25,12 +31,12 @@ export type Action = typeof ActionCreators[keyof typeof ActionCreators];
 
 class Actions {
   @disptachable()
-  async getCategories(index: number = 0, limit?: number, dispatch?: Function, getState?: () => IRootState) {
+  async getCategories(options: Partial<QueryCategoriesArgs>, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
+    options.root = options.root === undefined ? true : options.root;
+
     const resp = await graphql<{ categories: PaginatedCategoryResponse }>(GET_CATEGORIES, {
-      index: index,
-      limit: limit,
-      root: true,
+      ...options,
     });
     dispatch!(ActionCreators.SetCategories.create(resp.categories));
   }
@@ -47,7 +53,7 @@ class Actions {
     const resp = await graphql<{ updateCategory: Category }>(PATCH_CATEGORY, { token: category });
     // const resp = await categories.edit(category._id as string, category);
     dispatch!(AppActions.serverResponse.create(`Category '${resp.updateCategory.title}' updated`));
-    dispatch!(this.getCategories());
+    dispatch!(this.getCategories({}));
 
     if (callback) callback();
   }
@@ -64,7 +70,7 @@ class Actions {
     const resp = await graphql<{ createCategory: Category }>(ADD_CATEGORY, { token: category });
     // const resp = await categories.create(category);
     dispatch!(AppActions.serverResponse.create(`New Category '${resp.createCategory.title}' created`));
-    dispatch!(this.getCategories());
+    dispatch!(this.getCategories({}));
 
     if (callback) callback();
   }
@@ -76,7 +82,7 @@ class Actions {
       await graphql<{ removeCategory: Category }>(REMOVE_CATEGORY, { id: category._id });
       // await categories.remove(category._id);
       dispatch!(AppActions.serverResponse.create(`Category '${category.title}' removed`));
-      dispatch!(this.getCategories());
+      dispatch!(this.getCategories({}));
     } catch (err) {
       dispatch!(AppActions.serverResponse.create(`Error: ${err.message}`));
       dispatch!(ActionCreators.SetCategoriesBusy.create(false));

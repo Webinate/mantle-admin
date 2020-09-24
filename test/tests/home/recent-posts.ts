@@ -53,7 +53,7 @@ describe('Recent Posts: ', function () {
     await page.load(admin);
     const recent = await page.getRecentPosts();
     assert.deepEqual(recent[0].author, publicPost.author.username);
-    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, yyyy')); // Today
+    assert.deepEqual(recent[0].created, format(new Date(), 'MMM do, yyyy')); // Today
     assert.deepEqual(recent[0].heading, publicPost.title);
     assert.deepEqual(recent[1].heading, privatePost.title);
   });
@@ -66,7 +66,7 @@ describe('Recent Posts: ', function () {
 
     const recent = await page.getRecentPosts();
     assert.deepEqual(recent[0].author, publicPost.author.username);
-    assert.deepEqual(recent[0].created, format(new Date(), 'MMM Do, yyyy')); // Today
+    assert.deepEqual(recent[0].created, format(new Date(), 'MMM do, yyyy')); // Today
     assert.deepEqual(recent[0].heading, publicPost.title);
     if (recent.length > 1) assert.notDeepEqual(recent[1].heading, privatePost.title);
   });

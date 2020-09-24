@@ -29,7 +29,7 @@ if (analyze) {
   plugins.push(new BundleAnalyzerPlugin());
 }
 
-console.log('==== BUILDING: ' + process.env.NODE_ENV + ' ====');
+console.log('==== BUILDING: ' + (process.env.NODE_ENV || 'development') + ' ====');
 
 module.exports = {
   mode: isProdBuild ? 'production' : 'development',
@@ -83,5 +83,5 @@ module.exports = {
   resolve: {
     extensions: ['*', '.tsx', '.ts', '.js'],
   },
-  devtool: isProdBuild ? 'source-map' : 'source-map',
+  devtool: isProdBuild ? undefined : 'source-map',
 };

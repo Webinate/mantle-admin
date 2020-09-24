@@ -16,14 +16,14 @@ export function dispatchError<T>(
   action: ActionCreator<T, string | null>,
   options?: { prefix?: string; showSnackbar?: boolean }
 ) {
-  return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value as () => void;
 
-    descriptor.value = function() {
+    descriptor.value = function () {
       const argsArray = Array.from(arguments);
 
       const promise: Promise<any> = originalMethod.apply(this, argsArray);
-      promise.catch(err => {
+      promise.catch((err) => {
         // We assume that this is just after a dispatchable descriptor
         const dispatchFunction = argsArray[argsArray.length - 2];
         const error = err as ClientError;
@@ -32,14 +32,14 @@ export function dispatchError<T>(
         if (error instanceof ClientError) {
           dispatchFunction(
             action.create(
-              options ? options.prefix || '' : '' + decodeURIComponent(error.message || error.response.statusText)
+              (options ? options.prefix || '' : '') + decodeURIComponent(error.message || error.response.statusText)
             )
           );
         }
         // REGULAR ERROR
         else {
           const regError = err as Error;
-          dispatchFunction(action.create(options ? options.prefix || '' : '' + decodeURIComponent(regError.message)));
+          dispatchFunction(action.create((options ? options.prefix || '' : '') + decodeURIComponent(regError.message)));
         }
       });
     };

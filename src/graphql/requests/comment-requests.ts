@@ -81,6 +81,20 @@ export const GET_COMMENTS = gql`
       limit
       data {
         _id
+        author
+        content
+        createdOn
+        lastUpdated
+        public
+        user {
+          _id
+          username
+          avatar
+          avatarFile {
+            _id
+            publicURL
+          }
+        }
       }
     }
   }

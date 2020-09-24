@@ -143,7 +143,7 @@ export default class UserProperties extends React.Component<Props, State> {
                     onChange={(e: Date) => this.setState({ user: { ...this.state.user!, createdOn: e.getTime() } })}
                     fullWidth={true}
                     disabled={isAdmin ? false : true}
-                    format={'MMMM Do, yyyy'}
+                    format={'MMMM do, yyyy'}
                   />
                 </Field>
                 {this.userCanInteract(selected) ? (
@@ -155,7 +155,7 @@ export default class UserProperties extends React.Component<Props, State> {
                       fullWidth={true}
                       value={new Date(selected.lastLoggedIn)}
                       onChange={(e: Date) => {}}
-                      format={'MMMM Do, yyyy'}
+                      format={'MMMM do, yyyy'}
                     />
                   </Field>
                 ) : undefined}

@@ -1,5 +1,4 @@
 import gql from '../../utils/gql';
-import { USER_FRAG } from './user-requests';
 
 export const LOGIN = gql`
   mutation LOGIN($token: LoginInput!) {
@@ -7,12 +6,12 @@ export const LOGIN = gql`
       authenticated
       message
       user {
-        ...UserFields
+        _id
+        username
+        avatar
       }
     }
   }
-
-  ${USER_FRAG}
 `;
 
 export const LOGOUT = gql`
@@ -27,7 +26,8 @@ export const REGISTER = gql`
       authenticated
       message
       user {
-        ...UserFields
+        _id
+        username
       }
     }
   }

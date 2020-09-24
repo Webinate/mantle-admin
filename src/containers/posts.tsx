@@ -61,30 +61,6 @@ const Posts: React.FC<void> = (props) => {
   let location = useLocation();
 
   useEffect(() => {
-    dispatch(getAllTemplates());
-    const inPostsRoot = matchPath(location.pathname, { exact: true, path: '/dashboard/posts' });
-
-    if (inPostsRoot) {
-      dispatch(
-        getPosts({
-          index: 0,
-          sortOrder: posts.postFilters.sortOrder,
-          visibility: posts.postFilters.visibility,
-          author: '',
-          sortType: posts.postFilters.sortType,
-        })
-      );
-    } else {
-      const matches = matchPath<{ postId: string }>(location.pathname, {
-        exact: true,
-        path: '/dashboard/posts/edit/:postId',
-      });
-      dispatch(getPost(matches!.params.postId));
-      dispatch(categoryActions.getCategories());
-    }
-  }, [dispatch, location]);
-
-  useEffect(() => {
     const inPostsRoot = matchPath(location.pathname, { exact: true, path: '/dashboard/posts' });
     setPreviewMode(false);
 
@@ -103,10 +79,35 @@ const Posts: React.FC<void> = (props) => {
         exact: true,
         path: '/dashboard/posts/edit/:postId',
       });
+      dispatch(getAllTemplates());
       dispatch(getPost(matches!.params.postId));
-      dispatch(categoryActions.getCategories());
+      dispatch(categoryActions.getCategories({}));
     }
-  }, [location]);
+  }, [dispatch, location]);
+
+  // useEffect(() => {
+  //   const inPostsRoot = matchPath(location.pathname, { exact: true, path: '/dashboard/posts' });
+  //   setPreviewMode(false);
+
+  //   if (inPostsRoot) {
+  //     dispatch(
+  //       getPosts({
+  //         index: 0,
+  //         sortOrder: posts.postFilters.sortOrder,
+  //         visibility: posts.postFilters.visibility,
+  //         author: '',
+  //         sortType: posts.postFilters.sortType,
+  //       })
+  //     );
+  //   } else {
+  //     const matches = matchPath<{ postId: string }>(location.pathname, {
+  //       exact: true,
+  //       path: '/dashboard/posts/edit/:postId',
+  //     });
+  //     dispatch(getPost(matches!.params.postId));
+  //     dispatch(categoryActions.getCategories());
+  //   }
+  // }, [location]);
 
   const onDeleteMultiple = () => {
     _selectedPost = undefined;
@@ -130,12 +131,12 @@ const Posts: React.FC<void> = (props) => {
         <NewComment
           auth={user!}
           enabled={!comments.busy}
-          onNewComment={(comment) => dispatch(commentActions.createComment(postId, { content: comment }))}
+          onNewComment={(comment) => dispatch(commentActions.createComment({ content: comment, post: postId }))}
         />
         <CommentsList
           page={commentsPage}
           selectable={false}
-          onReply={(post, parent, comment) => dispatch(commentActions.createComment(post, comment, parent))}
+          onReply={(post, parent, comment) => dispatch(commentActions.createComment(comment, parent))}
           auth={user!}
           onEdit={(token) => dispatch(commentActions.editComment(token))}
           loading={comments.busy}

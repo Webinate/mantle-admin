@@ -41,6 +41,8 @@ export const ADD_CATEGORY = gql`
       ...CategoryFields
     }
   }
+
+  ${CATEGORY_FRAG}
 `;
 
 export const REMOVE_CATEGORY = gql`

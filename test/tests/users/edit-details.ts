@@ -57,7 +57,7 @@ describe('Testing the editing of user details: ', function () {
     yesterday.setDate(yesterday.getDate() - 1);
 
     // Assert the joined date was yesterday
-    assert.deepEqual(format(yesterday, 'MMMM Do, yyyy'), await users.getJoinedDate());
+    assert.deepEqual(format(yesterday, 'MMMM do, yyyy'), await users.getJoinedDate());
   });
 
   it('should allow an admin to edit a user email manually', async () => {

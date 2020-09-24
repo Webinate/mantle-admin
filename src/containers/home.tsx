@@ -58,7 +58,7 @@ const Home: React.FC<void> = () => {
           subheader={
             <span>
               By <span className="mt-post-header-author">{post.author ? post.author.username : ''}</span> on{' '}
-              <span className="mt-post-header-date">{format(new Date(post.createdOn), 'MMM Do, yyyy')}</span>
+              <span className="mt-post-header-date">{format(new Date(post.createdOn), 'MMM do, yyyy')}</span>
             </span>
           }
         />
@@ -121,7 +121,7 @@ const Home: React.FC<void> = () => {
                   secondary={
                     <span>
                       By <span className="mt-recent-post-author">{p.author ? p.author.username : ''}</span> on{' '}
-                      <span className="mt-recent-post-date">{format(new Date(p.createdOn), 'MMM Do, yyyy')}</span>
+                      <span className="mt-recent-post-date">{format(new Date(p.createdOn), `MMM do, yyyy`)}</span>
                     </span>
                   }
                 />

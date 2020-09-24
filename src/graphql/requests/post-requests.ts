@@ -39,6 +39,15 @@ export const POST_FRAG = gql`
     title
     tags
     slug
+    author {
+      _id
+      avatar
+      username
+      avatarFile {
+        _id
+        publicURL
+      }
+    }
     latestDraft {
       _id
       createdOn

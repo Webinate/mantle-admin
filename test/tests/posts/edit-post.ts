@@ -55,8 +55,8 @@ describe('View & edit post created by backend: ', function () {
     assert.deepEqual(await postPage.isPublic(), false);
     assert.deepEqual(await postPage.user(), 'Not set ');
     // Check the dates are today
-    assert.deepEqual(await postPage.getCreatedOn(), format(new Date(), 'MMM Do, yyyy'));
-    assert.deepEqual(await postPage.getLastModified(), format(new Date(), 'MMM Do, yyyy'));
+    assert.deepEqual(await postPage.getCreatedOn(), format(new Date(), 'MMM do, yyyy'));
+    assert.deepEqual(await postPage.getLastModified(), format(new Date(), 'MMM do, yyyy'));
   });
 
   it('can update post details', async () => {
@@ -98,6 +98,6 @@ describe('View & edit post created by backend: ', function () {
     await postPage.load(admin, `/dashboard/posts/edit/${post._id}`);
 
     // Check the dates are not equal
-    assert.notDeepEqual(await postPage.getCreatedOn(), format(new Date(), 'MMM Do, yyyy'));
+    assert.notDeepEqual(await postPage.getCreatedOn(), format(new Date(), 'MMM do, yyyy'));
   });
 });

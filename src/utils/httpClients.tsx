@@ -104,5 +104,10 @@ export async function graphql<T>(query: string, variables: any, headers?: any) {
     }),
   });
 
-  return (await resp.json()).data as T;
+  const json = await resp.json();
+  const data = json.data as T;
+  const errors = json.errors as { message: string }[];
+  if (errors && errors.length > 0) throw new ClientError(errors[0].message, 400, resp);
+
+  return data;
 }

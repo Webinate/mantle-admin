@@ -49,7 +49,7 @@ export default class PostPreview extends React.Component<Props, State> {
                   by <span id="mt-preview-author">{post.author.username}</span>
                 </span>
               ) : undefined}
-              <span id="mt-preview-date">{format(new Date(post.lastUpdated), '[at] H:m [on] MMMM Do YYYY')}</span>
+              <span id="mt-preview-date">{format(new Date(post.lastUpdated), `'at' H:m 'on' MMMM do yyyy`)}</span>
             </div>
           </div>
         </div>

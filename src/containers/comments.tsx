@@ -157,7 +157,7 @@ const Comments: React.FC = () => {
                 }}
                 getAll={(options) => dispatch(commentActions.getComments(options))}
                 onEdit={(token) => dispatch(commentActions.editComment(token))}
-                onReply={(post, parent, comment) => dispatch(commentActions.createComment(post, comment, parent))}
+                onReply={(post, parent, comment) => dispatch(commentActions.createComment(comment, parent))}
                 onDelete={(id) => dispatch(commentActions.deleteComment(id))}
                 loading={isBusy}
                 page={page}

@@ -76,13 +76,13 @@ class Actions {
       const promises = filesArr.map((file) => files.create(volumeId, file));
       await Promise.all(promises);
 
-      const filePage = await graphql<PaginatedFilesResponse>(GET_FILES, { volumeId, ...filesFilter });
+      const filePage = await graphql<{ files: PaginatedFilesResponse }>(GET_FILES, { volumeId, ...filesFilter });
       // const filePage = await files.getAll(volumeId, filesFilter);
-      dispatch!(ActionCreators.SetFiles.create({ page: filePage, filters: filesFilter }));
+      dispatch!(ActionCreators.SetFiles.create({ page: filePage.files, filters: filesFilter }));
     } catch (err) {
       // const filePage = await files.getAll(volumeId, filesFilter);
-      const filePage = await graphql<PaginatedFilesResponse>(GET_FILES, { volumeId, ...filesFilter });
-      dispatch!(ActionCreators.SetFiles.create({ page: filePage, filters: filesFilter }));
+      const filePage = await graphql<{ files: PaginatedFilesResponse }>(GET_FILES, { volumeId, ...filesFilter });
+      dispatch!(ActionCreators.SetFiles.create({ page: filePage.files, filters: filesFilter }));
       dispatch!(ActionCreators.SetVolumesBusy.create(false));
       dispatch!(AppActions.serverResponse.create(err.message));
     }
@@ -100,12 +100,12 @@ class Actions {
       await files.replaceFile(fileId, file);
 
       // const filePage = await files.getAll(volumeId, filesFilter);
-      const filePage = await graphql<PaginatedFilesResponse>(GET_FILES, { volumeId, ...filesFilter });
-      dispatch!(ActionCreators.SetFiles.create({ page: filePage, filters: filesFilter }));
+      const filePage = await graphql<{ files: PaginatedFilesResponse }>(GET_FILES, { volumeId, ...filesFilter });
+      dispatch!(ActionCreators.SetFiles.create({ page: filePage.files, filters: filesFilter }));
     } catch (err) {
-      const filePage = await graphql<PaginatedFilesResponse>(GET_FILES, { volumeId, ...filesFilter });
+      const filePage = await graphql<{ files: PaginatedFilesResponse }>(GET_FILES, { volumeId, ...filesFilter });
       // const filePage = await files.getAll(volumeId, filesFilter);
-      dispatch!(ActionCreators.SetFiles.create({ page: filePage, filters: filesFilter }));
+      dispatch!(ActionCreators.SetFiles.create({ page: filePage.files, filters: filesFilter }));
       dispatch!(ActionCreators.SetVolumesBusy.create(false));
       dispatch!(AppActions.serverResponse.create(err.message));
     }
@@ -127,9 +127,12 @@ class Actions {
       await Promise.all(promises);
 
       const state = getState!();
-      const resp = await graphql<PaginatedFilesResponse>(GET_FILES, { volumeId, ...state.media.filesFilters });
+      const resp = await graphql<{ files: PaginatedFilesResponse }>(GET_FILES, {
+        volumeId,
+        ...state.media.filesFilters,
+      });
       // const resp = await files.getAll(volumeId, state.media.filesFilters);
-      dispatch!(ActionCreators.SetFiles.create({ page: resp, filters: state.media.filesFilters }));
+      dispatch!(ActionCreators.SetFiles.create({ page: resp.files, filters: state.media.filesFilters }));
     } catch (err) {
       dispatch!(ActionCreators.SetVolumesBusy.create(false));
       dispatch!(AppActions.serverResponse.create(err.message));
@@ -186,11 +189,11 @@ class Actions {
       // const responses = await Promise.all([volumes.getOne(id), files.getAll(id, filesFilter)]);
       const responses = await Promise.all([
         graphql<{ volume: Volume }>(GET_VOLUME, { id }),
-        graphql<PaginatedFilesResponse>(GET_FILES, { volumeId: id, ...filesFilter }),
+        graphql<{ files: PaginatedFilesResponse }>(GET_FILES, { volumeId: id, ...filesFilter }),
       ]);
 
       dispatch!(ActionCreators.SelectedVolume.create(responses[0].volume));
-      dispatch!(ActionCreators.SetFiles.create({ page: responses[1], filters: filesFilter }));
+      dispatch!(ActionCreators.SetFiles.create({ page: responses[1].files, filters: filesFilter }));
     } catch (err) {
       dispatch!(AppActions.serverResponse.create(err.message));
       dispatch!(
@@ -235,9 +238,12 @@ class Actions {
     await graphql<File>(PATCH_FILE, { token });
 
     const state = getState!();
-    const filePage = await graphql<PaginatedFilesResponse>(GET_FILES, { volumeId, ...state.media.filesFilters });
+    const filePage = await graphql<{ files: PaginatedFilesResponse }>(GET_FILES, {
+      volumeId,
+      ...state.media.filesFilters,
+    });
     // const responses = await files.getAll(volumeId, state.media.filesFilters);
-    dispatch!(ActionCreators.SetFiles.create({ page: filePage, filters: state.media.filesFilters }));
+    dispatch!(ActionCreators.SetFiles.create({ page: filePage.files, filters: state.media.filesFilters }));
   }
 
   @disptachable()

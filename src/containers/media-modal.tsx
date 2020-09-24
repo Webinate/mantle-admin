@@ -117,7 +117,7 @@ const MediaModal: React.FC<Props> = (props) => {
         onSort={(sort, dir) => onSort(sort, dir, null)}
         openVolume={(volume) => {
           setSelectedUid(null);
-          dispatch(mediaActions.openDirectory(volume));
+          dispatch(mediaActions.openDirectory(volume, {}));
         }}
         onSelectionChanged={(volumes) => {
           setSelectedUid(volumes[volumes.length - 1]);

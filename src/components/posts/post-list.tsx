@@ -273,7 +273,7 @@ export default class PostList extends React.Component<Props, State> {
                           <i>Last Updated:</i>
                         </div>
                         <div>
-                          <i className="mt-post-last-updated">{format(new Date(post.lastUpdated), 'MMM Do, yyyy')}</i>
+                          <i className="mt-post-last-updated">{format(new Date(post.lastUpdated), 'MMM do, yyyy')}</i>
                         </div>
                       </div>
                       <div>
@@ -281,7 +281,7 @@ export default class PostList extends React.Component<Props, State> {
                           <i>Created:</i>
                         </div>
                         <div>
-                          <i className="mt-post-created">{format(new Date(post.createdOn), 'MMM Do, yyyy')}</i>
+                          <i className="mt-post-created">{format(new Date(post.createdOn), 'MMM do, yyyy')}</i>
                         </div>
                       </div>
                     </div>
