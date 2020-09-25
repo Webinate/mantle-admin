@@ -56,23 +56,12 @@ export type Props = {
   onTemplateChanged: (templateId: string) => void;
   onCreateElm: (elms: Partial<AddElementInput>[], index?: number) => void;
   onUpdateElm: (
-    id: string,
     token: Partial<UpdateElementInput>,
     createElement: Partial<AddElementInput> | null,
     deselect: 'select' | 'deselect' | 'none'
   ) => void;
   onDeleteElements: (ids: string[]) => void;
   onSelectionChanged: (ids: string[], focus: boolean) => void;
-};
-
-export type State = {
-  editable: Partial<UpdatePostInput>;
-  selectedUser: User | null;
-  currentTagText: string;
-  slugWasEdited: boolean;
-  showMediaPopup: boolean;
-  featuredImage: File | null;
-  activeTemplate: string;
 };
 
 const postToEditable = (post: Partial<Post>) => {
@@ -99,7 +88,7 @@ const PostForm: React.FC<Props> = (props) => {
   const [featuredImage, setFeaturedImage] = useState<File | null>(props.post.featuredImage || null);
   const [selectedUser, setSelectedUser] = useState<User | null>(props.post.author || null);
   const [currentTagText, setCurrentTagText] = useState('');
-  const [activeTemplate, setActiveTemplate] = useState(template._id.toString());
+  const [activeTemplate, setActiveTemplate] = useState(template._id as string);
   const [slugWasEdited, setSlugWasEdited] = useState(false);
   const [showMediaPopup, setShowMediaPopup] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
@@ -472,7 +461,7 @@ const PostForm: React.FC<Props> = (props) => {
             style={image.style}
             selectedElement={element}
             onChange={(style) => {
-              props.onUpdateElm(image._id, { style }, null, 'none');
+              props.onUpdateElm({ _id: image._id, style }, null, 'none');
             }}
           />
         ),
@@ -543,7 +532,7 @@ const PostForm: React.FC<Props> = (props) => {
           document={doc!}
           onCreateElm={(elms, index) => props.onCreateElm(elms, index)}
           onUpdateElm={(id, html, createParagraph, deselect) =>
-            props.onUpdateElm(id, { html }, createParagraph, deselect)
+            props.onUpdateElm({ _id: id, html }, createParagraph, deselect)
           }
           onDeleteElm={(ids) => props.onDeleteElements(ids)}
           onSelectionChanged={(uids, focus) => props.onSelectionChanged(uids, focus)}

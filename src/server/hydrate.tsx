@@ -30,7 +30,7 @@ export async function hydrate(url: string, user: User | null, request: Request, 
   if (matchPath(url, { path: '/dashboard/posts' })) await postHandler(url, user, actions, request, host);
 
   // Get comments if neccessary
-  if (matchPath(url, { path: '/dashboard/comments' })) await commentHandler(url, user, actions);
+  if (matchPath(url, { path: '/dashboard/comments' })) await commentHandler(url, user, actions, request, host);
 
   // Get media if neccessary
   if (matchPath(url, { path: '/dashboard/media' })) await mediaHandler(url, user, actions);

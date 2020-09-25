@@ -1,86 +1,87 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { default as styled } from '../../theme/styled';
 import { Post } from 'mantle';
 import Avatar from '@material-ui/core/Avatar';
+import commentActions from '../../store/comments/actions';
 import { generateAvatarPic } from '../../utils/component-utils';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { format } from 'date-fns';
 import theme from '../../theme/mui-theme';
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../store';
 
 export type Props = {
-  post: Post;
+  post: string;
   id?: string;
   loading: boolean;
   renderComments?: () => undefined | null | JSX.Element;
 };
 
-type State = {
-  activeZone: string;
+const PostPreview: React.FC<Props> = (props) => {
+  const dispatch = useDispatch();
+  const commentPost = useSelector<IRootState, Post | null>((state) => state.comments.postPreview);
+
+  useEffect(() => {
+    if (props.post) {
+      dispatch(commentActions.getPostPreview(props.post));
+    }
+  }, [dispatch, props.post]);
+
+  if (props.loading || !commentPost) return <CircularProgress className="mt-loading" />;
+
+  const post = commentPost;
+  const draft = post.latestDraft;
+  const zones = post.document.template.zones;
+
+  return (
+    <Container id="mt-post-preview">
+      <div className="mt-preview-headers">
+        <div className="mt-preview-author-avatar">
+          <Avatar src={generateAvatarPic(post.author)} />
+        </div>
+        <div>
+          <h1 id="mt-preview-title">{post.title}</h1>
+          <div id="mt-header-details">
+            <span>Posted </span>
+            {post.author ? (
+              <span>
+                by <span id="mt-preview-author">{post.author.username}</span>
+              </span>
+            ) : undefined}
+            <span id="mt-preview-date">{format(new Date(post.lastUpdated), `'at' H:m 'on' MMMM do yyyy`)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-preview-content">
+        {zones.length > 1 ? (
+          zones.map((z) => (
+            <div key={`zone-${z}`}>
+              <div className="mt-zone-header">
+                <h2>{z}</h2>
+                <div className="mt-content-divider" />
+              </div>
+              <div
+                className="mt-preview-content-col"
+                dangerouslySetInnerHTML={{ __html: draft ? draft.html[z] : '' }}
+              />
+            </div>
+          ))
+        ) : (
+          <div
+            className="mt-preview-content-col"
+            dangerouslySetInnerHTML={{ __html: draft ? draft.html[zones[0]] : '' }}
+          />
+        )}
+      </div>
+
+      <div id="mt-preview-comments">{props.renderComments ? props.renderComments() : undefined}</div>
+    </Container>
+  );
 };
 
-export default class PostPreview extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      activeZone: '',
-    };
-  }
-
-  render() {
-    if (this.props.loading) return <CircularProgress className="mt-loading" />;
-
-    const post = this.props.post;
-    const draft = post.latestDraft;
-    const zones = post.document.template.zones;
-
-    return (
-      <Container id="mt-post-preview">
-        <div className="mt-preview-headers">
-          <div className="mt-preview-author-avatar">
-            <Avatar src={generateAvatarPic(post.author)} />
-          </div>
-          <div>
-            <h1 id="mt-preview-title">{post.title}</h1>
-            <div id="mt-header-details">
-              <span>Posted </span>
-              {post.author ? (
-                <span>
-                  by <span id="mt-preview-author">{post.author.username}</span>
-                </span>
-              ) : undefined}
-              <span id="mt-preview-date">{format(new Date(post.lastUpdated), `'at' H:m 'on' MMMM do yyyy`)}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-preview-content">
-          {zones.length > 1 ? (
-            zones.map((z) => (
-              <div key={`zone-${z}`}>
-                <div className="mt-zone-header">
-                  <h2>{z}</h2>
-                  <div className="mt-content-divider" />
-                </div>
-                <div
-                  className="mt-preview-content-col"
-                  dangerouslySetInnerHTML={{ __html: draft ? draft.html[z] : '' }}
-                />
-              </div>
-            ))
-          ) : (
-            <div
-              className="mt-preview-content-col"
-              dangerouslySetInnerHTML={{ __html: draft ? draft.html[zones[0]] : '' }}
-            />
-          )}
-        </div>
-
-        <div id="mt-preview-comments">{this.props.renderComments ? this.props.renderComments() : undefined}</div>
-      </Container>
-    );
-  }
-}
+export default PostPreview;
 
 const Container = styled.form`
   .mt-preview-content {

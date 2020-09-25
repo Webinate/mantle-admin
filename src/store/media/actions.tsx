@@ -225,13 +225,7 @@ class Actions {
 
   @disptachable()
   @dispatchError(AppActions.serverResponse)
-  async editFile(
-    volumeId: string,
-    id: string,
-    token: Partial<UpdateFileInput>,
-    dispatch?: Function,
-    getState?: () => IRootState
-  ) {
+  async editFile(volumeId: string, token: Partial<UpdateFileInput>, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetVolumesBusy.create(true));
 
     // await files.update(id, token);

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 type Props = {
   html: string;
-  styles: any;
+  styles: any[];
   stylesMaterial: any;
   intialData: any;
   agent: string;
@@ -24,7 +24,7 @@ export default class HTML extends React.Component<Props, State> {
       '/tiny/plugins/image/plugin.min.js',
       '/tiny/plugins/paste/plugin.min.js',
       '/tiny/plugins/link/plugin.min.js',
-      '/tiny/plugins/code/plugin.min.js'
+      '/tiny/plugins/code/plugin.min.js',
     ];
 
     const content = (
@@ -52,12 +52,12 @@ export default class HTML extends React.Component<Props, State> {
           <div id="application" dangerouslySetInnerHTML={{ __html: this.props.html }} />
           <script
             dangerouslySetInnerHTML={{
-              __html: `window.PROPS=${JSON.stringify(this.props.intialData).replace(/</g, '\\u003c')}`
+              __html: `window.PROPS=${JSON.stringify(this.props.intialData).replace(/</g, '\\u003c')}`,
             }}
           />
           <script
             dangerouslySetInnerHTML={{
-              __html: `window.AGENT=${JSON.stringify(this.props.agent)}`
+              __html: `window.AGENT=${JSON.stringify(this.props.agent)}`,
             }}
           />
           <script src="/bundle.js" />

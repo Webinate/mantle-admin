@@ -99,7 +99,7 @@ const Media: React.FC = (props) => {
                   selectedIds={selectedUids}
                   files={media.filesPage}
                   onRename={(newName, id) =>
-                    dispatch(mediaActions.editFile(props.match.params.id, id, { name: newName }))
+                    dispatch(mediaActions.editFile(props.match.params.id, { _id: id, name: newName }))
                   }
                   onDelete={() => onDelete(props.match.params.id)}
                   onSort={(sort, dir) => onSort(sort, dir, props.match.params.id)}

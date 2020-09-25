@@ -9,6 +9,12 @@ export const LOGIN = gql`
         _id
         username
         avatar
+        createdOn
+        lastLoggedIn
+        avatarFile {
+          _id
+          publicURL
+        }
       }
     }
   }

@@ -132,6 +132,7 @@ export const PATCH_FILE = gql`
       ...FileFields
     }
   }
+  ${File_FRAG}
 `;
 
 export const GET_FILE = gql`

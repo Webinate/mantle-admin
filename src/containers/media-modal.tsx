@@ -88,7 +88,7 @@ const MediaModal: React.FC<Props> = (props) => {
         selectedIds={selectedUids}
         files={media.filesPage}
         style={style}
-        onRename={(newName, id) => dispatch(mediaActions.editFile(activeDir._id as string, id, { name: newName }))}
+        onRename={(newName, id) => dispatch(mediaActions.editFile(activeDir._id as string, { _id: id, name: newName }))}
         onDelete={() => onDelete(activeDir._id as string)}
         onSort={(sort, dir) => onSort(sort, dir, activeDir._id as string)}
         onUploadFiles={(files) => {

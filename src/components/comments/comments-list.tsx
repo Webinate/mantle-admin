@@ -151,7 +151,7 @@ export class CommentsList extends React.Component<Props, State> {
 
           {flattened.map((comment, index) => {
             const isEditting = this.state.activeCommentId === (comment._id as string);
-            const isChild = comment.parent ? true : false;
+            const isChild = comment.parentId ? true : false;
             const user = comment.user;
             let canEditComment = isAdmin || (user && user._id === auth._id ? true : false);
             const isSelected = this.props.selectedUids!.indexOf(comment._id as string) !== -1;
@@ -267,10 +267,10 @@ export class CommentsList extends React.Component<Props, State> {
                       enabled={true}
                       commentMode={true}
                       onNewComment={(text) => {
-                        const postId = typeof comment.post === 'string' ? comment.post : comment.post._id;
-                        this.props.onReply(postId as string, comment._id as string, {
+                        this.props.onReply(comment.postId, comment._id, {
                           content: text,
-                          post: postId,
+                          post: comment.postId,
+                          parent: this.state.commentToReplyId || undefined,
                         });
                         this.setState({ commentToReplyId: '' });
                       }}

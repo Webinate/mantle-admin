@@ -16,10 +16,12 @@ import { Router } from '../../../src/routers/router';
 import { FileRouter } from '../../../src/routers/file';
 import { AuthRouter } from '../../../src/routers/auth';
 import { ThemeProvider, ServerStyleSheets, createMuiTheme } from '@material-ui/core/styles';
+import { ServerStyleSheet } from 'styled-components';
 import Theme from './theme/mui-theme';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import * as DateFnsUtils from '@date-io/date-fns';
 import { User as UserModel } from '../../../src/graphql/models/user-type';
+import { File as FileModel } from '../../../src/graphql/models/file-type';
 import { IServer } from '../../../src/types/config/properties/i-client';
 import { User } from 'mantle';
 
@@ -76,17 +78,29 @@ export default class MainController extends Router {
     if (!user && url !== '/login' && url !== '/register') return res.redirect('/login');
     else if (user && (url === '/login' || url === '/register')) return res.redirect('/');
 
+    const userModel = user ? (UserModel.fromEntity(user) as User) : null;
+
+    if (userModel && userModel.avatarFile) {
+      const avatarFile = await controllerFactory.get('files').getFile(userModel.avatarFile._id);
+      if (avatarFile) userModel.avatarFile = FileModel.fromEntity(avatarFile);
+    }
+
     let initialState: Partial<IRootState> = {};
     const muiAgent = req.headers['user-agent'];
     const store = createStore(initialState, history);
     const theme = createMuiTheme(Theme);
     const server = this.client.server as IServer;
 
+    // For material ui
+    const sheets = new ServerStyleSheets();
+    // For Styled components
+    const styledComponentsSheet = new ServerStyleSheet();
+
     let actions: Action[];
     try {
       actions = await hydrate(
         req.url,
-        user ? (UserModel.fromEntity(user) as User) : null,
+        userModel,
         req,
         `${server.ssl ? 'https://' : 'http://'}${server.host}:${server.port}`
       );
@@ -99,27 +113,27 @@ export default class MainController extends Router {
     try {
       for (const action of actions) store.dispatch(action);
 
-      // For material ui
-      const sheets = new ServerStyleSheets();
-
       // We use a require to support hot reloading
       const App = await import('./containers/app');
 
       let html = renderToString(
-        sheets.collect(
-          <Provider store={store}>
-            <ThemeProvider theme={theme}>
-              <StaticRouter location={url} context={context}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <App.default />
-                </MuiPickersUtilsProvider>
-              </StaticRouter>
-            </ThemeProvider>
-          </Provider>
+        styledComponentsSheet.collectStyles(
+          sheets.collect(
+            <Provider store={store}>
+              <ThemeProvider theme={theme}>
+                <StaticRouter location={url} context={context}>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <App.default />
+                  </MuiPickersUtilsProvider>
+                </StaticRouter>
+              </ThemeProvider>
+            </Provider>
+          )
         )
       );
 
       const styleTags = sheets.getStyleElement();
+      const styledComponentStyles = styledComponentsSheet.getStyleElement();
 
       // Grab the CSS from the sheets.
       const styleTagsMaterial = sheets.toString();
@@ -137,7 +151,7 @@ export default class MainController extends Router {
       html = renderToStaticMarkup(
         <HTML
           html={html}
-          styles={styleTags}
+          styles={[styleTags, styledComponentStyles]}
           stylesMaterial={styleTagsMaterial}
           intialData={initialState}
           agent={muiAgent!}
@@ -147,6 +161,8 @@ export default class MainController extends Router {
       res.send(html);
     } catch (err) {
       this.renderError(res, err);
+    } finally {
+      styledComponentsSheet.seal();
     }
   }
 

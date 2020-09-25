@@ -1,12 +1,18 @@
 import { ActionCreator } from '../actions-creator';
-import { Comment, PaginatedCommentsResponse, AddCommentInput, QueryCommentsArgs } from 'mantle';
+import { Comment, PaginatedCommentsResponse, AddCommentInput, Post, QueryCommentsArgs } from 'mantle';
 import { UpdateCommentInput } from 'mantle';
 import { IRootState } from '..';
 import { ActionCreators as AppActions } from '../app/actions';
 import { disptachable } from '../../decorators/dispatchable';
 import { dispatchError } from '../../decorators/dispatchError';
 import { graphql } from '../../utils/httpClients';
-import { ADD_COMMENT, PATCH_COMMENT, GET_COMMENTS, REMOVE_COMMENT } from '../../graphql/requests/comment-requests';
+import {
+  ADD_COMMENT,
+  PATCH_COMMENT,
+  getCommentsQuery,
+  REMOVE_COMMENT,
+  GET_POST_PREVIEW,
+} from '../../graphql/requests/comment-requests';
 
 // Action Creators
 export const ActionCreators = {
@@ -16,6 +22,7 @@ export const ActionCreators = {
     { page: PaginatedCommentsResponse; filters: Partial<QueryCommentsArgs> }
   >('comments-set-comments'),
   SetComment: new ActionCreator<'comments-set-comment', Comment>('comments-set-comment'),
+  SetCommentPostPreview: new ActionCreator<'set-comment-post-preview', Post | null>('set-comment-post-preview'),
 };
 
 // Action Types
@@ -34,7 +41,7 @@ class Actions {
 
     // let resp: Page<IComment<'client' | 'expanded'>>;
 
-    const resp = await graphql<{ comments: PaginatedCommentsResponse }>(GET_COMMENTS, newFilters);
+    const resp = await graphql<{ comments: PaginatedCommentsResponse }>(getCommentsQuery(5), newFilters);
     // resp = await comments.getAll(newFilters);
 
     dispatch!(ActionCreators.SetComments.create({ page: resp.comments, filters: newFilters }));
@@ -61,6 +68,14 @@ class Actions {
     await graphql<{ patchComment: Comment }>(PATCH_COMMENT, { token: token });
     // await comments.update(commentId, token);
     dispatch!(this.getComments({}));
+  }
+
+  @disptachable()
+  @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
+  async getPostPreview(postId: string, dispatch?: Function, getState?: () => IRootState) {
+    dispatch!(ActionCreators.SetCommentPostPreview.create(null));
+    const resp = await graphql<{ post: Post }>(GET_POST_PREVIEW, { id: postId });
+    dispatch!(ActionCreators.SetCommentPostPreview.create(resp.post));
   }
 
   @disptachable()

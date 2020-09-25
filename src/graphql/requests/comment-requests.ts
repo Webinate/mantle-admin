@@ -45,13 +45,66 @@ export const PATCH_COMMENT = gql`
   ${COMMENT_FRAG}
 `;
 
+export const GET_POST_PREVIEW = gql`
+  query GET_POST_PREVIEW($id: ObjectId) {
+    post(id: $id) {
+      _id
+      brief
+      lastUpdated
+      createdOn
+      latestDraft {
+        html
+        _id
+        createdOn
+      }
+      document {
+        template {
+          zones
+        }
+      }
+      author {
+        _id
+        username
+        avatar
+        avatarFile {
+          publicURL
+        }
+      }
+    }
+  }
+`;
+
 export const REMOVE_COMMENT = gql`
   mutation REMOVE_COMMENT($id: ObjectId!) {
     removeComment(id: $id)
   }
 `;
 
-export const GET_COMMENTS = gql`
+export function getCommentsQuery(depth = 5) {
+  function renderComment(depthInternal: number): string {
+    return `
+      _id
+      author
+      content
+      createdOn
+      lastUpdated
+      public
+      postId
+      parentId
+      user {
+        _id
+        username
+        avatar
+        avatarFile {
+          _id
+          publicURL
+        }
+      }
+      ${depthInternal > 0 ? `children {${renderComment(depthInternal - 1)}}` : ''}
+    `;
+  }
+
+  return gql`
   query GET_COMMENTS(
     $index: Int
     $keyword: String
@@ -80,22 +133,11 @@ export const GET_COMMENTS = gql`
       index
       limit
       data {
-        _id
-        author
-        content
-        createdOn
-        lastUpdated
-        public
-        user {
-          _id
-          username
-          avatar
-          avatarFile {
-            _id
-            publicURL
-          }
-        }
+        ${renderComment(depth)}
       }
     }
   }
 `;
+}
+
+export const GET_COMMENTS = gql;

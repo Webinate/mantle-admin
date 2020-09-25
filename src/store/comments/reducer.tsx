@@ -1,5 +1,5 @@
 import { ActionCreators, Action } from './actions';
-import { Comment, PaginatedCommentsResponse, QueryCommentsArgs } from 'mantle';
+import { Comment, PaginatedCommentsResponse, Post, QueryCommentsArgs } from 'mantle';
 import { ActionCreators as AppActions, Action as AppAction } from '../app/actions';
 
 // State
@@ -8,6 +8,7 @@ export type State = {
   readonly commentPage: PaginatedCommentsResponse | null;
   readonly comment: Comment | null;
   readonly busy: boolean;
+  readonly postPreview: Post | null;
 };
 
 export const initialState: State = {
@@ -15,6 +16,7 @@ export const initialState: State = {
   commentPage: null,
   comment: null,
   busy: false,
+  postPreview: null,
 };
 
 // Reducer
@@ -31,6 +33,12 @@ export default function reducer(state: State = initialState, action: Action | Ap
         busy: false,
         commentPage: action.payload.page,
         commentFilters: { ...state.commentFilters, ...action.payload.filters },
+      };
+      break;
+
+    case ActionCreators.SetCommentPostPreview.type:
+      partialState = {
+        postPreview: action.payload,
       };
       break;
 

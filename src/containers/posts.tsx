@@ -204,7 +204,7 @@ const Posts: React.FC<void> = (props) => {
                     onRequestPreview={() => setPreviewMode(true)}
                     renderAfterForm={() => renderComment(props.match.params.postId)}
                     onCreateElm={(elms, index) => dispatch(addElement(doc._id as string, elms, index))}
-                    onUpdateElm={(id, token, createElement, deselect) =>
+                    onUpdateElm={(token, createElement, deselect) =>
                       dispatch(updateElement(doc._id as string, token, createElement, deselect))
                     }
                     onDeleteElements={(ids) => dispatch(deleteElements(doc._id as string, ids))}
@@ -219,7 +219,7 @@ const Posts: React.FC<void> = (props) => {
               } else {
                 return (
                   <PostPreview
-                    post={post}
+                    post={post._id}
                     loading={isBusy}
                     id={props.match.params.postId}
                     renderComments={() => renderComment(props.match.params.postId)}

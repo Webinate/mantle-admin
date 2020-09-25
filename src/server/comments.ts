@@ -6,8 +6,11 @@ import { CommentSortType, SortOrder, CommentVisibility, CommentsGetOptions } fro
 import { User } from 'mantle';
 import controllerFactory from '../../../../src/core/controller-factory';
 import { PaginatedCommentsResponse, Comment } from '../../../../src/graphql/models/comment-type';
+import { graphql } from '../utils/nodeClients';
+import { getCommentsQuery } from '../graphql/requests/comment-requests';
+import { Request } from 'express';
 
-export default async function (url: string, user: User | null, actions: Action[]) {
+export default async function (url: string, user: User | null, actions: Action[], request: Request, host: string) {
   const isAdmin = user && user.privileges !== 'regular' ? true : false;
   const matchesEdit = matchPath<any>(url, { path: '/dashboard/comments/edit/:id' });
   const initialFilter: Partial<CommentsGetOptions> = {
@@ -28,10 +31,17 @@ export default async function (url: string, user: User | null, actions: Action[]
     const comment = await controllerFactory.get('comments').getOne(matchesEdit.params.id);
     actions.push(CommentActions.SetComment.create(Comment.fromEntity(comment)));
   } else {
-    let comments = await controllerFactory.get('comments').getAll(initialFilter);
+    const page = await graphql<{ comments: PaginatedCommentsResponse }>(
+      host,
+      getCommentsQuery(5),
+      initialFilter,
+      request.headers
+    );
+
+    // let comments = await controllerFactory.get('comments').getAll(initialFilter);
     actions.push(
       CommentActions.SetComments.create({
-        page: PaginatedCommentsResponse.fromEntity(comments),
+        page: page.comments,
         filters: initialFilter,
       })
     );

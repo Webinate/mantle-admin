@@ -5,7 +5,7 @@ import { default as styled } from '../theme/styled';
 import ContentHeader from '../components/content-header';
 import commentActions from '../store/comments/actions';
 import FilterBar from '../components/comments/filter-bar';
-import { User, Post, CommentSortType } from 'mantle';
+import { User, CommentSortType } from 'mantle';
 import { isAdminUser } from '../utils/component-utils';
 import { CommentsList } from '../components/comments/comments-list';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -68,11 +68,11 @@ const Comments: React.FC = () => {
   const isBusy = commentState.busy;
   const isAdmin = isAdminUser(authUser);
   const animated = app.debugMode ? false : true;
-  let selectedPost: Post | null = null;
+  let selectedPost: string | null = null;
 
   if (page && selectedUid) {
-    const comment = page.data.find((c) => (c.post._id as string) === selectedPostUid)!;
-    if (comment) selectedPost = comment.post;
+    const comment = page.data.find((c) => (c.postId as string) === selectedPostUid)!;
+    if (comment) selectedPost = comment.postId;
   }
 
   return (
@@ -149,7 +149,7 @@ const Comments: React.FC = () => {
                 onCommentSelected={(comment) => {
                   if (comment) {
                     setSelectedUid(comment._id as string);
-                    setSelectedPostUid(typeof comment.post === 'string' ? comment.post : (comment.post._id as string));
+                    setSelectedPostUid(comment.postId);
                   } else {
                     setSelectedUid(null);
                     setSelectedPostUid(null);
