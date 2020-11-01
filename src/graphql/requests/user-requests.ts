@@ -5,12 +5,9 @@ export const USER_FRAG = gql`
     _id
     avatar
     createdOn
-    email
     isActivated
     lastLoggedIn
     meta
-    privileges
-    registerKey
     username
     avatarFile {
       _id
@@ -35,7 +32,38 @@ export const GET_USERS = gql`
   ${USER_FRAG}
 `;
 
+export const GET_USERS_ADMIN = gql`
+  query GET_USERS_ADMIN($index: Int, $limit: Int, $search: String) {
+    users(index: $index, limit: $limit, search: $search) {
+      count
+      index
+      limit
+      data {
+        ...UserFields
+        privileges
+        registerKey
+        email
+      }
+    }
+  }
+
+  ${USER_FRAG}
+`;
+
 export const GET_USER = gql`
+  query GET_USER($user: String!) {
+    user(user: $user) {
+      ...UserFields
+      privileges
+      registerKey
+      email
+    }
+  }
+
+  ${USER_FRAG}
+`;
+
+export const GET_USER_ADMIN = gql`
   query GET_USER($user: String!) {
     user(user: $user) {
       ...UserFields

@@ -31,7 +31,7 @@ export default class RegisterForm extends React.Component<Props, State> {
       email: '',
       pass: '',
       pass2: '',
-      formSubmitted: false
+      formSubmitted: false,
     };
   }
 
@@ -62,13 +62,11 @@ export default class RegisterForm extends React.Component<Props, State> {
             id="user"
             name="username"
             value={this.state.user}
-            onChange={e => this.setState({ user: e.currentTarget.value })}
+            onChange={(e) => this.setState({ user: e.currentTarget.value })}
           />
           {this.showUsernameError() ? (
             <FormHelperText id="mt-username-error">Please specify a username</FormHelperText>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FormControl>
 
         <FormControl className="mt-email" fullWidth={true} error={this.showEmailError()}>
@@ -77,13 +75,11 @@ export default class RegisterForm extends React.Component<Props, State> {
             id="email"
             name="email"
             value={this.state.email}
-            onChange={e => this.setState({ email: e.currentTarget.value })}
+            onChange={(e) => this.setState({ email: e.currentTarget.value })}
           />
           {this.state.formSubmitted && !this.state.email ? (
             <FormHelperText id="mt-email-error">Please specify an email</FormHelperText>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FormControl>
 
         <FormControl fullWidth={true} className="mt-password" error={this.showPasswordError()}>
@@ -93,13 +89,11 @@ export default class RegisterForm extends React.Component<Props, State> {
             name="password"
             type="password"
             value={this.state.pass}
-            onChange={e => this.setState({ pass: e.currentTarget.value })}
+            onChange={(e) => this.setState({ pass: e.currentTarget.value })}
           />
           {this.showPasswordError() ? (
             <FormHelperText id="mt-password-error">Please specify a password</FormHelperText>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FormControl>
 
         <FormControl fullWidth={true} className="mt-password2" error={this.state.pass !== this.state.pass2}>
@@ -109,13 +103,11 @@ export default class RegisterForm extends React.Component<Props, State> {
             name="password2"
             type="password"
             value={this.state.pass2}
-            onChange={e => this.setState({ pass2: e.currentTarget.value })}
+            onChange={(e) => this.setState({ pass2: e.currentTarget.value })}
           />
           {this.state.pass !== this.state.pass2 ? (
             <FormHelperText id="mt-password2-error">Passwords do not match</FormHelperText>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FormControl>
 
         <ButtonsDiv>
@@ -124,7 +116,7 @@ export default class RegisterForm extends React.Component<Props, State> {
             className="mt-register-btn"
             disabled={this.props.loading}
             fullWidth={true}
-            onClick={e => this.onRegister()}
+            onClick={(e) => this.onRegister()}
             color="primary"
           >
             <RegisterIcon style={{ margin: '0 5px 0 0' }} />

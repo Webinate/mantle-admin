@@ -4,7 +4,7 @@ import { IRootState } from '..';
 import { ActionCreators as AppActionCreators } from '../app/actions';
 import { ActionCreators as AppActions } from '../app/actions';
 import { graphql } from '../../utils/httpClients';
-import { CREATE_USER, REMOVE_USER, GET_USERS, PATCH_USER } from '../../graphql/requests/user-requests';
+import { CREATE_USER, REMOVE_USER, GET_USERS, PATCH_USER, GET_USERS_ADMIN } from '../../graphql/requests/user-requests';
 
 // Action Creators
 export const ActionCreators = {
@@ -22,14 +22,23 @@ export type Action = typeof ActionCreators[keyof typeof ActionCreators];
  */
 export function getUsers(index: number = 0, search?: string) {
   return async function (dispatch: Function, getState: () => IRootState) {
-    dispatch(ActionCreators.SetUsersBusy.create(true));
-    const resp = await graphql<{ users: PaginatedUserResponse }>(GET_USERS, { index: index, search: search });
-    // const resp = await getAll({ index: index, search: search });
-    dispatch(ActionCreators.SetUsers.create(resp.users));
+    try {
+      dispatch(ActionCreators.SetUsersBusy.create(true));
+      const isAdmin = getState().authentication.user?.privileges !== 'regular';
+      const resp = await graphql<{ users: PaginatedUserResponse }>(isAdmin ? GET_USERS_ADMIN : GET_USERS, {
+        index: index,
+        search: search,
+      });
+      // const resp = await getAll({ index: index, search: search });
+      dispatch(ActionCreators.SetUsers.create(resp.users));
+    } catch (err) {
+      dispatch(ActionCreators.SetUsersBusy.create(false));
+      dispatch(AppActions.serverResponse.create(err.message));
+    }
   };
 }
 
-export function update(id: string, token: Partial<UpdateUserInput>) {
+export function update(token: Partial<UpdateUserInput>) {
   return async function (dispatch: Function, getState: () => IRootState) {
     try {
       dispatch(ActionCreators.SetUsersBusy.create(true));
@@ -50,7 +59,11 @@ export function create(token: Partial<AddUserInput>, onComplete: () => void) {
       await graphql<{ addUser: User }>(CREATE_USER, { token });
       // await createUser(token);
       // const resp = await getAll({ index: 0, search: '' });
-      const resp = await graphql<{ users: PaginatedUserResponse }>(GET_USERS, { index: 0, search: '' });
+      const isAdmin = getState().authentication.user?.privileges !== 'regular';
+      const resp = await graphql<{ users: PaginatedUserResponse }>(isAdmin ? GET_USERS_ADMIN : GET_USERS, {
+        index: 0,
+        search: '',
+      });
       dispatch(ActionCreators.SetUsers.create(resp.users));
       onComplete();
     } catch (err) {

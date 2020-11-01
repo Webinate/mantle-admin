@@ -1,18 +1,21 @@
 import HomePage from '../../pages/home';
 import * as assert from 'assert';
 import {} from 'mocha';
-import { IPost } from 'mantle/src';
+import { IPost, IUserEntry } from 'mantle/src/types';
 import Agent from '../../utils/agent';
 import utils from '../../utils';
 import ControllerFactory from 'mantle/src/core/controller-factory';
 import { randomId } from '../../utils/misc';
 import { format } from 'date-fns';
+import { ElementType } from '../../../../../src/core/enums';
 
 let page = new HomePage();
 let admin: Agent, joe: Agent;
-let publicPost: IPost<'expanded'>, privatePost: IPost<'expanded'>;
+let publicPost: IPost<'server'>, privatePost: IPost<'server'>;
 
 describe('Latest Post tests: ', function () {
+  let joeUser: IUserEntry<'server'>;
+
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
@@ -22,34 +25,36 @@ describe('Latest Post tests: ', function () {
     const templates = ControllerFactory.get('templates');
     const docs = ControllerFactory.get('documents');
     const users = ControllerFactory.get('users');
-    const joeUser = await users.getUser({ username: joe.username });
-    const adminUser = await users.getUser({ username: admin.username });
+    joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
+    const adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
     const templatePage = await templates.getMany();
 
-    publicPost = (await posts.create({
+    publicPost = await posts.create({
       title: randomId(),
       slug: randomId(),
       public: true,
       brief: 'This is the first',
-      author: adminUser._id.toString(),
-    })) as IPost<'expanded'>;
+      author: adminUser._id,
+    });
 
-    privatePost = (await posts.create({
+    privatePost = await posts.create({
       title: randomId(),
       slug: randomId(),
       public: true,
       brief: 'This is brief',
-      author: joeUser._id.toString(),
-    })) as IPost<'expanded'>;
+      author: joeUser._id,
+    });
 
     await docs.addElement(
-      { id: publicPost.document._id },
-      { html: 'This is part of the first', type: 'elm-paragraph' }
+      { docId: publicPost.document },
+      { html: 'This is part of the first', type: ElementType.paragraph }
     );
-
-    await docs.changeTemplate({ id: privatePost.document._id }, templatePage.data[1]._id);
-    await docs.addElement({ id: privatePost.document._id }, { zone: 'left', html: 'Left', type: 'elm-paragraph' });
-    await docs.addElement({ id: privatePost.document._id }, { zone: 'right', html: 'Right', type: 'elm-paragraph' });
+    await docs.changeTemplate({ docId: privatePost.document }, templatePage.data[1]._id);
+    await docs.addElement({ docId: privatePost.document }, { zone: 'left', html: 'Left', type: ElementType.paragraph });
+    await docs.addElement(
+      { docId: privatePost.document },
+      { zone: 'right', html: 'Right', type: ElementType.paragraph }
+    );
 
     // Publish - order important here.
     // We publish the public post second because we want to check that the latest post
@@ -81,7 +86,7 @@ describe('Latest Post tests: ', function () {
     const latest = await page.getLatestPostDetails();
 
     assert.deepEqual(latest.heading, privatePost.title);
-    assert.deepEqual(latest.author, privatePost.author ? privatePost.author.username : '');
+    assert.deepEqual(latest.author, privatePost.author ? joeUser.username : '');
     assert.deepEqual(latest.created, format(new Date(), 'MMM do, yyyy')); // Make sure its today
     assert.deepEqual(latest.zones.length, 2);
     assert.deepEqual(latest.zones[0].name, 'left');
@@ -91,7 +96,6 @@ describe('Latest Post tests: ', function () {
   });
 
   it('should show the first public post if not an admin', async () => {
-    const posts = ControllerFactory.get('posts');
     await page.load(joe);
     assert.deepEqual(await page.hasLatestPost(), true);
     const latest = await page.getLatestPostDetails();

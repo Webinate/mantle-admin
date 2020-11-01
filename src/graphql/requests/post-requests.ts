@@ -101,9 +101,6 @@ export const REMOVE_POST = gql`
   mutation REMOVE_POST($id: ObjectId!) {
     removePost(id: $id)
   }
-
-  ${POST_FRAG}
-  ${DOCUMENT_FRAG}
 `;
 
 export const GET_POSTS = gql`

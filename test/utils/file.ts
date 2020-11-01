@@ -1,5 +1,5 @@
-import { } from 'mocha';
-import { IVolume, IUserEntry } from 'mantle';
+import {} from 'mocha';
+import { IVolume } from 'mantle/src/types';
 import { resolve } from 'path';
 import { statSync } from 'fs';
 import ControllerFactory from 'mantle/src/core/controller-factory';
@@ -9,7 +9,7 @@ export class File {
   path: string;
   size: number;
   type: string;
-  constructor( name: string, path: string, size: number, type: string ) {
+  constructor(name: string, path: string, size: number, type: string) {
     this.name = name;
     this.path = path;
     this.size = size;
@@ -21,9 +21,9 @@ export class File {
   }
 }
 
-export async function uploadFileToVolume( file: string, volume: IVolume<'client' | 'expanded'>, name: string = 'test-file' ) {
-  const files = ControllerFactory.get( 'files' );
-  const filePath = resolve( __dirname + '/../tests/media-files/' + file );
-  const f = new File( name, filePath, statSync( filePath ).size, 'image/png' );
-  return await files.uploadFileToRemote( f, { ...volume, user: ( volume.user as IUserEntry<'client'> )._id }, false );
+export async function uploadFileToVolume(file: string, volume: IVolume<'server'>, name: string = 'test-file') {
+  const files = ControllerFactory.get('files');
+  const filePath = resolve(__dirname + '/../tests/media-files/' + file);
+  const f = new File(name, filePath, statSync(filePath).size, 'image/png');
+  return await files.uploadFileToRemote(f, volume, false);
 }

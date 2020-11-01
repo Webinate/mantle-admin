@@ -1,46 +1,44 @@
 import utils from '../utils';
 import { Browser, Page as PuppeteerPage } from 'puppeteer';
 import Agent from '../utils/agent';
-import { IConfig } from 'mantle/src';
+import { IConfig } from 'mantle/src/types';
 
 /**
  * Base class for all page tests
  */
 export default class Page {
-
   public page: PuppeteerPage;
   public browser: Browser;
   public config: IConfig;
 
-  constructor() {
-  }
+  constructor() {}
 
-  async load( options?: any ): Promise<any> {
+  async load(options?: any): Promise<any> {
     this.page = utils.page;
     this.browser = utils.browser;
     this.config = utils.config;
     return this.page;
   }
 
-  async setAgent( agent: Agent ) {
-    await this.page.setCookie( {
+  async setAgent(agent: Agent) {
+    await this.page.setCookie({
       name: 'SID',
       value: agent.getSID(),
       path: '/',
       url: utils.getHost(),
-      httpOnly: true
-    } );
+      httpOnly: true,
+    });
   }
 
-  sleep( milliseconds: number ) {
-    return this.page.waitFor( milliseconds );
+  sleep(milliseconds: number) {
+    return this.page.waitFor(milliseconds);
   }
 
-  async click( selector: string ) {
-    const handle = await this.page.$( selector );
-    await this.sleep( 50 );
-    await handle!.executionContext().evaluate( elm => elm.scrollIntoView(), handle );
-    return this.page.click( selector );
+  async click(selector: string) {
+    const handle = await this.page.$(selector);
+    await this.sleep(50);
+    await handle!.executionContext().evaluate((elm) => elm.scrollIntoView(), handle);
+    return this.page.click(selector);
   }
 
   /**
@@ -48,12 +46,12 @@ export default class Page {
    * @param {string} path The url to direct the page to
    * @returns {Promise<void>}
    */
-  to( path: string ) {
-    return this.page.goto( utils.host + path );
+  to(path: string) {
+    return this.page.goto(utils.host + path);
   }
 
-  async emptySelector( selector: string ) {
-    return this.page.waitForFunction( `document.querySelector("${ selector }") == null` );
+  async emptySelector(selector: string) {
+    return this.page.waitForFunction(`document.querySelector("${selector}") == null`);
   }
 
   /**
@@ -61,10 +59,9 @@ export default class Page {
    * @param {string} selector
    * @returns {Promise<string|null>}
    */
-  async getElmText( selector: string ) {
-    const elm = await this.page.$( `${ selector }` );
-    if ( elm )
-      return await this.page.$eval( `${ selector }`, elm => elm.textContent );
+  async getElmText(selector: string) {
+    const elm = await this.page.$(`${selector}`);
+    if (elm) return await this.page.$eval(`${selector}`, (elm) => elm.textContent);
 
     return null;
   }
@@ -73,27 +70,26 @@ export default class Page {
    * @returns {string} Gets the current page window.location.pathname
    */
   async pathname() {
-    let location = await this.page.evaluate( async () => window.location );
+    let location = await this.page.evaluate(async () => window.location);
     return location.pathname as string;
   }
 
   /**
    * Gets or sets an input element's value
    */
-  async input( selector: string, val?: string ) {
-    if ( val === undefined ) {
-      return this.page.$eval( selector, ( elm: HTMLInputElement ) => elm.value );
-    }
-    else {
-      await this.page.click( selector )
-      await this.page.$eval( selector, ( elm: HTMLInputElement ) => {
+  async input(selector: string, val?: string) {
+    if (val === undefined) {
+      return this.page.$eval(selector, (elm: HTMLInputElement) => elm.value);
+    } else {
+      await this.page.click(selector);
+      await this.page.$eval(selector, (elm: HTMLInputElement) => {
         elm.value = '';
         elm.focus();
-      } );
+      });
 
-      await this.page.keyboard.type( val, { delay: 10 } );
-      await this.page.keyboard.press( 'Digit0' );
-      await this.page.keyboard.press( 'Backspace' );
+      await this.page.keyboard.type(val, { delay: 10 });
+      await this.page.keyboard.press('Digit0');
+      await this.page.keyboard.press('Backspace');
     }
   }
 
@@ -106,56 +102,60 @@ export default class Page {
    * the input is cleared
    * @returns {Promise<string>}
    */
-  async textfield( selector: string, val?: string, selectorIsInput: boolean = false ) {
-    let s = selectorIsInput ? selector : `${ selector } input`;
+  async textfield(selector: string, val?: string, selectorIsInput: boolean = false) {
+    let s = selectorIsInput ? selector : `${selector} input`;
 
     // If nothing specified - then return the value
-    if ( val === undefined )
-      return await this.page.$eval( s, el => ( el as HTMLInputElement ).value );
-
+    if (val === undefined) return await this.page.$eval(s, (el) => (el as HTMLInputElement).value);
     // If a string, then type the value
-    else if ( val !== '' ) {
+    else if (val !== '') {
+      await this.page.focus(s);
 
-      await this.page.focus( s );
+      await this.page.evaluate(async (data) => {
+        document.querySelector(data).value = '';
+      }, s);
 
-      await this.page.evaluate( async ( data ) => {
-        document.querySelector( data ).value = '';
-      }, s );
-
-      await this.page.type( s, val, { delay: 10 } );
+      await this.page.type(s, val, { delay: 10 });
     }
     // Else clear the input
     else {
-      await this.page.focus( s );
-      const curVal = await this.page.$eval( s, el => ( el as HTMLInputElement ).value );
+      await this.page.focus(s);
+      const curVal = await this.page.$eval(s, (el) => (el as HTMLInputElement).value);
       const promises = [];
-      for ( let i = 0, l = curVal.length; i < l; i++ )
-        promises.push( this.page.keyboard.press( 'Backspace' ) );
+      for (let i = 0, l = curVal.length; i < l; i++) promises.push(this.page.keyboard.press('Backspace'));
 
-      await Promise.all( promises );
+      await Promise.all(promises);
     }
   }
 
   async keyboardCut() {
-    await this.page.keyboard.down( 'Control' );
-    await this.page.keyboard.press( 'X' );
-    await this.page.keyboard.up( 'Control' );
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('X');
+    await this.page.keyboard.up('Control');
   }
 
   async keyboardCopy() {
-    await this.page.keyboard.down( 'Control' );
-    await this.page.keyboard.press( 'C' );
-    await this.page.keyboard.up( 'Control' );
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('Control');
   }
 
   async keyboardPaste() {
-    await this.page.keyboard.down( 'Control' );
-    await this.page.keyboard.press( 'V' );
-    await this.page.keyboard.up( 'Control' );
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('V');
+    await this.page.keyboard.up('Control');
   }
 
-  $eval( selector: string, callback: ( element: Element, ...args: any[] ) => any ) { return this.page.$eval( selector, callback ) }
-  $( selector: string ) { return this.page.$( selector ) }
-  $$( selector: string ) { return this.page.$$( selector ) }
-  waitFor( selector: string ) { return this.page.waitFor( selector ) }
+  $eval(selector: string, callback: (element: Element, ...args: any[]) => any) {
+    return this.page.$eval(selector, callback);
+  }
+  $(selector: string) {
+    return this.page.$(selector);
+  }
+  $$(selector: string) {
+    return this.page.$$(selector);
+  }
+  waitFor(selector: string) {
+    return this.page.waitFor(selector);
+  }
 }

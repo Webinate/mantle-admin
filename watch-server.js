@@ -18,7 +18,7 @@ const fs = require('fs');
 const webpack = require('webpack');
 
 // Get the server details
-const mantleJson = JSON.parse(fs.readFileSync('./clients/mantle-admin/mantle.json', { encoding: 'utf8' }));
+const mantleJson = JSON.parse(fs.readFileSync('./mantle.json', { encoding: 'utf8' }));
 
 async function start() {
   // Initialize the server
@@ -28,9 +28,6 @@ async function start() {
     proxy: 'localhost:' + mantleJson.server.port,
     port: mantleJson.server.port,
   });
-
-  // Set the directory to the client
-  process.chdir('./clients/mantle-admin');
 
   // returns a Compiler instance
   const compiler = webpack(require('./webpack.config.js'));

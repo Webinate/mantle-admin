@@ -3,7 +3,8 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import Agent from '../../utils/agent';
 import { format } from 'date-fns';
-import ControllerFactory from '../../../../../src/core/controller-factory';
+import { PATCH_USER } from '../../../src/graphql/requests/user-requests';
+import { UpdateUserInput, User } from 'mantle';
 
 let users = new UsersPage();
 let admin: Agent, joe: Agent;
@@ -12,13 +13,16 @@ describe('Testing the editing of user details: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    const users = ControllerFactory.get('users');
-    const user = await users.getUser({ username: 'Joe' });
+
+    const user = await admin.getUser('Joe');
 
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    await users.update(user._id, { createdOn: yesterday.getTime() }, false);
+    const resp = await admin.graphql<{ updateUser: User }>(PATCH_USER, {
+      token: { _id: user!._id, createdOn: yesterday.getTime() } as UpdateUserInput,
+    });
+    assert.ok(resp.data.updateUser);
   });
 
   after(async () => {});

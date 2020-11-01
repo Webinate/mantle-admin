@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Mantle Admin Dev Server",
+      "name": "Watch",
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
@@ -17,10 +17,7 @@
       "cwd": "${workspaceRoot}/../../",
       "preLaunchTask": null,
       "runtimeExecutable": null,
-      "runtimeArgs": [
-        "-r",
-        "ts-node/register"
-      ],
+      "runtimeArgs": ["-r", "ts-node/register"],
       "env": {
         "NODE_ENV": "development"
       },
@@ -29,39 +26,27 @@
       "outFiles": []
     },
     {
-      "name": "Mantle Admin Tests",
+      "name": "Run Single Test",
       "type": "node",
       "protocol": "inspector",
       "request": "launch",
       "program": "${workspaceRoot}/../../node_modules/mocha/bin/_mocha",
       "stopOnEntry": false,
       "args": [
-        "--compilers ts:ts-node/register",
+        "--compilers",
+        "ts:ts-node/register",
         "-t",
         "50000",
         "--exit",
-        "./test/index.js",
-        "--config=../../config.json",
-        "--logging=false",
-        "--runningTests=true",
-        "--runningClientTests=true",
-        "--debug=true",
-        "--clientsFolder=../../clients/",
-        "--remotes.local.path=../../clients/mantle-admin/test/media-uploads"
-        // // Uncomment these to run from the mantle root folder
-        // "./clients/mantle-admin/test/index.js",
-        // "--config=./config.json",
-        // "--clientsFolder=./clients/",
-        // "--remotes.local.url=http://localhost:8001",
-        // "--remotes.local.path=test/test-server/media"
+        "--file",
+        "./test/index",
+        "./${relativeFile}",
+        "--config=../../config.json"
       ],
-      // "cwd": "${workspaceRoot}/../../",
       "cwd": "${workspaceRoot}",
       "preLaunchTask": null,
       "runtimeExecutable": null,
-      "runtimeArgs": [
-        "--nolazy"
-      ],
+      "runtimeArgs": ["--nolazy"],
       "env": {
         "NODE_ENV": "development"
       },

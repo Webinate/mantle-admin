@@ -5,15 +5,18 @@ import {} from 'mocha';
 import Agent from 'mantle/clients/mantle-admin/test/utils/agent';
 import { randomId } from 'mantle/clients/mantle-admin/test/utils/misc';
 import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost, IComment, IUserEntry } from 'mantle';
+import { IPost, IComment, IUserEntry } from 'mantle/src/types';
 
 let commentPage = new CommentsPage();
 let admin: Agent, joe: Agent;
-let post1: IPost<'expanded'>;
-let post2: IPost<'expanded'>;
-let rootComment: IComment<'expanded'>, otherRootComment: IComment<'expanded'>;
+let post1: IPost<'server'>;
+let post2: IPost<'server'>;
+let rootComment: IComment<'server'>, otherRootComment: IComment<'server'>;
 
-describe('View comment posts: ', function() {
+describe('View comment posts: ', function () {
+  let joeUser: IUserEntry<'server'>;
+  let adminUser: IUserEntry<'server'>;
+
   before(async () => {
     const controller = ControllerFactory.get('posts');
     const users = ControllerFactory.get('users');
@@ -23,38 +26,42 @@ describe('View comment posts: ', function() {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    const joeUser = await users.getUser({ username: joe.username });
-    const adminUser = await users.getUser({ username: admin.username });
+    joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
+    adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
 
-    post1 = (await controller.create({
+    post1 = await controller.create({
       title: randomId(),
       slug: randomId(),
       public: true,
-      author: joeUser._id.toString()
-    })) as IPost<'expanded'>;
+      author: joeUser._id,
+    });
 
-    post2 = (await controller.create({
+    post2 = await controller.create({
       title: randomId(),
       slug: randomId(),
       public: false,
-      author: adminUser._id.toString()
-    })) as IPost<'expanded'>;
+      author: adminUser._id,
+    });
 
-    docs.updateElement({ id: post1.document._id }, post1.document.elements[0]._id, { html: '<p>This is post 1</p>' });
-    docs.updateElement({ id: post2.document._id }, post2.document.elements[0]._id, { html: '<p>This is post 2</p>' });
+    const post1Doc = await ControllerFactory.get('documents').get({ docId: post1._id });
+    const post2Doc = await ControllerFactory.get('documents').get({ docId: post1._id });
 
-    rootComment = (await comments.create({
-      author: joeUser.username,
+    docs.updateElement({ docId: post1.document }, { _id: post1Doc!.elements[0], html: '<p>This is post 1</p>' });
+    docs.updateElement({ docId: post2.document }, { _id: post2Doc!.elements[0], html: '<p>This is post 2</p>' });
+
+    rootComment = await comments.create({
+      author: joeUser.username as string,
       user: joeUser._id,
       post: post1._id,
-      content: randomId()
-    })) as IComment<'expanded'>;
-    otherRootComment = (await comments.create({
-      author: joeUser.username,
+      content: randomId(),
+    });
+
+    otherRootComment = await comments.create({
+      author: joeUser.username as string,
       user: joeUser._id,
       post: post2._id,
-      content: randomId()
-    })) as IComment<'expanded'>;
+      content: randomId(),
+    });
 
     // Publish post
     await controller.update(post1._id, { public: true });
@@ -75,7 +82,7 @@ describe('View comment posts: ', function() {
     await commentPage.load(admin);
     await commentPage.commentModule.select(1);
     const details = await commentPage.commentModule.previewDetails();
-    assert.deepEqual(details.author, post1.author.username);
+    assert.deepEqual(details.author, joeUser.username);
     assert.deepEqual(details.contents[0], '<p>This is post 1</p>');
     assert.deepEqual(details.title, post1.title);
   });
@@ -83,7 +90,7 @@ describe('View comment posts: ', function() {
   it('can view a different post preview', async () => {
     await commentPage.commentModule.select(0);
     const details = await commentPage.commentModule.previewDetails();
-    assert.deepEqual(details.author, post2.author.username);
+    assert.deepEqual(details.author, adminUser.username);
     assert.deepEqual(details.contents[0], '<p>This is post 2</p>');
     assert.deepEqual(details.title, post2.title);
   });

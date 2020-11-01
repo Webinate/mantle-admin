@@ -43,8 +43,8 @@ const Users: React.FC<void> = (props) => {
   const app = useSelector<IRootState, AppState>((state) => state.app);
 
   useEffect(() => {
-    dispatch(getUsers());
-  }, [dispatch]);
+    if (app.appHasHistory) dispatch(getUsers());
+  }, [dispatch, app]);
 
   const onUserSelected = (user: User, e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -146,9 +146,9 @@ const Users: React.FC<void> = (props) => {
               resendActivation={(username) => {
                 dispatch(adminActions.resendActivation(username));
               }}
-              updateUserAvatar={(userId, file) => dispatch(update(userId, { avatarFile: file._id }))}
+              updateUserAvatar={(userId, file) => dispatch(update({ _id: userId, avatarFile: file._id }))}
               activeUser={auth.user!}
-              updateUserDetails={(user) => dispatch(update(user._id! as string, user))}
+              updateUserDetails={(user) => dispatch(update({ ...user, _id: user._id! as string }))}
               onDeleteRequested={(user) => {
                 setDialogue(
                   `Are you sure you want to remove the user '${user.username}', this action is irreversible?`

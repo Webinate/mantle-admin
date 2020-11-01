@@ -13,19 +13,16 @@
     "url": "https://github.com/Webinate/mantle-admin/issues"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=development gulp build",
+    "build": "npm run clean && cross-env NODE_ENV=production gulp build-prod",
     "build-analyze": "cross-env NODE_ENV=development gulp build --analyze=true",
-    "build-prod": "npm run clean && cross-env NODE_ENV=production gulp build-prod",
-    "watch-server": "cd ../../ && node \"./clients/mantle-admin/watch-server.js\" --config=config.json --logging=true --inspect=true --runningTests=true",
+    "start": "node \"./watch-server.js\"",
     "clean": "rimraf dist",
     "patch": "npm version patch --no-git-tag-version",
     "major": "npm version major --no-git-tag-version",
     "minor": "npm version minor --no-git-tag-version",
     "fonts": "gulp fonts",
     "statics": "gulp statics",
-    "start-dev": "cd ../../ && ts-node src/main.ts --config=config.json --numThreads=1 --logging=true --inspect=true",
-    "start-server": "cd ../../ && ts-node src/main.ts --config=config.json --logging=true --inspect=true",
-    "test": "mocha -t 100000 ./test/index.js --config=../../config.json --logging=false --runningTests=true --clientsFolder=../../clients/ --remotes.local.url=http://localhost:8001 --remotes.local.path=../../clients/mantle-ssr/test/media-uploads"
+    "test": "mocha -t 100000 ./test/index.js --config=../../config.json"
   },
   "homepage": "https://github.com/Webinate/mantle-admin#readme",
   "devDependencies": {
@@ -34,8 +31,8 @@
     "mocha": "^3.5.3",
     "puppeteer": "^0.13.0",
     "rimraf": "~2.6.2",
-    "yargs": "^9.0.1",
-    "webpack-bundle-analyzer": "~2.13.1"
+    "webpack-bundle-analyzer": "~2.13.1",
+    "yargs": "^9.0.1"
   },
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.55",

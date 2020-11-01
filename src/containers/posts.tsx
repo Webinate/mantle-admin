@@ -120,7 +120,7 @@ const Posts: React.FC<void> = (props) => {
   };
 
   const onSearch = (term: string) => {
-    getPosts({ index: 0, keyword: term });
+    dispatch(getPosts({ index: 0, keyword: term }));
   };
 
   const renderComment = (postId: string) => {
@@ -245,7 +245,7 @@ const Posts: React.FC<void> = (props) => {
                   onPostSelected={(selected) => {
                     setSelectedPosts(selected);
                   }}
-                  getPosts={(options) => getPosts(options)}
+                  getPosts={(options) => dispatch(getPosts(options))}
                 />
               );
             }}

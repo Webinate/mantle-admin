@@ -84,4 +84,7 @@ module.exports = {
     extensions: ['*', '.tsx', '.ts', '.js'],
   },
   devtool: isProdBuild ? undefined : 'source-map',
+  devServer: {
+    contentBase: './dist/client',
+  },
 };

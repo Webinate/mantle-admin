@@ -16,6 +16,6 @@
     "noStrictGenericChecks": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["../../src/types/**/*", "src/**/*"],
+  "include": ["../../src/types/**/*", "src/**/*", "test/**/*"],
   "exclude": ["src/server/**/*"]
 }

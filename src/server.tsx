@@ -22,14 +22,14 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import * as DateFnsUtils from '@date-io/date-fns';
 import { User as UserModel } from '../../../src/graphql/models/user-type';
 import { File as FileModel } from '../../../src/graphql/models/file-type';
-import { IServer } from '../../../src/types/config/properties/i-client';
+import { IServer } from 'mantle/src/types';
 import { User } from 'mantle';
 
 // Needed for onTouchTap
 import { Action } from 'redux';
 import { RedirectError } from './server/errors';
 import controllerFactory from '../../../src/core/controller-factory';
-import { IClient } from '../../../src/types/config/properties/i-client';
+import { IClient } from 'mantle/src/types';
 
 /**
  * The default entry point for the admin server

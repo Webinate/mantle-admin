@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "c:\\projects\\mantle\\clients\\mantle-admin\\node_modules\\typescript\\lib",
+  "typescript.tsdk": "d:\\projects\\mantle\\clients\\mantle-admin\\node_modules\\typescript\\lib",
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
@@ -11,5 +11,6 @@
   "files.trimTrailingWhitespace": true,
   "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-  "editor.detectIndentation": false
+  "editor.detectIndentation": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

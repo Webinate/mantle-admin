@@ -6,12 +6,12 @@ import Agent from '../../utils/agent';
 import { format } from 'date-fns';
 import { randomId } from '../../utils/misc';
 import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle';
+import { IPost } from 'mantle/src/types';
 import { PostsController } from '../../../../../src/controllers/posts';
 
 let postPage = new PostsPage();
 let admin: Agent, joe: Agent;
-let post: IPost<'expanded'>;
+let post: IPost<'server'>;
 let controller: PostsController;
 let newSlug = randomId();
 
@@ -21,13 +21,13 @@ describe('View & edit post created by backend: ', function () {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    post = (await controller.create({
+    post = await controller.create({
       title: 'Test Post',
       brief: 'Oh my brief',
       tags: ['Tag 1', 'Tag 2'],
       slug: randomId(),
       public: false,
-    })) as IPost<'expanded'>;
+    });
 
     await postPage.load(admin);
   });

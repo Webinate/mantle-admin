@@ -1,134 +1,125 @@
 import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
-import { } from 'mocha';
+import {} from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle';
-import { PostsController } from '../../../../../src/controllers/posts';
-import { UsersController } from '../../../../../src/controllers/users';
+import { Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent, joe: Agent;
-let postA: IPost<'expanded'>;
-let postB: IPost<'expanded'>;
-let controller: PostsController;
+let admin: AdminAgent, joe: Agent;
+let postA: Post;
+let postB: Post;
 
-describe( 'View and filter posts created by backend: ', function() {
-
-  before( async () => {
-    controller = ControllerFactory.get( 'posts' );
-    const users = ControllerFactory.get( 'users' );
-
+describe('View and filter posts created by backend: ', function () {
+  before(async () => {
     admin = await utils.refreshAdminToken();
-    joe = await utils.createAgent( 'Joe', 'joe222@test.com', 'password' );
+    joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    const joeUser = await users.getUser( { username: joe.username } );
-    const adminUser = await users.getUser( { username: admin.username } );
+    const joeUser = await admin.getUser(joe.username);
+    const adminUser = await admin.getUser(admin.username);
 
-    postA = await controller.create( {
+    postA = await admin.addPost({
       title: 'AAAA',
       slug: randomId(),
       public: false,
-      author: joeUser._id.toString()
-    } ) as IPost<'expanded'>;
+      author: joeUser!._id,
+    });
 
-    postB = await controller.create( {
+    postB = await admin.addPost({
       title: 'zzzz',
       slug: randomId(),
       public: true,
-      author: adminUser._id.toString()
-    } ) as IPost<'expanded'>;
+      author: adminUser!._id,
+    });
 
+    await postPage.load(admin);
+  });
 
-    await postPage.load( admin );
-  } )
-
-  it( 'Post is available in post dashboard & visible to admin', async () => {
+  it('Post is available in post dashboard & visible to admin', async () => {
     const postsOnPage = await postPage.getPosts();
-    assert( postsOnPage.length > 0 );
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
-  } )
+    assert(postsOnPage.length > 0);
+    assert.equal(postsOnPage[0].name, postB.title);
+  });
 
-  it( 'Posts can filter by title', async () => {
-    await postPage.filter( 'Something_I_AM_NOT' );
+  it('Posts can filter by title', async () => {
+    await postPage.filter('Something_I_AM_NOT');
     let postsOnPage = await postPage.getPosts();
-    assert( postsOnPage.length === 0 );
+    assert(postsOnPage.length === 0);
 
-    await postPage.filter( postA.title );
+    await postPage.filter(postA.title);
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postA.title );
-  } )
+    assert.equal(postsOnPage[0].name, postA.title);
+  });
 
-  it( 'Can sort by title, creation date, modified date', async () => {
-    await postPage.load( admin );
-    await postPage.toggleFilterOptionsPanel( true );
-    await postPage.selectSortType( 'title' );
+  it('Can sort by title, creation date, modified date', async () => {
+    await postPage.load(admin);
+    await postPage.toggleFilterOptionsPanel(true);
+    await postPage.selectSortType('title');
 
     // Check the name sorting (desc to begin with)
     let postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
+    assert.equal(postsOnPage[0].name, postB.title);
 
     // Reverse (now asc)
     await postPage.clickSortOrder();
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postA.title );
+    assert.equal(postsOnPage[0].name, postA.title);
 
     // Check the creation date sorting (desc)
-    await postPage.selectSortType( 'created' );
+    await postPage.selectSortType('created');
     await postPage.clickSortOrder();
 
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
-    assert.equal( postsOnPage[ 1 ].name, postA.title );
+    assert.equal(postsOnPage[0].name, postB.title);
+    assert.equal(postsOnPage[1].name, postA.title);
 
     // Check the modified date sorting (desc)
-    await postPage.selectSortType( 'modified' );
+    await postPage.selectSortType('modified');
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
-    assert.equal( postsOnPage[ 1 ].name, postA.title );
-  } )
+    assert.equal(postsOnPage[0].name, postB.title);
+    assert.equal(postsOnPage[1].name, postA.title);
+  });
 
-  it( 'Posts can filter by visibility', async () => {
-    await postPage.load( admin );
-    await postPage.toggleFilterOptionsPanel( true );
+  it('Posts can filter by visibility', async () => {
+    await postPage.load(admin);
+    await postPage.toggleFilterOptionsPanel(true);
 
-    await postPage.selectVisibility( 'public' );
+    await postPage.selectVisibility('public');
     let postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
+    assert.equal(postsOnPage[0].name, postB.title);
 
-    await postPage.selectVisibility( 'private' );
+    await postPage.selectVisibility('private');
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postA.title );
+    assert.equal(postsOnPage[0].name, postA.title);
 
-    await postPage.selectVisibility( 'all' );
+    await postPage.selectVisibility('all');
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
-  } )
+    assert.equal(postsOnPage[0].name, postB.title);
+  });
 
-  it( 'Posts can filter by user', async () => {
-    await postPage.load( admin );
-    await postPage.toggleFilterOptionsPanel( true );
+  it('Posts can filter by user', async () => {
+    await postPage.load(admin);
+    await postPage.toggleFilterOptionsPanel(true);
 
-    await postPage.selectUserFilter( joe.email );
+    await postPage.selectUserFilter(joe.email);
     let postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postA.title );
+    assert.equal(postsOnPage[0].name, postA.title);
 
-    await postPage.selectUserFilter( admin.email );
+    await postPage.selectUserFilter(admin.email);
     postsOnPage = await postPage.getPosts();
-    assert.equal( postsOnPage[ 0 ].name, postB.title );
-  } )
+    assert.equal(postsOnPage[0].name, postB.title);
+  });
 
-  it( 'Post is private & not visible to regular user in dashboard', async () => {
-    await postPage.load( joe );
+  it('Post is private & not visible to regular user in dashboard', async () => {
+    await postPage.load(joe);
     const postsOnPage = await postPage.getPosts();
-    if ( postsOnPage.length > 0 )
-      assert.notEqual( postsOnPage[ 0 ].name, postA.title );
-  } )
+    if (postsOnPage.length > 0) assert.notEqual(postsOnPage[0].name, postA.title);
+  });
 
-  after( async () => {
-    await controller.removePost( postA._id.toString() );
-    await controller.removePost( postB._id.toString() );
-  } )
-} );
+  after(async () => {
+    assert.deepStrictEqual(await admin.removePost(postA._id), true);
+    assert.deepStrictEqual(await admin.removePost(postB._id), true);
+  });
+});
