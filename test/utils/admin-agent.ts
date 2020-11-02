@@ -1,8 +1,9 @@
 import Agent from './agent';
 import { GET_USER, REMOVE_USER } from '../../src/graphql/requests/user-requests';
-import { User, AddVolumeInput, Post, AddPostInput, Volume } from 'mantle';
+import { User, AddVolumeInput, Post, AddPostInput, Category, Volume, PaginatedCategoryResponse } from 'mantle';
 import { ADD_VOLUME, REMOVE_VOLUME } from '../../src/graphql/requests/media-requests';
-import { ADD_POST, REMOVE_POST } from '../../src/graphql/requests/post-requests';
+import { ADD_POST, REMOVE_POST, GET_POST } from '../../src/graphql/requests/post-requests';
+import { GET_CATEGORIES, GET_CATEGORY, REMOVE_CATEGORY } from '../../src/graphql/requests/category-requests';
 
 export type Headers = { [name: string]: string };
 
@@ -40,6 +41,11 @@ export default class AdminAgent extends Agent {
     return resp.data.removeVolume;
   }
 
+  async getPost(post: { id?: string; slug?: string }) {
+    const resp = await this.graphql<{ post: Post }>(GET_POST, { ...post });
+    return resp.data.post;
+  }
+
   async addPost(token: AddPostInput) {
     const resp = await this.graphql<{ createPost: Post }>(ADD_POST, { token });
     return resp.data.createPost;
@@ -48,5 +54,20 @@ export default class AdminAgent extends Agent {
   async removePost(id: string) {
     const resp = await this.graphql<{ removePost: Post }>(REMOVE_POST, { id });
     return resp.data.removePost;
+  }
+
+  async getCategory(cat: { id?: string; slug?: string }) {
+    const resp = await this.graphql<{ category: Category }>(GET_CATEGORY, { ...cat });
+    return resp.data.category;
+  }
+
+  async getCategories() {
+    const resp = await this.graphql<{ categories: PaginatedCategoryResponse }>(GET_CATEGORIES, {});
+    return resp.data.categories;
+  }
+
+  async removeCategory(id: string) {
+    const resp = await this.graphql<{ removeCategory: boolean }>(REMOVE_CATEGORY, { id });
+    return resp.data.removeCategory;
   }
 }

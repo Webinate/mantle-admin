@@ -5,23 +5,20 @@ import {} from 'mocha';
 import Agent from '../../utils/agent';
 import { format } from 'date-fns';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
-import { PostsController } from '../../../../../src/controllers/posts';
+import { Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent, joe: Agent;
-let post: IPost<'server'>;
-let controller: PostsController;
+let admin: AdminAgent, joe: Agent;
+let post: Post;
 let newSlug = randomId();
 
 describe('View & edit post created by backend: ', function () {
   before(async () => {
-    controller = ControllerFactory.get('posts');
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    post = await controller.create({
+    post = await admin.addPost({
       title: 'Test Post',
       brief: 'Oh my brief',
       tags: ['Tag 1', 'Tag 2'],
@@ -33,7 +30,7 @@ describe('View & edit post created by backend: ', function () {
   });
 
   after(async () => {
-    if (post) await controller.removePost(post._id.toString());
+    if (post) await admin.removePost(post._id);
   });
 
   it('does not let regular user navigate to edit post page', async () => {
@@ -47,21 +44,22 @@ describe('View & edit post created by backend: ', function () {
   });
 
   it('does get the current post data', async () => {
+    await postPage.openPanel('tags');
+    await postPage.openPanel('meta');
+
     assert.deepEqual(await postPage.title(), 'Test Post');
     assert.deepEqual(await postPage.brief(), 'Oh my brief');
     assert(await postPage.hasTag('Tag 1'));
     assert(await postPage.hasTag('Tag 2'));
     assert.deepEqual(await postPage.getSlug(), post.slug);
     assert.deepEqual(await postPage.isPublic(), false);
-    assert.deepEqual(await postPage.user(), 'Not set ');
+    assert.deepEqual(await postPage.user(), admin.username);
     // Check the dates are today
     assert.deepEqual(await postPage.getCreatedOn(), format(new Date(), 'MMM do, yyyy'));
     assert.deepEqual(await postPage.getLastModified(), format(new Date(), 'MMM do, yyyy'));
   });
 
   it('can update post details', async () => {
-    await postPage.openPanel('tags');
-
     await postPage.title('Test Post EDITED');
     await postPage.brief('Oh my brief EDITED');
     await postPage.removeTag('Tag 1');

@@ -51,8 +51,9 @@ export default class UserPicker extends React.Component<Props, State> {
   }
 
   async onUpdateInput(user: string) {
+    this.setState({ username: user });
     const page = await graphql<{ users: PaginatedUserResponse }>(GET_USERS, { search: user, limit: 10 });
-    this.setState({ username: user, users: page.users.data });
+    this.setState({ users: page.users.data });
   }
 
   private close() {

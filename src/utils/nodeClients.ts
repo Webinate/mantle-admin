@@ -9,9 +9,9 @@ export async function graphql<T>(host: string, query: string, variables: any, he
       variables,
     }),
     headers: {
+      ...headers,
       'content-type': 'application/json',
       accept: 'application/json',
-      ...headers,
     },
   });
 

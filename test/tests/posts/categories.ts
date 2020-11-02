@@ -2,23 +2,21 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
+import { Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let post: IPost<'server'>;
+let admin: AdminAgent;
+let post: Post;
 let rootCat = randomId();
 let childCat = randomId();
 let childDeeperCat = randomId();
 
 describe('Testing the interactions with categories in posts:', function () {
   before(async () => {
-    const posts = ControllerFactory.get('posts');
     admin = await utils.refreshAdminToken();
-    post = await posts.create({
+    post = await admin.addPost({
       title: 'Test Post',
       brief: 'Oh my brief',
       tags: ['Tag 1', 'Tag 2'],
@@ -33,10 +31,9 @@ describe('Testing the interactions with categories in posts:', function () {
   });
 
   after(async () => {
-    await ControllerFactory.get('posts').removePost(post._id.toString());
-    const categories = ControllerFactory.get('categories');
-    const category = await categories.getBySlug(rootCat.toLowerCase());
-    await categories.remove(category!._id);
+    await admin.removePost(post._id);
+    const category = await admin.getCategory({ slug: rootCat.toLowerCase() });
+    await admin.removeCategory(category!._id);
   });
 
   it('does autofill the category when none is set', async () => {

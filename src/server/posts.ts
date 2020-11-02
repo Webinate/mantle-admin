@@ -43,27 +43,31 @@ export default async function (url: string, user: User | null, actions: Action[]
   };
 
   if (matchesEdit) {
-    const postReply = await Promise.all([
-      graphql<{ post: Post }>(host, GET_POST, { id: matchesEdit.params.id }, request.headers),
-      // ControllerFactory.get('posts').getPost({ id: matchesEdit.params.id }),
-      ControllerFactory.get('categories').getAll(initialCategoryFilter),
-      ControllerFactory.get('comments').getAll(initialCommentFilter),
-      ControllerFactory.get('templates').getMany(),
-    ]);
+    try {
+      const postReply = await Promise.all([
+        graphql<{ post: Post }>(host, GET_POST, { id: matchesEdit.params.id }, request.headers),
+        // ControllerFactory.get('posts').getPost({ id: matchesEdit.params.id }),
+        ControllerFactory.get('categories').getAll(initialCategoryFilter),
+        ControllerFactory.get('comments').getAll(initialCommentFilter),
+        ControllerFactory.get('templates').getMany(),
+      ]);
 
-    const post = postReply[0].post;
+      const post = postReply[0].post;
 
-    if (!isAdmin && !post.public) throw new RedirectError('/dashboard/posts');
+      if (!isAdmin && !post.public) throw new RedirectError('/dashboard/posts');
 
-    actions.push(PostActions.SetPost.create(post));
-    actions.push(CategoryActions.SetCategories.create(PaginatedCategoryResponse.fromEntity(postReply[1])));
-    actions.push(
-      CommentActions.SetComments.create({
-        page: PaginatedCommentsResponse.fromEntity(postReply[2]),
-        filters: initialCommentFilter,
-      })
-    );
-    actions.push(TemplatesActions.GetAll.create(PaginatedTemplateResponse.fromEntity(postReply[3])));
+      actions.push(PostActions.SetPost.create(post));
+      actions.push(CategoryActions.SetCategories.create(PaginatedCategoryResponse.fromEntity(postReply[1])));
+      actions.push(
+        CommentActions.SetComments.create({
+          page: PaginatedCommentsResponse.fromEntity(postReply[2]),
+          filters: initialCommentFilter,
+        })
+      );
+      actions.push(TemplatesActions.GetAll.create(PaginatedTemplateResponse.fromEntity(postReply[3])));
+    } catch (err) {
+      throw new RedirectError('/dashboard/posts');
+    }
   } else {
     let posts = await ControllerFactory.get('posts').getPosts(initialPostsFilter);
     actions.push(

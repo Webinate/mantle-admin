@@ -197,6 +197,7 @@ const PostForm: React.FC<Props> = (props) => {
                     <DatePicker
                       leftArrowIcon={<ChevronLeft id="mt-date-prev-month" />}
                       rightArrowIcon={<ChevronRight id="mt-date-next-month" />}
+                      okLabel={<span data-test="date-confirm">OK</span>}
                       open={isDateOpen}
                       onOpen={() => setIsDateOpen(true)}
                       onClose={() => setIsDateOpen(false)}

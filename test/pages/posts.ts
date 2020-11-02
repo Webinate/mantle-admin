@@ -187,7 +187,7 @@ export default class PostsPage extends Page {
   }
 
   async setPreviousMonth() {
-    const datePickerOkBtn = 'div[role=dialog] button[aria-label=OK]';
+    const datePickerOkBtn = "[data-test='date-confirm']";
     const buttons = '.mt-picker-content div[role=presentation] button';
 
     await this.page.click('#mt-edit-created-date');

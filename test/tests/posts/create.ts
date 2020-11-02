@@ -4,35 +4,28 @@ import utils from '../../utils';
 import {} from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IVolume, IPost } from 'mantle/src/types';
-import { PostsController } from '../../../../../src/controllers/posts';
+import { Volume, Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent, joe: Agent;
-let controller: PostsController;
+let admin: AdminAgent, joe: Agent;
 let postSlug = randomId();
-let volume: IVolume<'server'>;
-let createdPost: IPost<'server'>;
+let volume: Volume;
+let createdPost: Post;
 
 describe('Testing the creation of posts: ', function () {
   before(async () => {
-    controller = ControllerFactory.get('posts');
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-
-    const usersCtrl = ControllerFactory.get('users');
-    const volumes = ControllerFactory.get('volumes');
-    const userEntry = await usersCtrl.getUser({ username: admin.username });
-    volume = await volumes.create({ name: randomId(), user: userEntry!._id });
+    const userEntry = await admin.getUser(admin.username);
+    volume = await admin.addVolume({ name: randomId(), user: userEntry!._id });
 
     await postPage.load(admin);
   });
 
   after(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    await volumes.remove({ _id: volume._id });
-    await controller.removePost(createdPost._id);
+    await admin.removeVolume(volume._id);
+    await admin.removePost(createdPost._id);
   });
 
   it('does not let regular users click new post', async () => {
@@ -47,7 +40,7 @@ describe('Testing the creation of posts: ', function () {
     // Now check that post was created
     const path = await postPage.pathname();
     const id = path.split('/').pop();
-    createdPost = await controller.getPost({ id });
+    createdPost = await admin.getPost({ id });
     assert(createdPost);
   });
 
@@ -153,17 +146,14 @@ describe('Testing the creation of posts: ', function () {
     await postPage.updateElmContent(0, 'This is a post bruv');
     await postPage.clickConfirm();
     await postPage.clickBack();
+    await postPage.doneLoading();
 
     const posts = await postPage.getPosts();
     assert.equal(posts[0].name, postSlug);
 
     // Confirm the post is saved as it was created
-    const post = await controller.getPost({ slug: postSlug });
-    const postDoc = await ControllerFactory.get('documents').get({ docId: post.document });
-    const postDocElements = await ControllerFactory.get('documents').getElements(postDoc!._id);
-
-    assert.equal(postDocElements[0].html, '<p>This is a post bruv</p>');
-
+    const post = await admin.getPost({ slug: postSlug });
+    assert.equal(post.document.elements![0].html, '<p>This is a post bruv</p>');
     assert.equal(post.title, postSlug);
     assert.equal(post.slug, postSlug);
     assert(post.tags.includes('Test Dino'));

@@ -9,6 +9,41 @@ export const CATEGORY_FRAG = gql`
   }
 `;
 
+export const GET_CATEGORY = gql`
+  query GET_CATEGORY($id: String, $slug: String) {
+    category(id: $id, slug: $slug) {
+      ...CategoryFields
+    }
+  }
+
+  ${CATEGORY_FRAG}
+`;
+
+export function getCategoriesQuery(depth = 5) {
+  function renderComment(depthInternal: number): string {
+    return `
+      _id
+      description
+      slug
+      title
+      ${depthInternal > 0 ? `children {${renderComment(depthInternal - 1)}}` : ''}
+    `;
+  }
+
+  return gql`
+  query GET_CATEGORIES($index: Int, $root: Boolean, $limit: Int) {
+    categories(index: $index, root: $root, limit: $limit) {
+      count
+      index
+      limit
+      data {
+        ${renderComment(depth)}
+      }
+    }
+  }
+`;
+}
+
 export const GET_CATEGORIES = gql`
   query GET_CATEGORIES($index: Int, $root: Boolean, $limit: Int) {
     categories(index: $index, root: $root, limit: $limit) {

@@ -12,7 +12,7 @@ import {
 } from 'mantle';
 import { graphql } from '../../utils/httpClients';
 import {
-  GET_CATEGORIES,
+  getCategoriesQuery,
   PATCH_CATEGORY,
   ADD_CATEGORY,
   REMOVE_CATEGORY,
@@ -35,7 +35,7 @@ class Actions {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
     options.root = options.root === undefined ? true : options.root;
 
-    const resp = await graphql<{ categories: PaginatedCategoryResponse }>(GET_CATEGORIES, {
+    const resp = await graphql<{ categories: PaginatedCategoryResponse }>(getCategoriesQuery(3), {
       ...options,
     });
     dispatch!(ActionCreators.SetCategories.create(resp.categories));
@@ -50,11 +50,16 @@ class Actions {
     getState?: () => IRootState
   ) {
     dispatch!(ActionCreators.SetCategoriesBusy.create(true));
+    if (category.parent === '') category.parent = null;
+
     const resp = await graphql<{ updateCategory: Category }>(PATCH_CATEGORY, { token: category });
     // const resp = await categories.edit(category._id as string, category);
     dispatch!(AppActions.serverResponse.create(`Category '${resp.updateCategory.title}' updated`));
-    dispatch!(this.getCategories({}));
 
+    const getCategoriesPromise = this.getCategories({});
+    dispatch!(getCategoriesPromise);
+
+    await getCategoriesPromise;
     if (callback) callback();
   }
 

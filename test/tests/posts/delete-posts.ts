@@ -2,34 +2,30 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
-import { PostsController } from '../../../../../src/controllers/posts';
+import { Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let singlePost: IPost<'server'>, multiPost1: IPost<'server'>, multiPost2: IPost<'server'>;
-let controller: PostsController;
+let admin: AdminAgent;
+let singlePost: Post, multiPost1: Post, multiPost2: Post;
 
 describe('Testing the Deletion of posts: ', function () {
   before(async () => {
-    controller = ControllerFactory.get('posts');
     admin = await utils.refreshAdminToken();
     await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    multiPost1 = await controller.create({
+    multiPost1 = await admin.addPost({
       title: randomId(),
       slug: randomId(),
     });
 
-    multiPost2 = await controller.create({
+    multiPost2 = await admin.addPost({
       title: randomId(),
       slug: randomId(),
     });
 
-    singlePost = await controller.create({
+    singlePost = await admin.addPost({
       title: randomId(),
       slug: randomId(),
     });

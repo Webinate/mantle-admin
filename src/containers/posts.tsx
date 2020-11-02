@@ -111,7 +111,7 @@ const Posts: React.FC<void> = (props) => {
 
   const onDeleteMultiple = () => {
     _selectedPost = undefined;
-    setShowDeleteModal(showDeleteModal);
+    setShowDeleteModal(true);
   };
 
   const onDelete = (post: Post) => {
