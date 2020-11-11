@@ -4,25 +4,23 @@ import utils from 'mantle/clients/mantle-admin/test/utils';
 import {} from 'mocha';
 import Agent from 'mantle/clients/mantle-admin/test/utils/agent';
 import { randomId } from 'mantle/clients/mantle-admin/test/utils/misc';
-import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
+import { Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent, joe: Agent, mary: Agent;
-let publicPost: IPost<'server'>;
+let admin: AdminAgent, joe: Agent, mary: Agent;
+let publicPost: Post;
 let commentText = randomId();
 let replyText = randomId();
 
 describe('Preview posts available to regular users: ', function () {
   before(async () => {
-    const controller = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
     mary = await utils.createAgent('Mary', 'mary333@test.com', 'password');
-    const adminUser = await users.getUser({ username: admin.username });
+    const adminUser = await admin.getUser(admin.username);
 
-    publicPost = await controller.create({
+    publicPost = await admin.addPost({
       title: 'Test Public Post',
       author: adminUser!._id,
       slug: randomId(),
@@ -33,8 +31,7 @@ describe('Preview posts available to regular users: ', function () {
   });
 
   after(async () => {
-    const controller = ControllerFactory.get('posts');
-    await controller.removePost(publicPost._id.toString());
+    await admin.removePost(publicPost._id);
   });
 
   it('does allow a regular user to comment on a preview', async () => {

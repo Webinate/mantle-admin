@@ -131,7 +131,7 @@ const Posts: React.FC<void> = (props) => {
         <NewComment
           auth={user!}
           enabled={!comments.busy}
-          onNewComment={(comment) => dispatch(commentActions.createComment({ content: comment, post: postId }))}
+          onNewComment={(comment) => dispatch(commentActions.createComment({ content: comment, post: postId }, null))}
         />
         <CommentsList
           page={commentsPage}

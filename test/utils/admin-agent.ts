@@ -1,9 +1,24 @@
 import Agent from './agent';
 import { GET_USER, REMOVE_USER } from '../../src/graphql/requests/user-requests';
-import { User, AddVolumeInput, Post, AddPostInput, Category, Volume, PaginatedCategoryResponse } from 'mantle';
-import { ADD_VOLUME, REMOVE_VOLUME } from '../../src/graphql/requests/media-requests';
+import {
+  User,
+  AddVolumeInput,
+  Post,
+  Element,
+  AddPostInput,
+  Category,
+  Volume,
+  PaginatedCategoryResponse,
+  PaginatedFilesResponse,
+  PaginatedTemplateResponse,
+} from 'mantle';
+import { ADD_VOLUME, REMOVE_VOLUME, GET_FILES } from '../../src/graphql/requests/media-requests';
 import { ADD_POST, REMOVE_POST, GET_POST } from '../../src/graphql/requests/post-requests';
 import { GET_CATEGORIES, GET_CATEGORY, REMOVE_CATEGORY } from '../../src/graphql/requests/category-requests';
+import { GetFilesArgs } from '../../../../src/graphql/models/file-type';
+import { PATCH_ELEMENT, ADD_ELEMENT, SET_TEMPLATE } from '../../src/graphql/requests/document-requests';
+import { UpdateElementInput, AddElementInput } from '../../../../src/graphql/models/element-type';
+import { GET_TEMPLATES } from '../../src/graphql/requests/templates-request';
 
 export type Headers = { [name: string]: string };
 
@@ -36,6 +51,11 @@ export default class AdminAgent extends Agent {
     return resp.data.addVolume;
   }
 
+  async getFiles(options: Partial<GetFilesArgs>) {
+    const resp = await this.graphql<{ files: PaginatedFilesResponse }>(GET_FILES, { ...options });
+    return resp.data.files;
+  }
+
   async removeVolume(id: string) {
     const resp = await this.graphql<{ removeVolume: boolean }>(REMOVE_VOLUME, { id });
     return resp.data.removeVolume;
@@ -61,6 +81,21 @@ export default class AdminAgent extends Agent {
     return resp.data.category;
   }
 
+  async updateElement(token: UpdateElementInput, docId: string) {
+    const resp = await this.graphql<{ updateDocElement: Element }>(PATCH_ELEMENT, { token, docId });
+    return resp.data.updateDocElement;
+  }
+
+  async addElement(token: AddElementInput, docId: string) {
+    const resp = await this.graphql<{ addDocElement: Element }>(ADD_ELEMENT, { token, docId });
+    return resp.data.addDocElement;
+  }
+
+  async changeTemplate(templateId: string, docId: string) {
+    const resp = await this.graphql<{ changeDocTemplate: boolean }>(SET_TEMPLATE, { template: templateId, id: docId });
+    return resp.data.changeDocTemplate;
+  }
+
   async getCategories() {
     const resp = await this.graphql<{ categories: PaginatedCategoryResponse }>(GET_CATEGORIES, {});
     return resp.data.categories;
@@ -69,5 +104,10 @@ export default class AdminAgent extends Agent {
   async removeCategory(id: string) {
     const resp = await this.graphql<{ removeCategory: boolean }>(REMOVE_CATEGORY, { id });
     return resp.data.removeCategory;
+  }
+
+  async getTemplates() {
+    const resp = await this.graphql<{ templates: PaginatedTemplateResponse }>(GET_TEMPLATES, {});
+    return resp.data.templates;
   }
 }

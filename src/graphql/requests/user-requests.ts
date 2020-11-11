@@ -64,7 +64,7 @@ export const GET_USER = gql`
 `;
 
 export const GET_USER_ADMIN = gql`
-  query GET_USER($user: String!) {
+  query GET_USER_ADMIN($user: String!) {
     user(user: $user) {
       ...UserFields
     }

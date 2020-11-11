@@ -2,33 +2,31 @@ import MediaPage from '../../pages/media';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
-import { IVolume, IUserEntry } from 'mantle/src/types';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import { Volume } from 'mantle';
 import { uploadFileToVolume } from '../../utils/file';
+import AdminAgent from '../../utils/admin-agent';
+import Agent from '../../utils/agent';
 
 let page = new MediaPage();
+let admin: AdminAgent;
 let joe: Agent;
-let volume: IVolume<'server'>;
+let volume: Volume;
 
 describe('Testing the sorting and filtering of files: ', function () {
   before(async () => {
-    await utils.refreshAdminToken();
+    admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    const users = ControllerFactory.get('users');
-    const volumes = ControllerFactory.get('volumes');
-    const userEntry = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
+    const userEntry = await admin.getUser(joe.username);
 
-    volume = await volumes.create({ name: 'test', user: userEntry._id });
+    volume = await admin.addVolume({ name: 'test', user: userEntry._id });
 
-    await uploadFileToVolume('img-a.png', volume, 'File A');
-    await uploadFileToVolume('img-b.png', volume, 'File B');
-    await uploadFileToVolume('img-c.png', volume, 'File C');
+    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
+    await uploadFileToVolume('img-b.png', volume._id, 'File B', joe);
+    await uploadFileToVolume('img-c.png', volume._id, 'File C', joe);
   });
 
   after(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    await volumes.remove({ _id: volume._id });
+    await admin.removeVolume(volume._id);
   });
 
   it('does have three files uploaded & sorted by upload date', async () => {

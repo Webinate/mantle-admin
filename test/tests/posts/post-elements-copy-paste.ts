@@ -2,79 +2,63 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
+import AdminAgent from '../../utils/admin-agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost, IVolume } from 'mantle/src/types';
 import { uploadFileToVolume } from '../../utils/file';
+import { Post, Volume } from 'mantle';
 import { ElementType } from '../../../../../src/core/enums';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let post: IPost<'server'>;
-let post2: IPost<'server'>;
-let volume: IVolume<'server'>;
+let admin: AdminAgent;
+let post: Post;
+let post2: Post;
+let volume: Volume;
 
 describe('Testing the copy/paste of image elements: ', function () {
   before(async () => {
-    const posts = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
-    const docs = ControllerFactory.get('documents');
-    const volumes = ControllerFactory.get('volumes');
-    const files = ControllerFactory.get('files');
-
     admin = await utils.refreshAdminToken();
-    post = await posts.create({
+    post = await admin.addPost({
       title: 'Image test',
       slug: randomId(),
       public: false,
     });
 
-    post2 = await posts.create({
+    post2 = await admin.addPost({
       title: 'Image test 2',
       slug: randomId(),
       public: false,
     });
 
-    const userEntry = await users.getUser({ username: admin.username });
-    volume = await volumes.create({ name: randomId(), user: userEntry!._id });
+    const userEntry = await admin.getUser(admin.username);
+    volume = await admin.addVolume({ name: randomId(), user: userEntry!._id });
 
-    await uploadFileToVolume('img-a.png', volume, 'File A');
-    const uploads = await files.getFiles({ volumeId: volume._id });
+    const resp = await uploadFileToVolume('img-a.png', volume, 'File A', admin);
+    assert.deepEqual(resp.status, 200);
 
-    const postDocElements = await docs.getElements(post.document);
+    const uploads = await admin.getFiles({ volumeId: volume._id });
 
-    await docs.updateElement(
-      { docId: post.document },
+    const fetchedPost = await admin.getPost({ id: post._id });
+
+    await admin.updateElement(
       {
-        _id: postDocElements[0]._id,
+        _id: fetchedPost.document.elements![0]._id,
         html: '<p>THIS IS A TEST</p>',
-      }
+      },
+      post.document._id
     );
-    await docs.addElement(
-      { docId: post.document },
-      { type: ElementType.header1, html: '<h1>HEADER 1</h1>', zone: 'main' }
-    );
-    await docs.addElement(
-      { docId: post.document },
-      { type: ElementType.header2, html: '<h1>HEADER 2</h1>', zone: 'main' }
-    );
-    await docs.addElement(
-      { docId: post.document },
-      { type: ElementType.header3, html: '<h1>HEADER 3</h1>', zone: 'main' }
-    );
-    await docs.addElement(
-      { docId: post.document },
-      { type: ElementType.image, html: `<figure><img src="${uploads.data[0].publicURL}" /></figure>`, zone: 'main' }
+    await admin.addElement({ type: ElementType.header1, html: '<h1>HEADER 1</h1>', zone: 'main' }, post.document._id);
+    await admin.addElement({ type: ElementType.header2, html: '<h1>HEADER 2</h1>', zone: 'main' }, post.document._id);
+    await admin.addElement({ type: ElementType.header3, html: '<h1>HEADER 3</h1>', zone: 'main' }, post.document._id);
+    await admin.addElement(
+      { type: ElementType.image, html: `<figure><img src="${uploads.data[0].publicURL}" /></figure>`, zone: 'main' },
+      post.document._id
     );
   });
 
   after(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    const posts = ControllerFactory.get('posts');
-    await volumes.remove({ _id: volume._id });
-    await posts.removePost(post._id.toString());
-    await posts.removePost(post2._id.toString());
+    await admin.removeVolume(volume._id);
+    await admin.removePost(post._id);
+    await admin.removePost(post2._id);
   });
 
   it('does have a set of elements to copy from', async () => {

@@ -2,40 +2,33 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
+import AdminAgent from '../../utils/admin-agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost, IVolume } from 'mantle/src/types';
+import { Post, Volume } from 'mantle';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let post: IPost<'server'>;
-let volume: IVolume<'server'>;
+let admin: AdminAgent;
+let post: Post;
+let volume: Volume;
 
 describe('Testing the creation of image elements: ', function () {
   before(async () => {
-    const posts = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
-    const volumes = ControllerFactory.get('volumes');
-
     admin = await utils.refreshAdminToken();
-    post = await posts.create({
+    post = await admin.addPost({
       title: 'Image test',
       slug: randomId(),
       public: false,
     });
 
-    const userEntry = await users.getUser({ username: admin.username });
-    volume = await volumes.create({ name: randomId(), user: userEntry!._id });
+    const userEntry = await admin.getUser(admin.username);
+    volume = await admin.addVolume({ name: randomId(), user: userEntry!._id });
 
     await postPage.load(admin, `/dashboard/posts/edit/${post._id}`);
   });
 
   after(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    const posts = ControllerFactory.get('posts');
-    await volumes.remove({ _id: volume._id });
-    await posts.removePost(post._id.toString());
+    await admin.removeVolume(volume._id);
+    await admin.removePost(post._id);
   });
 
   it('does create a valid image element', async () => {
@@ -52,9 +45,7 @@ describe('Testing the creation of image elements: ', function () {
 
     await postPage.elementsModule.waitForSelected(1);
     const elements = await postPage.elementsModule.htmlArray();
-
-    const files = ControllerFactory.get('files');
-    const filesPage = await files.getFiles({ volumeId: volume._id });
+    const filesPage = await admin.getFiles({ volumeId: volume._id });
 
     assert.deepEqual(elements[1], `<figure><img src="${filesPage.data[0].publicURL}"></figure>`);
   });
@@ -75,8 +66,7 @@ describe('Testing the creation of image elements: ', function () {
     await postPage.load(admin, `/dashboard/posts/edit/${post._id}`);
     const elements = await postPage.elementsModule.htmlArray();
 
-    const files = ControllerFactory.get('files');
-    const filesPage = await files.getFiles({ volumeId: volume._id });
+    const filesPage = await admin.getFiles({ volumeId: volume._id });
     assert.deepEqual(elements[1], `<figure><img src="${filesPage.data[0].publicURL}"></figure>`);
     assert(filesPage.data[0].publicURL!.endsWith('img-b.png'));
   });
@@ -96,9 +86,7 @@ describe('Testing the creation of image elements: ', function () {
     await postPage.imageFloat('left');
     await postPage.doneLoading();
 
-    const files = ControllerFactory.get('files');
-    const filesPage = await files.getFiles({ volumeId: volume._id });
-
+    const filesPage = await admin.getFiles({ volumeId: volume._id });
     const figureHtml = await postPage.$eval('.mt-element figure', (e) => e.outerHTML);
     assert.deepEqual(
       figureHtml,

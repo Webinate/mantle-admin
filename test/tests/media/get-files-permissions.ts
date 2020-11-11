@@ -3,33 +3,30 @@ import * as assert from 'assert';
 import utils from '../../../test/utils';
 import {} from 'mocha';
 import Agent from '../../../test/utils/agent';
-import { IVolume } from 'mantle/src/types';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import { Volume } from 'mantle';
 import { uploadFileToVolume } from '../../../test/utils/file';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new MediaPage();
-let admin: Agent, joe: Agent, mary: Agent;
-let volume: IVolume<'server'>;
+let admin: AdminAgent, joe: Agent, mary: Agent;
+let volume: Volume;
 
 describe('Testing the fetching of files & permissions: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
     mary = await utils.createAgent('Mary', 'mary333@test.com', 'password');
-    const users = ControllerFactory.get('users');
-    const volumes = ControllerFactory.get('volumes');
-    const userEntry = await users.getUser({ username: joe.username });
 
-    volume = await volumes.create({ name: 'test', user: userEntry!._id });
+    const userEntry = await admin.getUser(joe.username);
+    volume = await admin.addVolume({ name: 'test', user: userEntry!._id });
 
-    await uploadFileToVolume('img-a.png', volume, 'File A');
-    await uploadFileToVolume('img-b.png', volume, 'File B');
-    await uploadFileToVolume('img-c.png', volume, 'File C');
+    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
+    await uploadFileToVolume('img-b.png', volume._id, 'File B', joe);
+    await uploadFileToVolume('img-c.png', volume._id, 'File C', joe);
   });
 
   after(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    await volumes.remove({ _id: volume._id });
+    await admin.removeVolume(volume._id);
   });
 
   it('does show 3 files for the user who uploaded then', async () => {

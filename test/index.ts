@@ -57,7 +57,6 @@ describe('Initialize Server', function () {
 // require( './tests/posts/post-elements-add-link' );
 // require( './tests/posts/post-elements-set-styles' );
 // require( './tests/posts/post-elements-delete-elm' );
-// require( './tests/posts/post-elements-delete-elm' );
 // require( './tests/posts/post-elements-images' );
 // require( './tests/posts/change-template' );
 // require( './tests/posts/post-elements-copy-paste' );

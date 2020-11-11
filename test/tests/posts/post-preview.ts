@@ -2,43 +2,36 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
+import { Post } from 'mantle';
 import { ElementType } from '../../../../../src/core/enums';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let post: IPost<'server'>;
+let admin: AdminAgent;
+let post: Post;
 
 describe('Testing the view preview button for admins: ', function () {
   before(async () => {
-    const controller = ControllerFactory.get('posts');
-    const docs = ControllerFactory.get('documents');
-    const templateCtrl = ControllerFactory.get('templates');
-
-    const users = ControllerFactory.get('users');
     admin = await utils.refreshAdminToken();
 
-    const adminUser = await users.getUser({ username: admin.username })!;
-    const templatePage = await templateCtrl.getMany();
+    const adminUser = await admin.getUser(admin.username)!;
+    const templatePage = await admin.getTemplates();
 
-    post = await controller.create({
+    post = await admin.addPost({
       title: 'Test Post',
       author: adminUser!._id,
       slug: randomId(),
       public: false,
     });
 
-    await docs.changeTemplate({ docId: post.document }, templatePage.data[1]._id);
-    await docs.addElement({ docId: post.document }, { zone: 'left', html: 'Left', type: ElementType.paragraph });
-    await docs.addElement({ docId: post.document }, { zone: 'right', html: 'Right', type: ElementType.paragraph });
+    await admin.changeTemplate(templatePage.data[1]._id, post.document._id);
+    await admin.addElement({ zone: 'left', html: 'Left', type: ElementType.paragraph }, post.document._id);
+    await admin.addElement({ zone: 'right', html: 'Right', type: ElementType.paragraph }, post.document._id);
   });
 
   after(async () => {
-    const controller = ControllerFactory.get('posts');
-    await controller.removePost(post._id.toString());
+    await admin.removePost(post._id);
   });
 
   it('does show a post preview to admin users when preview clicked', async () => {
@@ -68,8 +61,8 @@ describe('Testing the view preview button for admins: ', function () {
     assert.deepEqual(previewDetails.author, admin.username);
     assert.deepEqual(previewDetails.title, 'Test Post');
     assert.deepEqual(previewDetails.zones.length, 2);
-    assert.deepEqual(previewDetails.contents[0], 'Left');
-    assert.deepEqual(previewDetails.contents[1], 'Right');
+    assert.deepEqual(previewDetails.contents[0], '<p>Left</p>');
+    assert.deepEqual(previewDetails.contents[1], '<p>Right</p>');
   });
 
   it('does go back to editing a post when we click back', async () => {

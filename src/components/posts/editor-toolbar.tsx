@@ -215,7 +215,7 @@ export default class EditorToolbar extends React.Component<Props, State> {
 
         <ButtonGroup>
           <div
-            id="mt-create-paragraph"
+            id="mt-create-paragraph-btn"
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();

@@ -50,6 +50,7 @@ export const GET_POST_PREVIEW = gql`
     post(id: $id) {
       _id
       brief
+      title
       lastUpdated
       createdOn
       latestDraft {

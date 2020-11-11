@@ -4,33 +4,30 @@ import utils from '../../utils';
 import {} from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import { IVolume } from 'mantle/src/types';
-import { VolumesController } from 'mantle/src/controllers/volumes';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import { Volume } from 'mantle';
 import { uploadFileToVolume } from '../../utils/file';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new MediaPage();
-let admin: Agent, joe: Agent;
-let volumes: VolumesController;
-let volume: IVolume<'server'>;
+let admin: AdminAgent, joe: Agent;
+let volume: Volume;
 
 describe('Testing the fetching of volumes: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    volumes = ControllerFactory.get('volumes');
-    const users = ControllerFactory.get('users');
-    const userEntry = await users.getUser({ username: joe.username });
-    volume = await volumes.create({
+
+    const userEntry = await admin.getUser(joe.username);
+    volume = await admin.addVolume({
       name: randomId(),
       user: userEntry!._id,
     });
 
-    await uploadFileToVolume('img-a.png', volume);
+    await uploadFileToVolume('img-a.png', volume._id, 'File', joe);
   });
 
   after(async () => {
-    await volumes.remove({ _id: volume._id });
+    await admin.removeVolume(volume._id);
   });
 
   it('does show 1 volume with correct stats', async () => {

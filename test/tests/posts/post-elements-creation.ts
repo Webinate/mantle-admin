@@ -123,7 +123,7 @@ describe('Testing the creation of elements: ', function () {
 
   it('does create a header in the middle', async () => {
     await postPage.elementsModule.activateAt(0);
-    await postPage.elementsModule.selectBlockType('header-3');
+    await postPage.elementsModule.selectBlockType('header3');
     await postPage.elementsModule.waitForActivation(1);
     await postPage.elementsModule.typeAndPress('HEADING', 'Escape');
     await postPage.elementsModule.waitForNoFocus();
@@ -135,12 +135,12 @@ describe('Testing the creation of elements: ', function () {
 
   it("does allow empty blocks from the menu and they're valid html", async () => {
     const toTest: { type: ElementType; code: string }[] = [
-      { type: 'header-1', code: 'h1' },
-      { type: 'header-2', code: 'h2' },
-      { type: 'header-3', code: 'h3' },
-      { type: 'header-4', code: 'h4' },
-      { type: 'header-5', code: 'h5' },
-      { type: 'header-6', code: 'h6' },
+      { type: 'header1', code: 'h1' },
+      { type: 'header2', code: 'h2' },
+      { type: 'header3', code: 'h3' },
+      { type: 'header4', code: 'h4' },
+      { type: 'header5', code: 'h5' },
+      { type: 'header6', code: 'h6' },
       { type: 'code', code: 'pre' },
       { type: 'paragraph', code: 'p' },
     ];
@@ -160,12 +160,12 @@ describe('Testing the creation of elements: ', function () {
 
   it("does allow blocks with text from the menu and they're valid html", async () => {
     const toTest: { type: ElementType; code: string }[] = [
-      { type: 'header-1', code: 'h1' },
-      { type: 'header-2', code: 'h2' },
-      { type: 'header-3', code: 'h3' },
-      { type: 'header-4', code: 'h4' },
-      { type: 'header-5', code: 'h5' },
-      { type: 'header-6', code: 'h6' },
+      { type: 'header1', code: 'h1' },
+      { type: 'header2', code: 'h2' },
+      { type: 'header3', code: 'h3' },
+      { type: 'header4', code: 'h4' },
+      { type: 'header5', code: 'h5' },
+      { type: 'header6', code: 'h6' },
       { type: 'code', code: 'pre' },
       { type: 'paragraph', code: 'p' },
     ];

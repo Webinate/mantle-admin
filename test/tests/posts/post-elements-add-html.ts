@@ -2,23 +2,18 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
-import { PostsController } from '../../../../../src/controllers/posts';
+import { Post } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let post: IPost<'server'>;
-let controller: PostsController;
+let admin: AdminAgent;
+let post: Post;
 
 describe('Testing the creation of generic html elements: ', function () {
   before(async () => {
-    controller = ControllerFactory.get('posts');
     admin = await utils.refreshAdminToken();
-
-    post = await controller.create({
+    post = await admin.addPost({
       title: 'generic test',
       slug: randomId(),
       public: false,
@@ -28,7 +23,7 @@ describe('Testing the creation of generic html elements: ', function () {
   });
 
   after(async () => {
-    await controller.removePost(post._id.toString());
+    await admin.removePost(post._id);
   });
 
   it('does create and show the html editor when the html button is clicked', async () => {

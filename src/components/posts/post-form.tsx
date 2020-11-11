@@ -84,6 +84,7 @@ const PostForm: React.FC<Props> = (props) => {
   const doc = props.post.document!;
   const template = doc.template;
 
+  const [dirty, setDirty] = useState<boolean>(false);
   const [editable, setEditable] = useState<Partial<UpdatePostInput>>(_editableRef);
   const [featuredImage, setFeaturedImage] = useState<File | null>(props.post.featuredImage || null);
   const [selectedUser, setSelectedUser] = useState<User | null>(props.post.author || null);
@@ -93,6 +94,11 @@ const PostForm: React.FC<Props> = (props) => {
   const [showMediaPopup, setShowMediaPopup] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
 
+  const updateEditable = (post: Partial<UpdatePostInput>) => {
+    setEditable(post);
+    setDirty(true);
+  };
+
   useEffect(() => {
     _editableRef = postToEditable(props.post);
     const doc = props.post.document!;
@@ -100,6 +106,7 @@ const PostForm: React.FC<Props> = (props) => {
 
     setEditable(_editableRef);
     setCurrentTagText('');
+    setDirty(false);
     setActiveTemplate(template._id.toString());
   }, [props.post]);
 
@@ -109,7 +116,7 @@ const PostForm: React.FC<Props> = (props) => {
     if (text === '') return;
 
     setCurrentTagText('');
-    setEditable({
+    updateEditable({
       ...editable,
       tags: editable.tags!.concat(currentTagText.trim()),
     });
@@ -169,7 +176,7 @@ const PostForm: React.FC<Props> = (props) => {
                     color="primary"
                     checked={editable.public ? true : false}
                     onChange={(e) => {
-                      setEditable({
+                      updateEditable({
                         ...editable,
                         public: editable.public ? false : true,
                       });
@@ -206,7 +213,7 @@ const PostForm: React.FC<Props> = (props) => {
                       style={{ display: 'none' }}
                       value={new Date(editable.createdOn!)}
                       onChange={(e: Date) =>
-                        setEditable({
+                        updateEditable({
                           ...editable,
                           createdOn: e.getTime(),
                         })
@@ -261,7 +268,7 @@ const PostForm: React.FC<Props> = (props) => {
                     className="mt-tag-chip"
                     style={{ margin: '4px 4px 0 0' }}
                     onDelete={(e) => {
-                      setEditable({
+                      updateEditable({
                         ...editable,
                         tags: editable.tags!.filter((t) => t !== tag),
                       });
@@ -291,7 +298,7 @@ const PostForm: React.FC<Props> = (props) => {
               multiline={true}
               helperText="Post Brief Description"
               onChange={(e) => {
-                setEditable({
+                updateEditable({
                   ...editable,
                   brief: e.currentTarget.value,
                 });
@@ -314,7 +321,7 @@ const PostForm: React.FC<Props> = (props) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setEditable({
+                updateEditable({
                   ...editable,
                   featuredImage: '',
                 });
@@ -363,7 +370,7 @@ const PostForm: React.FC<Props> = (props) => {
                 if (index === -1) newIds = editable.categories!.concat(category._id as string) as string[];
                 else newIds = editable.categories!.filter((f) => f !== category._id) as string[];
 
-                setEditable({
+                updateEditable({
                   ...editable,
                   categories: newIds,
                 });
@@ -376,11 +383,6 @@ const PostForm: React.FC<Props> = (props) => {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-  };
-
-  const hasModified = () => {
-    if (editable !== _editableRef) return true;
-    else return false;
   };
 
   const renderTemplates = () => {
@@ -427,7 +429,7 @@ const PostForm: React.FC<Props> = (props) => {
               Apply Template
             </Button>
 
-            {hasModified() ? (
+            {dirty ? (
               <div
                 style={{
                   textAlign: 'center',
@@ -492,7 +494,7 @@ const PostForm: React.FC<Props> = (props) => {
             value={editable.title || ''}
             placeholder="Enter Post Title"
             onChange={(e) => {
-              setEditable({
+              updateEditable({
                 ...editable,
                 title: e.currentTarget.value,
                 slug: getSlug(e.currentTarget.value),
@@ -505,7 +507,7 @@ const PostForm: React.FC<Props> = (props) => {
                 value={editable.slug || ''}
                 onChange={(value) => {
                   setSlugWasEdited(true);
-                  setEditable({
+                  updateEditable({
                     ...editable,
                     slug: value,
                   });
@@ -518,7 +520,7 @@ const PostForm: React.FC<Props> = (props) => {
                 canEdit={props.isAdmin}
                 onChange={(user) => {
                   setSelectedUser(user);
-                  setEditable({
+                  updateEditable({
                     ...editable,
                     author: user ? user._id : '',
                   });
@@ -531,11 +533,18 @@ const PostForm: React.FC<Props> = (props) => {
         <ElmEditor
           elements={props.elements}
           document={doc!}
-          onCreateElm={(elms, index) => props.onCreateElm(elms, index)}
-          onUpdateElm={(id, html, createParagraph, deselect) =>
-            props.onUpdateElm({ _id: id, html }, createParagraph, deselect)
-          }
-          onDeleteElm={(ids) => props.onDeleteElements(ids)}
+          onCreateElm={(elms, index) => {
+            setDirty(true);
+            props.onCreateElm(elms, index);
+          }}
+          onUpdateElm={(id, html, createParagraph, deselect) => {
+            setDirty(true);
+            props.onUpdateElm({ _id: id, html }, createParagraph, deselect);
+          }}
+          onDeleteElm={(ids) => {
+            setDirty(true);
+            props.onDeleteElements(ids);
+          }}
           onSelectionChanged={(uids, focus) => props.onSelectionChanged(uids, focus)}
           selected={props.selectedElements}
           focussedId={props.focussedId}
@@ -559,7 +568,7 @@ const PostForm: React.FC<Props> = (props) => {
           onSelect={(file) => {
             setShowMediaPopup(false);
             setFeaturedImage(file);
-            setEditable({
+            updateEditable({
               ...editable,
               featuredImage: file._id,
             });

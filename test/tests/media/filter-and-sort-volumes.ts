@@ -2,36 +2,33 @@ import MediaPage from '../../pages/media';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
-import { IVolume, IUserEntry } from 'mantle/src/types';
-import { VolumesController } from '../../../../../src/controllers/volumes';
-import ControllerFactory from '../../../../../src/core/controller-factory';
+import { Volume } from 'mantle';
 import { uploadFileToVolume } from '../../utils/file';
+import AdminAgent from '../../utils/admin-agent';
+import Agent from '../../utils/agent';
 
 let page = new MediaPage();
 let joe: Agent;
-let volumes: VolumesController;
-let volA: IVolume<'server'>, volB: IVolume<'server'>, volC: IVolume<'server'>;
+let admin: AdminAgent;
+let volA: Volume, volB: Volume, volC: Volume;
 
 describe('Testing the sorting and filtering of volumes: ', function () {
   before(async () => {
-    await utils.refreshAdminToken();
+    admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    volumes = ControllerFactory.get('volumes');
-    const users = ControllerFactory.get('users');
-    const userEntry = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
+    const userEntry = await admin.getUser(joe.username);
 
-    volA = await volumes.create({ name: 'A', user: userEntry._id });
-    volB = await volumes.create({ name: 'B', user: userEntry._id });
-    volC = await volumes.create({ name: 'C', user: userEntry._id });
+    volA = await admin.addVolume({ name: 'A', user: userEntry._id });
+    volB = await admin.addVolume({ name: 'B', user: userEntry._id });
+    volC = await admin.addVolume({ name: 'C', user: userEntry._id });
 
-    await uploadFileToVolume('img-a.png', volB);
+    await uploadFileToVolume('img-a.png', volB._id, 'file', joe);
   });
 
   after(async () => {
-    await volumes.remove({ _id: volA._id });
-    await volumes.remove({ _id: volB._id });
-    await volumes.remove({ _id: volC._id });
+    await admin.removeVolume(volA._id);
+    await admin.removeVolume(volB._id);
+    await admin.removeVolume(volC._id);
   });
 
   it('does show 3 volumes', async () => {

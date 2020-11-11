@@ -51,7 +51,7 @@ class Actions {
   @dispatchError(AppActions.serverResponse, { prefix: 'Error: ' })
   async createComment(
     comment: Partial<AddCommentInput>,
-    parent?: string,
+    parent?: string | null,
     dispatch?: Function,
     getState?: () => IRootState
   ) {

@@ -2,25 +2,20 @@ import PostsPage from '../../pages/posts';
 import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
-import Agent from '../../utils/agent';
+import AdminAgent from '../../utils/admin-agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
-import { PostsController } from '../../../../../src/controllers/posts';
+import { Post } from 'mantle';
 
 let postPage = new PostsPage();
-let admin: Agent;
-let post: IPost<'server'>;
-let controller: PostsController;
+let admin: AdminAgent;
+let post: Post;
 
 describe('Test changing of post template: ', function () {
   before(async () => {
-    controller = ControllerFactory.get('posts');
-    const docs = ControllerFactory.get('documents');
     admin = await utils.refreshAdminToken();
     await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    post = await controller.create({
+    post = await admin.addPost({
       title: 'Test Post',
       brief: 'Oh my brief',
       tags: ['Tag 1', 'Tag 2'],
@@ -28,19 +23,19 @@ describe('Test changing of post template: ', function () {
       public: false,
     });
 
-    const postDoc = await ControllerFactory.get('documents').get({ docId: post.document });
+    const fetchedPost = await admin.getPost({ id: post._id });
 
-    await docs.updateElement(
-      { docId: post.document },
+    await admin.updateElement(
       {
-        _id: postDoc!.elements[0],
+        _id: fetchedPost.document!.elements![0]._id,
         html: '<p>HELLO WORLD</p>',
-      }
+      },
+      post.document._id
     );
   });
 
   after(async () => {
-    await controller.removePost(post._id.toString());
+    await admin.removePost(post._id);
   });
 
   it('does have only 1 template tab', async () => {

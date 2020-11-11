@@ -81,12 +81,14 @@ export default class Agent {
     });
   }
 
-  async post(url: string, data?: any, options = {}) {
+  async post(url: string, data?: any, options: Partial<Headers> = {}) {
     const headers: Headers = {
       cookie: this.cookie,
       'content-type': 'application/json',
       ...options,
     };
+
+    if (headers['content-type'] === 'multipart/form-data') delete headers['content-type'];
 
     const contentType = headers['content-type'] || headers['Content-Type'];
 

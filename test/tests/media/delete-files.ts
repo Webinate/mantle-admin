@@ -3,30 +3,27 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
 import Agent from '../../utils/agent';
-import { IUserEntry, IVolume } from 'mantle/src/types';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import { Volume } from 'mantle';
 import { randomId } from '../../utils/misc';
 import { uploadFileToVolume } from '../../utils/file';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new MediaPage();
-let admin: Agent, joe: Agent;
-let volume: IVolume<'server'>;
+let admin: AdminAgent, joe: Agent;
+let volume: Volume;
 const randomName = randomId();
 
 describe('Testing the deletion of files: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    const users = ControllerFactory.get('users');
-    const volumes = ControllerFactory.get('volumes');
-    const userEntry = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
+    const userEntry = await admin.getUser(joe.username);
+    volume = await admin.addVolume({ name: randomName, user: userEntry._id });
 
-    volume = await volumes.create({ name: randomName, user: userEntry._id });
-
-    await uploadFileToVolume('img-a.png', volume, 'File A');
-    await uploadFileToVolume('img-b.png', volume, 'File B');
-    await uploadFileToVolume('img-c.png', volume, 'File C');
-    await uploadFileToVolume('img-c.png', volume, 'File D');
+    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
+    await uploadFileToVolume('img-b.png', volume._id, 'File B', joe);
+    await uploadFileToVolume('img-c.png', volume._id, 'File C', joe);
+    await uploadFileToVolume('img-c.png', volume._id, 'File D', joe);
   });
 
   it('can select and delete a single file', async () => {

@@ -1,29 +1,24 @@
 import {} from 'mocha';
-import { IVolume } from 'mantle/src/types';
+import { Volume } from 'mantle';
 import { resolve } from 'path';
-import { statSync } from 'fs';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import * as fs from 'fs';
+import Agent from './agent';
+import * as FormData from 'form-data';
 
-export class File {
-  name: string;
-  path: string;
-  size: number;
-  type: string;
-  constructor(name: string, path: string, size: number, type: string) {
-    this.name = name;
-    this.path = path;
-    this.size = size;
-    this.type = type;
-  }
-
-  toJSON() {
-    return this;
-  }
-}
-
-export async function uploadFileToVolume(file: string, volume: IVolume<'server'>, name: string = 'test-file') {
-  const files = ControllerFactory.get('files');
+export async function uploadFileToVolume(file: string, volume: Volume, name: string = 'test-file', agent: Agent) {
   const filePath = resolve(__dirname + '/../tests/media-files/' + file);
-  const f = new File(name, filePath, statSync(filePath).size, 'image/png');
-  return await files.uploadFileToRemote(f, volume, false);
+
+  if (!fs.existsSync(filePath)) throw new Error(`File doesnt exist: [${filePath}]`);
+
+  const stats = fs.statSync(filePath);
+  const fileSizeInBytes = stats.size;
+  let readStream = fs.createReadStream(filePath);
+  const form = new FormData();
+  form.append(name, readStream, { knownLength: fileSizeInBytes });
+
+  const resp = await agent.post(`/api/files/volumes/${volume._id}/upload`, form, {
+    'content-type': 'multipart/form-data',
+  });
+
+  return resp;
 }
