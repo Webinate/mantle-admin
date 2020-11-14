@@ -23,6 +23,7 @@ import { Post } from '../../../../src/graphql/models/post-type';
 import { graphql } from '../utils/nodeClients';
 import { GET_POST } from '../graphql/requests/post-requests';
 import { Request } from 'express';
+import { getCommentsQuery } from '../graphql/requests/comment-requests';
 
 export default async function (url: string, user: User | null, actions: Action[], request: Request, host: string) {
   const isAdmin = user && user.privileges !== 'regular' ? true : false;
@@ -37,9 +38,9 @@ export default async function (url: string, user: User | null, actions: Action[]
   };
   const initialCommentFilter: Partial<CommentsGetOptions> = {
     expanded: true,
-    depth: 5,
     index: 0,
     postId: matchesEdit ? matchesEdit.params.id : undefined,
+    root: true,
   };
 
   if (matchesEdit) {
@@ -48,7 +49,12 @@ export default async function (url: string, user: User | null, actions: Action[]
         graphql<{ post: Post }>(host, GET_POST, { id: matchesEdit.params.id }, request.headers),
         // ControllerFactory.get('posts').getPost({ id: matchesEdit.params.id }),
         ControllerFactory.get('categories').getAll(initialCategoryFilter),
-        ControllerFactory.get('comments').getAll(initialCommentFilter),
+        graphql<{ comments: PaginatedCommentsResponse }>(
+          host,
+          getCommentsQuery(2),
+          initialCommentFilter,
+          request.headers
+        ),
         ControllerFactory.get('templates').getMany(),
       ]);
 
@@ -60,7 +66,7 @@ export default async function (url: string, user: User | null, actions: Action[]
       actions.push(CategoryActions.SetCategories.create(PaginatedCategoryResponse.fromEntity(postReply[1])));
       actions.push(
         CommentActions.SetComments.create({
-          page: PaginatedCommentsResponse.fromEntity(postReply[2]),
+          page: postReply[2].comments,
           filters: initialCommentFilter,
         })
       );

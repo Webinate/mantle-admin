@@ -12,7 +12,7 @@ let postPage = new PostsPage();
 let admin: AdminAgent, joe: Agent;
 let publicPost: Post, multiZonePost: Post, privatePost: Post;
 
-describe('Preview posts available to regular users: ', function () {
+describe('Preview posts permissions: ', function () {
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');

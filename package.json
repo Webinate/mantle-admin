@@ -22,7 +22,7 @@
     "minor": "npm version minor --no-git-tag-version",
     "fonts": "gulp fonts",
     "statics": "gulp statics",
-    "test": "mocha -t 100000 ./test/index.js --config=../../config.json"
+    "test": "mocha --compilers ts:ts-node/register -t 50000 ./test/index.ts ./test/tests/**/*.ts --config=../../config.json"
   },
   "homepage": "https://github.com/Webinate/mantle-admin#readme",
   "devDependencies": {

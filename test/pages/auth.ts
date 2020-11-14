@@ -14,12 +14,11 @@ export default class AuthPage extends Page {
     this.$password2 = '.mt-password2';
   }
 
-  async load( toLogin = true ) {
+  async load(toLogin = true, removeCookie = true) {
     await super.load();
-    if ( toLogin )
-      return super.to( '/login' );
-    else
-      return super.to( '/register' );
+    if (removeCookie) this.page.deleteCookie({ name: 'SID' });
+    if (toLogin) return super.to('/login');
+    else return super.to('/register');
   }
 
   /**
@@ -27,8 +26,8 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  username( val?: string ) {
-    return super.textfield( this.$username, val )
+  username(val?: string) {
+    return super.textfield(this.$username, val);
   }
 
   /**
@@ -36,8 +35,8 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  password( val?: string ) {
-    return super.textfield( this.$password, val )
+  password(val?: string) {
+    return super.textfield(this.$password, val);
   }
 
   /**
@@ -45,8 +44,8 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  email( val?: string ) {
-    return super.textfield( this.$email, val )
+  email(val?: string) {
+    return super.textfield(this.$email, val);
   }
 
   /**
@@ -54,8 +53,8 @@ export default class AuthPage extends Page {
    * @param {string} val
    * @returns {Promise<string>}
    */
-  password2( val?: string ) {
-    return super.textfield( this.$password2, val )
+  password2(val?: string) {
+    return super.textfield(this.$password2, val);
   }
 
   /**
@@ -65,11 +64,10 @@ export default class AuthPage extends Page {
    */
   async usernameError() {
     const selector = '#mt-username-error';
-    const result = await this.page.$( selector );
-    if ( !result )
-      return null;
+    const result = await this.page.$(selector);
+    if (!result) return null;
 
-    return this.page.$eval( selector, e => e.textContent );
+    return this.page.$eval(selector, (e) => e.textContent);
   }
 
   /**
@@ -79,11 +77,10 @@ export default class AuthPage extends Page {
    */
   async emailError() {
     const selector = '#mt-email-error';
-    const result = await this.page.$( selector );
-    if ( !result )
-      return null;
+    const result = await this.page.$(selector);
+    if (!result) return null;
 
-    return this.page.$eval( selector, e => e.textContent );
+    return this.page.$eval(selector, (e) => e.textContent);
   }
 
   /**
@@ -93,11 +90,10 @@ export default class AuthPage extends Page {
    */
   async passwordError() {
     const selector = '#mt-password-error';
-    const result = await this.page.$( selector );
-    if ( !result )
-      return null;
+    const result = await this.page.$(selector);
+    if (!result) return null;
 
-    return this.page.$eval( selector, e => e.textContent );
+    return this.page.$eval(selector, (e) => e.textContent);
   }
 
   /**
@@ -107,28 +103,43 @@ export default class AuthPage extends Page {
    */
   async password2Error() {
     const selector = '#mt-password2-error';
-    const result = await this.page.$( selector );
-    if ( !result )
-      return null;
+    const result = await this.page.$(selector);
+    if (!result) return null;
 
-    return this.page.$eval( selector, e => e.textContent );
+    return this.page.$eval(selector, (e) => e.textContent);
   }
 
   /**
    * Gets the server error response text if it exists
    * @returns {string}
    */
-  error() { return super.getElmText( '.mt-auth-err' ); }
+  error() {
+    return super.getElmText('.mt-auth-err');
+  }
 
   /**
    * Waits for the auth page to not be in a busy state
    */
-  doneLoading() { return this.page.waitForFunction( 'document.querySelector(".mt-loading") == null' ); }
+  doneLoading() {
+    return this.page.waitForFunction('document.querySelector(".mt-loading") == null');
+  }
 
-  clickLogin() { return this.page.click( 'button.mt-login-btn' ); }
-  clickRegister() { return this.page.click( 'button.mt-register-btn' ); }
-  clickCreateAccount() { return this.page.click( '.mt-create-account' ); }
-  clickToLogin() { return this.page.click( '.mt-to-login' ); }
-  clickResendActivation() { return this.page.click( '.mt-resend-activation' ); }
-  clickResetPassword() { return this.page.click( '.mt-retrieve-password' ); }
+  clickLogin() {
+    return this.page.click('button.mt-login-btn');
+  }
+  clickRegister() {
+    return this.page.click('button.mt-register-btn');
+  }
+  clickCreateAccount() {
+    return this.page.click('.mt-create-account');
+  }
+  clickToLogin() {
+    return this.page.click('.mt-to-login');
+  }
+  clickResendActivation() {
+    return this.page.click('.mt-resend-activation');
+  }
+  clickResetPassword() {
+    return this.page.click('.mt-retrieve-password');
+  }
 }
