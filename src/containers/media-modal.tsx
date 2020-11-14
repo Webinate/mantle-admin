@@ -113,7 +113,7 @@ const MediaModal: React.FC<Props> = (props) => {
         selectedIds={selectedUids}
         style={style}
         onDelete={() => onDelete()}
-        onRename={(newName, id) => dispatch(mediaActions.editVolume(id, { name: newName }))}
+        onRename={(newName, id) => dispatch(mediaActions.editVolume({ _id: id, name: newName }))}
         onSort={(sort, dir) => onSort(sort, dir, null)}
         openVolume={(volume) => {
           setSelectedUid(null);

@@ -162,7 +162,7 @@ export class CommentsList extends React.Component<Props, State> {
                 className={`mt-comment ${isEditting ? 'mt-editting' : ''} ${isChild ? 'mt-is-child' : ''} ${
                   isSelected ? 'mt-comment-selected' : ''
                 }`}
-                key={'comment-' + index.toString()}
+                key={'comment-' + comment._id.toString()}
                 onClick={() => {
                   if (this.props.onCommentSelected) {
                     this.setState({ commentToReplyId: '', activeCommentId: '' });

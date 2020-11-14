@@ -7,18 +7,23 @@ import {
   Element,
   AddPostInput,
   Category,
+  Comment,
   Volume,
   PaginatedCategoryResponse,
   PaginatedFilesResponse,
   PaginatedTemplateResponse,
+  UpdatePostInput,
+  AddCommentInput,
+  UpdateCommentInput,
 } from 'mantle';
 import { ADD_VOLUME, REMOVE_VOLUME, GET_FILES } from '../../src/graphql/requests/media-requests';
-import { ADD_POST, REMOVE_POST, GET_POST } from '../../src/graphql/requests/post-requests';
+import { ADD_POST, REMOVE_POST, GET_POST, UPDATE_POST } from '../../src/graphql/requests/post-requests';
 import { GET_CATEGORIES, GET_CATEGORY, REMOVE_CATEGORY } from '../../src/graphql/requests/category-requests';
 import { GetFilesArgs } from '../../../../src/graphql/models/file-type';
 import { PATCH_ELEMENT, ADD_ELEMENT, SET_TEMPLATE } from '../../src/graphql/requests/document-requests';
 import { UpdateElementInput, AddElementInput } from '../../../../src/graphql/models/element-type';
 import { GET_TEMPLATES } from '../../src/graphql/requests/templates-request';
+import { ADD_COMMENT, REMOVE_COMMENT, PATCH_COMMENT } from '../../src/graphql/requests/comment-requests';
 
 export type Headers = { [name: string]: string };
 
@@ -71,9 +76,29 @@ export default class AdminAgent extends Agent {
     return resp.data.createPost;
   }
 
+  async patchPost(token: UpdatePostInput) {
+    const resp = await this.graphql<{ patchPost: Post }>(UPDATE_POST, { token });
+    return resp.data.patchPost;
+  }
+
   async removePost(id: string) {
     const resp = await this.graphql<{ removePost: Post }>(REMOVE_POST, { id });
     return resp.data.removePost;
+  }
+
+  async addComment(token: AddCommentInput) {
+    const resp = await this.graphql<{ addComment: Comment }>(ADD_COMMENT, { token });
+    return resp.data.addComment;
+  }
+
+  async patchComment(token: UpdateCommentInput) {
+    const resp = await this.graphql<{ patchComment: Comment }>(PATCH_COMMENT, { token });
+    return resp.data.patchComment;
+  }
+
+  async removeComment(id: string) {
+    const resp = await this.graphql<{ removeComment: boolean }>(REMOVE_COMMENT, { id });
+    return resp.data.removeComment;
   }
 
   async getCategory(cat: { id?: string; slug?: string }) {

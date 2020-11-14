@@ -3,24 +3,23 @@ import * as assert from 'assert';
 import utils from '../../utils';
 import {} from 'mocha';
 import Agent from '../../utils/agent';
-import { IVolume } from 'mantle/src/types';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import { Volume } from 'mantle';
 import { randomId } from '../../utils/misc';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new MediaPage();
 let joe: Agent;
-let volume: IVolume<'server'>;
+let admin: AdminAgent;
+let volume: Volume;
 const randomName = randomId();
 
 describe('Testing the uploading of a file: ', function () {
   before(async () => {
-    await utils.refreshAdminToken();
+    admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    const users = ControllerFactory.get('users');
-    const volumes = ControllerFactory.get('volumes');
-    const userEntry = await users.getUser({ username: joe.username });
+    const userEntry = await admin.getUser(joe.username);
 
-    volume = await volumes.create({ name: randomName, user: userEntry!._id });
+    volume = await admin.addVolume({ name: randomName, user: userEntry!._id });
   });
 
   it('does open a volume & the url is correct', async () => {

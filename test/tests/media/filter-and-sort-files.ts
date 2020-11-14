@@ -20,9 +20,9 @@ describe('Testing the sorting and filtering of files: ', function () {
 
     volume = await admin.addVolume({ name: 'test', user: userEntry._id });
 
-    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
-    await uploadFileToVolume('img-b.png', volume._id, 'File B', joe);
-    await uploadFileToVolume('img-c.png', volume._id, 'File C', joe);
+    await uploadFileToVolume('img-a.png', volume._id, joe);
+    await uploadFileToVolume('img-b.png', volume._id, joe);
+    await uploadFileToVolume('img-c.png', volume._id, joe);
   });
 
   after(async () => {
@@ -35,8 +35,8 @@ describe('Testing the sorting and filtering of files: ', function () {
 
     const files = await page.mediaModule.getFiles();
     assert.deepEqual(files.length, 3);
-    assert.deepEqual(files[0].name, 'File C');
-    assert.deepEqual(files[2].name, 'File A');
+    assert.deepEqual(files[0].name, 'img-c.png');
+    assert.deepEqual(files[2].name, 'img-a.png');
   });
 
   it('does filter based on name', async () => {
@@ -45,16 +45,16 @@ describe('Testing the sorting and filtering of files: ', function () {
     await page.mediaModule.clickFileFilter('name');
 
     let files = await page.mediaModule.getFiles();
-    assert.deepEqual(files[0].name, 'File C');
-    assert.deepEqual(files[1].name, 'File B');
-    assert.deepEqual(files[2].name, 'File A');
+    assert.deepEqual(files[0].name, 'img-c.png');
+    assert.deepEqual(files[1].name, 'img-b.png');
+    assert.deepEqual(files[2].name, 'img-a.png');
 
     await page.mediaModule.clickFileFilter('name');
     files = await page.mediaModule.getFiles();
 
-    assert.deepEqual(files[0].name, 'File A');
-    assert.deepEqual(files[1].name, 'File B');
-    assert.deepEqual(files[2].name, 'File C');
+    assert.deepEqual(files[0].name, 'img-a.png');
+    assert.deepEqual(files[1].name, 'img-b.png');
+    assert.deepEqual(files[2].name, 'img-c.png');
   });
 
   it('does filter based on memory', async () => {
@@ -63,16 +63,16 @@ describe('Testing the sorting and filtering of files: ', function () {
     await page.mediaModule.clickFileFilter('memory');
 
     let files = await page.mediaModule.getFiles();
-    assert.deepEqual(files[0].name, 'File C');
-    assert.deepEqual(files[1].name, 'File B');
-    assert.deepEqual(files[2].name, 'File A');
+    assert.deepEqual(files[0].name, 'img-c.png');
+    assert.deepEqual(files[1].name, 'img-b.png');
+    assert.deepEqual(files[2].name, 'img-a.png');
 
     await page.mediaModule.clickFileFilter('memory');
     files = await page.mediaModule.getFiles();
 
-    assert.deepEqual(files[0].name, 'File A');
-    assert.deepEqual(files[1].name, 'File B');
-    assert.deepEqual(files[2].name, 'File C');
+    assert.deepEqual(files[0].name, 'img-a.png');
+    assert.deepEqual(files[1].name, 'img-b.png');
+    assert.deepEqual(files[2].name, 'img-c.png');
   });
 
   it('does filter based on upload date', async () => {
@@ -81,15 +81,15 @@ describe('Testing the sorting and filtering of files: ', function () {
     await page.mediaModule.clickFileFilter('created');
 
     let files = await page.mediaModule.getFiles();
-    assert.deepEqual(files[0].name, 'File A');
-    assert.deepEqual(files[1].name, 'File B');
-    assert.deepEqual(files[2].name, 'File C');
+    assert.deepEqual(files[0].name, 'img-a.png');
+    assert.deepEqual(files[1].name, 'img-b.png');
+    assert.deepEqual(files[2].name, 'img-c.png');
 
     await page.mediaModule.clickFileFilter('created');
     files = await page.mediaModule.getFiles();
 
-    assert.deepEqual(files[0].name, 'File C');
-    assert.deepEqual(files[1].name, 'File B');
-    assert.deepEqual(files[2].name, 'File A');
+    assert.deepEqual(files[0].name, 'img-c.png');
+    assert.deepEqual(files[1].name, 'img-b.png');
+    assert.deepEqual(files[2].name, 'img-a.png');
   });
 });

@@ -4,43 +4,37 @@ import utils from '../../../test/utils';
 import {} from 'mocha';
 import Agent from '../../../test/utils/agent';
 import { randomId } from '../../../test/utils/misc';
-import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost, IComment, IUserEntry } from 'mantle/src/types';
+import { Post, Comment } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let commentPage = new CommentsPage();
-let admin: Agent, joe: Agent, mary: Agent;
-let post: IPost<'server'>;
-let comment1: IComment<'server'>, comment2: IComment<'server'>;
+let admin: AdminAgent, joe: Agent, mary: Agent;
+let post: Post;
+let comment1: Comment, comment2: Comment;
 
 describe('Show / Hide comment edit & delete buttons based on user: ', function () {
   before(async () => {
-    const controller = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
-    const comments = ControllerFactory.get('comments');
-
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
     mary = await utils.createAgent('Mary', 'mary333@test.com', 'password');
 
-    const joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
-    const adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
+    const joeUser = await admin.getUser(joe.username);
+    const adminUser = await admin.getUser(admin.username);
 
-    post = await controller.create({
+    post = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: true,
       author: joeUser._id,
     });
 
-    comment1 = await comments.create({
-      author: joeUser.username as string,
+    comment1 = await admin.addComment({
       user: joeUser._id,
       post: post._id,
       content: randomId(),
     });
 
-    comment2 = await comments.create({
-      author: adminUser.username as string,
+    comment2 = await admin.addComment({
       user: adminUser._id,
       post: post._id,
       content: randomId(),
@@ -49,12 +43,9 @@ describe('Show / Hide comment edit & delete buttons based on user: ', function (
   });
 
   after(async () => {
-    const posts = ControllerFactory.get('posts');
-    const comments = ControllerFactory.get('comments');
-
-    await comments.remove(comment1._id);
-    await comments.remove(comment2._id);
-    await posts.removePost(post._id.toString());
+    await admin.removeComment(comment1._id);
+    await admin.removeComment(comment2._id);
+    await admin.removePost(post._id);
   });
 
   it('allows an admin to edit & delete all comments', async () => {

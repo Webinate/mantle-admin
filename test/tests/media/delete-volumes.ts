@@ -4,26 +4,22 @@ import utils from '../../utils';
 import {} from 'mocha';
 import { randomId } from '../../utils/misc';
 import Agent from '../../utils/agent';
-import ControllerFactory from '../../../../../src/core/controller-factory';
-import { IUserEntry } from '../../../../../src/types';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new MediaPage();
-let admin: Agent, joe: Agent;
+let admin: AdminAgent, joe: Agent;
 const randomName = randomId();
 
 describe('Testing the deletion of volumes:', function () {
   before(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    const users = ControllerFactory.get('users');
-
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    const userEntry = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
-    await volumes.create({ name: 'A', user: userEntry._id });
-    await volumes.create({ name: 'B', user: userEntry._id });
-    await volumes.create({ name: randomName, user: userEntry._id });
-    await volumes.create({ name: 'D', user: userEntry._id });
+    const userEntry = await admin.getUser(joe.username);
+    await admin.addVolume({ name: 'A', user: userEntry._id });
+    await admin.addVolume({ name: 'B', user: userEntry._id });
+    await admin.addVolume({ name: randomName, user: userEntry._id });
+    await admin.addVolume({ name: 'D', user: userEntry._id });
   });
 
   it('does show the 4 volumes created for the test', async () => {

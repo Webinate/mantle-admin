@@ -1,35 +1,31 @@
 import HomePage from '../../pages/home';
 import * as assert from 'assert';
 import {} from 'mocha';
-import { IPost, IUserEntry } from 'mantle/src/types';
+import { Post, User } from 'mantle';
 import Agent from '../../utils/agent';
 import utils from '../../utils';
-import ControllerFactory from 'mantle/src/core/controller-factory';
 import { randomId } from '../../utils/misc';
 import { format } from 'date-fns';
+import AdminAgent from '../../utils/admin-agent';
 import { ElementType } from '../../../../../src/core/enums';
 
 let page = new HomePage();
-let admin: Agent, joe: Agent;
-let publicPost: IPost<'server'>, privatePost: IPost<'server'>;
+let admin: AdminAgent, joe: Agent;
+let publicPost: Post, privatePost: Post;
 
 describe('Latest Post tests: ', function () {
-  let joeUser: IUserEntry<'server'>;
+  let joeUser: User;
 
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
     admin = await utils.refreshAdminToken();
 
-    const posts = ControllerFactory.get('posts');
-    const templates = ControllerFactory.get('templates');
-    const docs = ControllerFactory.get('documents');
-    const users = ControllerFactory.get('users');
-    joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
-    const adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
-    const templatePage = await templates.getMany();
+    joeUser = await admin.getUser(joe.username);
+    const adminUser = await admin.getUser(admin.username);
+    const templatePage = await admin.getTemplates();
 
-    publicPost = await posts.create({
+    publicPost = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: true,
@@ -37,7 +33,7 @@ describe('Latest Post tests: ', function () {
       author: adminUser._id,
     });
 
-    privatePost = await posts.create({
+    privatePost = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: true,
@@ -45,29 +41,22 @@ describe('Latest Post tests: ', function () {
       author: joeUser._id,
     });
 
-    await docs.addElement(
-      { docId: publicPost.document },
-      { html: 'This is part of the first', type: ElementType.paragraph }
-    );
-    await docs.changeTemplate({ docId: privatePost.document }, templatePage.data[1]._id);
-    await docs.addElement({ docId: privatePost.document }, { zone: 'left', html: 'Left', type: ElementType.paragraph });
-    await docs.addElement(
-      { docId: privatePost.document },
-      { zone: 'right', html: 'Right', type: ElementType.paragraph }
-    );
+    await admin.addElement({ html: 'This is part of the first', type: ElementType.paragraph }, publicPost.document._id);
+    await admin.changeTemplate(templatePage.data[1]._id, privatePost.document._id);
+    await admin.addElement({ zone: 'left', html: 'Left', type: ElementType.paragraph }, privatePost.document._id);
+    await admin.addElement({ zone: 'right', html: 'Right', type: ElementType.paragraph }, privatePost.document._id);
 
     // Publish - order important here.
     // We publish the public post second because we want to check that the latest post
     // is based on creation date as opposed to modified
-    await posts.update(privatePost._id, { public: false });
-    await posts.update(publicPost._id, { public: true });
+    await admin.patchPost({ _id: privatePost._id, public: false });
+    await admin.patchPost({ _id: publicPost._id, public: true });
     await page.load(admin);
   });
 
   after(async () => {
-    const controller = ControllerFactory.get('posts');
-    await controller.removePost(privatePost._id.toString());
-    await controller.removePost(publicPost._id.toString());
+    await admin.removePost(privatePost._id);
+    await admin.removePost(publicPost._id);
   });
 
   it('it should have a latest post', async () => {
@@ -103,8 +92,7 @@ describe('Latest Post tests: ', function () {
   });
 
   it('should show the all posts if an admin', async () => {
-    const posts = ControllerFactory.get('posts');
-    await posts.update(privatePost._id, { public: false });
+    await admin.patchPost({ _id: privatePost._id, public: false });
     await page.load(admin);
     const latest = await page.getLatestPostDetails();
     assert.deepEqual(latest.heading, privatePost.title);

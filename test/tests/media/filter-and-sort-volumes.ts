@@ -22,7 +22,8 @@ describe('Testing the sorting and filtering of volumes: ', function () {
     volB = await admin.addVolume({ name: 'B', user: userEntry._id });
     volC = await admin.addVolume({ name: 'C', user: userEntry._id });
 
-    await uploadFileToVolume('img-a.png', volB._id, 'file', joe);
+    const resp = await uploadFileToVolume('img-a.png', volB._id, joe);
+    assert.deepStrictEqual(resp.status, 200);
   });
 
   after(async () => {

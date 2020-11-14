@@ -20,6 +20,9 @@ const args = yargs.argv;
 export async function hydrate(url: string, user: User | null, request: Request, host: string) {
   const actions: Action[] = [];
 
+  // Ensure the ID is not an ObjectId Object
+  if (user) user._id = user._id.toString();
+
   // Get the user
   actions.push(ActionCreators.setUser.create(user));
 

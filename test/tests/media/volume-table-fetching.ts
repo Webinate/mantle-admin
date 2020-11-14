@@ -23,7 +23,7 @@ describe('Testing the fetching of volumes: ', function () {
       user: userEntry!._id,
     });
 
-    await uploadFileToVolume('img-a.png', volume._id, 'File', joe);
+    await uploadFileToVolume('img-a.png', volume._id, joe);
   });
 
   after(async () => {

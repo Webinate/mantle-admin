@@ -20,23 +20,23 @@ describe('Testing the deletion of files: ', function () {
     const userEntry = await admin.getUser(joe.username);
     volume = await admin.addVolume({ name: randomName, user: userEntry._id });
 
-    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
-    await uploadFileToVolume('img-b.png', volume._id, 'File B', joe);
-    await uploadFileToVolume('img-c.png', volume._id, 'File C', joe);
-    await uploadFileToVolume('img-c.png', volume._id, 'File D', joe);
+    await uploadFileToVolume('img-a.png', volume._id, joe);
+    await uploadFileToVolume('img-b.png', volume._id, joe);
+    await uploadFileToVolume('img-c.png', volume._id, joe);
+    await uploadFileToVolume('img-c.png', volume._id, joe);
   });
 
   it('can select and delete a single file', async () => {
     await page.load(joe, `/dashboard/media/volume/${volume._id}`);
     await page.doneLoading();
-    await page.mediaModule.selectFile('File A');
+    await page.mediaModule.selectFile('img-a.png');
     await page.mediaModule.clickDeleteFiles();
     await page.mediaModule.confirmModal();
 
     const files = await page.mediaModule.getFiles();
     assert.deepEqual(files.length, 3);
     assert.deepEqual(
-      files.find((f) => f.name === 'File A'),
+      files.find((f) => f.name === 'img-a.png'),
       undefined
     );
   });
@@ -44,7 +44,7 @@ describe('Testing the deletion of files: ', function () {
   it('allows admin to delete a file', async () => {
     await page.load(admin, `/dashboard/media/volume/${volume._id}`);
     await page.doneLoading();
-    await page.mediaModule.selectFile('File B');
+    await page.mediaModule.selectFile('img-b.png');
     await page.mediaModule.clickDeleteFiles();
     await page.mediaModule.confirmModal();
 
@@ -54,7 +54,7 @@ describe('Testing the deletion of files: ', function () {
     const files = await page.mediaModule.getFiles();
     assert.deepEqual(files.length, 2);
     assert.deepEqual(
-      files.find((f) => f.name === 'File B'),
+      files.find((f) => f.name === 'img-b.png'),
       undefined
     );
   });

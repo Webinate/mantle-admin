@@ -20,9 +20,9 @@ describe('Testing the fetching of files & permissions: ', function () {
     const userEntry = await admin.getUser(joe.username);
     volume = await admin.addVolume({ name: 'test', user: userEntry!._id });
 
-    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
-    await uploadFileToVolume('img-b.png', volume._id, 'File B', joe);
-    await uploadFileToVolume('img-c.png', volume._id, 'File C', joe);
+    await uploadFileToVolume('img-a.png', volume._id, joe);
+    await uploadFileToVolume('img-b.png', volume._id, joe);
+    await uploadFileToVolume('img-c.png', volume._id, joe);
   });
 
   after(async () => {

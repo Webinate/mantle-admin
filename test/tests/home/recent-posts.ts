@@ -1,32 +1,29 @@
 import HomePage from '../../pages/home';
 import * as assert from 'assert';
 import {} from 'mocha';
-import { IPost, IUserEntry } from 'mantle/src/types';
+import { Post, User } from 'mantle';
 import Agent from '../../utils/agent';
 import utils from '../../utils';
-import ControllerFactory from 'mantle/src/core/controller-factory';
 import { randomId } from '../../utils/misc';
 import { format } from 'date-fns';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new HomePage();
-let admin: Agent, joe: Agent;
-let publicPost: IPost<'server'>, privatePost: IPost<'server'>;
+let admin: AdminAgent, joe: Agent;
+let publicPost: Post, privatePost: Post;
 
 describe('Recent Posts: ', function () {
-  let joeUser: IUserEntry<'server'>;
-  let adminUser: IUserEntry<'server'>;
+  let joeUser: User;
+  let adminUser: User;
 
   before(async () => {
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
-    admin = await utils.refreshAdminToken();
 
-    const posts = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
-    joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
-    adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
+    joeUser = await admin.getUser(joe.username);
+    adminUser = await admin.getUser(admin.username);
 
-    publicPost = await posts.create({
+    publicPost = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: true,
@@ -34,7 +31,7 @@ describe('Recent Posts: ', function () {
       author: adminUser._id,
     });
 
-    privatePost = await posts.create({
+    privatePost = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: false,
@@ -43,28 +40,27 @@ describe('Recent Posts: ', function () {
     });
 
     // Update so we can check its sorting by modified
-    await posts.update(publicPost._id, { public: true });
+    await admin.patchPost({ _id: publicPost._id, public: true });
   });
 
   after(async () => {
-    const controller = ControllerFactory.get('posts');
-    await controller.removePost(privatePost._id.toString());
-    await controller.removePost(publicPost._id.toString());
+    await admin.removePost(privatePost._id);
+    await admin.removePost(publicPost._id);
   });
 
   it('it should have both public & private posts for admin', async () => {
     await page.load(admin);
     const recent = await page.getRecentPosts();
-    assert.deepEqual(recent[0].author, adminUser.username);
+    assert.deepEqual(recent[0].author, joe.username);
     assert.deepEqual(recent[0].created, format(new Date(), 'MMM do, yyyy')); // Today
-    assert.deepEqual(recent[0].heading, publicPost.title);
-    assert.deepEqual(recent[1].heading, privatePost.title);
+    assert.deepEqual(recent[0].heading, privatePost.title);
+    assert.deepEqual(recent[1].heading, publicPost.title);
+    assert.deepEqual(recent[1].author, admin.username);
   });
 
   it('it should have only public posts for joe', async () => {
     // Update so we can check its sorting by modified
-    const posts = ControllerFactory.get('posts');
-    await posts.update(privatePost._id, { public: false });
+    await admin.patchPost({ _id: privatePost._id, public: false });
     await page.load(joe);
 
     const recent = await page.getRecentPosts();

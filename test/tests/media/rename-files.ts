@@ -21,13 +21,13 @@ describe('Testing the renaming of files: ', function () {
     const userEntry = await admin.getUser(joe.username);
 
     volume = await admin.addVolume({ name: randomName, user: userEntry!._id });
-    await uploadFileToVolume('img-a.png', volume._id, 'File A', joe);
+    await uploadFileToVolume('img-a.png', volume._id, joe);
   });
 
   it('can select and rename a single file', async () => {
     await page.load(joe, `/dashboard/media/volume/${volume._id}`);
     await page.doneLoading();
-    await page.mediaModule.selectFile('File A');
+    await page.mediaModule.selectFile('img-a.png');
     await page.mediaModule.clickRenameFile();
     await page.mediaModule.newName(randomFileName);
     await page.mediaModule.confirmModal();
@@ -41,16 +41,16 @@ describe('Testing the renaming of files: ', function () {
     await page.doneLoading();
     await page.mediaModule.selectFile(randomFileName);
     await page.mediaModule.clickRenameFile();
-    await page.mediaModule.newName('File A');
+    await page.mediaModule.newName('img-a.png');
     await page.mediaModule.confirmModal();
 
     let files = await page.mediaModule.getFiles();
-    assert.deepEqual(files[0].name, 'File A');
+    assert.deepEqual(files[0].name, 'img-a.png');
 
     await page.load(joe, `/dashboard/media/volume/${volume._id}`);
     await page.doneLoading();
 
     files = await page.mediaModule.getFiles();
-    assert.deepEqual(files[0].name, 'File A');
+    assert.deepEqual(files[0].name, 'img-a.png');
   });
 });

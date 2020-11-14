@@ -129,7 +129,7 @@ const Media: React.FC = (props) => {
                   volumeFilters={media.volumeFilters}
                   selectedIds={selectedUids}
                   onDelete={() => onDelete()}
-                  onRename={(newName, id) => dispatch(mediaActions.editVolume(id, { name: newName }))}
+                  onRename={(newName, id) => dispatch(mediaActions.editVolume({ _id: id, name: newName }))}
                   onSort={(sort, dir) => onSort(sort, dir, null)}
                   openVolume={(volume) => dispatch(push(`/dashboard/media/volume/${volume}`))}
                   onSelectionChanged={(volumes) => setSelectedUids(volumes)}

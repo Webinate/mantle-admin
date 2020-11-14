@@ -32,7 +32,7 @@ describe('Testing the copy/paste of image elements: ', function () {
     const userEntry = await admin.getUser(admin.username);
     volume = await admin.addVolume({ name: randomId(), user: userEntry!._id });
 
-    const resp = await uploadFileToVolume('img-a.png', volume, 'File A', admin);
+    const resp = await uploadFileToVolume('img-a.png', volume._id, admin);
     assert.deepEqual(resp.status, 200);
 
     const uploads = await admin.getFiles({ volumeId: volume._id });

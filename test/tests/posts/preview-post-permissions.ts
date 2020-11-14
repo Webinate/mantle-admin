@@ -4,78 +4,66 @@ import utils from '../../utils';
 import {} from 'mocha';
 import Agent from '../../utils/agent';
 import { randomId } from '../../utils/misc';
-import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost } from 'mantle/src/types';
+import { Post } from 'mantle';
 import { ElementType } from '../../../../../src/core/enums';
+import AdminAgent from '../../utils/admin-agent';
 
 let postPage = new PostsPage();
-let admin: Agent, joe: Agent;
-let publicPost: IPost<'server'>, multiZonePost: IPost<'server'>, privatePost: IPost<'server'>;
+let admin: AdminAgent, joe: Agent;
+let publicPost: Post, multiZonePost: Post, privatePost: Post;
 
 describe('Preview posts available to regular users: ', function () {
   before(async () => {
-    const controller = ControllerFactory.get('posts');
-    const docs = ControllerFactory.get('documents');
-    const templateCtrl = ControllerFactory.get('templates');
-
-    const users = ControllerFactory.get('users');
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    const adminUser = await users.getUser({ username: admin.username });
-    const templatePage = await templateCtrl.getMany();
+    const adminUser = await admin.getUser(admin.username);
+    const templatePage = await admin.getTemplates();
 
-    publicPost = await controller.create({
+    publicPost = await admin.addPost({
       title: 'Test Public Post',
       author: adminUser!._id,
       slug: randomId(),
       public: true,
     });
 
-    multiZonePost = await controller.create({
+    multiZonePost = await admin.addPost({
       title: 'Test Public Post',
       author: adminUser!._id,
       slug: randomId(),
       public: true,
     });
 
-    privatePost = await controller.create({
+    privatePost = await admin.addPost({
       title: 'Test Private Post',
       author: adminUser!._id,
       slug: randomId(),
       public: false,
     });
 
-    const publicPostDocElements = await docs.getElements(publicPost.document);
-
     // Add an element to the public post#
-    await docs.updateElement(
-      { docId: publicPost.document },
+    await admin.updateElement(
       {
-        _id: publicPostDocElements[0]._id,
+        _id: publicPost.document.elements![0]._id,
         html: "This is a post's <b>content</b>",
-      }
+      },
+      publicPost.document._id
     );
-    await docs.changeTemplate({ docId: multiZonePost.document }, templatePage.data[1]._id);
-    await docs.addElement(
-      { docId: multiZonePost.document },
-      { zone: 'left', html: 'Left', type: ElementType.paragraph }
-    );
-    await docs.addElement(
-      { docId: multiZonePost.document },
-      { zone: 'right', html: 'Right', type: ElementType.paragraph }
-    );
+    await admin.changeTemplate(templatePage.data[1]._id, multiZonePost.document._id);
+    await admin.addElement({ zone: 'left', html: 'Left', type: ElementType.paragraph }, multiZonePost.document._id);
+    await admin.addElement({ zone: 'right', html: 'Right', type: ElementType.paragraph }, multiZonePost.document._id);
 
     // Publish the posts so we can see them in preview
-    await controller.update(publicPost._id, { public: true });
-    await controller.update(multiZonePost._id, { public: true });
+    let patchResp = await admin.patchPost({ _id: publicPost._id, public: true });
+    assert.ok(patchResp);
+    patchResp = await admin.patchPost({ _id: multiZonePost._id, public: true });
+    assert.ok(patchResp);
   });
 
   after(async () => {
-    const controller = ControllerFactory.get('posts');
-    await controller.removePost(publicPost._id.toString());
-    await controller.removePost(multiZonePost._id.toString());
-    await controller.removePost(privatePost._id.toString());
+    await admin.removePost(publicPost._id);
+    await admin.removePost(multiZonePost._id);
+    await admin.removePost(privatePost._id);
   });
 
   it('does not let regular jump to private post url', async () => {
@@ -110,7 +98,7 @@ describe('Preview posts available to regular users: ', function () {
     assert.deepEqual(previewDetails.author, admin.username);
     assert.deepEqual(previewDetails.title, 'Test Public Post');
     assert.deepEqual(previewDetails.zones.length, 2);
-    assert.deepEqual(previewDetails.contents[0], 'Left');
-    assert.deepEqual(previewDetails.contents[1], 'Right');
+    assert.deepEqual(previewDetails.contents[0], '<p>Left</p>');
+    assert.deepEqual(previewDetails.contents[1], '<p>Right</p>');
   });
 });

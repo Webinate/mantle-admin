@@ -212,7 +212,7 @@ class Actions {
 
   @disptachable()
   @dispatchError(AppActions.serverResponse)
-  async editVolume(id: string, token: Partial<UpdateVolumeInput>, dispatch?: Function, getState?: () => IRootState) {
+  async editVolume(token: Partial<UpdateVolumeInput>, dispatch?: Function, getState?: () => IRootState) {
     dispatch!(ActionCreators.SetVolumesBusy.create(true));
     await graphql<{ updateVolume: Volume }>(PATCH_VOLUME, { token: token });
     // await volumes.update(id, token);

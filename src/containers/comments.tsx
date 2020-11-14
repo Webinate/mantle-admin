@@ -155,7 +155,9 @@ const Comments: React.FC = () => {
                     setSelectedPostUid(null);
                   }
                 }}
-                getAll={(options) => dispatch(commentActions.getComments(options))}
+                getAll={(options) => {
+                  if (app.appHasHistory) dispatch(commentActions.getComments(options));
+                }}
                 onEdit={(token) => dispatch(commentActions.editComment(token))}
                 onReply={(post, parent, comment) => dispatch(commentActions.createComment(comment, parent))}
                 onDelete={(id) => dispatch(commentActions.deleteComment(id))}

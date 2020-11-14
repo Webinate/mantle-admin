@@ -4,78 +4,64 @@ import utils from 'mantle/clients/mantle-admin/test/utils';
 import {} from 'mocha';
 import Agent from 'mantle/clients/mantle-admin/test/utils/agent';
 import { randomId } from 'mantle/clients/mantle-admin/test/utils/misc';
-import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost, IComment, IUserEntry } from 'mantle/src/types';
+import { Post, Comment, User } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let commentPage = new CommentsPage();
-let admin: Agent, joe: Agent;
-let post1: IPost<'server'>;
-let post2: IPost<'server'>;
-let rootComment: IComment<'server'>, otherRootComment: IComment<'server'>;
+let admin: AdminAgent, joe: Agent;
+let post1: Post;
+let post2: Post;
+let rootComment: Comment, otherRootComment: Comment;
 
 describe('View comment posts: ', function () {
-  let joeUser: IUserEntry<'server'>;
-  let adminUser: IUserEntry<'server'>;
+  let joeUser: User;
+  let adminUser: User;
 
   before(async () => {
-    const controller = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
-    const comments = ControllerFactory.get('comments');
-    const docs = ControllerFactory.get('documents');
-
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
+    joeUser = await admin.getUser(joe.username);
+    adminUser = await admin.getUser(admin.username);
 
-    joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
-    adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
-
-    post1 = await controller.create({
+    post1 = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: true,
       author: joeUser._id,
     });
 
-    post2 = await controller.create({
+    post2 = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: false,
       author: adminUser._id,
     });
 
-    const post1Doc = await ControllerFactory.get('documents').get({ docId: post1._id });
-    const post2Doc = await ControllerFactory.get('documents').get({ docId: post1._id });
+    admin.updateElement({ _id: post1.document.elements![0]._id, html: '<p>This is post 1</p>' }, post1.document._id);
+    admin.updateElement({ _id: post2.document.elements![0]._id, html: '<p>This is post 2</p>' }, post2.document._id);
 
-    docs.updateElement({ docId: post1.document }, { _id: post1Doc!.elements[0], html: '<p>This is post 1</p>' });
-    docs.updateElement({ docId: post2.document }, { _id: post2Doc!.elements[0], html: '<p>This is post 2</p>' });
-
-    rootComment = await comments.create({
-      author: joeUser.username as string,
+    rootComment = await admin.addComment({
       user: joeUser._id,
       post: post1._id,
       content: randomId(),
     });
 
-    otherRootComment = await comments.create({
-      author: joeUser.username as string,
+    otherRootComment = await admin.addComment({
       user: joeUser._id,
       post: post2._id,
       content: randomId(),
     });
 
     // Publish post
-    await controller.update(post1._id, { public: true });
-    const resp = await controller.update(post2._id, { public: true });
+    await admin.patchPost({ _id: post1._id, public: true });
+    const resp = await admin.patchPost({ _id: post2._id, public: true });
     resp;
   });
 
   after(async () => {
-    const posts = ControllerFactory.get('posts');
-    const comments = ControllerFactory.get('comments');
-
-    await comments.remove(rootComment._id);
-    await comments.remove(otherRootComment._id);
-    await posts.removePost(post1._id.toString());
+    await admin.removeComment(rootComment._id);
+    await admin.removeComment(otherRootComment._id);
+    await admin.removePost(post1._id);
   });
 
   it('can view the post preview', async () => {

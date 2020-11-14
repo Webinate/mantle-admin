@@ -4,53 +4,45 @@ import utils from '../../../test/utils';
 import {} from 'mocha';
 import Agent from '../../../test/utils/agent';
 import { randomId } from '../../../test/utils/misc';
-import ControllerFactory from 'mantle/src/core/controller-factory';
-import { IPost, IComment, IUserEntry } from 'mantle/src/types';
+import { Post, Comment } from 'mantle';
+import AdminAgent from '../../utils/admin-agent';
 
 let commentPage = new CommentsPage();
-let admin: Agent, joe: Agent;
-let post: IPost<'server'>;
-let joesComment: IComment<'server'>, joesOtherComment: IComment<'server'>, joesParentComment: IComment<'server'>;
+let admin: AdminAgent, joe: Agent;
+let post: Post;
+let joesComment: Comment, joesOtherComment: Comment, joesParentComment: Comment;
 
 describe('Test the deletion of comments:', function () {
   before(async () => {
-    const controller = ControllerFactory.get('posts');
-    const users = ControllerFactory.get('users');
-    const comments = ControllerFactory.get('comments');
-
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    const joeUser = (await users.getUser({ username: joe.username })) as IUserEntry<'server'>;
-    const adminUser = (await users.getUser({ username: admin.username })) as IUserEntry<'server'>;
+    const joeUser = await admin.getUser(joe.username);
+    const adminUser = await admin.getUser(admin.username);
 
-    post = await controller.create({
+    post = await admin.addPost({
       title: randomId(),
       slug: randomId(),
       public: true,
       author: joeUser._id,
     });
 
-    joesComment = await comments.create({
-      author: joeUser.username as string,
+    joesComment = await admin.addComment({
       user: joeUser._id,
       post: post._id,
       content: randomId(),
     });
-    joesOtherComment = await comments.create({
-      author: joeUser.username as string,
+    joesOtherComment = await admin.addComment({
       user: joeUser._id,
       post: post._id,
       content: randomId(),
     });
-    joesParentComment = await comments.create({
-      author: joeUser.username as string,
+    joesParentComment = await admin.addComment({
       user: joeUser._id,
       post: post._id,
       content: randomId(),
     });
-    await comments.create({
-      author: adminUser.username as string,
+    await admin.addComment({
       user: adminUser._id,
       post: post._id,
       content: randomId(),
@@ -60,8 +52,7 @@ describe('Test the deletion of comments:', function () {
   });
 
   after(async () => {
-    const posts = ControllerFactory.get('posts');
-    await posts.removePost(post._id.toString());
+    await admin.removePost(post._id);
   });
 
   it('allows regular users to delete their own comment', async () => {

@@ -4,23 +4,20 @@ import utils from '../../utils';
 import {} from 'mocha';
 import { randomId } from '../../utils/misc';
 import Agent from '../../utils/agent';
-import ControllerFactory from 'mantle/src/core/controller-factory';
+import AdminAgent from '../../utils/admin-agent';
 
 let page = new MediaPage();
-let admin: Agent, joe: Agent;
+let admin: AdminAgent, joe: Agent;
 const randomName = randomId();
 const newRandomName = randomId();
 
 describe('Testing the renaming of a volume: ', function () {
   before(async () => {
-    const volumes = ControllerFactory.get('volumes');
-    const users = ControllerFactory.get('users');
-
     admin = await utils.refreshAdminToken();
     joe = await utils.createAgent('Joe', 'joe222@test.com', 'password');
 
-    const userEntry = await users.getUser({ username: joe.username });
-    await volumes.create({ name: randomName, user: userEntry!._id });
+    const userEntry = await admin.getUser(joe.username);
+    await admin.addVolume({ name: randomName, user: userEntry!._id });
   });
 
   it('does allow a user to rename a volume', async () => {
