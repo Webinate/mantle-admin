@@ -1,137 +1,130 @@
-const gulp = require( 'gulp' );
-const sass = require( 'gulp-sass' );
-const tslint = require( 'gulp-tslint' );
-const webpack = require( 'webpack' );
-const ts = require( "gulp-typescript" );
-const tsProject = ts.createProject( 'tsconfig.json' );
-const fs = require( 'fs' );
-const spawn = require( 'child_process' );
-const webfontsGenerator = require( 'webfonts-generator' );
+const gulp = require('gulp');
+const tslint = require('gulp-tslint');
+const webpack = require('webpack');
+const ts = require('gulp-typescript');
+const tsProject = ts.createProject('tsconfig.json');
+const fs = require('fs');
+const spawn = require('child_process');
+const webfontsGenerator = require('webfonts-generator');
 
 /**
  * Moves the static files to dist
  */
 function buildStatics() {
-  return gulp.src( './src/static/**/*' )
-    .pipe( gulp.dest( './dist/client/' ) );
-};
+  return gulp.src('./src/static/**/*').pipe(gulp.dest('./dist/client/'));
+}
 
 /**
  * Generates the font icons from svgs
  */
-function generateFonts( callback ) {
+function generateFonts(callback) {
   const files = [];
-  fs.readdirSync( './fonts' ).forEach( file => {
-    files.push( './fonts/' + file );
-  } )
+  fs.readdirSync('./fonts').forEach((file) => {
+    files.push('./fonts/' + file);
+  });
 
-  webfontsGenerator( {
-    fontName: 'mantle',
-    cssFontsUrl: '../fonts/',
-    formatOptions: {
-      svg: {
-        normalize: true,
-        centerHorizontally: true,
-        round: 2000000
-      }
+  webfontsGenerator(
+    {
+      fontName: 'mantle',
+      cssFontsUrl: '../fonts/',
+      formatOptions: {
+        svg: {
+          normalize: true,
+          centerHorizontally: true,
+          round: 2000000,
+        },
+      },
+      css: true,
+      cssDest: './dist/client/css/mantle.css',
+      html: false,
+      types: ['eot', 'ttf', 'woff', 'woff2', 'svg'],
+      order: ['eot', 'ttf', 'woff', 'woff2', 'svg'],
+      files: files,
+      dest: './dist/client/fonts/',
     },
-    css: true,
-    cssDest: './dist/client/css/mantle.css',
-    html: false,
-    types: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
-    order: [ 'eot', 'ttf', 'woff', 'woff2', 'svg' ],
-    files: files,
-    dest: './dist/client/fonts/',
-  }, function( error ) {
-    if ( error ) {
-      console.log( 'Font generation fail!', error );
-      callback( error )
-    } else {
-      console.log( 'Generated Fonts...' );
-      callback();
+    function (error) {
+      if (error) {
+        console.log('Font generation fail!', error);
+        callback(error);
+      } else {
+        console.log('Generated Fonts...');
+        callback();
+      }
     }
-  } );
+  );
 }
 
 /**
  * Builds the client TS code
  */
-function buildClient( callback ) {
-  webpack( require( './webpack.config.js' ), function( err, stats ) {
-
-    if ( stats.hasWarnings() ) {
+function buildClient(callback) {
+  webpack(require('./webpack.config.js'), function (err, stats) {
+    if (stats?.hasWarnings()) {
       const info = stats.toJson();
-      console.warn( info.warnings );
+      console.warn(info.warnings);
     }
 
-    if ( err || stats.hasErrors() ) {
+    if (stats?.hasErrors()) {
       const info = stats.toJson();
       throw info.errors;
     }
 
-    if ( err )
-      throw err;
+    if (err) throw err;
 
     callback();
-  } );
+  });
 }
 
 /**
  * Starts a child process that runs the mantle server
  */
 function runServer() {
-  let prc = spawn.spawn( 'node', [ "./dist/main.js", "--config=./config.json", "--numThreads=1", "--logging=true" ], { cwd: '../../' } );
-  prc.stdout.setEncoding( 'utf8' );
-  prc.stderr.setEncoding( 'utf8' );
-  prc.stdout.on( 'data', function( data ) {
+  let prc = spawn.spawn('node', ['./dist/main.js', '--config=./config.json', '--numThreads=1', '--logging=true'], {
+    cwd: '../../',
+  });
+  prc.stdout.setEncoding('utf8');
+  prc.stderr.setEncoding('utf8');
+  prc.stdout.on('data', function (data) {
     var str = data.toString();
-    console.log( str );
-  } );
+    console.log(str);
+  });
 
-  prc.stderr.on( 'data', function( data ) {
+  prc.stderr.on('data', function (data) {
     var str = data.toString();
-    console.error( str );
-  } );
+    console.error(str);
+  });
 
-  prc.on( 'close', function( code ) {
-    console.error( 'Server closed prematurely' );
-  } );
+  prc.on('close', function (code) {
+    console.error('Server closed prematurely');
+  });
 
   return prc;
 }
 
-/**
- * Builds any sass files
- */
-function buildSass() {
-  return gulp.src( './src/main.scss' )
-    .pipe( sass().on( 'error', sass.logError ) )
-    .pipe( gulp.dest( './dist/client/css' ) );
-}
-
 function copyTinyFiles() {
-  return gulp.src( [
-    './node_modules/tinymce/**/*'
-  ] )
-    .pipe( gulp.dest( './dist/client/tiny' ) )
+  return gulp.src(['./node_modules/tinymce/**/*']).pipe(gulp.dest('./dist/client/tiny'));
 }
 
 /**
  * Notifies of any lint errors
  */
 function lint() {
-  return gulp.src( [ './src/**/*.ts', './src/**/*.tsx' ] )
-    .pipe( tslint( {
-      configuration: 'tslint.json',
-      formatter: 'verbose'
-    } ) )
-    .pipe( tslint.report( {
-      emitError: true
-    } ) )
-    .on( 'error', function( error ) {
-      if ( error )
-        throwerror;
-    } );
+  return gulp
+    .src(['./src/**/*.ts', './src/**/*.tsx'])
+    .pipe(
+      tslint({
+        configuration: 'tslint.json',
+        formatter: 'verbose',
+      })
+    )
+    .pipe(
+      tslint.report({
+        emitError: true,
+      })
+    )
+    .on('error', function (error) {
+      if (error) throwerror;
+    });
 }
 
 /**
@@ -139,23 +132,27 @@ function lint() {
  */
 function quickCheck() {
   let didError = false;
-  const tsResult = tsProject.src()
-    .pipe( tsProject() )
-    .on( 'error', function( error ) {
+  const tsResult = tsProject
+    .src()
+    .pipe(tsProject())
+    .on('error', function (error) {
       didError = true;
-    } );
+    });
 
-  return tsResult.js.pipe( gulp.dest( './dist/server' ) )
-    .on( 'end', function() {
-      if ( didError )
-        throw new Error( 'There were build errors' );
-    } );
+  return tsResult.js.pipe(gulp.dest('./dist/server')).on('end', function () {
+    if (didError) throw new Error('There were build errors');
+  });
 }
 
-
-gulp.task( 'build', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
-gulp.task( 'build-prod', gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) );
-gulp.task( 'default', gulp.series( quickCheck, gulp.parallel( generateFonts, buildClient, lint, buildSass, buildStatics, copyTinyFiles ) ) );
-gulp.task( 'tiny-files', copyTinyFiles );
-gulp.task( 'fonts', generateFonts );
-gulp.task( 'statics', buildStatics );
+gulp.task(
+  'build',
+  gulp.series(quickCheck, gulp.parallel(generateFonts, buildClient, lint, buildStatics, copyTinyFiles))
+);
+gulp.task('build-prod', gulp.parallel(generateFonts, buildClient, lint, buildStatics, copyTinyFiles));
+gulp.task(
+  'default',
+  gulp.series(quickCheck, gulp.parallel(generateFonts, buildClient, lint, buildStatics, copyTinyFiles))
+);
+gulp.task('tiny-files', copyTinyFiles);
+gulp.task('fonts', generateFonts);
+gulp.task('statics', buildStatics);

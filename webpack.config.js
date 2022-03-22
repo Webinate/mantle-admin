@@ -42,8 +42,7 @@ module.exports = {
   },
   plugins: plugins,
   optimization: {
-    namedModules: true,
-    noEmitOnErrors: true,
+    emitOnErrors: false,
     concatenateModules: true,
   },
   module: {

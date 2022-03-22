@@ -62,7 +62,6 @@
     "draft-js": "~0.10.5",
     "express": "4.15.3",
     "graphql-tag": "^2.11.0",
-    "gulp-sass": "~3.1.0",
     "gulp-tslint": "8.1.4",
     "gulp-typescript": "6.0.0-alpha.1",
     "history": "~4.6.3",
@@ -89,6 +88,6 @@
     "typescript-plugin-styled-components": "^1.4.4",
     "uglifyjs-webpack-plugin": "~1.2.7",
     "webfonts-generator": "0.4.0",
-    "webpack": "4.43.0"
+    "webpack": "5.70.0"
   }
 }
